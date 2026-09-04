@@ -55,6 +55,12 @@ export default function Home() {
           </aside>
         </section>
 
+        <section className="page-section note-card">
+          <h2>Decisions recorded · 4 September</h2>
+          <p>Stone starter tools, simpler first crafts, Village progression, exploration, recipe tracking, colour, and the Peerless proposal. Current behavior and future changes are clearly separated.</p>
+          <p><Link href="/references/design-decisions-september-4">Read the decisions</Link> · <Link href="/references/aimee-homework">Aimee Homework</Link></p>
+        </section>
+
         <section className="page-section journey-section" aria-labelledby="journey-heading">
           <div className="section-heading"><div><p className="eyebrow">The first journey</p><h2 id="journey-heading">Prepare, write, and step through</h2></div><Link href="/getting-started">Read the full first-trip guide</Link></div>
           <div className="journey-strip">

@@ -1,3 +1,4 @@
+import { SeptemberDecisions } from '@/components/september-decisions';
 import Link from '@/components/wiki-link';
 import { GuideBreadcrumbs, RelatedGuides } from '@/components/guide-navigation';
 import { PageIntro } from '@/components/page-intro';
@@ -28,6 +29,7 @@ export default function JourneyGuide() {
         title="Your current journey"
         summary="Use this guide to connect the systems that are available now: prepare in the Village, write and Bind a world, explore it, return with what you recovered, then choose the next current build, service, recipe, or Research node."
       />
+    <SeptemberDecisions topic="progression" />
       <section className="article-section">
         <h2>The journey that is available now</h2>
         <ol className="numbered-guide">

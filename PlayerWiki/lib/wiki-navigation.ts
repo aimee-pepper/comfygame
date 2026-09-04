@@ -87,6 +87,6 @@ export const wikiNavigationSections: WikiNavigationSection[] = [
   },
   {
     label: 'Aimee Reference',
-    links: [{ href: '/references', label: 'Plans and production references' }],
+    links: [{ href: '/references', label: 'Plans and production references' }, { href: '/references/design-decisions-september-4', label: '4 September decisions' }, { href: '/references/aimee-homework', label: 'Aimee Homework' }, { href: '/references/asset-homework', label: 'Asset Homework' }],
   },
 ];

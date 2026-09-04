@@ -290,8 +290,8 @@ export function consumableEffect(item: Item) {
     case 'coatDazzle': return 'Prepare a dazzling coating';
     case 'identifyCurio': return 'Identify one carried curio';
     case 'lureCreature': return 'Draw the nearest creature';
-    case 'maskScent': return 'Mask scent';
-    case 'seamlightGuidance': return 'Light Seamlight';
+    case 'maskScent': return 'Scent masking — Field Kit use unverified';
+    case 'seamlightGuidance': return 'Portal guidance — Field Kit use unverified; does not create light';
     case 'restoreStability': return 'Restore Stability';
     case 'returnHome': return 'Return home with the haul';
     case 'lightWorld': return 'Raise the party’s vision';

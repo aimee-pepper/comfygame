@@ -1,5 +1,15 @@
 # Bookbinder Agent Instructions
 
+## Public Wiki Source of Truth — Direct Aimee Instruction
+
+- Keep the public [Bookbinder Player Wiki](https://aimee-pepper.github.io/comfygame/) up to date as the source of truth for the game. For every feature, its relevant page must explain both **how it works now** and **its decided intended behavior**, clearly separated so planned changes never appear already playable.
+- Record newly settled decisions promptly, then update current behavior when the corresponding implementation is delivered and verified. Keep current behavior visible while an intended change is pending. Do not wait for implementation to document an accepted design decision.
+- Use clear, friendly, player-facing language: explain what the player sees, does, needs, and receives. Keep internal IDs, code paths, commit hashes, implementation jargon, and team coordination details out of player explanations; keep technical evidence in development records.
+- Distinguish decided intended behavior from proposals, open questions, and first-pass tuning. When a decision changes, reconcile affected feature pages, summaries, tables, and links so obsolete statements do not remain competing truth. Preserve the Aimee Reference section for plans and authoring references.
+- Verify claims about current behavior against the relevant delivered implementation. When evidence is missing or contradictory, state the uncertainty honestly and resolve it; source code or a design document alone does not prove a feature is playable.
+- Each lead owns keeping the Wiki accurate for their decisions and deliveries; PM coordinates cross-feature consistency. Local documents and handoffs must align with the latest decisions and must not silently override the public record. Aimee's newer direct instructions take precedence and must be reflected in the Wiki.
+
+
 ## Delivery Over Activity — Direct Aimee Override
 
 The objective is a finished, playable game. Never optimize for visible activity, agent utilization, audit
@@ -20,7 +30,7 @@ volume, document volume, evaluator construction, or the appearance of progress.
   test that proves the behavior.
 - Source inspection and unit tests do not substitute for playing the implemented flow. Every player-visible
   or progression-critical correction requires a bounded mounted playtest through the real native consumer at
-  368×800/default text.
+  the actual target iPhone native viewport with default text.
 - Do not describe source work, a dirty checkout, a test plan, or an audit packet as delivered implementation.
   Report implementation progress only with an exact durable commit.
 - If coordination or task messaging fails twice, stop assigning unrelated work and report the blocker
@@ -56,7 +66,7 @@ lane until a corrected build is on her phone.
 1. Split the blocker into the smallest independently committable gameplay corrections.
 2. Implement and checkpoint each correction on persistent storage.
 3. Run focused automated tests proportional to the risk.
-4. Play the corrected path through the real mounted app at 368×800/default text.
+4. Play the corrected path through the real mounted app at the actual target iPhone native viewport with default text.
 5. Fix failures found by play rather than replacing play with more evaluators.
 6. Produce one clean cumulative candidate with exact provenance.
 7. Install that candidate on Aimee's phone promptly. A longer milestone playthrough continues afterward and
@@ -106,15 +116,24 @@ The three leads are builders. Their default work is creating the game, not evalu
 
 ## Fixed UI Configuration — Direct Aimee Override
 
-Bookbinder is designed, implemented, reviewed, and tested for one fixed UI configuration only: native
-368×800 at the standard/default text setting, unless Aimee explicitly replaces that target.
+Aimee clarified on 4 September 2026: use the actual target iPhone screen dimensions at the standard/default text setting. The inherited 368×800 number is not a separate product requirement. Record the actual device and native viewport used for each visual acceptance receipt; do not assume 300×800 or 368×800. All exclusions below remain in force.
 
 - Do not perform, assign, queue, recommend, or require accessibility-specific work.
-- Do not implement or audit Dynamic Type variants, accessibility or XXL text sizes, adaptive layouts for
-  alternate size categories, VoiceOver behavior, Reduce Motion behavior, or multi-configuration UI matrices.
-- Do not run light/dark, text-size, device-size, orientation, or other configuration matrices unless Aimee
-  explicitly names those configurations for the specific task.
+- Do not implement or audit Dynamic Type variants, accessibility or XXL text sizes, adaptive layouts for alternate size categories, VoiceOver behavior, Reduce Motion behavior, or multi-configuration UI matrices.
+- Do not run light/dark, text-size, device-size, orientation, or other configuration matrices unless Aimee explicitly names those configurations for the specific task. If an appearance is not specified, use only the current installed or phone-visible ordinary configuration; do not test both appearances by default.
+- Evaluate visual defects and acceptance only at the fixed target. Do not infer work from failures that exist solely in excluded configurations.
+- Prior accessibility commits, branches, audits, screenshots, PASS/HOLD dispositions, and test artifacts are closed historical evidence only. Do not queue, review, merge, integrate, install, or use them as implementation parents.
+- If any delegation, document, roadmap entry, test name, or prior instruction conflicts with this override, treat the conflicting direction as invalid, stop that work, and report the conflict.
 - Do not broaden this fixed target without a new direct instruction from Aimee.
+
+
+## Asset Work Continuity — Direct Aimee Override
+
+- The font chooser is Asset's first priority only until its bounded fixed-configuration regression proves it functionally complete. Pending Aimee visual acceptance does not monopolize Asset and must not leave Asset idle.
+- After a functional Asset milestone is preserved for Aimee's later review, move Asset immediately to another exact implemented, phone-visible consumer.
+- Before assigning Asset work, name the exact native screen/file or stable content ID, the current visible deficiency, the exact output dimensions and format, and the actual-target-iPhone/default-text phone acceptance route.
+- Asset may own literal artwork, typography, layout/composition, color/opacity, and motion for a new feature only after Engineering implements and names the exact native consumer and its state/event protocol. Until then, hold that speculative asset family and use another implemented visible gap.
+- For Lantern and Light Inscription specifically, Asset will own the literal preceding activation animation and visible Lantern/Light states after Engineering supplies the named native consumer. Asset owns duration, easing, composition, dimensions, and final format; presentation must never imply illumination before the rules-owned activation completion.
 
 ## Generated Final-Art Provenance — Direct Aimee Override
 

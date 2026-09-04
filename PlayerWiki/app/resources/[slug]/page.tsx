@@ -1,3 +1,4 @@
+import { SeptemberDecisions } from '@/components/september-decisions';
 import type { Metadata } from 'next';
 import Link from '@/components/wiki-link';
 import { notFound } from 'next/navigation';
@@ -62,8 +63,8 @@ export default async function ResourceDetail({
           eyebrow={resource.tradeStatus}
           title={resource.name}
           summary={resource.summary}
-        />
-      </div>
+        /></div>
+    <SeptemberDecisions topic="progression" />
       <section className="article-section">
         <h2>How it works now and how it will change</h2>
         <TruthPair current={`${resource.name} currently follows the acquisition, storage, trade, and recipe rules described on this page.`} accepted={futureResourceCopy(resource.name)} />

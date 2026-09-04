@@ -1,5 +1,7 @@
 # Resource, Crafting, Creature, and World Implementation Roadmap V1
 
+> **Updated 4 September 2026 — decided intended behavior, not current phone behavior.** Costs, recipes, upgrades, and character order are revisable first-pass tuning. Starter tools are stone; basic Blacksmith gear and first Pick/Axe improvements use raw materials; basic healing no longer needs Quartz. Ingot making at T2 and the new Peerless refinement route remain proposals. Recipe tracking highlights relevant sources as soon as normally visible, without prior inspection or tool readiness. See **Design Decisions · 4 September** in Aimee Reference for the complete current/intended comparison and the exact early recipes. These changes supersede older cost/order freezes and the old Peerless chance and twentieth-copy rule.
+
 Status: ordered Game Design roadmap. This roadmap does not dispatch Engineering and does not authorize unresolved mechanics.
 
 ## Delivery principle
@@ -68,7 +70,7 @@ Closed by Aimee's resource/world decisions:
 5. 12×12, 15×15, 18×18, 26×26, and 36×36 world sizes.
 6. Exact opening-kit Rock Pick, Axe, and Scythe ownership; three tool tiers; first material groups; harvest timing; and persistent packed-tool preference.
 7. Processed-material ownership across Recycler, Blacksmith, Tannery, Bowyer, Scriptorium, Apothecary, and Deep Works.
-8. Baseline-plus-source material arithmetic, identity-bearing multi-input crafted quality, and schematic-scoped maximum-facility Peerless chance/staffing rule.
+8. Baseline-plus-source material arithmetic and identity-bearing multi-input crafted quality. Peerless refinement is reopened design; its old chance and twentieth-copy rules are not ready to implement.
 9. Ground, liquid, base-resource, and ecological-material requests use their distinct guarantee or pressure rules and disclose known tool access before Binding.
 10. Flora materials remain ungraded by default.
 11. Exact source-lot selection appears only when it changes output, and ambiguous old stock remains Legacy stock rather than receiving invented provenance.
@@ -187,7 +189,7 @@ Encounter and inspect one naturally generated member of each accepted body-plan/
 
 ### Build
 
-- Exact owned Rock Pick, basic Axe, and basic Scythe in a dedicated opening tool roll; selection includes only tools packed with the active party, and the three required classes never consume ordinary supply capacity.
+- Exact owned stone Pick, stone Axe, and stone Scythe in a dedicated opening tool roll; selection includes only tools packed with the active party, and the three required classes never consume ordinary supply capacity.
 - Tool-tier requirements on resource nodes, tree trunks, ordinary plants, and dangerous harvestable flora.
 - Field controls: movement-centre hold for quick-use items, Interact hold for field-tool selection, Interact for eligible underfoot harvesting, and a direction into an adjacent blocking harvest target for the selected tool.
 - Tree canopy/trunk placement and under-canopy presentation.
@@ -358,13 +360,13 @@ The order within a facility may follow its first reachable consumers, but owners
 - Deterministic multi-input result-quality calculation.
 - Rough/Fine/Superior/Exceptional crafted names, with every ungraded designated socket contributing the fixed Fine rank-1 baseline.
 - Peerless alpha-drop route.
-- Apply the accepted maximum-facility all-high-quality Peerless chance, matching-specialist modifier, and twentieth-craft protection per schematic at one facility with visible progress.
+- **Unsettled proposal, updated 4 September:** refine an existing eligible piece toward Peerless. One Mote, a maximum-level shop, and its attending matching keeper would together guarantee success; one or two advantages would still offer a disclosed chance. Partial odds, Mote spending on a miss, preview behavior, and old bad-luck progress remain open. The former 3%/5% chance and twentieth-copy guarantee are reopened, not an additional settled rule. Peerless remains finished equipment only and never an ordinary progression requirement.
 
 ### Prohibited
 
 - Durability, brittleness, wear, repair, or breakage.
 - Vague material adjectives with no implemented statistic.
-- Hidden output rolls not shown by an accepted preview rule, except the explicitly approved Peerless chance.
+- Hidden output rolls not shown by an accepted preview rule. The new Peerless preview and chance rules must be settled together before implementation.
 
 ### Focused gates
 

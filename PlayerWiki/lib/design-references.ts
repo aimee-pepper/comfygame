@@ -1,3 +1,5 @@
+import currentDecisions from '../../docs/player-wiki-design-decisions-current.md?raw';
+import aimeeHomework from '../../docs/aimee-homework-current.md?raw';
 import cohesivePlan from '../../docs/resource-crafting-world-ecology-cohesive-plan-v1.md?raw';
 import overhaulPlan from '../../docs/resource-crafting-world-overhaul-structure-v1.md?raw';
 import implementationRoadmap from '../../docs/resource-crafting-world-implementation-roadmap-v1.md?raw';
@@ -39,6 +41,23 @@ const characterLinks: DesignReferenceLink[] = [
 ];
 
 export const designReferences: DesignReference[] = [
+  {
+    slug: 'design-decisions-september-4',
+    title: 'Design Decisions · 4 September',
+    summary: 'Current behavior, decided intended behavior, first-pass tuning, and unsettled proposals: stone tools, raw-material crafting, early buildings, recipe tracking, exploration, colour, and Peerless refinement.',
+    source: currentDecisions,
+    systemLinks: [{ href: '/references/aimee-homework', title: 'Aimee Homework', summary: 'The Mote-spending choice and optional artwork.' }, ...systemLinks],
+  },
+  {
+    slug: 'aimee-homework',
+    title: 'Aimee Homework',
+    summary: 'One open choice about spending a Mote on a missed refinement attempt, plus links to optional artwork. Early crafting work can continue.',
+    source: aimeeHomework,
+    systemLinks: [
+      { href: '/references/design-decisions-september-4', title: 'Today’s design decisions', summary: 'What is current, decided, provisional, and still open.' },
+      { href: '/references/asset-homework', title: 'Asset Homework', summary: 'Sky and cloud studies, Library books, and export briefs.' },
+    ],
+  },
   {
     slug: 'character-background-and-voice',
     title: 'Character Background and Voice Guide',
