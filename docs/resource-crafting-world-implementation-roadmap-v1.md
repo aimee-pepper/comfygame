@@ -77,6 +77,8 @@ Closed by Aimee's resource/world decisions:
 14. Ordinary buy → process/craft → sell loops cannot return the full purchased input cost; authored commissions are the only explicit exception.
 15. Opening Pick, Axe, and Scythe use a dedicated three-place tool roll and do not consume ordinary item or Field Kit capacity.
 16. Incompatible conditions resolve by approved transformation, then total pressure support, then a frozen stable tie-break; the pre-Bind preview discloses any direct request that becomes influence instead of a guarantee.
+17. The intended Waystone recipe uses 1 Obsidian, 1 Rift-glass, 1 Mote, and 12 Essence. Obsidian is the hard
+    body; Rift-glass remains the boundary-crossing element.
 
 Still to author in later Game Design passes:
 
@@ -100,7 +102,10 @@ Still to author in later Game Design passes:
 
 ### Exit gate
 
-No structural implementation starts until all decisions needed by its first vertical slice are closed. Decisions for unrelated later slices remain visibly pending without being mislabelled as Aimee decisions.
+All Aimee product decisions needed for Phase 1 and the first ungraded geological vertical slice are closed.
+Engineering may begin the versioned registry/compatibility foundation and then one narrow ungraded-material
+slice while Game Design completes the broader recipe, habitat, and world-condition matrices. A later slice does
+not begin until its own named inputs, outputs, and consumers are closed.
 
 ## Phase 1 - Add versioned registries without changing gameplay
 

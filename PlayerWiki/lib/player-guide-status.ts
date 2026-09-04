@@ -137,7 +137,7 @@ const apothecaryChanges: CraftingChange[] = ([
   ['Solvent', 'One reactive sample at 40 or better, 1 Reagent, and 1 Salt.', 'Planned: 1 named dissolving or reactive substance from the recipe’s disclosed list and 1 Salt. The final named list is still being authored.'],
   ['Lure', 'One reactive sample at 50 or better, 1 Toxin, and 1 Pulp.', '1 creature Hide, Pelt, Down, or Oil, plus 1 Pulp.'],
   ['Stillwater', 'One lustrous sample at 60 or better, 1 Rift-glass, 1 Mercury, and 6 Essence.', '1 Silver, 1 Rift-glass, 1 Mercury, and 6 Essence.'],
-  ['Waystone', 'One hard sample at 70 or better, 1 Rift-glass, 1 Mote, and 12 Essence.', 'Rift-glass, Mote, and Essence stay; its permanent hard World material is still being chosen.'],
+  ['Waystone', 'One hard sample at 70 or better, 1 Rift-glass, 1 Mote, and 12 Essence.', 'Planned: 1 Obsidian, 1 Rift-glass, 1 Mote, and 12 Essence. Obsidian forms the hard body while Rift-glass provides the boundary-crossing element.'],
   ['Torch', 'One reactive sample at 30 or better, 1 Resin, and 2 Timber.', '2 eligible Logs and 1 Resin.'],
   ['Farsight Draught', 'One lustrous sample at 50 or better, 1 Quartz, and 1 Ichor.', '1 Quartz and 1 Creature Ichor.'],
   ['Scent Mask', 'One individual creature Hide, Pelt, Down, or Oil, plus 1 Reagent.', 'Planned: one visible scent-bearing creature-material category and one named masking plant substance. The final type/subtype list is still being authored.'],
@@ -311,17 +311,17 @@ export function futureResourceCopy(name: string) {
   return `${name} will use a recognizable physical type or subtype. Creature materials use the four quality bands where approved; ordinary flora remains ungraded. Source world, species where relevant, and inherited colour remain available in expanded history without needlessly splitting the stack.`;
 }
 
-export const openDecisions = [
-  {
-    title: 'What permanent World material should form the Waystone’s hard body?',
-    body: 'Rift-glass, one Mote, and 12 Essence remain fixed. The final physical body could be a named structural stone, Obsidian, Adamant, or another already-approved hard World material. This choice affects the item’s identity and world-writing goal, so it remains open for Aimee.',
-  },
-] as const;
+export const openDecisions: ReadonlyArray<{ title: string; body: string }> = [];
+export const openDecisionSummary = 'No resource, crafting, harvesting, or world-foundation decision in this pass is waiting on Aimee. Remaining content tables belong to Game Design, and implementation can begin in bounded compatible slices.';
 
 export const acceptedChoices = [
   {
     title: 'Visible equipment materials keep their colours',
     body: 'Equipment and other visibly material-led gear preserve separate coloured regions for the materials the player selected. Standardized recognition-critical items such as potions and remedies keep their authored colours instead, so they remain easy to tell apart at a glance.',
+  },
+  {
+    title: 'Obsidian forms the Waystone’s hard body',
+    body: 'The intended Waystone recipe uses 1 Obsidian, 1 Rift-glass, 1 Mote, and 12 Essence. Obsidian forms the rigid carried instrument while Rift-glass remains the part that crosses a world boundary.',
   },
 ] as const;
 

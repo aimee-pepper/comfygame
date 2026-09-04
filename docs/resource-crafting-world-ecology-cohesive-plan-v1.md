@@ -745,10 +745,13 @@ With those foundations closed, Game Design can produce the complete terrain→re
 the exact recipe eligibility lists, and the harvesting tiers without guessing. Only then should the project
 decide which land/material concepts deserve Sigils, when those Sigils drop, and which traveller clues are fair.
 
-## The only remaining Aimee choice in this pass
+## Aimee decisions are closed for this pass
 
-1. **Waystone body.** Rift-glass, one Mote, and 12 Essence remain fixed. The permanent hard physical body still
-   needs one approved named World material.
+1. **Multi-colour equipment.** Visible equipment components preserve separate regions of the selected material
+   colours. Potions and other recognition-critical supplies keep their standardized authored colours.
+2. **Waystone body.** The intended recipe uses 1 Obsidian as its permanent hard body, alongside the already
+   settled 1 Rift-glass, 1 Mote, and 12 Essence. Obsidian supplies the carried instrument's dark rigid frame;
+   Rift-glass remains the boundary-crossing element rather than being asked to perform both jobs.
 
 Complete recipe lists, facility tiers, creature bodies, ecology matrices, Sigil order, and clue teaching are
 remaining Game Design production work. They are not being handed back to Aimee as vague decisions.
