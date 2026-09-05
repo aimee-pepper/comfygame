@@ -184,10 +184,15 @@
       },
       "leatherHomogeneous": [
         "band",
-        "colour",
-        "recipeRelevantSourceMeasurements"
+        "exact frozen Coloration: cyan/magenta/yellow/depth/patterning",
+        "coverage",
+        "hardness",
+        "length",
+        "flexibility",
+        "coveringProtection"
       ],
-      "output": "early.item.leather_guard.v1"
+      "output": "early.item.leather_guard.v1",
+      "ancestryGrouping": "processed.leather result-equivalent units may combine across raw subtypes and historical animal/world IDs; all parent types/quantities/measurements retained"
     }
   ],
   "item": {
@@ -263,5 +268,14 @@
     "world.salt": 2,
     "early.plant_fibre.v1": 2
   },
-  "sourceGrouping": "may span multiple parent receipts with identical output-relevant values; preserve all selected parent IDs and quantities; never require all inputs from one animal"
+  "sourceGrouping": "may span multiple parent receipts with identical output-relevant values; preserve all selected parent IDs and quantities; never require all inputs from one animal",
+  "colourAuthority": {
+    "functional": "full validated frozen actual-source Coloration: cyan,magenta,yellow,depth,patterning",
+    "comparison": "exact saved values; no normalization, rounding, averaging or reroll",
+    "nativeRGBStatus": "not established; flora/ink/prototype conversions are not creature authority",
+    "missingRGB": "not unknown when complete authoritative Coloration exists; transactions may proceed without accepted swatch",
+    "missingSource": "no matching group and no default-value or species-lookup backfill",
+    "lineage": "retain source Coloration through Leather, Guard body and prepared salvage; Cord owns ties separately",
+    "presentation": "placeholder/text does not prove source-colour rendering; exact native RGB/pattern acceptance pending"
+  }
 }

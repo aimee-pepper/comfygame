@@ -232,3 +232,31 @@ both the replaced legacy Hide and its typed replacement. Preserve other family b
 keep the supported legacy reward policy, grant no newly typed Hide, and do not claim full creature-material
 migration. New Leather recipes continue to require exact Skin/Supple/Tough stock. Reprojecting all coverings
 or migrating other anatomical families remains outside this bounded slice.
+
+## Leather colour identity and prepared grouping — 5 September 2026
+
+No exact accepted native creature-to-sRGB conversion is established by the inspected source. The current
+`CreaturePixelIdentity` uses primary/orange functional silhouettes; the world-grade species conversion
+belongs to flora, the ink conversion belongs to authored ink/paper, and the old AssetLab creature generator
+is prototype presentation. None supplies an authoritative Leather body swatch. Do not copy these formulas
+or choose a plant palette as a creature colour. Exact creature/material RGB and pattern presentation remains
+unaccepted, without opening Library Bestiary UI/integration or assigning new final artwork.
+
+For the functional Leather slice, the actual typed-source receipt's full validated frozen `Coloration`
+(Cyan, Magenta, Yellow, Depth, Patterning) is the source-colour identity. Compare those exact saved values,
+without averaging, rounding, normalizing again, or rerolling. A missing RGB receipt alone is not unknown
+colour: the source descriptor already exists. Preserve it through Hide, prepared Leather, the Guard's body,
+and prepared-component salvage. Truly missing or malformed source colour cannot establish a matching group.
+Never repair missing historical evidence through `Coloration` default values or a species/world lookup.
+A neutral functional icon or source text may support transactions, but is not proof of the chosen swatch;
+keep exact rendered source-to-Leather/garment colour acceptance pending. A later versioned renderer must
+consume the retained descriptor without replacing its source or rewriting old choices.
+
+Raw Hide/Skin processing still requires one exact eligible raw subtype plus matching band, full colour and
+relevant measurements. Prepared output is the single `processed.leather` material. For the Guard's two
+Leather units, raw ancestry does not itself split an otherwise identical-result group: match quality band,
+full frozen Coloration, coverage, hardness, length, flexibility and covering protection exactly. Historical
+animal/world IDs, raw subtype and source Danger remain in every parent receipt but are not extra group
+keys when all the recipe's output-relevant values match. Do not average different measurements or colours,
+discard parents, or let this rule turn an ineligible raw family into Leather. Guard body retains selected
+Leather colour identity, ties retain the existing Cord colour, and each remains its own component lineage.
