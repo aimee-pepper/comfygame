@@ -7,6 +7,8 @@ finite-producer and canopy rules, and current AGENTS. This packet closes the nar
 Engineering's later native proof. The active material/Return/Nessa route continues; no replacement world
 catalogue, final asset sheet or camera experiment is a prerequisite for its delivery.
 
+**5 September clarification:** the numerical water examples below are illustrative, not facts present in current saves. See [the bounded terrain/water trial proposal](terrain-water-geometry-trial-v1.md) for the missing geometry owner, an optional authored study requiring approval, and the unchanged movement implementation dependency.
+
 ## 1. Physical truth before drawing order
 
 Keep the square grid and four-way movement. A map position has at most one supporting ground/bed surface,
