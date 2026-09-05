@@ -1,6 +1,6 @@
 # Bestiary knowledge and grouping — implementation contract
 
-**5 September 2026 · Decided intended clarification for the approved sorting UI; not yet implemented.** Preserve existing discovery events, records, combat, rewards and early-game balance. Aimee approved Sky, Water, Amphibious and Land with body-shape subcategories and lifted the Bestiary hold. This contract closes the disclosure and compatibility details required to implement that arrangement.
+**5 September 2026 · Implemented and tested in the Simulator; not included in phone build 307.** Preserve existing discovery events, records, combat, rewards and early-game balance. Aimee approved Sky, Water, Amphibious and Land with body-shape subcategories and lifted the Bestiary hold. This contract closes the disclosure and compatibility details required to implement that arrangement.
 
 Source baseline inspected: Engineering `594cb61c23c198337b2c42ad4ccebc10023a1817`, tree `1c8501453bd2c360a3dced3f047e18dad95c8a55`. Source owners are `Discovery.swift`, `BestiaryRules.swift`, `BestiaryView.swift`, `WorldRules.swift`, `CombatRules.swift`, and the Library shelf adapter in `LibraryRules.swift`. This is source inspection, not a mounted sorting receipt.
 
@@ -113,3 +113,12 @@ Focused verification should cover the admission filter, explicit-provenance deco
 **Unsettled reveal proposals:** exact remote-sighting fields; a new analysis action or additional reveal tiers; when a future likely-material panel learns each family. Existing encounter and reward behavior does not authorize those additions.
 
 The complete-player-experience Homework goal remains open pending implementation and playtesting. This contract is partial progress, not a claim that the Bestiary or whole creature rework is finished.
+
+
+## Preserved Engineering delivery — 5 September
+
+Engineering branch `codex/early-material-regions-v1`, clean HEAD `09459e221b538c5d49208fece76ec77ee968a98c`, tree `4884123f22677351e6d7400d91ee6c9cc75a1f80`. Implementation/build source `36a9e6b7596c145553a69249a73b27d0ad22095e`, tree `0745540db5d012dad267688d945ea940dc87bb6d`; installable Simulator artifact `build/bestiary-sorting-playtest/Bookbinder.app` with BUILD.txt. Full receipt: `early-material-regions-v1/docs/bestiary-sorting-implementation-2026-09-05.md`.
+
+Five focused tests passed: known grouping/persistence/pruning, missing marker/body, morphology RNG/gameplay invariance, trait round trip and existing rendering contract. Final decoding result `786c8e8a`; native Library → Bestiary → represented chapters → legacy entry → Back result `057bd21b`. Actual iPhone 17 Pro Simulator, iOS 26.2, 402×874pt /1206×2622px, default text/current appearance only. The implementation hides unrepresented chapters and body groups, which is permitted by this contract; no new discovery event or material reveal is added.
+
+The temporary bug reporter can overlap the overall counter; chapter counters were visible. This is functional Engineering acceptance, not Aimee visual acceptance. Presentation refinement is separate. The physical phone remains on installed/launched build307/source `71102e03`, whose normal Early Overhaul Playtest campaign entry is separate and does not contain this sorting update. No additional native test, paid campaign action or phone installation is requested by this receipt.
