@@ -1,6 +1,6 @@
-# Terrain and local water: bounded 3D trial proposal
+# Terrain and local water: approved bounded 3D study
 
-5 September 2026. **Design proposal, not implemented terrain or an approved save conversion.**
+5 September 2026. **Aimee approved the separate authored study with “allowed!” Decided intended demonstration; implementation pending. Production terrain and save conversion are not approved by this decision.**
 
 Purpose: unblock the shallow-bed/raised-pond portion of the agreed renderer trial without inventing facts in generated worlds. Engineering's reduced camera/depth proof can proceed independently. No early-game rules, phone campaign, renderer selection or Asset assignment changes here.
 
@@ -14,15 +14,15 @@ Authority: [accepted three-quarter direction](three-quarter-world-direction-2026
 
 Consequently neither a water tile's elevation nor its shallow category proves a measured depth. A connected categorical water patch is not sufficient evidence for one level pond surface: it may include channels, differing heights, or unavailable formation identity. Aggregate body/channel counts cannot reconstruct those missing facts. Current generation need not already admit the proposed physical representation without a separately versioned change.
 
-## Recommended smallest next step
+## Approved next step
 
-**Proposed approval boundary:** add one separate, labelled, authored geometry demonstration beside the existing generated-patch camera/interaction proof. Its label should say **Terrain and water study — example heights, not a generated expedition**. It is temporary isolated test state, never a campaign conversion or additional resource world. The original generated-patch proof retains actual saved positions, actions and facts; this study does not impersonate missing geometry in that patch.
+**Approved scope:** add one separate, labelled, authored geometry demonstration beside the existing generated-patch camera/interaction proof. Its label should say **Terrain and water study — example heights, not a generated expedition**. It is temporary isolated test state, never a campaign conversion or additional resource world. The original generated-patch proof retains actual saved positions, actions and facts; this study does not impersonate missing geometry in that patch.
 
-The study contains a small shallow pond on raised land, a lower shallow channel, and a dry route passing their banks. Use placeholders. Numerical heights are explicit example data owned by the fixture, not renderer guesses. Aimee's approval is needed because this supplements the earlier existing-generated-patch-only brief with authored geometry. The current reduced proof needs no wait for that answer.
+The study contains a small shallow pond on raised land, a lower shallow channel, and a dry route passing their banks. Use placeholders. Numerical heights are explicit example data owned by the fixture, not renderer guesses. Aimee approved supplementing the earlier existing-generated-patch-only brief with this authored geometry study on 5 September. Both parts can proceed without another scope confirmation.
 
 For this first study, the actor's actionable route stays on equal-height dry ground using the already implemented action rules. The raised bank and pond are viewed from beside it. Do not imply that walking a rendered ramp proves new edge rules. A later interactive slope/shore demonstration depends on the shared graph implementation already required by the accepted semantics. The study can prove local water rendering; it cannot complete the entire terrain/movement milestone.
 
-## Minimal representation to implement after that approval
+## Minimal representation for the approved study
 
 Names below are semantic suggestions; Engineering owns exact types and persistence placement. Keep the authored fixture format versioned and distinct from production saves. No new game-world version activates as a side effect of opening it.
 
@@ -38,7 +38,7 @@ Names below are semantic suggestions; Engineering owns exact types and persisten
 
 Use exact quarter-level example values; they require no physical unit scale or universal shallow-depth threshold. Engineering's vertical scene scaling remains a display transform applied equally to support and liquid heights. Mesh thickness, wave displacement and foot-sprite pivots do not write physical state. Wave decoration must not visually spill into unrelated land.
 
-Liquid category retains current movement authority. This proposal does not turn a given numerical depth into swimming, drowning, wading costs, new habitat eligibility or a resource host. A production depth-to-category policy is still Design work. Do not extrapolate this fixture's shallow depth to every Water cell or give every DeepWater cell an arbitrary deeper value.
+Liquid category retains current movement authority. This study does not turn a given numerical depth into swimming, drowning, wading costs, new habitat eligibility or a resource host. A production depth-to-category policy is still Design work. Do not extrapolate this fixture's shallow depth to every Water cell or give every DeepWater cell an arbitrary deeper value.
 
 ## Concrete geometry and action examples
 
@@ -70,9 +70,9 @@ The first study explicitly permits the simple bed in its shallow example. That a
 
 ## Exact dependencies and decisions
 
-1. **Aimee decision now, limited to completing the water comparison:** permit the separate authored geometry study with labelled example heights? Recommended yes. If declined, keep the reduced generated-patch proof and leave numerical water demonstration incomplete until real generated geometry exists. Do not ask again about local ponds, one support per cell or agreed steps/slopes.
+1. **Aimee decision closed:** the separate authored geometry study with labelled example heights is approved. Engineering may implement this bounded supplement alongside the reduced generated-patch proof. No further approval is needed for this scope; local ponds, one support per cell and agreed steps/slopes remain settled.
 2. **Design/Engineering before production terrain:** choose and specify the versioned numerical bed/surface generation policy, its relationship to existing categorical elevation and shallow/deep bands, local outlet representation, and generation failure behavior. This requires a real generator packet, not guesses in the renderer. It does not require Aimee to supply numerical tables.
 3. **Engineering before interactive height/shore proof:** implement the single shared cardinal-edge authority and reachable action positions across its consumers, preserving old worlds. A new fixture is not permission to enable that graph in the early playtest. Numeric shore connection details must be specified with the production packet; the trial does not invent them.
 4. **Existing scope exclusions remain:** no save migration, stacked floors, flooding/flow simulation, new movement costs or abilities, opaque-water knowledge unlock, or new generator guarantees. Any later proposal adding those needs explicit scope approval.
 
-Delivery is this bounded proposal plus its player-facing Wiki/Homework summary. No renderer research, new evaluator, native test or phone verification is part of Design's work here.
+Design delivery is this approved bounded contract plus its player-facing Wiki/Homework summary; Engineering owns implementation. No renderer research, new evaluator, native test or phone verification is part of Design's work here.
