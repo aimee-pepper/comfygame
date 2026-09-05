@@ -1,0 +1,267 @@
+{
+  "id": "early.carrying.v1",
+  "status": "decided intended behavior; numerical first-pass tuning; not delivered or campaign-tested",
+  "materialSets": {
+    "early.log.v1": [
+      "flora.log.softwood",
+      "flora.log.hardwood"
+    ],
+    "early.plant_fibre.v1": [
+      "flora.fibre.stem",
+      "flora.fibre.leaf"
+    ]
+  },
+  "startingPackCapacity": 8,
+  "projects": [
+    {
+      "id": "early.pack.stitching.v1",
+      "name": "Reinforced Stitching",
+      "owner": "Storehouse",
+      "requires": [],
+      "essence": 5,
+      "inputs": {
+        "early.plant_fibre.v1": 4
+      },
+      "addsCapacity": 3,
+      "legacyCoverage": [
+        "satchel_one"
+      ]
+    },
+    {
+      "id": "early.pack.straps.v1",
+      "name": "Balanced Straps",
+      "owner": "Storehouse",
+      "requires": [
+        "early.pack.stitching.v1"
+      ],
+      "essence": 10,
+      "inputs": {
+        "early.plant_fibre.v1": 6,
+        "world.resin": 1
+      },
+      "addsCapacity": 3,
+      "legacyCoverage": [
+        "satchel_two"
+      ]
+    },
+    {
+      "id": "early.pack.deepened.v1",
+      "name": "Deepened Satchel",
+      "owner": "Corrin, Tannery Carry",
+      "requires": [
+        "built tannery",
+        "early.pack.stitching.v1",
+        "early.pack.straps.v1"
+      ],
+      "essence": 20,
+      "inputs": {
+        "processed.cloth.plant": 2,
+        "processed.cord.plant": 2,
+        "world.resin": 1
+      },
+      "addsCapacity": 9,
+      "legacyCoverage": [
+        "satchel_three",
+        "satchel_four",
+        "satchel_five"
+      ]
+    },
+    {
+      "id": "early.build.wayfarer.v1",
+      "name": "Wayfarer\u2019s Table",
+      "owner": "Sela",
+      "requires": [
+        "Sela recruited"
+      ],
+      "essence": 30,
+      "inputs": {
+        "early.log.v1": 6,
+        "early.plant_fibre.v1": 4
+      },
+      "addsCapacity": 2,
+      "separatePassive": true
+    }
+  ],
+  "recipes": [
+    {
+      "id": "early.craft.woven_gloves.v1",
+      "name": "Woven Gloves",
+      "slot": "hands",
+      "inputs": {
+        "processed.cloth.plant": 1,
+        "processed.cord.plant": 1
+      },
+      "sell": 5,
+      "buy": 10,
+      "station": "tannery",
+      "minimumPlayerTier": 1,
+      "essence": 0,
+      "outputQuantity": 1,
+      "quality": "Fine",
+      "totalProtection": 1.0,
+      "initiative": 0,
+      "wards": {},
+      "salvage": "exact prepared inputs once; no raw-material refund"
+    },
+    {
+      "id": "early.craft.woven_boots.v1",
+      "name": "Woven Boots",
+      "slot": "feet",
+      "inputs": {
+        "processed.cloth.plant": 1,
+        "processed.cord.plant": 1,
+        "world.resin": 1
+      },
+      "sell": 7,
+      "buy": 14,
+      "station": "tannery",
+      "minimumPlayerTier": 1,
+      "essence": 0,
+      "outputQuantity": 1,
+      "quality": "Fine",
+      "totalProtection": 1.0,
+      "initiative": 0,
+      "wards": {},
+      "salvage": "exact prepared inputs once; no raw-material refund"
+    }
+  ],
+  "carryAccess": "Free with built Tannery; no paid tannery_carry_root prerequisite. Existing paid root remains in history and grants no slots.",
+  "migration": {
+    "version": "early.carrying.v1",
+    "legacyRank": "maximum of stored rank and highest supported satchel_one..five ordinal; never sum research and direct-upgrade aliases",
+    "mappedProjectCountByOldRank": [
+      0,
+      1,
+      2,
+      3,
+      3,
+      3
+    ],
+    "baseCapacityByOldRank": [
+      8,
+      11,
+      14,
+      23,
+      23,
+      23
+    ],
+    "credit": "max(0, proven pre-migration capacity excluding Sela minus mapped new base capacity); reconcile any already-recorded credit within proven capacity, never add it twice",
+    "repeatDecode": "use canonical entitlements and frozen credit only; no replay of legacy grants",
+    "activeRun": "preserve bound contents and capacity; apply new campaign capacity to next packing",
+    "fixtures": [
+      {
+        "oldSatchelTier": 0,
+        "selaBuilt": false,
+        "before": 8,
+        "after": 8,
+        "legacyCredit": 0
+      },
+      {
+        "oldSatchelTier": 0,
+        "selaBuilt": true,
+        "before": 10,
+        "after": 10,
+        "legacyCredit": 0
+      },
+      {
+        "oldSatchelTier": 1,
+        "selaBuilt": false,
+        "before": 11,
+        "after": 11,
+        "legacyCredit": 0
+      },
+      {
+        "oldSatchelTier": 1,
+        "selaBuilt": true,
+        "before": 13,
+        "after": 13,
+        "legacyCredit": 0
+      },
+      {
+        "oldSatchelTier": 2,
+        "selaBuilt": false,
+        "before": 14,
+        "after": 14,
+        "legacyCredit": 0
+      },
+      {
+        "oldSatchelTier": 2,
+        "selaBuilt": true,
+        "before": 16,
+        "after": 16,
+        "legacyCredit": 0
+      },
+      {
+        "oldSatchelTier": 3,
+        "selaBuilt": false,
+        "before": 17,
+        "after": 23,
+        "legacyCredit": 0
+      },
+      {
+        "oldSatchelTier": 3,
+        "selaBuilt": true,
+        "before": 19,
+        "after": 25,
+        "legacyCredit": 0
+      },
+      {
+        "oldSatchelTier": 4,
+        "selaBuilt": false,
+        "before": 20,
+        "after": 23,
+        "legacyCredit": 0
+      },
+      {
+        "oldSatchelTier": 4,
+        "selaBuilt": true,
+        "before": 22,
+        "after": 25,
+        "legacyCredit": 0
+      },
+      {
+        "oldSatchelTier": 5,
+        "selaBuilt": false,
+        "before": 23,
+        "after": 23,
+        "legacyCredit": 0
+      },
+      {
+        "oldSatchelTier": 5,
+        "selaBuilt": true,
+        "before": 25,
+        "after": 25,
+        "legacyCredit": 0
+      }
+    ]
+  },
+  "firstUseTotals": {
+    "firstProject": {
+      "essence": 5,
+      "plantFibre": 4
+    },
+    "firstTwo": {
+      "essence": 15,
+      "plantFibre": 10,
+      "resin": 1
+    },
+    "allThreeFromOpeningWithoutTannery": {
+      "essence": 55,
+      "plantFibre": 26,
+      "resin": 2,
+      "logs": 6,
+      "clay": 4
+    },
+    "wovenGlovesFromBuiltTannery": {
+      "essence": 0,
+      "plantFibre": 6
+    },
+    "wovenBootsFromBuiltTannery": {
+      "essence": 0,
+      "plantFibre": 6,
+      "resin": 1
+    }
+  },
+  "nextBindCheck": "quote actual next legal Bind in campaign state; from opening 40 Essence, first project leaves 35 and first two leave 25 before other purchases; do not assume flat Bind cost or assert campaign pacing from arithmetic",
+  "unchanged": "slot-free materials, dedicated tool roll, packing plan, item custody, nine shelving benefits, Sela non-capacity behavior"
+}
