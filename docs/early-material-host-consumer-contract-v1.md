@@ -202,3 +202,7 @@ map clearance. Small favourable worlds may still be explored thoroughly; there i
 Later T2 Ingot cost/consumers, broader land/flora, traveller/Sigil/clue progression, and Peerless/refinement
 remain separate design work. The closed inputs, outputs and finite hosts above change only through an
 explicit next version. No full campaign reorder, runtime patch, or successful phone test is claimed.
+
+## Direct Aimee solid-deposit clarification —4 September2026
+
+The first Iron/Coal producers now have blocking physical bases in new cutover worlds. Deliberate movement into their adjacent base mines with the selected packed Pick; successful hits remain one turn and do not move the actor, even on depletion. Automatic routes never mine. Loose Clay, Salt and low flora remain walkable with their existing underfoot gathering. Exact intent, refusal, protected-route, durable depletion and legacy/canopy separation rules are in [Solid deposits and manual bump mining](early-solid-deposit-interaction-v1.md) and its authored JSON. These rules supersede any assumption that every mineral source is walkable or can be mined by standing on its footprint. Current installed/older worlds retain their saved behavior.

@@ -1,0 +1,68 @@
+{
+  "id": "early.solid_deposit_interaction.v1",
+  "status": "decided intended; direct Aimee instruction relayed by PM; not delivered",
+  "footprint": {
+    "substantialDeposit": "one blocking physical base cell in this first cutover",
+    "iron": "blocking; Pick1;3hits;2Iron per hit",
+    "coal": "blocking; Pick1;3hits;2Coal per hit",
+    "looseClaySaltStonesHerbsLowPatches": "walkable; existing underfoot gathering and tool requirements unchanged; walking onto them does not auto-harvest",
+    "boulders": "substantial boulder forms block; only an explicitly defined harvest producer has mining/yield behavior; no invented Rubble producer",
+    "underlyingGround": "blocking deposit requires supporting ground/edge that is traversable once deposit obstruction is removed; no cliff/chasm/height rewrite"
+  },
+  "manualBump": {
+    "intent": "explicit cardinal one-cell player step or explicit adjacent-cell step into a normally disclosed live deposit",
+    "tool": "currently selected packed Pick meeting source tier; no automatic switch/equip or tool manufacture",
+    "owner": "same EarlyMaterialGameplayRules.quote/apply and GameStore.harvestEarlyMaterial durable transaction as explicit mining",
+    "success": "one finite hit; actor remains on adjacent original cell even on final hit; exact yield and work saved; exactly one world turn/effects",
+    "finalHit": "remove only this deposit obstruction; next explicit movement into cleared cell uses ordinary terrain movement cost",
+    "refusal": "existing wrongTool,hiddenOrMissing,outOfReach,priorityInteraction,exhausted,stale or save refusal spends0 mining turns/materials/work and grants0 output; do not fall through to charged blocked movement",
+    "priority": "existing encounter/authored-interaction priorities retain ownership; mining cannot bypass them"
+  },
+  "automaticNavigation": {
+    "passability": "live blocking deposits excluded from traversal; route around or stop",
+    "depositDestination": "route may end on explicitly selected reachable adjacent ground; deposit footprint is never a traversal step",
+    "arrival": "never queue or perform mining automatically; fresh manual intent required",
+    "dynamicObstruction": "stop/replan under existing navigation rules without mining or spending a mining turn"
+  },
+  "placement": {
+    "workPosition": "at least one cardinal adjacent passable work cell reachable under actual post-placement collision and normal edge rules",
+    "protectedRoutes": [
+      "entry and return",
+      "required teaching",
+      "starter resources and their work positions",
+      "tool-acquisition opportunities"
+    ],
+    "forbidden": "no sole reachable Iron behind an Iron-Pick requirement; no protected route needing an unavailable tool",
+    "optionalAreas": "deliberately fully tool-gated areas are later scope; this cutover permits detours and shortcuts, not new inaccessible districts",
+    "budgets": "unchanged shared mineral/source budgets; written and ordinary reservations use same placements"
+  },
+  "persistence": {
+    "newSources": "freeze deposit obstruction and physical source version at generation; preserve work through save/relaunch/anchor",
+    "legacy": "old worlds and existing saved source collision retain old semantics; do not infer new blocking from a live producer-ID lookup on old saves",
+    "atomicity": "yield,work,depletion,obstruction,turn and terminal events commit together; no open path or impact success before durable commit; retry cannot repeat output"
+  },
+  "presentation": {
+    "target": "physical base and normally visible existing tool requirement; no hidden source reveal",
+    "canopy": "deposits have no foliage crown; separate deposit obstruction from blockingTrunk/liveCrown",
+    "occlusion": "existing terrain/object visibility rules only; no new five-cell sight mask or tree canopy copied from collision",
+    "assets": "no new artwork assignment or dimensions; Engineering names native consumer/protocol before Asset work"
+  },
+  "unchanged": [
+    "mineral occurrence weights",
+    "unwritten intensity tuning",
+    "source yields and tool tiers",
+    "plant interactions",
+    "dedicated tool roll and slot-free materials",
+    "global terrain and height semantics"
+  ],
+  "focusedAcceptance": [
+    "manual Iron hits1/2/3 stay adjacent and each take1turn/yield2; final clears obstruction",
+    "next manual step moves normally without another harvest",
+    "wrong/no/weak tool refusal0 with no fallback blocked-step charge",
+    "auto-route detours or stops without source-work changes",
+    "save failure preserves solid obstruction/work/stock/turn; retry/reopen exactly once",
+    "depleted deposit clears no overlapping tree canopy",
+    "placement retains essential route and reachable node work position",
+    "legacy saved sources preserve collision"
+  ]
+}
