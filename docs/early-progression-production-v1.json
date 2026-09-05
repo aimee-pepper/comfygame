@@ -164,7 +164,28 @@
           "count": 1
         }
       ],
-      "reservationPolicy": "only if host eligible; written placements satisfy counts and spend same budget; unavailable reservation released"
+      "reservationPolicy": "only if host eligible; written placements satisfy counts and spend same budget; unavailable reservation released",
+      "candidateRarityByCurrentResourceID": {
+        "ore": "common",
+        "iron": "common",
+        "coal": "common",
+        "quartz": "common",
+        "copper": "uncommon",
+        "silver": "uncommon",
+        "obsidian": "uncommon",
+        "sulfur": "uncommon",
+        "gold": "rare",
+        "mercury": "rare",
+        "adamant": "rare",
+        "rift_glass": "rare"
+      },
+      "aliasRule": "ore and iron name one Iron candidate; never enter both in the same draw",
+      "excludedCurrentResourceIDs": {
+        "clay": "dedicated loose-earth placement",
+        "salt": "dedicated dry-crust placement from Leather extension",
+        "rubble": "held from new bounded mineral pool until its producer/consumer route is integrated; existing holdings and old worlds remain"
+      },
+      "candidatePolicy": "These are explicit occurrence classes, never tradeBand, quality or extraction-rank conversions. Preserve existing resolved compatible-host eligibility; this table grants neither a new host nor a guaranteed placement. Equal within eligible bucket; renormalize nonempty rarity weights; leave slot unused if no candidate."
     },
     "looseEarth": {
       "budget": "max(2, roundHalfUp(entryConnectedPassableLand / 56))",

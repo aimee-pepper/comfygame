@@ -242,3 +242,19 @@ family or Peerless decision is required to deliver the first Salve/Pick path.
 **Next bounded design packet:** T2 smelting cost and useful specialist consumers, then only the additional
 land/flora and creature rows those consumers actually need. T3, later people and broader balance remain
 separate. The partial-Mote-spend question stays in Aimee Homework and does not block these ordinary paths.
+
+## Mineral lottery adapter — 4 September closure
+
+The current ResourceDef has no geological rarity field. Author these occurrence classes explicitly; do not infer them from trade prices, item quality or extraction rank.
+
+| Current resource IDs | Occurrence class |
+| --- | --- |
+| `ore` / `iron` (one Iron identity), `coal`, `quartz` | common |
+| `copper`, `silver`, `obsidian`, `sulfur` | uncommon |
+| `gold`, `mercury`, `adamant`, `rift_glass` | rare |
+
+`clay` and `salt` are excluded from this mineral-node lottery because the closed loose-earth and dry-crust producers own them. `rubble` is excluded from the bounded new early pool until its actual producer/consumer route is integrated. This is not removal of owned stock, legacy trade or already-generated worlds.
+
+Preserve each candidate’s existing explicit compatible-host eligibility. These rows do not invent new rock formations, guarantee late minerals, make higher-rank resources harvestable, or add extra placements. Iron’s old and new spellings enter as one candidate, never twice. After written placements and eligible ordinary reservations spend the shared budget, remaining slots use 70/25/5 weights, equally weighted eligible candidates within each bucket. An empty bucket is omitted and the other weights renormalize; no candidates means the slot remains unused. The selected occurrence class changes no material quality, trade price, source colour, chemistry or tool requirement.
+
+This closure supplies the exact candidate-rarity input requested by Engineering’s placement adapter. It is authored tuning, not measured seed-corpus or mounted-play evidence.
