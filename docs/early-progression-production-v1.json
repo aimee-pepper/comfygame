@@ -179,11 +179,7 @@
         "id": "early.fact.fresh_growing_land.v1",
         "label": "Fresh growing land",
         "all": [
-          "one entry-connected region has at least 12 compatible ordinary root tiles",
-          "region has at least one legal resin-shrub site and one legal small-softwood site"
-        ],
-        "requires": [
-          "at generation, at least12 unique qualifying ordinary root cells across the entry-connected ground component, using the same pre-population root-cell eligibility as flora budget",
+          "at generation, at least 12 unique qualifying ordinary root cells across the entry-connected ground component, using the same pre-population root-cell eligibility as flora budget",
           "reachable legal resin-shrub and small-softwood source sites in that same component; source positions must be usable without violating work-position or protected-route rules"
         ]
       },
@@ -200,11 +196,7 @@
         "id": "early.fact.fibre_growth.v1",
         "label": "Fibre-bearing growth",
         "all": [
-          "one entry-connected region has at least 12 compatible ordinary root tiles",
-          "region supports both stem-patch and leaf-rosette profiles"
-        ],
-        "requires": [
-          "at generation, at least12 unique qualifying ordinary root cells across the entry-connected ground component, using the same pre-population root-cell eligibility as flora budget",
+          "at generation, at least 12 unique qualifying ordinary root cells across the entry-connected ground component, using the same pre-population root-cell eligibility as flora budget",
           "reachable legal stem-patch and leaf-rosette source sites in that same component"
         ]
       }
