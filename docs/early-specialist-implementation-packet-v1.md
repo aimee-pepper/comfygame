@@ -118,3 +118,11 @@ while retaining every parent receipt and selected quantity. Two matching patches
 two matching animals may supply four Hide. No numerical averaging, guessed provenance, or loss of parent
 identity is permitted. In the picker, identical-result groups need no duplicate choices. Different
 measurements or colours still require an explicit choice; grouping never makes an ineligible type qualify.
+
+## Bounded forge and Scythe runtime milestone — 5 September 2026
+
+Engineering preserved the forge milestone at `f1acb661` and the connected field milestone at `cf613f5c03a371c069bc67e5d8ac631b591e295c`, tree `88e292794b048925bb4e3fdf1687c06a2f3c1fc2`, in its named early-material-regions-v1 worktree. Exact receipt: `docs/early-blacksmith-native-acceptance-2026-09-05.md`. It implements the closed basic Pick/Axe improvements, T2 upgrade, Iron smelting, same-instance Scythe2 and finite Tall Stem Patch with unchanged starter reservations. Consumed Iron/Coal parents remain retained after prepared ingots are spent; legacy valid Iron parents are supported without fabricated harvest provenance. Original tools retain identity and order, and higher legacy shop tiers remain.
+
+Focused transaction/material tests, stale/replay/write-failure/reopen cases, harvest/host/threshold tests and final legacy/written-Iron compatibility checks pass. Native isolated forge operation and reopen pass; the isolated Tall Stem Patch harvest commits one turn/three Stem Fibre. Its following UI test encountered a tutorial after the successful action; durable inspection and a separate read-only reopen verify the harvest without replaying it. Evidence is iPhone17Pro Simulator402×874pt/default text/current appearance, not a physical-phone receipt or natural affordability journey.
+
+Design accepts this bounded functional milestone. Tannery Cord/Cloth/garment consumers and literal source-colour presentation are not included. No final art, natural Nessa/search progression or phone delivery is established, and no fourth paid search is authorized. Natural Home remains29 Essence/issued3. Full test IDs and native artifacts stay in the named Engineering receipt rather than duplicating them here.
