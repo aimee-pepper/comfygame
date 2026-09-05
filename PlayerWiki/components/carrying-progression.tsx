@@ -12,7 +12,8 @@ export function CarryingProgression() {
     </tbody></table>
     <p>Carry opens with the Tannery, without another paid lesson. Leather, Ingots and later shop upgrades are optional paths. Sela’s built Wayfarer’s Table adds its separate <strong>2 spaces</strong> at any stage, for a final <strong>25</strong>. Its intended foundation costs 30 Essence, 6 Logs and 4 Plant Fibre after she joins.</p>
     <p>Older purchased capacity is preserved without granting the same benefit twice. Materials remain slot-free, harvesting tools keep their own roll, and your packing choices stay yours. Home shelving is separate and keeps all nine existing improvements. The earlier proposed 20-space pack ceiling has been replaced.</p>
-    <p><strong>Still to test:</strong> These prices need full journey testing, including enough Essence left for the next Bind. They are starting balance values, not a required shopping list.</p>
+    <p><strong>Tested in development:</strong> The two Storehouse projects reach 14 spaces and survive reopening. An arranged opening campaign then paid 10 Essence for its next Bind, entering with 14 spaces and 15 Essence remaining. Separate native checks saved Corrin’s expansion to 23, then Sela’s bonus to 25 after reopening. These checks preserve previous purchases and active expedition contents; the increased capacity applies at the next packing boundary.</p>
+    <p><strong>Still to test:</strong> Full natural gathering and later affordability, and phone delivery. These prices are starting balance values, not a required shopping list. The separate Woven Gloves and Boots recipes are not included in this completed pack milestone.</p>
     <p><Link href="/references/design-decisions-september-4">Full decisions, woven equipment and recipes</Link></p>
   </section>;
 }
