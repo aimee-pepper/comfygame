@@ -126,3 +126,19 @@ Engineering preserved the forge milestone at `f1acb661` and the connected field 
 Focused transaction/material tests, stale/replay/write-failure/reopen cases, harvest/host/threshold tests and final legacy/written-Iron compatibility checks pass. Native isolated forge operation and reopen pass; the isolated Tall Stem Patch harvest commits one turn/three Stem Fibre. Its following UI test encountered a tutorial after the successful action; durable inspection and a separate read-only reopen verify the harvest without replaying it. Evidence is iPhone17Pro Simulator402×874pt/default text/current appearance, not a physical-phone receipt or natural affordability journey.
 
 Design accepts this bounded functional milestone. Tannery Cord/Cloth/garment consumers and literal source-colour presentation are not included. No final art, natural Nessa/search progression or phone delivery is established, and no fourth paid search is authorized. Natural Home remains29 Essence/issued3. Full test IDs and native artifacts stay in the named Engineering receipt rather than duplicating them here.
+
+## Early fibre colour mapping dependency — 5 September 2026
+
+The intended inheritance and source-grouping rules above are closed; their exact mapping onto early
+Stem/Leaf producers is not. At Engineering `cf613f5c`, `EarlyMaterialSourceReceipt` retains the world seed,
+region, producer, anchor and immutable `WorldVisualReceipt`, but no dedicated resolved fibre colour or
+linked flora-species identity. A saved world flora tendency is not itself proof of an individual plant's
+colour; an unrelated cast entry cannot supply that missing identity. The older Bloom-to-flora tendency
+contract does not close this gap. No new palette rule is adopted by this finding.
+
+Continue bounded Tannery costs, custody, output statistics and durable transactions while preserving all
+parents. Do not combine unknown-colour sources as proven identical-colour groups or present placeholder
+colours as accepted source-colour output. Exact source-colour selection and visual acceptance remain a
+Design/Engineering dependency, not an Aimee decision or a reason to block unrelated transaction work.
+Existing saved lots must remain intact; a later versioned resolution must not silently invent historical
+species provenance or reroll owned materials.
