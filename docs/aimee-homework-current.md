@@ -1,6 +1,6 @@
 # Aimee Homework
 
-Updated 4 September 2026. One place for your decisions and optional creative work. You are not holding up the early crafting work by leaving a later refinement question open.
+Updated 5 September 2026. One place for your decisions, design to-dos and optional creative work. You are not holding up the early crafting work by leaving a later refinement question open.
 
 ## 1. Decision needed: spending a Mote on a chance
 
@@ -20,10 +20,24 @@ Reply with the experience you prefer; you do not need to supply probability tabl
 
 There is no request to replace your existing Library work or finish every task together. Final sky/cloud placement and dimensions are a team dependency, not a decision you are blocking.
 
-## 3. Open design work that does not need homework
+## 3. Creature-generator rework to-do list
 
-Blacksmith T2 Iron Ingots, the upgrade’s starting cost, the first useful cloth and Leather crafts, and the early maker discovery rules are now specified in **Design Decisions · 4 September**. They are intended changes awaiting implementation and playtesting. The wider character order, later materials, encounter and gathering balance, refinement odds, and preview behavior remain design work. You are welcome to steer these; none is a mandatory approval chore for you.
+**Status: open · added at your request. The full creature rework is unfinished.**
+
+The first body-and-habitat compatibility rules are decided, but still await implementation and playtesting. Keep these three larger goals here for your review and discussion:
+
+- [ ] **Body → materials:** work out which actual anatomical parts each generated creature has, and which usable materials those parts produce beyond the completed Hide path.
+- [ ] **Ecological coherence:** work out how world conditions produce varied, believable creatures, including relevant food, nesting and weather relationships.
+- [ ] **The complete player experience:** review whether creatures feel distinct, make sense visually and mechanically, and support enjoyable exploration and crafting. This needs playtesting of the completed features as well as design discussion.
+
+These are unfinished goals, not claims that the generator already achieves them. Bring your preferences and examples; Game Design owns the detailed rules and content, and Engineering owns implementation and native testing. Adding these to your list does not make you the sole blocker or reopen the Library Bestiary work.
+
+See [the current creature decisions](design-decisions-september-4.html) for what is settled and what remains unfinished.
+
+## 4. Open design work that does not need homework
+
+Blacksmith T2 Iron Ingots, the upgrade’s starting cost, the first useful cloth and Leather crafts, and the early maker discovery rules are now specified in **Design Decisions · 4 September**. They have bounded implementations tested in development; natural progression, final presentation and phone delivery remain pending. The wider character order, later materials, encounter and gathering balance, refinement odds, and preview behavior remain design work. You are welcome to steer these; none is a mandatory approval chore for you.
 
 Your decisions already recorded today include flexible costs and ordering, intuitive raw-material starter gear, stone opening tools, exploration that leaves territory unexplored, colour-led gathering, recipe relevance separate from tool readiness, and the agreed visual treatment. They do not need to be approved again.
 
-This is a reading list rather than a form. Tell Game Design or Project Manager your answer to item 1, or share an artwork task with Asset Lead; the recorded status will then be updated here.
+This is a reference and to-do list rather than a form. Tell Game Design or Project Manager your answer to item 1 or your thoughts on the creature goals in item 3, or share an artwork task with Asset Lead; the recorded status will then be updated here.

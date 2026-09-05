@@ -46,12 +46,12 @@ export const designReferences: DesignReference[] = [
     title: 'Design Decisions · 4 September',
     summary: 'Current behavior, decided intended behavior, first-pass tuning, and unsettled proposals: stone tools, raw-material crafting, early buildings, recipe tracking, exploration, colour, and Peerless refinement.',
     source: currentDecisions,
-    systemLinks: [{ href: '/references/aimee-homework', title: 'Aimee Homework', summary: 'The Mote-spending choice and optional artwork.' }, ...systemLinks],
+    systemLinks: [{ href: '/references/aimee-homework', title: 'Aimee Homework', summary: 'The Mote-spending choice, creature-rework to-dos and optional artwork.' }, ...systemLinks],
   },
   {
     slug: 'aimee-homework',
     title: 'Aimee Homework',
-    summary: 'One open choice about spending a Mote on a missed refinement attempt, plus links to optional artwork. Early crafting work can continue.',
+    summary: 'Your Mote-spending choice, the three creature-generator rework goals, and links to optional artwork. Current status and remaining work stay visible.',
     source: aimeeHomework,
     systemLinks: [
       { href: '/references/design-decisions-september-4', title: 'Today’s design decisions', summary: 'What is current, decided, provisional, and still open.' },

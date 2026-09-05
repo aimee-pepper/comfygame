@@ -14,7 +14,7 @@ export default function ReferencesPage() {
     <PageIntro eyebrow="Project reference" title="Aimee Reference" summary="A clearly labelled home for Aimee's system plans, implementation roadmaps, and visual production references." />
     <section className="article-section note-card">
       <h2>Today’s decisions and Aimee Homework</h2>
-      <p>Read the 4 September decisions with current behavior, decided intended behavior, first-pass tuning, and unsettled proposals clearly separated. Aimee Homework collects the one open Mote-spending choice and links to optional artwork.</p>
+      <p>Read the 4 September decisions with current behavior, decided intended behavior, first-pass tuning, and unsettled proposals clearly separated. Aimee Homework collects the open Mote-spending choice, three creature-generator rework goals, and links to optional artwork.</p>
       <p><Link href="/references/design-decisions-september-4">Open today’s design decisions</Link> · <Link href="/references/aimee-homework">Open Aimee Homework</Link></p>
     </section>
     <section className="article-section note-card">
