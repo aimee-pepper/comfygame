@@ -33,6 +33,8 @@ Retain this bias only when the species has **Shore or Aquatic habitat validated 
 
 Terrestrial and Aerial species do not receive this particular bias, even beside water or while flying over it. They retain the ordinary appendage variation, darkness contribution and all other climate effects. This does not prohibit many-legged land creatures or multi-winged fliers.
 
+Current physical-root rules exclude frozen liquid below thermal floor 25. Therefore the ordinary liquid-water examples use floor 25: the retained cold-water bias is 0.2 there, falling to zero at 30. The full 1.2 arithmetic example applies to correcting severe dry cold, not to inventing unfrozen water at floor 0. Preserve the existing freeze boundary; do not thaw a source or stretch the cold ramp to make the effect larger.
+
 An invalid Shore/Aquatic component is an existing body/habitat validation failure, not permission to downgrade its species to Land or silently apply a dry fallback.
 
 ## Preserve sampling, then round once

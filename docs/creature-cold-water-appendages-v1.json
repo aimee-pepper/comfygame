@@ -35,7 +35,7 @@
   "examples": [
     {
       "id": "cold-aquatic",
-      "thermalFloor": 0,
+      "thermalFloor": 25,
       "habitat": "aquatic",
       "certifiedLiquid": true,
       "originalType": "finned",
@@ -43,11 +43,11 @@
       "bodyPlan": "piscine",
       "dark": false,
       "jitter": 0.4,
-      "expectedCount": 6
+      "expectedCount": 5
     },
     {
       "id": "cold-land",
-      "thermalFloor": 0,
+      "thermalFloor": 25,
       "habitat": "terrestrial",
       "certifiedLiquid": false,
       "originalType": "limbed",
@@ -59,7 +59,7 @@
     },
     {
       "id": "cold-flight-over-water",
-      "thermalFloor": 0,
+      "thermalFloor": 25,
       "habitat": "aerial",
       "certifiedLiquid": true,
       "originalType": "membrane",
@@ -71,7 +71,7 @@
     },
     {
       "id": "cold-shore-bank",
-      "thermalFloor": 0,
+      "thermalFloor": 25,
       "habitat": "shore",
       "certifiedLiquid": true,
       "originalType": "limbed",
@@ -79,7 +79,7 @@
       "bodyPlan": "piscine",
       "dark": false,
       "jitter": 0.4,
-      "expectedCount": 6
+      "expectedCount": 5
     },
     {
       "id": "warm-aquatic",
@@ -95,7 +95,7 @@
     },
     {
       "id": "dark-cold-aquatic",
-      "thermalFloor": 0,
+      "thermalFloor": 25,
       "habitat": "aquatic",
       "certifiedLiquid": true,
       "originalType": "finned",
@@ -103,11 +103,11 @@
       "bodyPlan": "piscine",
       "dark": true,
       "jitter": 1.4,
-      "expectedCount": 8
+      "expectedCount": 7
     },
     {
       "id": "dark-cold-land",
-      "thermalFloor": 0,
+      "thermalFloor": 25,
       "habitat": "terrestrial",
       "certifiedLiquid": false,
       "originalType": "limbed",
@@ -119,7 +119,7 @@
     },
     {
       "id": "none-to-shore-support",
-      "thermalFloor": 0,
+      "thermalFloor": 25,
       "habitat": "shore",
       "certifiedLiquid": true,
       "originalType": "none",
@@ -131,7 +131,7 @@
     },
     {
       "id": "none-to-flight",
-      "thermalFloor": 0,
+      "thermalFloor": 25,
       "habitat": "aerial",
       "certifiedLiquid": false,
       "originalType": "none",
@@ -143,7 +143,7 @@
     },
     {
       "id": "final-none",
-      "thermalFloor": 0,
+      "thermalFloor": 25,
       "habitat": "aquatic",
       "certifiedLiquid": true,
       "originalType": "finned",
@@ -164,6 +164,18 @@
       "dark": false,
       "jitter": 0.4,
       "expectedError": "invalid-body-habitat-component"
+    },
+    {
+      "id": "severe-dry-cold-round-once",
+      "thermalFloor": 0,
+      "habitat": "terrestrial",
+      "certifiedLiquid": false,
+      "originalType": "limbed",
+      "finalType": "limbed",
+      "bodyPlan": "quadruped",
+      "dark": false,
+      "jitter": 0.4,
+      "expectedCount": 4
     }
   ],
   "outOfScope": [
@@ -175,5 +187,6 @@
     "new-material-consumers",
     "Bestiary-UI",
     "legacy-migration"
-  ]
+  ],
+  "physicalBoundary": "Retain existing floor-below-25 freeze exclusion; valid ordinary liquid cold examples use floor25, never invented unfrozen floor0 water."
 }
