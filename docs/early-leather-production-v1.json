@@ -146,7 +146,52 @@
     "physicalIdentity": "saved site-level salt-crust deposit retains base ground/bedrock/elevation/liquid; no recession history invented and no whole-region surface replacement",
     "freeze": "separate stable branch/original-region stream; save basis, original region, roll and candidate/selected anchor facts; preserve across downstream adapters; no legacy backfill",
     "protection": "no occupied, critical, already-promised or explicitly protected incompatible surface; selected producer excludes optional flora at same anchor",
-    "writtenGuaranteeStatus": "generic hand-gather promise only; exact Salt grammar/host preparation/infeasibility adapter unclosed; ordinary Salt independent; no invented trigger or chemistry rewrite"
+    "writtenGuaranteeStatus": "decided intended binding in early-written-salt-guarantee-v1.md; implementation and native acceptance pending; ordinary generation remains independent",
+    "writtenGuarantee": {
+      "authority": "early-written-salt-guarantee-v1.md",
+      "version": 1,
+      "trigger": {
+        "source": "salt",
+        "explicitTarget": "substrate",
+        "authoredOnly": true,
+        "includeCanonicalCompoundComponents": true,
+        "excludeAbsent": true,
+        "excludeOwnSubstrateNegation": true,
+        "otherTargets": "existing pressure only"
+      },
+      "deduplication": "one promise per canonical Salt identity/world; local denial does not cancel independent positive components; no Count/Scale/Intensity multiplication",
+      "producer": "early.gather.salt_crust.v1",
+      "placements": 1,
+      "quantityPerPlacement": 2,
+      "hits": 1,
+      "tool": "hand",
+      "host": "prefer existing valid exposed crust; otherwise one written_salt_deposit over empty dry unfrozen unsubmerged soil/loam/clay-soil or sand with known ordinary-water chemistry; passable and unprotected",
+      "authoredException": "one local material occurrence need not satisfy ambient salinity60/root-water25/shoreline/ordinary random roll; preserve regional chemistry and separate proof from ordinary Salt receipt",
+      "preserve": [
+        "base ground",
+        "bedrock",
+        "elevation",
+        "water",
+        "neighbouring roots",
+        "protected and other promised content",
+        "independent region/formation rolls"
+      ],
+      "siteFacts": "actual crust excludes ordinary-root/plant claim at selected anchor; update final site/habitat and retain parent facts through adapters",
+      "budget": "one existing looseEarth slot before ordinary Clay/Salt; satisfies ordinary one-Salt reservation; no expansion or duplicate credit; joint protected allocation",
+      "distance": {
+        "finalShortestGraphSteps": [
+          3,
+          8
+        ],
+        "workPosition": "standable source anchor",
+        "secondNodeRule": null
+      },
+      "preflight": "same frozen quote/Bind world plan; structural physical/route/capacity failure refuses before spending; no auto seed reroll or silent pressure-only fallback",
+      "directConflict": "only genuine supported direct guarantees use existing disclosed transform/strength/frozen-tie winner and influence; unresolved conflict holds quote without spend",
+      "oldWorlds": "new explicit written-Salt policy only; ordinary earlySaltVersion alone is not opt-in; nil/older books pressure-only and contents unchanged",
+      "counterfactual": "remove qualifying declaration promise/preparation/credit, preserve ordinary policy and independent rolls",
+      "scope": "no new word, knowledge grant, paid natural search, climate rewrite, final art or Library UI"
+    }
   },
   "recipes": [
     {

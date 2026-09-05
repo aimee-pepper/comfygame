@@ -93,9 +93,9 @@ Use a stable separate stream per original region and branch, never per rendering
 new region partition or retry. Freeze host eligibility before allocating optional sources and preserve it
 through later map adapters. Old worlds keep their saved contents; missing legacy physical facts do not
 backfill new ordinary Salt or invent recession history. The generic first-pass written-resource rules are
-intended authority, but the exact callable Salt binding is not closed and no executable written-Salt adapter
-is established by this packet. Ordinary Salt does not require that adapter. See the precise remaining
-decisions below; do not invent a trigger, terrain preparation, guarantee or before-spend refusal for Salt.
+intended authority. The exact callable Salt binding is now closed in
+[Written Salt guarantee](early-written-salt-guarantee-v1.md); its distinct authored physical-host proof and
+preflight are required before claiming runtime support. Ordinary Salt remains independent of that adapter.
 
 One eligible Salt gather is reserved within the existing loose-earth budget after written guarantees and
 ordinary Clay reservations. If the budget or legal placement is exhausted, it competes in future eligible
@@ -185,7 +185,11 @@ encounter balance remain separate. Earlier ecology specifications and their obso
 are not a current comprehensive completion receipt. No Library integration automatically resumes from
 this packet's readiness or eventual bounded runtime acceptance.
 
-## Written Salt: exact binding remains unclosed — 5 September 2026
+## Written Salt: historical gap and superseding closure — 5 September 2026
+
+**Superseded later on 5 September:** [Written Salt guarantee](early-written-salt-guarantee-v1.md) now closes
+the exact trigger, one local authored crust, budget, physical failure and old-book policy. The following
+paragraphs retain the original gap diagnosis, not current open implementation choices.
 
 The phrase “existing written Salt guarantees” in earlier revisions overstated the retained authority.
 `resource-world-first-pass-tuning-v1.md`, Geological placement, settles a generic base-resource promise:
