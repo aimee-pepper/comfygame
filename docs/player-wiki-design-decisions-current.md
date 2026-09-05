@@ -221,7 +221,7 @@ Existing worlds retain their creatures and movement. The completed Hide path kee
 
 A creature’s supported habitat determines its section. Amphibious means suited to water and adjacent land; it does not mean the Earth animal class or unrestricted travel through every depth. Wings on a land-bound creature do not place it in Sky. Body shape describes its main body, rather than counting every wing, fin or other appendage. A category does not grant new abilities or reveal undiscovered creature information.
 
-**Bestiary work can now proceed:** Aimee explicitly lifted its hold after approving this structure. The wider creature rework remains unfinished. Bestiary implementation is currently deferred while fresh-start early progression takes priority; the arrangement needs no further approval. Materials and known source details belong inside each entry.
+**Bestiary work can now proceed:** Aimee explicitly lifted its hold after approving this structure. The wider creature rework remains unfinished. Bestiary implementation remains pending; the arrangement needs no further approval. Materials and known source details belong inside each entry.
 
 **Browsing proposal:** show body-shape subcategories represented by recorded creatures, without suggesting that every possible combination must be collected. This display treatment remains a recommendation.
 
@@ -234,6 +234,16 @@ An Ambusher needs the existing concealed close-range striking traits. Pursuers c
 A grazing diet is not yet defined, so new descriptions will not call a creature a Grazer merely because it has weak weapons or lives near plants. Its diet stays unspecified. These naming rules add no new behavior or food simulation; existing worlds retain their names, and source materials keep their own rules.
 
 **Still open:** actual food relationships, nesting, weather responses and the full creature experience. This is partial progress on ecological coherence, not a completed ecology system.
+
+### Climate and creature bodies
+
+**Current generation rules:** cold tends to favour larger bodies and more covering. The wetter cold response favours bulk with less extra covering length than the drier response; heat tends toward smaller, less-covered bodies. These are tendencies that leave room for different creatures, not promises that every animal has fur, fat or protection from the weather. These relationships have not yet had a complete creature-experience playtest.
+
+**Decided intended correction; not implemented:** the existing cold-water tendency toward additional appendages will apply only to creatures with a supported water or amphibious habitat containing actual liquid water. It currently applies too broadly to cold-world creatures. A land creature or flier will keep ordinary body variation, but will not receive that particular water-related tendency just because its world is cold or wet. Amphibious creatures can still qualify while on their bank; their supported water-and-land habitat is what matters.
+
+Ice alone is not liquid habitat. This correction adds no new swimming or flying ability, weather immunity, material reward or food simulation. A creature’s body stays fixed after generation, and existing worlds keep their creatures. Cold land can still produce many-legged creatures through ordinary variation.
+
+**Still unsettled:** actual diets, nesting and useful responses to changing weather. Wet coats, shelter seeking, migration and seasonal body changes are possible future ideas, not selected features. This is partial progress on weather/body coherence, not a complete weather ecology system.
 
 ### Bone — first material beyond Hide
 
@@ -315,7 +325,7 @@ Begin with **Bind & Depart**, review the actual price, and explore visible oppor
 
 **Next progression to test:** naturally find and invite Nessa, build the Apothecary for 20 Essence, 4 Clay and 4 Logs, then make and use a Lesser Salve for 1 Resin and 1 Plant Fibre at no Essence cost. Check your live next-departure price and the option to refine collected raw Essence before spending. The full natural Halloway, forge and T2 acquisition path also remains unverified.
 
-The maker services and early crafting transactions are implemented and have separate controlled checks. This fresh-start build lets you test their ordinary acquisition; it does not establish that the complete opening is balanced. Later maker/material migrations, later tiers, the wider creature rework and new terrain-height/liquid behavior remain unfinished. Bestiary sorting is approved but deferred while early progression takes priority; 3D remains under consideration. This is a Simulator test, not a phone replacement or a general release.
+The maker services and early crafting transactions are implemented and have separate controlled checks. This fresh-start build lets you test their ordinary acquisition; it does not establish that the complete opening is balanced. Later maker/material migrations, later tiers, the wider creature rework and new terrain-height/liquid behavior remain unfinished. Bestiary sorting is approved and awaits implementation; 3D remains under consideration. This is a Simulator test, not a phone replacement or a general release.
 
 ### Connected material development playtest
 
