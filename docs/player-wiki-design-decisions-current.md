@@ -69,6 +69,8 @@ Foreground trees, bushes, and objects partly fade when their artwork covers the 
 
 **Fading is a visual aid, not extra sight.** It reveals only the character and surroundings already permitted by the game’s visibility rules. It cannot expose fogged terrain, hidden creatures or resources, or things still concealed by gameplay canopy. The existing canopy rule remains: a second consecutive canopy square conceals what lies beyond; standing beneath canopy gives the local exception around the party. That exception does not erase other sight restrictions. Earned minimap knowledge remains earned. Fading itself spends no turn and changes no collision, target, harvest, or discovery.
 
+**Unsettled renderer proposal:** actual 3D rendering with sprites and a fixed orthographic camera is under consideration, partly for atmosphere and Blender authoring. A small on-phone comparison would show one existing grid patch, depth and foreground fading, local water, a simple shadow and one atmospheric effect. The renderer has not been chosen. This would preserve the square-grid actions, saved worlds and fog rules; it does not decide stacked floors, physics, camera rotation or a day/night system. The current playable overhaul continues before broad terrain production.
+
 **Accepted for later, low priority:** trees, elevated land, bushes, resource nodes, and the player character should have shadows in the three-quarter view. Their shape and treatment will be worked out after the new world geometry and foreground visibility are established. This is a presentation direction, not a decision to add dynamic lighting or a day/night system. The playable overhaul takes priority.
 
 Existing saved worlds keep their movement and contents. The initial proof will check a tree to walk behind and chop, a visible shallow-water bed, a raised pond, a legal height connection, and foreground overlap before final artwork is specified. Exact dimensions, composition, opacity, and fade timing remain production work. The active crafting overhaul continues alongside this bounded proof; this view does not introduce new world-writing guarantees, celestial cycles, or a fluid simulation.
@@ -228,7 +230,7 @@ These starter plants belong to compatible cool, temperate, or warm habitats with
 
 Ordinary background moisture counts as water even when the written conditions only reduce its amount. Sea, Tide and Brine still carry their actual saltiness. A Mercury seam is local: it does not turn every river or plant root in the world into Mercury. Mercury itself supplies no ordinary watering, and roots actually touching Mercury, another non-water liquid, or an unidentified liquid are unsuitable for these starter plants. Nearby ordinary water keeps its own identity.
 
-Early ingredients must have ordinary gathering routes; they cannot depend exclusively on a lucky merchant offer, recycling, creature loot, or a later resource-Writing symbol. The complete gathering and return journey still needs playtesting.
+Early ingredients must have ordinary gathering routes; they cannot depend exclusively on a lucky merchant offer, recycling, creature loot, or a later resource-Writing symbol. An arranged development journey now completes gathering, Return, building the Apothecary, preparing and packing a Salve, the next Bind, and using it. Natural generated-world pacing still needs playtesting.
 
 ### World-generation findings — development results, not phone delivery
 
@@ -240,22 +242,33 @@ The first test of **1,000 completely unwritten worlds**, before the latest corre
 
 With the chosen sources held fixed, those weights improved suitable soil-condition checks from **6.7% to 30.6%** for unwritten inputs and **20.3% to 41.7%** with a moderate Sun. Soil conditions alone do not prove that gathering sources appear on the map.
 
-**Latest actual-map sample:** 64 unwritten worlds and 64 worlds with a moderate Sun were generated using the corrected root water, adopted intensity weights, and blocking Iron and Coal deposits.
+**Latest full actual-map test:** one set of **1,000 completely unwritten worlds** used the corrected root water, adopted intensity weights, blocking deposits and connected-habitat check. **999 maps generated; one failed.** All percentages below use the full 1,000 requested worlds.
 
-| Result | Completely unwritten | Moderate Sun written |
-| --- | ---: | ---: |
-| Worlds containing all four starter plant sources: Stem Fibre, Leaf Fibre, Resin and Softwood | 16 of 64 (25%) | 23 of 64 (35.9%) |
-| Worlds recognized by the previous Nessa habitat check | 13 of 64 (20.3%) | 18 of 64 (28.1%) |
-| Worlds containing Iron | 64 of 64 | 64 of 64 |
-| Worlds containing Coal | 58 of 64 | 58 of 64 |
+| Measure | Worlds out of 1,000 |
+| --- | ---: |
+| Fresh growing habitat, previous single-region check on these same maps | 202 (20.2%) |
+| Fresh growing habitat, connected-area check | **296 (29.6%)** |
+| Fibre-bearing habitat, previous check → connected-area check | 278 → 299 |
+| Iron actually placed | 997 |
+| Suitable Coal hosts → worlds with Coal actually placed | 928 → 927 |
+| Resin actually placed | 296 |
+| Softwood actually placed | 293 |
+| Stem Fibre actually placed | 299 |
+| Leaf Fibre actually placed | 299 |
 
-All 128 maps generated successfully, and the placed gathering sources retained reachable working positions. Four worlds had room for only one legal Clay deposit, and that deposit was placed. A second deposit is not forced onto unsuitable ground. This small sample does not establish the full 1,000-world review target or prove an affordable gathering journey.
+The **25% growing-habitat review target is met in this sample**. Habitat and placed materials are different measures: recognizing suitable land does not prove that every intended source was placed. The old and new habitat counts come from the same maps, so that difference reflects the counting correction rather than an additional climate improvement. Individual material counts do not by themselves establish how often a world contains the complete set.
+
+**The overall test failed:** five worlds missed part or all of their intended Softwood reservation, and one missed Coal. Their available ground, competing placements and protected routes need diagnosis; these six cases have not been accepted as unavoidable shortages. Separately, 22 worlds had only one legal Clay site where two were requested. Those are confirmed capacity limits, and a second deposit is not forced onto unsuitable ground. Every source that was placed retained a reachable working position.
+
+The earlier, smaller comparison contained all four starter plant sources in 16 of 64 unwritten worlds and 23 of 64 moderate-Sun worlds. There has been no new full Sun-written test. The full unwritten result above is the latest measurement, not a promise about every future journey.
 
 **Decided intended habitat correction:** suitable growing ground counts together across the area connected to the entrance. It does not stop counting at a change of soil or elevation. Nessa’s fresh growing land still needs at least twelve suitable ground cells and legal Resin and Softwood sites; Corrin’s fibre-bearing growth needs twelve suitable cells and legal Stem and Leaf sites. Each cell must meet its own habitat requirements. Disconnected, dark, frozen, saline or otherwise unsuitable ground does not help. No extra plants are added, and harvesting does not erase a world’s established suitability.
 
-The previous check required all twelve cells within one terrain region, even when the connected area already supplied all four starter plant materials. The corrected check will recognize that connected habitat consistently. Its new encounter rate has not yet been measured; the table above retains the previous check so the distinction stays visible.
+The previous check required all twelve cells within one terrain region. The connected check is now implemented in development and passes focused cases for split areas, unsuitable and disconnected ground, duplicate cells, missing source sites, and preserved older worlds. It does not change terrain or add plants merely to change the habitat result.
 
-**Remaining work:** measure one full set of 1,000 unwritten worlds with the connected-habitat correction, keeping actual sources and both habitat counts separate, then complete the gathering, return, healing and next-Bind journey checks. Keep the adopted intensity weights while measuring. Drainage has not been adopted as the availability fix, and writing a fainter Sun did not improve the earlier results. These development findings do not mark the overhaul as delivered.
+**Connected journey, tested in development:** an arranged first world has been played through six gathers, Nessa’s invitation, full Return, Apothecary construction, Lesser Salve preparation, packing, the next Bind, and use of the carried Salve. Native use confirmed target selection, consumption and one turn on a full-health character. A separate controlled injury check confirmed the existing 10-point healing effect. Arranged sources and those checks do not establish ordinary gathering time, encounter pressure or next-Bind affordability in naturally generated worlds.
+
+**Remaining work:** resolve the six placement exceptions and the generation failure, then check natural journey pacing and readiness for delivery. Keep the adopted intensity weights; the result does not call for another climate change. Drainage has not been adopted as the availability fix, and writing a fainter Sun did not improve the earlier results. **The overhaul remains disabled for new ordinary campaigns and is not delivered to your phone.**
 
 ### Mineral occurrence — decided intended behavior
 
@@ -269,7 +282,7 @@ After written sources and suitable early Iron and Coal opportunities, other mine
 
 Each still needs compatible geology. These groups describe how often a suitable find is selected, not material quality, sale price or the tool needed to gather it. The starting group weights are 70 / 25 / 5; groups with no suitable material are skipped. This does not promise that every world contains each group.
 
-Clay and Salt use their separate hand-gathered deposits. Rubble is held out of this new early mineral selection until its gathering and processing route is ready; existing worlds and owned stock are preserved. These rules are intended tuning. The first actual-map sample is recorded above; the larger measurement and complete journey testing remain pending.
+Clay and Salt use their separate hand-gathered deposits. Rubble is held out of this new early mineral selection until its gathering and processing route is ready; existing worlds and owned stock are preserved. These rules are intended tuning. The full actual-map test and arranged journey are recorded above; placement exceptions, natural pacing and delivery remain pending.
 
 ### Trade and recovery
 
