@@ -1,7 +1,7 @@
 # Workshop NPC transfer — current authority
 
 **Status:** Direct Aimee implementation authority. The standalone Workshop is removed. Every one of its
-54 live grants remains obtainable from a named existing traveller source before the Workshop route is hidden.
+54 live grants remains obtainable from a named existing source before the Workshop route is hidden.
 **Scope:** stable ownership, acquisition, migration and consumer continuity only. This packet does not add
 a traveller, building, currency, research tree or Party teaching surface.
 **Updated:** 4 September 2026 (field-pack rows only).
