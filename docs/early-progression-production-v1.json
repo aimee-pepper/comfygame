@@ -51,7 +51,52 @@
         "acid_precipitation",
         "corrosive_air"
       ],
-      "identityRule": "resolved root liquid/precipitation is ordinary water; saline water fails fresh threshold; other liquids and unknown identities are ineligible"
+      "identityRule": "resolved root liquid/precipitation is ordinary water; saline water fails fresh threshold; other liquids and unknown identities are ineligible",
+      "pressureOnlyIdentityAdapter": {
+        "baseline": "ordinary water even if only reducing sources speak",
+        "reducers": "change quantity/derived state, not remaining-water identity",
+        "salineSources": "water with actual salinity; freshness still checked",
+        "mercury": "separate substrate seam; omit only its non-water Hydrology contribution before clamp and frozen-water availability; preserve all other contributions and random outcomes",
+        "spatialExclusion": "only explicit Mercury/non-water root contact is ineligible; no whole-world contamination from a source tag",
+        "unknowns": "explicit unresolved local liquid/contact remains ineligible and is reported separately"
+      },
+      "adapterQuantityFixtures": [
+        {
+          "waterNetBeforeClamp": 30,
+          "mercuryContribution": 0,
+          "waterOnlyFrozenShare": 0,
+          "expectedOrdinaryAvailable": 30,
+          "meaning": "ordinary baseline after reducers remains water"
+        },
+        {
+          "waterNetBeforeClamp": 40,
+          "mercuryContribution": 4,
+          "waterOnlyFrozenShare": 0,
+          "expectedOrdinaryAvailable": 40,
+          "meaning": "Mercury does not supply root moisture or globally remove baseline water"
+        },
+        {
+          "waterNetBeforeClamp": 70,
+          "mercuryContribution": 4,
+          "waterOnlyFrozenShare": 0,
+          "expectedOrdinaryAvailable": 70,
+          "meaning": "ordinary water and Mercury coexist separately"
+        },
+        {
+          "waterNetBeforeClamp": 110,
+          "mercuryContribution": 4,
+          "waterOnlyFrozenShare": 0,
+          "expectedOrdinaryAvailable": 100,
+          "meaning": "exclude non-water before clamping, not subtract4 afterward"
+        },
+        {
+          "waterNetBeforeClamp": 40,
+          "mercuryContribution": 4,
+          "waterOnlyFrozenShare": 0.5,
+          "expectedOrdinaryAvailable": 20,
+          "meaning": "frozen availability reads water-only resolved forms"
+        }
+      ]
     },
     "regionGeologyFallback": {
       "bedrockWeights": {

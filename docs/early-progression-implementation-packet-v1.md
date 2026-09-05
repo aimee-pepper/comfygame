@@ -39,6 +39,23 @@ infer them from colour, and never invent an unapproved Rain-plus-Miasma reaction
 is excluded from the ordinary cohort pending resolution. Existing disclosed toxic world hazards still
 apply to the player independently of whether an ordinary plant can grow there.
 
+**Pressure-only water adapter closure (Engineering question, 4 September):** the ordinary Hydrology
+baseline is ordinary water even if only water-reducing sources speak. Chasm, Salt, Sand, Thin Air and
+Wildfire modify its amount or derived state; they do not make the remaining baseline an unknown liquid.
+Brine, Sea and Tide remain water with their actual salinity; they do not automatically pass the fresh-root
+test. Frozen-water and all other ordinary-cohort exclusions remain.
+
+Mercury is a separate substrate seam. Its +4 contaminated-seam Hydrology contribution is not root moisture.
+Resolve ordinary-water Hydrology from the same baseline and actual authored/generated contributions while
+omitting only that non-water contribution **before** the existing clamp and water-only frozen-availability
+calculation. Keep the substrate contribution and all other world pressures/random outcomes. Do not subtract
+4 after clamping or reroll the world. A Mercury source/tag does not exclude unrelated roots across the
+whole world. Explicit Mercury/non-water root-contact positions are ineligible; explicitly unresolved local
+contact is reported separately. If the minimum adapter has no such contact placement, do not invent one
+or poison every region. This adds no Mercury pool producer, acid transformation, or global contamination
+mechanic. JSON quantity fixtures check reduction, coexistence, clamping and frozen water; they precede the
+remaining moisture/category tests and are not complete habitat fixtures.
+
 **Sun consistency:** a baseline Thermal 50 plus current Sun produces peak 90/floor 58, midpoint 74:
 ordinary warm roots, subject to the other resolved conditions. The old `TerrainRules.paint` rule turning
 soil into sand solely above peak 75 must not run again after the new region has resolved ordinary roots.
