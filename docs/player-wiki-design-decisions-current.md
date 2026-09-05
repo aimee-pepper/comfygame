@@ -223,7 +223,21 @@ A creature’s supported habitat determines its section. Amphibious means suited
 
 **Bestiary work can now proceed:** Aimee explicitly lifted its hold after approving this structure. The wider creature rework remains unfinished. Bestiary implementation remains pending; the arrangement needs no further approval. Materials and known source details belong inside each entry.
 
-**Browsing proposal:** show body-shape subcategories represented by recorded creatures, without suggesting that every possible combination must be collected. This display treatment remains a recommendation.
+**Decided browsing clarification:** body-shape groups contain recorded creatures only. The four chapter labels may be visible when empty, but the game will not fill them with locked creature silhouettes or suggest that every possible combination must be collected.
+
+### What the Bestiary knows
+
+**Current record behavior:** an ordinary encounter records the creature kind and, when available, an individual record. You do not need to win the fight to keep that record. Existing recorded measurements and comparisons remain available. Simply seeing a distant creature does not yet create its own saved sighting record.
+
+**Decided intended sorting behavior; not implemented:** habitat and body-shape grouping use what your records actually establish. Search and counts include recorded kinds only, never creatures hidden elsewhere in a world. Several individual records of the same kind still count as one kind.
+
+Older records stay available. A known Water creature with no trustworthy shape record belongs under **Water → Shape not recorded**. A creature with no recorded habitat stays **Unclassified**, even if its picture has wings. These are labels for incomplete records, not new habitats or body types. The game will not guess Four-legged from an old missing value.
+
+A kind’s body-shape grouping follows its **latest recorded shape**. Some broad kinds contain several individual records; when a later encounter establishes a different shape, the grouping may move while the older individual records remain accessible. A recorded classification stays known even when the oldest detailed specimen records are no longer retained. Habitat stays tied to its recorded movement category.
+
+Empty sections say that no creatures are recorded there. There is no hidden-species total, completion percentage, or search suggestion drawn from undiscovered creatures. Opening or sorting the Bestiary does not create a new discovery, specimen or material reward.
+
+**Intended but unfinished:** recording a genuine distant sighting, including an unreachable water creature, without pretending it is a measured specimen. The exact extra information such a sighting would reveal, and any new analysis or likely-material reveal stages, remain unsettled. The sorting update does not add those actions or infer a complete material list from appearance, an encounter or a victory.
 
 ### Creature descriptions that match their lives
 
