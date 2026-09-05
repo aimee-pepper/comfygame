@@ -1,6 +1,6 @@
 # Bone from generated bodies — bounded producer and custody contract
 
-**5 September 2026 · Decided intended contract, awaiting implementation assignment.** This advances the first creature Homework goal; it does not complete that goal or the wider rework. No Library Bestiary UI/integration is released.
+**5 September 2026 · Decided intended contract, awaiting implementation assignment.** This advances the first creature Homework goal; it does not complete that goal or the wider rework. Bone implementation remains separate from the Bestiary arrangement, whose work hold Aimee lifted on 5 September; see creature-role-coherence-v1.md section 8.
 
 **Scope:** one canonical raw material, **Bone**, from generated ordinary creatures, through reward, carried stock, Return, Storehouse and the existing Trading Post material-sale consumer. Current Bone-compatible crafting is recorded accurately below; a new-material crafting adapter is a separate unfinished dependency. No new weapon recipe, maker unlock, anatomy catalogue or final art is approved here.
 

@@ -1,0 +1,281 @@
+{
+  "schemaVersion": 1,
+  "authorityID": "creature-role-coherence-v1",
+  "status": "decided-intended-awaiting-assignment",
+  "nativeBaseline": "165a20e43f59a58baaa15f0c28ddd5b099b4ae7c",
+  "policy": {
+    "field": "creatureRoleCoherenceVersion",
+    "value": 1,
+    "requiresCreatureBodyHabitatVersion": 1,
+    "nil": "preserve-legacy-casts-names-and-keys"
+  },
+  "retainedCausalRules": {
+    "ordinaryBudget": "existing-fixed-budget",
+    "vitality": "cast-and-population-only",
+    "trophicDepthCap": "existing-FloraRules.productivity*1.2",
+    "diet": "unspecified-no-feeding-simulation",
+    "roleNeverChanges": [
+      "traits",
+      "habitat",
+      "counts",
+      "spawnWeights",
+      "RNG",
+      "Danger",
+      "combat",
+      "materialReceipts",
+      "teachingEligibility"
+    ]
+  },
+  "matching": {
+    "order": [
+      "ambusher",
+      "pursuer",
+      "tank",
+      "grazer",
+      "swarmer",
+      "apex",
+      "drifter",
+      "sentinel"
+    ],
+    "fit": "existing-IdentityRegion.fit-formulas",
+    "threshold": 0.78,
+    "tolerance": 25,
+    "selection": "hard-eligibility-before-highest-soft-fit; retain-first-in-order-tie",
+    "fallback": "composed-physical-description"
+  },
+  "gates": {
+    "ambusher": "armament.total>=25 && dominant==pierce && reach==close && defence==crypsis",
+    "pursuer": "ordinary-mobile && !sessile && !actualApex",
+    "tank": "covering.armourValue>0",
+    "grazer": "false; no confirmed plant-feeding identity in this policy",
+    "swarmer": "delivery==multi || delivery==area",
+    "apex": "false-for-ordinary-cast; preserve-separate-Apex-path",
+    "drifter": "habitat==aquatic || habitat==aerial",
+    "sentinel": "reach==far"
+  },
+  "unarmed": {
+    "threshold": 25,
+    "massDamage": "preserved",
+    "delivery": "preserved",
+    "farFirstStrike": "preserved",
+    "doesNotProve": "diet-or-harmlessness"
+  },
+  "nounByHabitat": {
+    "aerial": "flier",
+    "aquatic": "swimmer",
+    "terrestrial": {
+      "quadruped": "walker",
+      "biped": "walker",
+      "serpentine": "coil",
+      "segmented": "creeper",
+      "radial": "shape",
+      "amorphous": "shape"
+    },
+    "shore": {
+      "quadruped": "walker",
+      "biped": "walker",
+      "serpentine": "coil",
+      "segmented": "creeper",
+      "radial": "shape",
+      "piscine": "walker",
+      "amorphous": "shape"
+    }
+  },
+  "nounPrecondition": "validated-supported-body/habitat-pair; map-does-not-enable-zero-weight-body-or-new-movement",
+  "withheldWords": {
+    "grazer": "feeding-identity-undefined",
+    "eel": "no-specific-species-authority",
+    "glider": "no-distinct-gliding-mode",
+    "hollow": "no-cavity-anatomy-field"
+  },
+  "interpretation": {
+    "freeze": "species-generation-before-cosmetic-jitter",
+    "fields": [
+      "version",
+      "speciesID",
+      "sourceBodyHabitatPolicy",
+      "roleOrComposed",
+      "supportedDisplayName",
+      "existingCompatibilityKey"
+    ],
+    "consumers": [
+      "Field",
+      "Look",
+      "encounter-labels",
+      "reward-source-description"
+    ],
+    "keys": "preserve-existing-source-IDs-and-compatibility-keys; never-key-by-new-display-text",
+    "duplicateDisplay": "prefer-truth-over-invented-anatomical-distinction",
+    "Library": "no-UI-consumer-or-key-migration"
+  },
+  "exceptions": [
+    "actual-Apex",
+    "sessile-flora",
+    "authored-special-creatures",
+    "legacy-policy-nil"
+  ],
+  "bestiaryOrganization": {
+    "primaryStatus": "Aimee-direction-5-September-decided-intended",
+    "chapters": [
+      {
+        "name": "Sky",
+        "habitat": "aerial"
+      },
+      {
+        "name": "Water",
+        "habitat": "aquatic"
+      },
+      {
+        "name": "Amphibious",
+        "habitat": "shore"
+      },
+      {
+        "name": "Land",
+        "habitat": "terrestrial"
+      }
+    ],
+    "amphibiousMeaning": "supported-water-and-land-movement-not-Earth-taxonomic-class",
+    "subcategoryStatus": "Aimee-approved-5-September-decided-intended",
+    "implementation": "Bestiary-hold-lifted-by-Aimee-5-September-awaiting-implementation",
+    "subcategory": "bodyPlan",
+    "labels": {
+      "quadruped": "Four-legged",
+      "biped": "Two-legged",
+      "serpentine": "Serpentine",
+      "segmented": "Segmented",
+      "radial": "Radial",
+      "piscine": "Fish-shaped",
+      "amorphous": "Amorphous"
+    }
+  },
+  "examples": [
+    {
+      "id": "land-membrane",
+      "habitat": "terrestrial",
+      "bodyPlan": "quadruped",
+      "appendageType": "membrane",
+      "count": 2,
+      "noun": "walker"
+    },
+    {
+      "id": "air-membrane",
+      "habitat": "aerial",
+      "bodyPlan": "serpentine",
+      "appendageType": "membrane",
+      "count": 2,
+      "noun": "flier"
+    },
+    {
+      "id": "aquatic-no-fins",
+      "habitat": "aquatic",
+      "bodyPlan": "serpentine",
+      "appendageType": "none",
+      "count": 0,
+      "noun": "swimmer"
+    },
+    {
+      "id": "shore-piscine",
+      "habitat": "shore",
+      "bodyPlan": "piscine",
+      "appendageType": "limbed",
+      "count": 2,
+      "noun": "walker"
+    },
+    {
+      "id": "no-crypsis",
+      "candidate": "ambusher",
+      "legacyFit": 0.8,
+      "armamentTotal": 40,
+      "dominant": "pierce",
+      "reach": "close",
+      "defence": null,
+      "gate": false
+    },
+    {
+      "id": "actual-crypsis",
+      "candidate": "ambusher",
+      "legacyFit": 1,
+      "armamentTotal": 40,
+      "dominant": "pierce",
+      "reach": "close",
+      "defence": "crypsis",
+      "gate": true
+    },
+    {
+      "id": "unarmed-pursuer",
+      "candidate": "pursuer",
+      "legacyFit": 0.8,
+      "armamentTotal": 0,
+      "ordinaryMobile": true,
+      "sessile": false,
+      "actualApex": false,
+      "gate": true
+    },
+    {
+      "id": "no-producer-grazer",
+      "candidate": "grazer",
+      "producerProductivity": 0,
+      "gate": false
+    },
+    {
+      "id": "forest-grazer",
+      "candidate": "grazer",
+      "producerProductivity": 80,
+      "gate": false
+    },
+    {
+      "id": "land-drifter",
+      "candidate": "drifter",
+      "habitat": "terrestrial",
+      "gate": false
+    },
+    {
+      "id": "water-drifter",
+      "candidate": "drifter",
+      "habitat": "aquatic",
+      "gate": true
+    },
+    {
+      "id": "ordinary-apex",
+      "candidate": "apex",
+      "actualApex": false,
+      "gate": false
+    },
+    {
+      "id": "single-strike",
+      "candidate": "swarmer",
+      "delivery": "single",
+      "gate": false
+    },
+    {
+      "id": "unarmed-multi",
+      "candidate": "swarmer",
+      "delivery": "multi",
+      "armamentTotal": 0,
+      "gate": true
+    },
+    {
+      "id": "unarmed-far",
+      "candidate": "sentinel",
+      "reach": "far",
+      "armamentTotal": 0,
+      "gate": true
+    },
+    {
+      "id": "close-sentinel",
+      "candidate": "sentinel",
+      "reach": "close",
+      "gate": false
+    }
+  ],
+  "outOfScope": [
+    "diet-foodchain-nesting-weather-simulation",
+    "new-species-abilities-spawn-odds",
+    "full-adjective-catalogue",
+    "new-body-material-families",
+    "native-assignment",
+    "Library-integration",
+    "new-art",
+    "paid-natural-run"
+  ]
+}

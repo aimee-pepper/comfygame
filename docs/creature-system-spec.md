@@ -1,6 +1,8 @@
 # The Creature System — traits, cast, combat, loot
 
-> **5 September body/habitat authority:** [Generated body plans and habitat compatibility](generated-creature-body-habitat-v1.md) and its companion JSON close the next bounded Design slice. They supersede older morphology and aerial-boundary rules for newly opted-in worlds; implementation remains unassigned. The wider creature rework and Library Bestiary UI/integration remain unfinished/held. Existing Hide and full source-colour rules stay authoritative.
+> **5 September ecological-role slice:** [Creature role and movement coherence](creature-role-coherence-v1.md) supersedes unsupported new-policy role/movement naming. It preserves actual pursuit/combat, treats diet as unspecified, and carries the intended Sky/Water/Amphibious/Land Bestiary chapters with approved body-shape subcategories. Aimee lifted the Bestiary work hold on 5 September; implementation remains pending.
+
+> **5 September body/habitat authority:** [Generated body plans and habitat compatibility](generated-creature-body-habitat-v1.md) and its companion JSON close the next bounded Design slice. They supersede older morphology and aerial-boundary rules for newly opted-in worlds; implementation remains unassigned. The wider creature rework and Bestiary UI/integration remain unfinished; Aimee has now lifted the Bestiary work hold. Existing Hide and full source-colour rules stay authoritative.
 
 **Status:** Claude's design. Implements session 15's decisions (cast + jitter, Vitality sets cast size not spread, anchored worlds keep their cast, free sampling with derived identity) and §3–5 of `generation-spine-spec.md`. Numbers are **[PLACEHOLDER]** throughout.
 
