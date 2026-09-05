@@ -194,7 +194,7 @@ These are the completed starting specifications for the early material path. The
 | Pick 1 → 2 | Owned Pick plus the blade's raw-material bundle; no Essence | The same Pick improved to level 2 |
 | Axe 1 → 2 | Owned Axe plus the blade's raw-material bundle; no Essence | The same Axe improved to level 2 |
 
-Iron is the blade's point, Log its handle, Fibre its binding, and Coal the forge fuel. Handle and binding choices can change colour; they do not add a new statistic to this starter blade. Fuel does not tint equipment. The first Scythe improvement belongs to Blacksmith T2, as described above. Pick 2 opens the first uncommon mineral group, including Quartz; shop level and tool level are separate, so these tool improvements belong at the basic forge.
+Iron is the blade's point, Log its handle, Fibre its binding, and Coal the forge fuel. Handle and binding choices can change colour; they do not add a new statistic to this starter blade. Fuel does not tint equipment. The first Scythe improvement belongs to Blacksmith T2, as described above. Pick 2 opens harder deposits; shop level and tool level are separate, so these tool improvements belong at the basic forge. A mineral’s occurrence group is separate from its gathering requirement.
 
 ### Early gathering sources
 
@@ -220,7 +220,9 @@ Early ingredients must have ordinary gathering routes; they cannot depend exclus
 
 An initial test of **1,000 completely unwritten worlds** found suitable Iron ground in 98.2%, Coal ground in 90.5%, but suitable fresh growing land in only **3.6%**. Growing land missed the first review target of 25%. This is a real problem for the intended early gathering route; those numbers are not promised final encounter rates.
 
-The test checked suitable land, not completed gathering trips or the player’s ability to afford another Bind. A completely unwritten world also differs from the intended opening where you have learned to write Sun. That supported opening still needs a separate comparison. Some worlds also failed generation and are being investigated separately.
+The test checked suitable land, not completed gathering trips or the player’s ability to afford another Bind. A follow-up check of the soil conditions passed in 5.3% of completely unwritten cases, or 17.1% with a moderate Sun written. Those follow-up figures do not include the map, suitable soil area or placed gathering sources, so they are not successful-journey rates. The seven world-generation failures also occur under the older generator and are being investigated separately.
+
+**Decided calculation correction, awaiting verification:** a small amount of Ice must not erase the ordinary unfrozen water already available to plant roots. The calculation will keep that background water represented and then apply the actual freezing conditions. This adds no extra water and does not make truly frozen, salty or submerged roots suitable. Its effect on the overall shortage has not yet been measured.
 
 **Unsettled correction proposal:** let actual well-drained Loam retain useful root moisture even when the world contains a great deal of water. Clay, waterlogged soil and submerged ground would keep their different behavior. This would not make salt water fresh or make frozen, dark or harmful conditions suitable for ordinary plants. The proposal needs the local-soil results before it becomes a settled rule; it may not solve the whole shortage by itself.
 
