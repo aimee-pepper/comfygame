@@ -216,6 +216,20 @@ Ordinary background moisture counts as water even when the written conditions on
 
 Early ingredients must have ordinary gathering routes; they cannot depend exclusively on a lucky merchant offer, recycling, creature loot, or a later resource-Writing symbol. The complete gathering and return journey still needs playtesting.
 
+### Mineral occurrence — decided intended behavior
+
+After written sources and suitable early Iron and Coal opportunities, other mineral finds share the remaining space. Their first-pass occurrence groups are:
+
+| Occurrence group | Materials |
+| --- | --- |
+| Common | Iron, Coal, Quartz |
+| Uncommon | Copper, Silver, Obsidian, Sulfur |
+| Rare | Gold, Mercury, Adamant, Rift-glass |
+
+Each still needs compatible geology. These groups describe how often a suitable find is selected, not material quality, sale price or the tool needed to gather it. The starting group weights are 70 / 25 / 5; groups with no suitable material are skipped. This does not promise that every world contains each group.
+
+Clay and Salt use their separate hand-gathered deposits. Rubble is held out of this new early mineral selection until its gathering and processing route is ready; existing worlds and owned stock are preserved. These rules are intended tuning, with actual world-generation and journey testing still pending.
+
 ### Trade and recovery
 
 | Material or item | Sell | Buy, when offered |
