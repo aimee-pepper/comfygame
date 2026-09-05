@@ -79,6 +79,14 @@ The first water study will be viewed from a dry, level route. It demonstrates ap
 
 Existing saved worlds keep their movement and contents. The initial proof will check a tree to walk behind and chop, a visible shallow-water bed, a raised pond, a legal height connection, and foreground overlap before final artwork is specified. Exact dimensions, composition, opacity, and fade timing remain production work. The active crafting overhaul continues alongside this bounded proof; this view does not introduce new world-writing guarantees, celestial cycles, or a fluid simulation.
 
+### Harmful flora warnings
+
+**Current behavior and reported issue:** a dangerous plant patch is a specific hazard; other plants of the same species are not automatically harmful. Look can describe that patch, but you reported that harmful flora is not visually distinguished by animation. No corrected map warning has been delivered for this report.
+
+**Existing intended behavior:** known nearby harm should have a readable warning that works without animation. Dedicated 2D flora animation is deferred while the 3D work proceeds. Warning artwork must respect current sight and must never identify hidden plants, creatures or resources.
+
+**Unsettled proposal:** add one small static warning to an actual dangerous patch. Game Design recommends showing it on first full sight, so the player need not suffer an injury to recognize a route hazard. Older warning plans required prior harm or earned field recognition, so first-sight warning still needs your decision. Ordinary plants of the same species receive no warning; a contact/toxin marker does not reveal damage, duration, yield or unseen enemies. Existing Look and harm rules remain unchanged while this is decided. The single question is in [Aimee Homework](aimee-homework.html).
+
 ### Recipe tracking
 
 Pin a known recipe to see relevant sources highlighted **as soon as they become normally visible**, including a newly generated creature. You do not need to inspect, harvest, encounter, or kill it first. The highlight means “this can provide something needed for your recipe.” A creature's random drop is still only possible. Pinning does not reveal a full loot table, hidden rewards, or anything through fog.

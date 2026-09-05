@@ -58,4 +58,12 @@ You approved a clearly labelled example scene showing a shallow pond on raised l
 
 The first study shows the water from a dry, level route. Interactive slopes and shore movement remain separate implementation work. The existing-world camera trial can continue alongside it. Numerical depths for generated worlds and the finished water appearance remain team work, not homework for you.
 
-This is a reference and to-do list rather than a form. Tell Game Design or Project Manager your answer to item 1 or your thoughts on the creature goals in item 3, or share an artwork task with Asset Lead; the recorded status will then be updated here.
+## 6. Decision needed: when dangerous growth gets a warning
+
+**Status: open · a small static warning is proposed; dedicated 2D animation is deferred.**
+
+**Should an actually dangerous plant patch warn as soon as it is fully visible, or only after the party has learned its danger or gained field-guide recognition?** Game Design recommends first full sight, so choosing a safe route does not require getting hurt first.
+
+Older warning plans required learning or field recognition; current Look can already describe a dangerous patch. Those records do not settle when a new map warning should appear. The proposed marker would say only that this exact patch is dangerous. Ordinary plants of the same species, hidden patches and undisclosed creatures would remain unmarked. This choice concerns contact/toxin patches, not new creature detection or a change to your current campaign's harm rules.
+
+This is a reference and to-do list rather than a form. Tell Game Design or Project Manager your answer to item 1 or 6, or your thoughts on the creature goals in item 3, or share an artwork task with Asset Lead; the recorded status will then be updated here.
