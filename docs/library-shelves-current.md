@@ -1,5 +1,7 @@
 # Library shelves and growing collection — current
 
+> **5 September Bestiary authority:** [Knowledge and grouping](bestiary-knowledge-and-grouping-v1.md) supersedes the older habitat labels/order and resolves disclosure, body-shape grouping and legacy records. Use Sky, Water, Amphibious, Land. Inherited 368×800 and excluded configuration directions below are historical and superseded by the actual-target/default-text override.
+
 **Status:** Game Design implementation authority for the Library's root spatial surface and collection-growth
 presentation. It relocates Bestiary navigation inside the Library without changing Bestiary persistence,
 species knowledge or diary-page rules.

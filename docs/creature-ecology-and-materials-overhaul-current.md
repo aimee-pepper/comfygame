@@ -1,8 +1,10 @@
 # Creature ecology and creature-material overhaul — current
 
+> **5 September Bestiary disclosure:** [Knowledge and grouping](bestiary-knowledge-and-grouping-v1.md) governs the approved sorting UI. Remote-sighting recording and likely-material reveal remain separate unimplemented dependencies; sorting does not create them.
+
 > **5 September Bone slice:** [Bone from generated bodies](creature-bone-production-v1.md) closes plain Bone production, actual-source four-band identity, custody and raw-material trading for a new opt-in. It preserves legacy Bone and does not approve new Bone crafting through the older six-band calculator. Other anatomical families and Library integration remain unfinished.
 
-> **5 September body/habitat authority:** [Generated body plans and habitat compatibility](generated-creature-body-habitat-v1.md) and its companion JSON close the next bounded Design slice. They supersede older morphology and aerial-boundary rules for newly opted-in worlds; implementation remains unassigned. The wider creature rework and Library Bestiary UI/integration remain unfinished/held. Existing Hide and full source-colour rules stay authoritative.
+> **5 September body/habitat authority:** [Generated body plans and habitat compatibility](generated-creature-body-habitat-v1.md) and its companion JSON close the next bounded Design slice. They supersede older morphology and aerial-boundary rules for newly opted-in worlds; implementation remains unassigned. The wider creature rework remains unfinished; Aimee lifted the Bestiary work hold on 5 September. Existing Hide and full source-colour rules stay authoritative.
 
 > **Superseded material-model boundary (3 September 2026):** the habitat, body-plan, deterministic
 > species, and anatomy-derived-drop work in this document remains useful design input. Its six-band
