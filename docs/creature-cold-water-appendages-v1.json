@@ -1,0 +1,179 @@
+{
+  "schemaVersion": 1,
+  "authorityID": "creature-cold-water-appendages-v1",
+  "status": "decided-intended-unimplemented-unassigned",
+  "sourceCommit": "594cb61c23c198337b2c42ad4ccebc10023a1817",
+  "policy": {
+    "field": "creatureColdWaterAppendageVersion",
+    "value": 1,
+    "requiresCreatureBodyHabitatVersion": 1,
+    "nil": "preserve-existing-count-policy",
+    "currentFreshStartActivation": false
+  },
+  "constants": {
+    "coldFloor": 30,
+    "coldCountCoefficient": 1.2,
+    "neutralBase": 4,
+    "darknessContribution": 1.6,
+    "jitterRange": [
+      -1.4,
+      1.4
+    ],
+    "countRange": [
+      0,
+      8
+    ]
+  },
+  "eligibleHabitats": [
+    "shore",
+    "aquatic"
+  ],
+  "eligibility": "validated component includes certified liquid under body/habitat authority",
+  "rounding": "existing Swift .rounded(); clamp 0...8, then existing final body/type minima",
+  "rng": "capture existing sampled jitter only; original none branch has no count jitter; no new draws",
+  "freeze": "final count before material projection; no runtime reclassification",
+  "examples": [
+    {
+      "id": "cold-aquatic",
+      "thermalFloor": 0,
+      "habitat": "aquatic",
+      "certifiedLiquid": true,
+      "originalType": "finned",
+      "finalType": "finned",
+      "bodyPlan": "piscine",
+      "dark": false,
+      "jitter": 0.4,
+      "expectedCount": 6
+    },
+    {
+      "id": "cold-land",
+      "thermalFloor": 0,
+      "habitat": "terrestrial",
+      "certifiedLiquid": false,
+      "originalType": "limbed",
+      "finalType": "limbed",
+      "bodyPlan": "quadruped",
+      "dark": false,
+      "jitter": 0.4,
+      "expectedCount": 4
+    },
+    {
+      "id": "cold-flight-over-water",
+      "thermalFloor": 0,
+      "habitat": "aerial",
+      "certifiedLiquid": true,
+      "originalType": "membrane",
+      "finalType": "membrane",
+      "bodyPlan": "serpentine",
+      "dark": false,
+      "jitter": 0.4,
+      "expectedCount": 4
+    },
+    {
+      "id": "cold-shore-bank",
+      "thermalFloor": 0,
+      "habitat": "shore",
+      "certifiedLiquid": true,
+      "originalType": "limbed",
+      "finalType": "limbed",
+      "bodyPlan": "piscine",
+      "dark": false,
+      "jitter": 0.4,
+      "expectedCount": 6
+    },
+    {
+      "id": "warm-aquatic",
+      "thermalFloor": 30,
+      "habitat": "aquatic",
+      "certifiedLiquid": true,
+      "originalType": "finned",
+      "finalType": "finned",
+      "bodyPlan": "piscine",
+      "dark": false,
+      "jitter": 0.4,
+      "expectedCount": 4
+    },
+    {
+      "id": "dark-cold-aquatic",
+      "thermalFloor": 0,
+      "habitat": "aquatic",
+      "certifiedLiquid": true,
+      "originalType": "finned",
+      "finalType": "finned",
+      "bodyPlan": "piscine",
+      "dark": true,
+      "jitter": 1.4,
+      "expectedCount": 8
+    },
+    {
+      "id": "dark-cold-land",
+      "thermalFloor": 0,
+      "habitat": "terrestrial",
+      "certifiedLiquid": false,
+      "originalType": "limbed",
+      "finalType": "limbed",
+      "bodyPlan": "segmented",
+      "dark": true,
+      "jitter": 1.4,
+      "expectedCount": 7
+    },
+    {
+      "id": "none-to-shore-support",
+      "thermalFloor": 0,
+      "habitat": "shore",
+      "certifiedLiquid": true,
+      "originalType": "none",
+      "finalType": "limbed",
+      "bodyPlan": "piscine",
+      "dark": false,
+      "jitter": null,
+      "expectedCount": 2
+    },
+    {
+      "id": "none-to-flight",
+      "thermalFloor": 0,
+      "habitat": "aerial",
+      "certifiedLiquid": false,
+      "originalType": "none",
+      "finalType": "membrane",
+      "bodyPlan": "serpentine",
+      "dark": false,
+      "jitter": null,
+      "expectedCount": 2
+    },
+    {
+      "id": "final-none",
+      "thermalFloor": 0,
+      "habitat": "aquatic",
+      "certifiedLiquid": true,
+      "originalType": "finned",
+      "finalType": "none",
+      "bodyPlan": "serpentine",
+      "dark": false,
+      "jitter": 0.4,
+      "expectedCount": 0
+    },
+    {
+      "id": "ice-only-invalid",
+      "thermalFloor": 0,
+      "habitat": "aquatic",
+      "certifiedLiquid": false,
+      "originalType": "finned",
+      "finalType": "finned",
+      "bodyPlan": "piscine",
+      "dark": false,
+      "jitter": 0.4,
+      "expectedError": "invalid-body-habitat-component"
+    }
+  ],
+  "outOfScope": [
+    "early-game-playtest-changes",
+    "new-diets",
+    "nests",
+    "weather-simulation",
+    "thermal-immunity",
+    "new-material-consumers",
+    "Bestiary-UI",
+    "legacy-migration"
+  ]
+}
