@@ -216,6 +216,14 @@ Ordinary background moisture counts as water even when the written conditions on
 
 Early ingredients must have ordinary gathering routes; they cannot depend exclusively on a lucky merchant offer, recycling, creature loot, or a later resource-Writing symbol. The complete gathering and return journey still needs playtesting.
 
+### First world-generation test — a problem still to fix
+
+An initial test of **1,000 completely unwritten worlds** found suitable Iron ground in 98.2%, Coal ground in 90.5%, but suitable fresh growing land in only **3.6%**. Growing land missed the first review target of 25%. This is a real problem for the intended early gathering route; those numbers are not promised final encounter rates.
+
+The test checked suitable land, not completed gathering trips or the player’s ability to afford another Bind. A completely unwritten world also differs from the intended opening where you have learned to write Sun. That supported opening still needs a separate comparison. Some worlds also failed generation and are being investigated separately.
+
+**Unsettled correction proposal:** let actual well-drained Loam retain useful root moisture even when the world contains a great deal of water. Clay, waterlogged soil and submerged ground would keep their different behavior. This would not make salt water fresh or make frozen, dark or harmful conditions suitable for ordinary plants. The proposal needs the local-soil results before it becomes a settled rule; it may not solve the whole shortage by itself.
+
 ### Mineral occurrence — decided intended behavior
 
 After written sources and suitable early Iron and Coal opportunities, other mineral finds share the remaining space. Their first-pass occurrence groups are:
