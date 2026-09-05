@@ -188,6 +188,27 @@ The built Tannery also teaches **Woven Gloves** and **Woven Boots**, with no ext
 
 Focused checks also cover full Storehouse delivery to Waiting, exact colours and source quantities, partial Resin recovery, older Resin stock and save failures without duplicate crafting or refunds. Ingredient-colour swatches and source details are verified; generic item icons remain placeholders. Natural affordability, finished component-coloured artwork and phone delivery remain pending.
 
+### Creature bodies and habitats — decided intended behavior
+
+**Current development status:** physical habitat placement and the narrow Hide reward have development checks. Generation does not yet consistently choose a body suited to its habitat, and flying movement is still more restricted than the intended water crossing below. These new compatibility rules are designed, not delivered to the phone.
+
+Creatures will have a body and movement that suit the home their world provides. The first set uses four-legged, two-legged, serpentine, segmented, radial, fish-shaped and amorphous bodies; wings, fins and other appendages remain separate features. World conditions influence the possibilities without promising a named species.
+
+| Habitat | Decided movement |
+|---|---|
+| Land | Suitable connected ground; ordinary land creatures do not enter water |
+| Shore | Shallows and their adjacent banks; a fish-shaped shore creature needs supporting limbs to use land |
+| Aquatic | Connected shallow and deep liquid water; swimming bodies do not always need separate fins |
+| Aerial | Suitable ground and water, including deep water; membrane or feathered wings are required, but a perch is not |
+
+Flight does not open a party route across deep water. A creature beyond the party's current reach cannot be pulled into an ordinary encounter for convenience. Trees, blocking deposits, chasms and crumbled gaps remain obstacles in this first slice. Ice is not liquid habitat, though passable ice can support movement as ground.
+
+A habitat needs at least two connected suitable tiles. Most ordinary placement slots remain reserved for habitat areas the player can make contact with; this is not a promise that every animal starts on a reachable tile. A creature may move within its own area, but it cannot teleport out when blocked. Aquatic life in remote deep water may remain out of reach.
+
+Existing worlds retain their creatures and movement. The completed Hide path keeps its actual-source checks, drop chance, Anatomy benefit, quality, colour and material history.
+
+**Still unfinished:** the wider creature rework, additional anatomical materials and their recipes, and food, nesting and weather relationships. The game's Library Bestiary work remains on hold. This first habitat slice needs no new Aimee decision.
+
 ### Optional Hide-to-Leather path — decided intended behavior
 
 Some generated animals can provide **Smooth Skin, Supple Hide, or Tough Hide**, according to their actual covering. A feathered, scaled, shelled, or furry animal does not silently become a Hide source. Relevant creatures can be highlighted for a known recipe as soon as normally visible, but a possible drop is not a promise. Their appearance and species remain generated.

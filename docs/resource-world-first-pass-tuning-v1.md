@@ -4,7 +4,7 @@
 
 > **Status:** These are the accepted first-pass values and ownership decisions for the resource, harvesting, terrain, canopy, and Rubble subjects Aimee has discussed so far, reconciled through the first coherence and play-feel pass. They describe the intended game, not what the current build already does. Nothing on this page should be presented as implemented until its own game slice has shipped and been tested.
 
-This page keeps the accepted first-pass rules in one place so they can be read and adjusted together. It deliberately stops before the next design subjects: generated creature body plans, the full flora catalogue, Sigil acquisition order, clue progression, complete recipes, facility upgrade costs, and the final parallax-world art catalogue.
+This page keeps the accepted first-pass rules in one place so they can be read and adjusted together. It deliberately stops before the next design subjects: the wider creature rework beyond the first decided body/habitat slice, the full flora catalogue, Sigil acquisition order, clue progression, complete recipes, facility upgrade costs, and the final parallax-world art catalogue.
 
 ## Creature-material quality
 
@@ -188,7 +188,7 @@ The accepted three-quarter view targets trees at their reachable trunk base: use
 
 ## Aquatic and flying habitat boundaries
 
-Both shallow and deep water support aquatic creatures. Shore and shallow water can also support amphibious or crocodile-like creatures when their generated body plan supports movement between water and land. Flying creatures may cross ground and water; they do not receive a universal perch requirement. Their actual food, nesting, weather, and body-plan relationships belong to the upcoming creature-generation pass.
+Both shallow and deep water support aquatic creatures. Shore and shallow water can also support amphibious or crocodile-like creatures when their generated body plan supports movement between water and land. Flying creatures may cross ground and water; they do not receive a universal perch requirement. The first body/habitat compatibility slice is now decided: shore fish-shaped forms need supporting limbs, aerial forms need membrane or feathered wings, and aquatic forms remain in connected liquid water. Flight includes deep-water crossings but does not change party contact rules or pass through trees, blocking deposits, chasms or crumbled gaps. Existing worlds retain their behavior. This slice awaits implementation; food, nesting, weather relationships and the wider creature rework remain unfinished. See the [current creature decisions](design-decisions-september-4).
 
 ## Sorting Rubble at Noll's Recycler
 

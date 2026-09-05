@@ -1,3 +1,4 @@
+import { CreatureHabitatDecisions } from '@/components/creature-habitat-decisions';
 import { SolidDeposits } from '@/components/solid-deposits';
 import { SeptemberDecisions } from '@/components/september-decisions';
 import Link from '@/components/wiki-link';
@@ -9,6 +10,7 @@ import { content } from '@/lib/content';
 export default function Exploration() {
   return <SiteFrame sidebar><GuideBreadcrumbs items={[{ label: 'Systems', href: '/systems' }, { label: 'Exploration' }]} /><PageIntro eyebrow="System guide" title="Exploration" summary="Every expedition begins at an entry portal in a generated world. Reveal what is nearby, inspect uncertain terrain, gather what you can carry, and decide when to leave." />
     <SeptemberDecisions topic="exploration" />
+    <CreatureHabitatDecisions />
     <SolidDeposits />
     {content.writingAssetURL && <figure className="feature-figure"><img src={content.writingAssetURL} alt="Writing Desk parchment" /><figcaption>Your Page shapes the world before Binding; the world still generates its own exact terrain, sites, creatures, and resources.</figcaption></figure>}
     <section className="article-section"><h2>What your Page can describe</h2><p>The World preview names the current pressures your Writing can influence. It helps you compare the direction of a Page before Binding, but it does not promise exact terrain, sites, creatures, or resources.</p><div className="definition-grid">{content.pressureTargets.map((target) => <div key={target.id}><h3>{target.name}</h3><p>{target.blurb}</p><small>{target.lowLabel} ↔ {target.highLabel}</small></div>)}</div><p><Link href="/systems/world-writing">Write and review a Page</Link></p></section>

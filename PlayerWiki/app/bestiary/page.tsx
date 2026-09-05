@@ -1,3 +1,4 @@
+import { CreatureHabitatDecisions } from '@/components/creature-habitat-decisions';
 import Link from '@/components/wiki-link';
 import { DirectoryDetailsIntro, DirectoryIndex } from '@/components/directory-navigation';
 import { GuideBreadcrumbs, RelatedGuides } from '@/components/guide-navigation';
@@ -28,6 +29,7 @@ export default function BestiaryPage() {
         <PageIntro eyebrow="World records" title="Bestiary" summary={guide.summary} />
       </div>
       <p className="service-visual-note">The current building appearance for {station.name}.</p>
+    <CreatureHabitatDecisions />
       <DirectoryIndex label="Browse creatures" entries={content.creatures.map((creature) => ({ href: `/bestiary/${creature.slug}`, name: creature.name }))} />
       <DirectoryDetailsIntro title="Compare creature profiles" summary="Use these public field and combat facts without changing what your own campaign has discovered." />
       <section className="article-section">
