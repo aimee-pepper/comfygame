@@ -225,6 +225,15 @@
         "12 eligible cells but missing one required source profile: that fact refuses",
         "duplicate cell indices count once; old saved facts/history remain frozen"
       ]
+    },
+    "flowingWaterQuotaPolicy": {
+      "authority": "early-flowing-water-quota-correction-v1.md",
+      "ordinaryPartition": "For flowing quota Q>=2 cap existing desired channel count to floor(Q/2), minimum one; stable largest remainder, each channel>=2, exact total unchanged.",
+      "zeroQuota": "No channel.",
+      "oneCellQuota": "One shallow flowing source cell with explicit cardinal boundary-edge outlet or equal/lower already-standing-water receiver; receiver retains its standing quota. No duplicated path endpoint or interior isolated puddle.",
+      "oneCellRefusal": "If no legal outlet exists, explicit refusal retaining failed exact quota; no discard, conversion, new water or terrain grading.",
+      "compatibility": "Version newly generated early worlds; preserve absent-policy old worlds and selected preview/Bind/counterfactual consistency.",
+      "verification": "Actual264 and bounded flat/zero/small-quota/outlet/old-policy determinism cases; no full corpus rerun."
     }
   },
   "placement": {
