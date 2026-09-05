@@ -181,6 +181,10 @@
         "all": [
           "one entry-connected region has at least 12 compatible ordinary root tiles",
           "region has at least one legal resin-shrub site and one legal small-softwood site"
+        ],
+        "requires": [
+          "at generation, at least12 unique qualifying ordinary root cells across the entry-connected ground component, using the same pre-population root-cell eligibility as flora budget",
+          "reachable legal resin-shrub and small-softwood source sites in that same component; source positions must be usable without violating work-position or protected-route rules"
         ]
       },
       {
@@ -198,6 +202,10 @@
         "all": [
           "one entry-connected region has at least 12 compatible ordinary root tiles",
           "region supports both stem-patch and leaf-rosette profiles"
+        ],
+        "requires": [
+          "at generation, at least12 unique qualifying ordinary root cells across the entry-connected ground component, using the same pre-population root-cell eligibility as flora budget",
+          "reachable legal stem-patch and leaf-rosette source sites in that same component"
         ]
       }
     ],
@@ -206,6 +214,25 @@
       "corrosive_air": "saved atmosphere chemistry explicitly corrosive; not inferred from generic toxic tag",
       "currentPressureOnlyFallback": "no acid/corrosive facet exists in current source catalogue; keep absent unless a named resolved transformation explicitly creates it; Miasma toxic stays toxic, Mercury remains non-water",
       "unknownNewFacet": "exclude ordinary cohort until resolved; never silently ordinary"
+    },
+    "habitatFactScope": {
+      "id": "early.habitat_scope.connected.v1",
+      "status": "decided intended correction; source evidence dbce306e, aggregate fact counts unmeasured",
+      "count": "unique pre-population eligible root indices across the entry-connected ground component; same basis as flora budget",
+      "regionBoundaries": "base-ground, elevation, shore, soil and geological region boundaries do not reset the12-cell count",
+      "eligibility": "every counted cell and source site individually passes existing ecology/reachability/host rules; no disconnected or incompatible cells added",
+      "sourceSites": "existing legal producer sites and reachable work positions; no occupied or unusable source position qualifies merely to set a fact",
+      "identity": "existing fact/clue/traveller IDs and near-miss history remain; retain frozen facts and NPC selections in old worlds; version derivation for new generation only",
+      "rng": "pure aggregation; no RNG draw, source insertion, placement reroll, extra recruit, lesson or reward",
+      "evidence": "128 actual worlds already contain all four starter plant source types in16/64 blank and23/64 Sun; old single-region Nessa fact only13/18, fibre16/21",
+      "acceptanceFixtures": [
+        "6+6 eligible cells split by internal region, same entry-connected ground with both required source types: qualifies",
+        "11 unique eligible cells: refuses",
+        "6 eligible+6 saline/frozen/ineligible cells: refuses",
+        "eligible cells or required source sites only in disconnected ground: exclude them",
+        "12 eligible cells but missing one required source profile: that fact refuses",
+        "duplicate cell indices count once; old saved facts/history remain frozen"
+      ]
     }
   },
   "placement": {
@@ -251,7 +278,8 @@
     },
     "looseEarth": {
       "budget": "max(2, roundHalfUp(entryConnectedPassableLand / 56))",
-      "ordinaryClayReservation": 2
+      "ordinaryClayReservation": 2,
+      "reservationCapacityRule": "desired2; place min(2,distinct intrinsically legal Clay-site capacity before population allocation), within same budget. Record genuine capacity reduction separately; losing an eligible reservation to allocation/blocking remains a failure."
     },
     "flora": {
       "budget": "max(6, roundHalfUp(compatibleOrdinaryRootTiles / 12 * min(2, vitality.peak / 50))) if compatibleOrdinaryRootTiles >= 12 else 0",
@@ -949,15 +977,16 @@
       "sourceStateAtReport": "Engineering working continuation of86cc7ca7; Engineering must preserve exact diagnostic revision before next handoff"
     },
     "nextVerification": {
-      "seeds": "0...63",
+      "seeds": "0...999",
       "inputs": [
-        "blank",
-        "Sun moderate"
+        "blank"
       ],
-      "worldCount": 128,
-      "boundary": "actual new-policy early terrain, regional host facts and finite placement",
-      "report": "each cohort separately: pressure pass, regional12-compatible-roots plus Resin/Softwood sites, actual reserved sources, missing legal placements and exact generation refusals",
-      "interpretation": "bounded changed-case check, not proof of full1000-seed25% target or campaign affordability; inspect actual host loss before expensive full corpus"
+      "worldCount": 1000,
+      "boundary": "actual saved intensity policy1, root baseline correction, new blocking deposits, connected habitat scope, terrain/hosts/finite placement",
+      "preconditions": "checkpoint exact adopted diagnostic/native source and pass bounded habitat aggregation fixtures; do not repeat128 just for the corrected capacity assertion",
+      "report": "pressure conditions; actual source-host and placed-world counts for each material; old single-region facts and new connected facts from same snapshots; qualifying roots; legal-capacity reductions separate from missed eligible placements; exact refusals and reachable work positions",
+      "interpretation": "original25% review floor is not waived or declared passed from64; keep old and revised fact measures visible; full corpus still does not prove campaign affordability or mounted play",
+      "runPolicy": "one run only; collect original process after tool timeout rather than launching duplicate; mounted Nessa work remains independent"
     },
     "defaultGate": "remain disabled until Engineering completes connected native route/persistence/acceptance and delivery gates"
   },
