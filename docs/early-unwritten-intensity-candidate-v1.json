@@ -1,0 +1,48 @@
+{
+  "id": "early.unwritten_intensity.candidate.v1",
+  "status": "unsettled proposed experiment; not production authority",
+  "reason": "uniform intensity gives Great/Overwhelming half of all silent-target rolls; corrected root baseline and drainage bounds do not meet ordinary-host target",
+  "weights": {
+    "faint": 70,
+    "moderate": 25,
+    "great": 4,
+    "overwhelming": 1
+  },
+  "scope": "new early-generation pressure-only diagnostic first; keep existing whole source pool and authored sigils",
+  "sampling": "obtain existing rolled candidates once; retain each source,target,ID,scale,count,denials; replace only intensity using an independent deterministic per-world/per-target stream; Engineering freezes exact seed salt and reports it before production closure",
+  "comparisonInputs": [
+    "blank",
+    "Sun moderate"
+  ],
+  "comparison": "same rolled source/target/IDs in current and candidate arm; same corrected root baseline; no drainage or threshold change",
+  "report": [
+    "joint pass without shore",
+    "joint pass with shore",
+    "overlapping exclusions labelled as overlap",
+    "source/target/ID equality between arms",
+    "authored sigil equality between arms"
+  ],
+  "limits": "pressure-only is not map hosts, legal source sites, reservations, safe routes or campaign affordability; no full map corpus before Design reviews headroom",
+  "remainingBounds": {
+    "blank": {
+      "currentNoShore": 67,
+      "currentShore": 60,
+      "hypotheticalLoamNoShore": 91,
+      "hypotheticalLoamShore": 97
+    },
+    "sunModerate": {
+      "currentNoShore": 203,
+      "currentShore": 167,
+      "hypotheticalLoamNoShore": 256,
+      "hypotheticalLoamShore": 271
+    },
+    "sunFaint": {
+      "currentNoShore": 188,
+      "currentShore": 160,
+      "hypotheticalLoamNoShore": 241,
+      "hypotheticalLoamShore": 258
+    }
+  },
+  "fixtureRevision": "Engineering86cc7ca7;0\u2013999; pressure predicates only",
+  "decision": "dry-Loam drainage cannot be primary25% correction because even its blank upper bound9.7% is below25 before map/host losses; no drainage production change"
+}
