@@ -142,3 +142,70 @@ colours as accepted source-colour output. Exact source-colour selection and visu
 Design/Engineering dependency, not an Aimee decision or a reason to block unrelated transaction work.
 Existing saved lots must remain intact; a later versioned resolution must not silently invent historical
 species provenance or reroll owned materials.
+
+## Early fibre colour closure — 5 September 2026
+
+This section supersedes the unresolved mapping disposition immediately above. It closes only the named
+Stem Patch, Leaf Rosette and Tall Stem Patch consumers, using Aimee's accepted stable foliage channel and
+assigned-shade precedence. This is **new decided intended behavior**, not a claim that the old world
+receipt already resolved these producers or that source-colour presentation has passed.
+
+### Authoritative source value
+
+Add optional `plantColour` to `EarlyMaterialSourceReceipt`. Its version-1 payload stores `channel = foliage`,
+exact integer sRGB `[r,g,b]` in `0...255`, resolution version `early-source-colour-1.0.0`, basis, and the
+source's existing world visual receipt hash. Basis records either an actual assigned source shade, an
+inherited saved flora tendency, or the new world's generated foliage base. Preserve the existing source
+ID, producer ID, region, anchor and seed; no species ID is invented. A real assigned source shade must
+have an actual rules-owned saved assignment receipt; none is inferred from a display name or screenshot.
+
+All three named producer families inherit the same world foliage base unless an actual specific shade
+is assigned. Their different anatomy, subtype and harvest rules remain unchanged. For this bounded new
+bridge, the base is the exact validated RGB from `visualReceipt.request.resolvedColors.floraTendency`
+when present. This explicitly promotes that saved colour to the early-producer base; it does **not**
+claim that it was already a species colour, and does not change old flora-cast rendering. Assigned source
+shade wins over that base. Never choose the first, nearest, or similarly named flora-cast species.
+
+If that field is absent, resolve the world's early foliage base once with a separate versioned seed
+stream: `SeededRNG(seed: worldSeed).derived(0x4541524C464F4C31)` (EARLFOL1). Consume exactly four draws:
+hue = draw1 modulo 360; band = draw2 modulo 100; saturation = lower bound + draw3 modulo inclusive range
+count, using ranges 0...12 for band<20, 25...55 for band<70, otherwise 60...85; lightness = 35 + draw4
+modulo 31. Convert using the existing `WorldGrade2V1.resolvedSRGB` hue/saturation/lightness conversion.
+This reuses the existing open-colour distribution without a fabricated Sigil/species ID. It does not
+consume placement, encounter, teaching or harvest RNG. Copy the exact resulting base into each eligible
+source receipt; do not reroll at a coordinate, per unit, harvest, Return, processing, redraw or relaunch.
+A missing field uses this rule only for newly generated version-1 sources; malformed present colour
+refuses source creation instead of falling through to a different colour.
+
+### Binding, legacy sources and component lineage
+
+Engineering must version new source generation (for example optional `earlyPlantColourVersion = 1` on
+newly bound books) so old books/worlds retain their prior behavior. Persist the colour with each source
+at generation, before any harvest; harvest freezes that exact source receipt in custody. Existing sources
+with no colour decode as **unresolved**, not a neutral colour. Never backfill old lots by sampling their
+saved seed, adding a species link, or reading the currently rendered world. Keep old stock and old crafted
+items usable under their existing rules, including colour-independent foundation and raw-material costs.
+For a new colour-bearing Cord/Cloth quote, exclude unresolved sources and explain “Choose fibres with a
+known colour.” No eligible complete group means refusal before spending, not conversion into generic
+beige output or an automatic material grant. Legacy finished equipment is not invalidated.
+
+Known inputs group only by exact material subtype, ungraded quality, channel, exact sRGB and every other
+recipe-relevant measurement; source/world IDs and ancestry are retained but do not split identical-result
+choices. Different worlds with the same exact eligible result may combine. Unknown is never equal to a
+known colour or to another unknown as proof of output equivalence. Stem and Leaf remain distinct groups;
+Stem Patch and Tall Stem Patch may share a Stem group when their relevant values match.
+
+Cord and Cloth persist their selected colour plus every parent source/quantity through the prepared
+receipt. Processing does not bleach, average, shade-shift or grade fibre. Garment body uses the selected
+Cloth RGB, ties the selected Cord RGB; those two component colours may differ. Buckled Guard's two Cloth
+units must be output-equivalent. Iron buckles keep their metal appearance/receipt. Salvage returns the
+recorded prepared components with the same colours and parents, never a new raw-fibre refund. Display,
+source selection, spending and saved result must agree on the frozen component values.
+
+The same saved source base must be exposed to the implemented plant and material/garment presentation
+consumers; renderer lighting and preserved shading do not rewrite inherent RGB. This closes rules and
+lineage, not final pixels or an Asset assignment. Engineering must name the exact consumer/state protocol
+before Asset receives work. Scoped acceptance: assigned-shade precedence, saved tendency and absent-base
+branches, identical/different/unknown grouping, multi-parent processing, selected garment panels,
+stale/failure/reopen and legacy preservation. No extra natural search, grading, eligibility expansion,
+world-palette rewrite, new species or phone-delivery claim is authorized by this section.

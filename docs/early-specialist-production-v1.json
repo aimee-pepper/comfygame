@@ -213,5 +213,50 @@
       "iron": 12,
       "coal": 2
     }
+  },
+  "plantColour": {
+    "version": "early-source-colour-1.0.0",
+    "status": "decided intended behavior; implementation and presentation acceptance pending",
+    "producers": [
+      "early.flora.stem_patch.v1",
+      "early.flora.leaf_rosette.v1",
+      "early.flora.tall_stem.v1"
+    ],
+    "sourceField": "EarlyMaterialSourceReceipt.plantColour (optional; missing means legacy unresolved)",
+    "channel": "foliage",
+    "payload": [
+      "resolutionVersion",
+      "channel",
+      "srgb: three integers 0...255",
+      "basis: assignedSourceShade | savedFloraTendency | generatedWorldFoliage",
+      "worldVisualReceiptSHA256",
+      "actual assignment receipt when assignedSourceShade"
+    ],
+    "precedence": [
+      "actual saved assigned producer shade",
+      "exact saved visualReceipt.request.resolvedColors.floraTendency.srgb",
+      "new version-1 world foliage base"
+    ],
+    "openBase": {
+      "stream": "SeededRNG(seed: worldSeed).derived(0x4541524C464F4C31)",
+      "draws": 4,
+      "hue": "draw1 % 360",
+      "band": "draw2 % 100",
+      "saturation": "lower + draw3 % inclusiveRangeCount; band<20: 0...12; band<70: 25...55; otherwise 60...85",
+      "lightness": "35 + draw4 % 31",
+      "conversion": "existing WorldGrade2V1.resolvedSRGB"
+    },
+    "freeze": "persist at versioned source generation; harvest and every later custody or craft copy unchanged",
+    "legacy": "missing colour remains unresolved; preserve stock and existing colour-independent uses; refuse new Cord/Cloth quote without enough known-colour inputs; no backfill, recolour or invented species",
+    "equivalence": [
+      "exact material subtype",
+      "ungraded",
+      "channel",
+      "exact srgb",
+      "other recipe-relevant measurements"
+    ],
+    "lineage": "retain every parent and quantity; Cord/Cloth inherit RGB unchanged; garment body uses Cloth, ties Cord; two Buckled Cloth units output-equivalent; recorded prepared salvage preserves colour",
+    "unknownGroups": "unknown colours cannot be treated as proven output-equivalent",
+    "scope": "only named early fibre producers; no grading, species assignment, placement change, old-world reroll or final-art claim"
   }
 }
