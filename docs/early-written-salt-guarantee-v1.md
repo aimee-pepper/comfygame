@@ -1,6 +1,8 @@
 # Write Salt into the ground — one useful hand-gathering source
 
-**5 September 2026 · Decided intended behavior; not implemented or delivered.**
+**5 September 2026 · Decided behavior; implemented and tested in development, not delivered to the physical phone.**
+
+Engineering receipt: `7e69fe102a41de666dc0f94a75d7a8ba4445f148`, tree `c2228fa99fd12394ff55c03b5eb3addfd621a0b5`, clean `codex/early-material-regions-v1`; `docs/early-written-salt-native-acceptance-2026-09-05.md` there. Nineteen focused checks pass. The isolated native quote/Bind (14 Essence, 40→26), seven-step route, hand gather of 2 Salt, depletion and reopen pass. This is neither natural acquisition/pacing acceptance nor a physical-phone install. The debug fixture is already bound/harvested; do not replay. No mechanics in this contract changed.
 
 This closes the Salt-specific gaps recorded in the early Leather packet. Authority is the accepted generic
 base-resource presence promise, hand-gather yield and distance, source-budget ownership, existing Writing
