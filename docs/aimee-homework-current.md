@@ -34,7 +34,7 @@ The first body-and-habitat compatibility rules are decided, but still await impl
 
 **Partial progress on ecological coherence:** the next naming rules are specified so movement and role descriptions agree with a creature’s actual body and habitat. A land-bound membrane does not make a flier, and weak weapons do not prove a grazing diet. This is not implemented; food, nesting and weather relationships remain open.
 
-**Bestiary arrangement — decided:** Sky, Water, Amphibious and Land, with body-shape subcategories: Four-legged, Two-legged, Serpentine, Segmented, Radial, Fish-shaped and Amorphous. Amphibious means creatures suited to both water and land, rather than the Earth animal class. You approved this structure and lifted the Bestiary work hold on 5 September. Its implementation can proceed; this does not complete the three larger goals above.
+**Bestiary arrangement — decided:** Sky, Water, Amphibious and Land, with body-shape subcategories: Four-legged, Two-legged, Serpentine, Segmented, Radial, Fish-shaped and Amorphous. Amphibious means creatures suited to both water and land, rather than the Earth animal class. You approved this structure and lifted the Bestiary work hold on 5 September. Its implementation is approved, but currently deferred while fresh-start early progression takes priority. This does not complete the three larger goals above.
 
 These are unfinished goals, not claims that the generator already achieves them. Bring your preferences and examples; Game Design owns the detailed rules and content, and Engineering owns implementation and native testing. Adding these to your list does not make you the sole blocker. The Bestiary arrangement needs no further approval.
 
@@ -43,6 +43,8 @@ See [the current creature decisions](design-decisions-september-4.html) for what
 ## 4. Open design work that does not need homework
 
 Blacksmith T2 Iron Ingots, the upgrade’s starting cost, the first useful cloth and Leather crafts, and the early maker discovery rules are now specified in **Design Decisions · 4 September**. They have bounded implementations tested in development; natural progression, final presentation and phone delivery remain pending. The wider character order, later materials, encounter and gathering balance, refinement odds, and preview behavior remain design work. You are welcome to steer these; none is a mandatory approval chore for you.
+
+**Available to playtest:** a separate fresh-start Simulator build begins with the ordinary opening resources and no supplied crafting stock or recruited helpers. Paid departure, gathering, Return and learning Substrate have passed in an independent ordinary campaign. Natural Nessa recruitment, the first healing craft and the full Halloway/T2 route still need playtesting. See the [fresh-start playtest instructions](design-decisions-september-4.html). This is game testing, not another approval chore.
 
 Your decisions already recorded today include flexible costs and ordering, intuitive raw-material starter gear, stone opening tools, exploration that leaves territory unexplored, colour-led gathering, recipe relevance separate from tool readiness, and the agreed visual treatment. They do not need to be approved again.
 

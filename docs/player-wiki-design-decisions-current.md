@@ -221,7 +221,7 @@ Existing worlds retain their creatures and movement. The completed Hide path kee
 
 A creature’s supported habitat determines its section. Amphibious means suited to water and adjacent land; it does not mean the Earth animal class or unrestricted travel through every depth. Wings on a land-bound creature do not place it in Sky. Body shape describes its main body, rather than counting every wing, fin or other appendage. A category does not grant new abilities or reveal undiscovered creature information.
 
-**Bestiary work can now proceed:** Aimee explicitly lifted its hold after approving this structure. The wider creature rework remains unfinished. Materials and known source details belong inside each entry.
+**Bestiary work can now proceed:** Aimee explicitly lifted its hold after approving this structure. The wider creature rework remains unfinished. Bestiary implementation is currently deferred while fresh-start early progression takes priority; the arrangement needs no further approval. Materials and known source details belong inside each entry.
 
 **Browsing proposal:** show body-shape subcategories represented by recorded creatures, without suggesting that every possible combination must be collected. This display treatment remains a recommendation.
 
@@ -304,6 +304,18 @@ Leather determines the garment’s finished quality: Poor parts make Rough work,
 All 25 focused checks in this consumer test run passed, covering exact source matching, all four quality/stat/value bands, preserved colours and parents, full storage, older Salt, saving and duplicate-action refusal. The six older compatibility failures described above remain separate and unresolved. Value records do not themselves add merchant stock or a new material-selling route.
 
 Animal frequency, source matching during ordinary play, combat, recipe highlighting and the complete gathering journey still need playtesting. Ordinary Salt, the limited animal-source rules, Leather processing and the Leather Guard now have bounded development checks; this does not establish natural affordability or phone delivery. The wider creature rework is still unfinished, including additional body-derived materials, their uses and broader ecology. This Leather work does not update the Library Bestiary or establish that the whole creature rework is complete.
+
+### Fresh-start overhaul playtest
+
+**Now available as a separate Simulator build, using the existing 2D view.** Start at Home with the ordinary **40 Essence**, party and stone Pick, Axe and Scythe. No crafting materials, recruited makers, completed buildings or preselected world are supplied. Your campaign is created independently of the tested route, and reopening resumes it.
+
+Begin with **Bind & Depart**, review the actual price, and explore visible opportunities. An empty page currently costs 10 Essence. Gather sources you can reach with your starting tools, speak to travellers you meet, collect writing, and Return with useful stock. Read recovered lessons through **Study → Library → Field Notes** for free. You do not need to clear the map.
+
+**Verified in a separate ordinary campaign:** two paid blank-page expeditions, visible gathering and encounters, Return, a next-departure quote, and a naturally discovered Substrate lesson collected, read for free and retained after reopening. The first expedition brought Home 6 Iron and 5 raw Essence; the second ended with 26 spendable Essence, those materials and Substrate learned. No maker had joined. These are observations of that campaign, not promises about your first worlds.
+
+**Next progression to test:** naturally find and invite Nessa, build the Apothecary for 20 Essence, 4 Clay and 4 Logs, then make and use a Lesser Salve for 1 Resin and 1 Plant Fibre at no Essence cost. Check your live next-departure price and the option to refine collected raw Essence before spending. The full natural Halloway, forge and T2 acquisition path also remains unverified.
+
+The maker services and early crafting transactions are implemented and have separate controlled checks. This fresh-start build lets you test their ordinary acquisition; it does not establish that the complete opening is balanced. Later maker/material migrations, later tiers, the wider creature rework and new terrain-height/liquid behavior remain unfinished. Bestiary sorting is approved but deferred while early progression takes priority; 3D remains under consideration. This is a Simulator test, not a phone replacement or a general release.
 
 ### Connected material development playtest
 
