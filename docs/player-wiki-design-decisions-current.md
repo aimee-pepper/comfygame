@@ -288,7 +288,30 @@ For a total of only one flowing-water cell, the intended rule is a short shallow
 
 **Connected journey, tested in development:** an arranged first world has been played through six gathers, Nessa’s invitation, full Return, Apothecary construction, Lesser Salve preparation, packing, the next Bind, and use of the carried Salve. Native use confirmed target selection, consumption and one turn on a full-health character. A separate controlled injury check confirmed the existing 10-point healing effect. Arranged sources and those checks do not establish ordinary gathering time, encounter pressure or next-Bind affordability in naturally generated worlds.
 
-**Remaining work:** complete the Iron-first written guarantee and its budget credit, check natural journey pacing and Essence, finish material presentation and prepare delivery. The focused placement and water-channel corrections are complete in development; genuine capacity reductions remain explicit. Keep the adopted intensity weights; the result does not call for another climate change. Drainage has not been adopted as the availability fix, and writing a fainter Sun did not improve the earlier results. **The overhaul remains disabled for new ordinary campaigns and is not delivered to your phone.**
+### First natural gathering trip — measured development finding
+
+A normal paid blank-world journey now supplies and returns the first healing ingredients: **4 Clay, 4 Softwood Logs, 1 Resin and 2 Stem Fibre**, with no material loss. Six harvests and **47 movement turns** took **53 of 546 world turns (9.71%)**. Five natural encounters required ten player Attacks, which did not add to that world-turn counter. The trip met the existing movement and world-budget review targets; the fights still represent real effort. This is one route, not an average-world result.
+
+**Nessa did not appear.** Her clue was read during the trip, and the saved campaign records one Nessa near-miss. Under the existing rules, that means she was selected as the candidate but failed the chance to appear; no person was placed, invited or recruited. The exact original roll was not retained. The first blank attempt’s 25% chance is derived from the rules, not a recovered roll record. Finding the clue after Binding cannot change that already-created world.
+
+On a later suitable world, the clue helps Nessa’s selection priority. With one prior miss, another blank attempt has a 50% arrival chance **if she is selected again**. After two selected misses, the next selected attempt is certain. These are not promises that the next world contains her habitat or selects her, and no extra person is inserted into an existing world.
+
+| Measured balance or conditional budget | Essence |
+| --- | ---: |
+| Opening, before the paid Bind | 40 |
+| After paying for the first Bind | 30 |
+| Actual Return, including 3 from the existing spring | **33** |
+| Displayed next blank Bind, inspected but not purchased at this receipt | Costs 10; would leave 23 |
+| If that trip also returns only 3, with no other income | Would leave 26 |
+| If Nessa then joins and the 20-Essence Apothecary is built | Would leave 6, **4 short** of another 10-Essence Bind |
+
+The final two rows are scenarios, not observed outcomes. Actual income, recruitment delays and legal quotes must be measured. The existing protection against being unable to depart is not earned income and does not establish that building the Apothecary is comfortably affordable.
+
+The party ended the field trip at 24/30 and 13/24 health, but Home recovery is free and the next departure starts at full current health. There is no new paid-rest or Salve requirement to leave again. Healing within a world still matters. The natural campaign has enough materials but has **not yet recruited Nessa, built her room, prepared a Salve or carried it into another world**.
+
+The next bounded check continues this same campaign through one ordinary expedition, retaining its clue, near-miss, stock and normal randomness. It will measure recruitment and the real remaining budget before any further tuning. No rewards, prices or arrival odds have been changed from this one result.
+
+**Remaining work:** complete the Iron-first written guarantee and its budget credit, complete natural recruitment, healing and Essence-runway checks, finish material presentation and prepare delivery. The focused placement and water-channel corrections are complete in development; genuine capacity reductions remain explicit. Keep the adopted intensity weights; the result does not call for another climate change. Drainage has not been adopted as the availability fix, and writing a fainter Sun did not improve the earlier results. **The overhaul remains disabled for new ordinary campaigns and is not delivered to your phone.**
 
 ### Mineral occurrence — decided intended behavior
 
