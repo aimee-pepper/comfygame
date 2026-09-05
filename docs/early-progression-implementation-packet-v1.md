@@ -258,3 +258,22 @@ The current ResourceDef has no geological rarity field. Author these occurrence 
 Preserve each candidate’s existing explicit compatible-host eligibility. These rows do not invent new rock formations, guarantee late minerals, make higher-rank resources harvestable, or add extra placements. Iron’s old and new spellings enter as one candidate, never twice. After written placements and eligible ordinary reservations spend the shared budget, remaining slots use 70/25/5 weights, equally weighted eligible candidates within each bucket. An empty bucket is omitted and the other weights renormalize; no candidates means the slot remains unused. The selected occurrence class changes no material quality, trade price, source colour, chemistry or tool requirement.
 
 This closure supplies the exact candidate-rarity input requested by Engineering’s placement adapter. It is authored tuning, not measured seed-corpus or mounted-play evidence.
+
+## Ordinary root-water baseline forms — diagnostic consistency closure
+
+**Decided adapter correction following Engineering715b7433; availability improvement remains unmeasured.** The ordinary-water baseline already declared above must remain represented when forms are normalized. In the current adapter, baseline40 plus faint Ice8 resolves total Hydrology48 but normalizes only Ice’s frozen weight8. This makes available water0 even with thermal peak41.2/floor38.8, above freezing. That erases ordinary baseline water rather than freezing it through a real thermal condition.
+
+In the **ordinary root-water projection only**, initialize the standing ordinary-liquid form weight with the existing Hydrology baseline (currently40). Add the existing positive form weights at their actual source amplitudes, respecting denied contributions and the already-settled omission of Mercury Hydrology. Normalize those weights together **before** the existing thermal phase conversion. Preserve the existing net-magnitude calculation, diminishing returns, negative contributions and clamp. Adding the baseline’s form does not add another40 to the magnitude. Draining reduces the final quantity once; do not also subtract it from form weights. Preserve current airborne-water availability behavior.
+
+This does not change global Hydrology or terrain water painting, guarantee a new pool, supply a new source, or reroll any unwritten target. It records the background soil-water contribution separately from the additional frozen source in the existing root projection. Actual frozen/submerged root states still exclude plants. Below the current thermal freezing floor, the existing phase conversion also freezes the baseline’s standing share. All salinity, light, heat, moisture and soil requirements remain unchanged.
+
+| Exact source case, otherwise baseline environment | Net water | Available after projection |
+| --- | ---: | ---: |
+| No contributing water source | 40 | 40 |
+| Faint Ice (+8 water; thermal41.2/38.8) | 48 | 40 |
+| Faint Ice plus moderate Chasm (-12 water) | 36 | 30 |
+| Faint Ice plus Great Sand (-32 water) | 16 | 13⅓, still too dry |
+| Moderate Ice (+20 water; thermal28/22) | 60 | 0, still frozen |
+| Mercury alone, omitted from this water projection | 40 | 40 |
+
+These are arithmetic expectations checked in authored JSON, not native test results or measured world incidence. Engineering should verify exact cases and the existing cheap pressure diagnostic before another full map corpus. Existing saved worlds retain their frozen region receipts. The separate dry-Loam drainage idea remains an unsettled proposal and is not bundled into this correction.

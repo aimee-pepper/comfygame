@@ -96,6 +96,68 @@
           "expectedOrdinaryAvailable": 20,
           "meaning": "frozen availability reads water-only resolved forms"
         }
+      ],
+      "baselineFormComposition": {
+        "status": "decided adapter consistency correction; incidence unmeasured",
+        "scope": "ordinary-root-water projection for new early generation only; no global terrain or pressure-form retune",
+        "baselineWeight": "Hydrology target baseline, currently40, as ordinary standing-liquid form weight",
+        "positiveWeights": "retain existing source form weights and actual amplitudes after denials; omit Mercury Hydrology entirely as already decided",
+        "netMagnitude": "unchanged baseline + diminished positive - diminished negative, then clamp; baseline form weight is not extra magnitude",
+        "normalization": "normalize baseline standing weight plus existing positive source form weights together; draining affects final net magnitude, not a second subtraction from form weights",
+        "phaseOrder": "normalization before existing WorldConstraints thermal-to-water phase conversion, using same actual thermal and atmosphere source set",
+        "availability": "existing final peak * (1 - frozen share); preserve current airborne-water availability behavior",
+        "eligibility": "all local frozen, submerged, liquid identity, salinity, light, thermal, soil and root-moisture rules remain unchanged",
+        "migration": "saved region/root receipts remain frozen; do not reinterpret old worlds or reroll sources"
+      },
+      "baselineFormFixtures": [
+        {
+          "name": "ordinary baseline",
+          "netMagnitude": 40,
+          "standingWeight": 40,
+          "frozenWeight": 0,
+          "floor": 50,
+          "expectedAvailable": 40
+        },
+        {
+          "name": "faint Ice, no thermal freeze",
+          "netMagnitude": 48,
+          "standingWeight": 40,
+          "frozenWeight": 8,
+          "floor": 38.8,
+          "expectedAvailable": 40
+        },
+        {
+          "name": "faint Ice and moderate Chasm drain",
+          "netMagnitude": 36,
+          "standingWeight": 40,
+          "frozenWeight": 8,
+          "floor": 38.8,
+          "expectedAvailable": 30
+        },
+        {
+          "name": "faint Ice and Great Sand drain",
+          "netMagnitude": 16,
+          "standingWeight": 40,
+          "frozenWeight": 8,
+          "floor": 38.8,
+          "expectedAvailable": 13.333333333333334
+        },
+        {
+          "name": "moderate Ice freezes baseline too",
+          "netMagnitude": 60,
+          "standingWeight": 40,
+          "frozenWeight": 20,
+          "floor": 22,
+          "expectedAvailable": 0
+        },
+        {
+          "name": "Mercury omitted, baseline retained",
+          "netMagnitude": 40,
+          "standingWeight": 40,
+          "frozenWeight": 0,
+          "floor": 50,
+          "expectedAvailable": 40
+        }
       ]
     },
     "regionGeologyFallback": {
