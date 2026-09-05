@@ -288,7 +288,7 @@ For a total of only one flowing-water cell, the intended rule is a short shallow
 
 **Connected journey, tested in development:** an arranged first world has been played through six gathers, Nessa’s invitation, full Return, Apothecary construction, Lesser Salve preparation, packing, the next Bind, and use of the carried Salve. Native use confirmed target selection, consumption and one turn on a full-health character. A separate controlled injury check confirmed the existing 10-point healing effect. Arranged sources and those checks do not establish ordinary gathering time, encounter pressure or next-Bind affordability in naturally generated worlds.
 
-### First natural gathering trip — measured development finding
+### First two natural trips — measured development findings
 
 A normal paid blank-world journey now supplies and returns the first healing ingredients: **4 Clay, 4 Softwood Logs, 1 Resin and 2 Stem Fibre**, with no material loss. Six harvests and **47 movement turns** took **53 of 546 world turns (9.71%)**. Five natural encounters required ten player Attacks, which did not add to that world-turn counter. The trip met the existing movement and world-budget review targets; the fights still represent real effort. This is one route, not an average-world result.
 
@@ -296,20 +296,27 @@ A normal paid blank-world journey now supplies and returns the first healing ing
 
 On a later suitable world, the clue helps Nessa’s selection priority. With one prior miss, another blank attempt has a 50% arrival chance **if she is selected again**. After two selected misses, the next selected attempt is certain. These are not promises that the next world contains her habitat or selects her, and no extra person is inserted into an existing world.
 
-| Measured balance or conditional budget | Essence |
+**Second trip:** one further ordinary blank expedition took 38 movement turns and one encounter with two grazers. It returned five raw Essence and four hides with no loss; the original healing materials remained banked. Substrate teaching was collected once and remained unread. No third Bind has been purchased at this receipt.
+
+This time **Nessa’s habitat did not match**. The saved world was too dark for the starter growing plants: every region failed the daylight requirement. Halloway was the sole eligible candidate and failed his own 25% appearance chance. This was not a second Nessa near-miss, and Halloway did not displace her. Nessa still has her first near-miss for a later world that actually matches and selects her.
+
+| Measured funds across the two trips | Essence |
 | --- | ---: |
-| Opening, before the paid Bind | 40 |
-| After paying for the first Bind | 30 |
-| Actual Return, including 3 from the existing spring | **33** |
-| Displayed next blank Bind, inspected but not purchased at this receipt | Costs 10; would leave 23 |
-| If that trip also returns only 3, with no other income | Would leave 26 |
-| If Nessa then joins and the 20-Essence Apothecary is built | Would leave 6, **4 short** of another 10-Essence Bind |
+| Opening, before the first paid Bind | 40 |
+| After the first Bind | 30 |
+| After the first Return, including 3 from the existing spring | 33 |
+| After the second paid Bind | 23 |
+| After the second Return, including its spring yield | **26 spendable, plus 5 raw Essence** |
+| Native Return’s quoted total after refining the five raw Essence | **36** |
+| Next displayed blank Bind, inspected but not purchased | Costs 10; would leave 16 from the current 26 |
 
-The final two rows are scenarios, not observed outcomes. Actual income, recruitment delays and legal quotes must be measured. The existing protection against being unable to depart is not earned income and does not establish that building the Apothecary is comfortably affordable.
+Automatic refinement is off in this campaign. The 36 is available **after the visible refining action**, not already-spendable currency. The earlier possible four-Essence shortfall assumed no extra income; this trip earned raw Essence, so that shortfall did not occur. If Nessa were already recruited, 36 would cover her current 20-Essence foundation and a 10-Essence blank Bind with six left. She is not recruited, and another search has its own price and earnings. The complete healing route’s budget therefore remains unproved.
 
-The party ended the field trip at 24/30 and 13/24 health, but Home recovery is free and the next departure starts at full current health. There is no new paid-rest or Salve requirement to leave again. Healing within a world still matters. The natural campaign has enough materials but has **not yet recruited Nessa, built her room, prepared a Salve or carried it into another world**.
+Field health ended at 24/30 and 13/24 on the first trip, then 27/30 and 21/24 on the second. Home recovery is free, and each new departure starts at full current health. There is no paid-rest or Salve requirement to leave again; healing during a world still matters. The natural campaign has enough ingredients but has **not yet recruited Nessa, built her room, prepared a Salve or carried it into another world**.
 
-The next bounded check continues this same campaign through one ordinary expedition, retaining its clue, near-miss, stock and normal randomness. It will measure recruitment and the real remaining budget before any further tuning. No rewards, prices or arrival odds have been changed from this one result.
+**Clue-led next step:** Nessa’s learned clue mentions fresh water, daylight, Resin and trees. This campaign already knows Illumination and Sun, so deliberately writing Sun addresses the second world’s lack of light. It does not guarantee fresh growing land or Nessa’s arrival. The bounded next check is at Home: refine the earned raw Essence through the visible route, read the recovered Substrate lesson for its existing target reward, review Nessa’s clue, and inspect one Moderate Sun page’s actual quote before purchasing another Bind. The Sun page’s price must not be assumed to equal the blank page’s 10 Essence. No prices, rewards, habitat requirements or arrival odds have been changed from these two results.
+
+**Development fixes encountered on this route:** the same second departure exposed repeated teaching-route searches that stalled Bind preparation. Reusing those unchanged route results reduced that specific diagnostic from about 99 seconds to about 2 seconds; ten focused checks and the same native departure passed. A separate lookup correction made the existing early Substrate teaching collectable without silently reading it or granting extra knowledge; four focused checks and native pickup passed. These are development results, not phone delivery or a general performance claim. An older save refusal from an unrecorded seed remains unresolved; passing these trips does not establish its cause or fix.
 
 **Remaining work:** complete the Iron-first written guarantee and its budget credit, complete natural recruitment, healing and Essence-runway checks, finish material presentation and prepare delivery. The focused placement and water-channel corrections are complete in development; genuine capacity reductions remain explicit. Keep the adopted intensity weights; the result does not call for another climate change. Drainage has not been adopted as the availability fix, and writing a fainter Sun did not improve the earlier results. **The overhaul remains disabled for new ordinary campaigns and is not delivered to your phone.**
 
