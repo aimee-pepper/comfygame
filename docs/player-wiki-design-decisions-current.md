@@ -43,6 +43,18 @@ A good expedition can achieve one worthwhile intention, reveal something unexpec
 
 Teaching discoveries, written guarantees, and the required route home remain reachable. Once a feature is discovered, its earned minimap record remains. There is no artificial exploration cap, compulsory completion percentage, universal clear-map reward, or padding with empty travel. Small or unusually favourable worlds may still be thoroughly explored.
 
+### Solid deposits and step-to-mine — decided intended behavior
+
+**Substantial solid deposits and boulders block their physical base.** In the first overhaul, Iron and Coal deposits each block one square. Small loose stones, herbs, Salt crust, Clay and low gathering patches remain walkable. Their existing gathering or pickup actions remain; a decorative rock does not automatically become a new source of loot.
+
+With the required **packed Pick selected**, deliberately step toward an adjacent harvestable deposit to mine from where you are standing. You do not stand on the deposit to use Interact. Each successful hit takes **one world turn**, gives the source’s normal yield and leaves you beside it. Iron and Coal still take three hits and give two units per hit. The final hit clears the deposit’s base; your **next step** enters the cleared square at its ordinary movement cost.
+
+A missing, wrong or insufficient tool spends no mining turn and takes no material. Cancelled, stale or failed-save attempts also grant no mining result or progress. Existing encounters and pending interactions keep their priority. Mining success and the opened space must be saved together.
+
+**Automatic routes never mine.** They go around blocking deposits or stop. Reaching nearby ground does not begin mining, spend harvesting turns or switch tools. Small gathering patches remain walkable; already-loose pickups retain their usual pickup behavior. Existing worlds keep their saved behavior while this new rule awaits delivery.
+
+Blocking sources may create detours and opened shortcuts while preserving essential return, starter-resource and tool-acquisition routes. Each required deposit has a reachable adjacent working position. There is no requirement for an Iron Pick to reach the only starter Iron source. Deliberately fully tool-gated optional areas are later work. Clearing a deposit does not remove nearby tree canopy or alter the underlying height rules.
+
 ### Three-quarter world view — decided intended behavior
 
 The world will use a **three-quarter top-down view** over the existing square grid. Ground remains readable from above, while the fronts of trees, rocks, characters, and cliffs make height clearer. This is an accepted direction awaiting an in-game proof and implementation; it is not a newly delivered renderer or finished artwork.
@@ -200,8 +212,8 @@ Iron is the blade's point, Log its handle, Fibre its binding, and Coal the forge
 
 | Material | Where and how | Starting yield |
 | --- | --- | --- |
-| Iron | Iron-bearing formations in Granite, Sandstone, or Basalt; Pick 1 | Three hits, 2 Iron each: 6 per node |
-| Coal | Fuel-bearing Sandstone formation; Pick 1 | Three hits, 2 Coal each: 6 per node |
+| Iron | Iron-bearing formations in Granite, Sandstone, or Basalt; selected Pick 1, deliberate step toward the blocking base | Three hits, 2 Iron each: 6 per node |
+| Coal | Fuel-bearing Sandstone formation; selected Pick 1, deliberate step toward the blocking base | Three hits, 2 Coal each: 6 per node |
 | Clay | Explicit loose Clay deposit on passable, unfrozen Clay soil or a compatible muddy margin; gathered by hand | One action, 2 Clay |
 | Stem Fibre | Ordinary medium stem-fibre patch; Scythe 1 | One hit, 2 Stem Fibre |
 | Leaf Fibre | Ordinary low leaf-fibre rosette; Scythe 1 | One hit, 1 Leaf Fibre |
