@@ -50,4 +50,12 @@ Blacksmith T2 Iron Ingots, the upgrade’s starting cost, the first useful cloth
 
 Your decisions already recorded today include flexible costs and ordering, intuitive raw-material starter gear, stone opening tools, exploration that leaves territory unexplored, colour-led gathering, recipe relevance separate from tool readiness, and the agreed visual treatment. They do not need to be approved again.
 
-This is a reference and to-do list rather than a form. Tell Game Design or Project Manager your answer to item 1 or your thoughts on the creature goals in item 3, or share an artwork task with Asset Lead; the recorded status will then be updated here.
+## 5. Decision needed: a separate terrain and water study
+
+**Status: proposal · affects the complete water demonstration, not the ongoing camera trial or early-game playtest.**
+
+**May we add a clearly labelled example scene showing a shallow pond on raised land beside a lower channel, using deliberately chosen example heights?** Game Design recommends yes. Existing saves do not contain measured water depths, so this separate study would let you judge the appearance without inventing depths in your campaigns. It would not be presented as a generated expedition.
+
+The study would first show the water from a dry, level route; it would not claim that new slopes or shore movement work. The existing-world camera trial can continue either way. If you prefer to use generated worlds only, the full water demonstration will wait for their numerical water geometry. You do not need to choose depth tables, opacity percentages or a new movement rule. Separate local water levels and the initial step/slope rules are already decided.
+
+This is a reference and to-do list rather than a form. Tell Game Design or Project Manager your answer to item 1 or 5, or your thoughts on the creature goals in item 3, or share an artwork task with Asset Lead; the recorded status will then be updated here.

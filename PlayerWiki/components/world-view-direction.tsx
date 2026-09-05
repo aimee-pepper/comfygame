@@ -14,6 +14,7 @@ export function WorldViewDirection() {
     </ul>
     <p><strong>Accepted for later, low priority:</strong> Trees, elevated land, bushes, resource nodes, and the player character should have shadows. Their treatment follows the new geometry and foreground visibility, behind the playable overhaul. Dynamic lighting and a day/night system are not part of this decision.</p>
     <p><strong>Under consideration:</strong> Actual 3D rendering with sprites and a fixed orthographic camera, including a small demonstration of atmosphere and Blender authoring. The renderer has not been selected; existing square-grid actions, saved worlds and fog rules remain authoritative.</p>
+    <p><strong>Proposed water study:</strong> A separate, clearly labelled example scene could show a raised shallow pond and a lower channel with their own water levels. It would use chosen example heights because existing saves lack measured water depths. It would change no campaign or movement rule, and a visible surface would reveal only a permitted bed. This awaits your decision in <Link href="/references/aimee-homework">Aimee Homework</Link>; the existing-world camera trial can continue independently.</p>
     <p><strong>Still to be worked out:</strong> Exact artwork sizes, composition, and fade timing follow a bounded in-game proof. This does not add stacked bridge floors or change saved worlds.</p>
     <p><Link href="/references/design-decisions-september-4">Read the complete world-view and exploration decisions</Link></p>
   </section>;
