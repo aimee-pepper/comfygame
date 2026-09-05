@@ -339,6 +339,16 @@
       "provenShortfalls": "Softwood 174, 505, 900 retain Resin and protected exit where applicable; insufficient joint capacity permits reduced tree reservation.",
       "requiredRuntimeFixes": "Softwood 548 and 909 and Coal 811 must satisfy feasible reservations within unchanged budgets; test-only witnesses are not implementation.",
       "compatibility": "Preserve saved old placements and work state, written source identity and budget credit. New early generation and counterfactuals use their selected placement policy."
+    },
+    "writtenIronGuarantee": {
+      "authority": "early-written-iron-guarantee-v1.md",
+      "trigger": "Canonical authored expansion only: source Iron, explicit target Substrate, non-Absent, own Substrate contribution not negated. Never unwritten or incidental other-target Iron.",
+      "deduplication": "One two-node cluster per canonical Iron identity per world; duplicates/compounds/Count/Scale/Intensity do not multiply guarantee. Existing pressure and cost effects retained.",
+      "budget": "Two existing Iron nodes spend ordinary mineral budget and satisfy ordinary one-Iron reservation; no duplicate credit or stock.",
+      "exposure": "Existing dry exposed faces first; otherwise at most two empty dry unfrozen ordinary-soil node anchors become exposed stone over compatible preserved bedrock, same final region. Re-resolve affected roots/hosts; no water/height/protected-content changes.",
+      "distance": "Final reachable work positions: first3–8 graph steps from entry, second<=4 steps from first; shared legal work cell allowed; both nodes same final compatible region.",
+      "infeasibility": "No partial guarantee. Capacity/protected-route failure without competing direct declaration refuses before spend. Genuine direct-guarantee conflict follows existing disclosed winner/influence rule before normal Bind; never silently downgrade.",
+      "compatibility": "New saved early guarantee policy only; same preflight/Bind plan, frozen old worlds, selected counterfactual policy, local negation semantics."
     }
   },
   "recruitment": {
