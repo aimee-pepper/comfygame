@@ -104,6 +104,10 @@ Nessa no longer asks you to seek toxic air and reactive ground before making you
 
 Early location clues give Nessa and Halloway extra attention. The next useful Writing lessons explain water, River, ground, and Iron. Each lesson teaches one thing when read in the Library, without an Essence charge. Finding a clue does not itself teach all the words in it. Learning opportunities come from the world and retain their protection against repeated unlucky misses.
 
+**How repeated-miss protection works in development:** it applies to suitable opportunities, not every expedition. When the same traveller is selected again after two failed arrival-chance rolls, their arrival chance is certain; finding suitable land or placing that person does not automatically complete the invitation. Fully causing their required world conditions can also make the arrival chance certain. A different traveller being selected, unsuitable land, or leaving before meeting a placed traveller does not count as a failed arrival roll for Nessa.
+
+Water lessons likewise need a suitable learning opportunity: safely observable liquid water for the water target, then an actually generated River and the known target for the River lesson. Repeated eligible misses make a lesson due, while older due lessons retain priority. Ice alone does not qualify under the current rule. There is no decided promise of these lessons or Nessa within a fixed number of expeditions. Whether the opening gives enough reliable progress before healing is available remains a playtesting question.
+
 Old diaries and collected Pages remain yours. An older location clue continues to help you find its person, with an updated location hint alongside its original record. Existing people, buildings, tools, knowledge, and unlocked abilities remain. Already-created worlds keep their original contents.
 
 ### Ordinary gathering — decided intended behavior
