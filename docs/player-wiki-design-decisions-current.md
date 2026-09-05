@@ -215,6 +215,10 @@ Salt comes from exposed crust on suitable dry soil or sand beside saline water, 
 
 Both recipes cost no Essence. Matching parts can come from several animals when their type, quality, colour, and relevant properties are the same. Different qualities or colours are not silently averaged together. A complete Leather Guard uses **4 matching raw parts, 2 Salt, and 2 Plant Fibre**, including its processing steps.
 
+Before tanning, the two raw parts must be the same kind. Once prepared, matching Leather may be combined even if its original parts came from different kinds of Skin or Hide, provided the retained quality, colour and relevant physical properties are identical. Every ingredient keeps its source history; different results are not silently blended.
+
+The full animal colour and pattern data stays with the material. An exact on-screen creature-to-Leather colour conversion is not yet established, so a generic icon is not a preview of that finished colour. Retaining known source colour and completing crafting transactions does not itself prove the final artwork matches it.
+
 Leather determines the garment’s finished quality: Poor parts make Rough work, Common makes Fine, Rare makes Superior, and Exceptional makes Exceptional. It adds no hidden Initiative, heat protection, or durability. Dismantling returns the recorded prepared Leather and Cord; it does not also refund the raw parts or spent Salt. Existing equipment and older materials remain available through their supported uses.
 
 Animal frequency, source matching, combat, and the complete gathering journey still need playtesting. Ordinary Salt and the limited animal-source rules are tested in development as described above; Leather processing and the Leather Guard are not yet established as complete. The wider creature rework is still unfinished, including additional body-derived materials, their uses and broader ecology. This Leather work does not update the Library Bestiary or establish that the whole creature rework is complete.
