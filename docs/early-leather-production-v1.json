@@ -106,10 +106,6 @@
     "id": "early.gather.salt_crust.v1",
     "minimumSalinity": 60,
     "surface": "salt_crust",
-    "formationOrHistory": [
-      "salt_bearing_evaporite",
-      "receded_saline_liquid_margin"
-    ],
     "drySalineMarginCrustChance": 0.5,
     "aridSalineEvaporiteChance": 0.35,
     "aridRootWaterMaximumExclusive": 25,
@@ -119,7 +115,22 @@
       "world.salt": 2
     },
     "hits": 1,
-    "tool": "hand"
+    "tool": "hand",
+    "physicalHostBasis": [
+      "salt_bearing_evaporite",
+      "saline_shore_deposition"
+    ],
+    "hostResolutionVersion": "early-salt-host-1.0.0",
+    "eligibleBaseSurfaces": [
+      "dry soil: loam or clay soil",
+      "sand"
+    ],
+    "shorelinePredicate": "cardinal adjacency to actual water/deepWater with resolved ordinary-water chemistry and salinity >=60; empty unprotected entry-connected passable unfrozen unsubmerged candidate",
+    "branchOrder": "if any eligible shoreline candidates, one50% roll; otherwise eligible arid saline region takes one35% roll; never fallback after a failed shoreline roll",
+    "evaporiteExposure": "successful arid35% roll resolves formation AND exposed crust deposit on eligible dry soil/sand; no separate exposure roll",
+    "physicalIdentity": "saved site-level salt-crust deposit retains base ground/bedrock/elevation/liquid; no recession history invented and no whole-region surface replacement",
+    "freeze": "separate stable branch/original-region stream; save basis, original region, roll and candidate/selected anchor facts; preserve across downstream adapters; no legacy backfill",
+    "protection": "no occupied, critical, already-promised or explicitly protected incompatible surface; selected producer excludes optional flora at same anchor"
   },
   "recipes": [
     {

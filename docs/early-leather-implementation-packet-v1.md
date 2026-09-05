@@ -58,16 +58,44 @@ its supported legacy uses; only exact retained anatomy may classify a subtype, w
 ## 3. Salt is a real separate geological producer
 
 `world.salt` is ungraded Salt; proven old scalar Salt maps 1:1 with old value overrides, never fabricated
-provenance. `early.gather.salt_crust.v1` requires a resolved saline basin/margin: salinity at least 60,
-actual dry exposed salt-crust surface, unfrozen and unsubmerged, on an entry-connected passable tile.
-The crust must be derived from an actual salt-bearing evaporite formation or a receded saline-liquid margin;
-white terrain by itself is insufficient. Existing written Salt guarantees resolve that compatible host
-before placement and retain the one hand-gather placement/2-unit contract.
+provenance. `early.gather.salt_crust.v1` requires a saved physical salt-crust deposit on an entry-connected,
+passable, unfrozen, unsubmerged site with salinity at least 60. White terrain is not proof of Salt.
 
-For ordinary generation, an unspecified dry exposed margin of a saline liquid receives salt-crust surface
-with 50% chance, drawn once per region; never over an occupied critical tile. An unspecified evaporite
-formation has 35% chance only where salinity is at least 60 and available root water is below 25. The
-surface must then be exposed; the flag alone cannot award Salt under water. No extra new climate is forced.
+**5 September closure:** ordinary current shoreline adjacency may generate **saline shore deposition**;
+it does not prove a receded shoreline. No recession-history simulator is required for this slice. The
+previous `receded_saline_liquid_margin` wording is replaced for new ordinary generation by a truthful
+`saline_shore_deposition` host basis. Do not add fictional historical events to a saved world.
+
+A shoreline candidate is empty, unprotected dry soil or sand, cardinally adjacent to actual `water` or
+`deepWater` whose resolved identity is ordinary water with known chemistry and salinity >=60. The current
+map's shoreline topology is used; this does not implement the future physical water-height renderer.
+Mud is not dry exposed salt crust. Ice, snow, liquid, stone, ash, broken ground and unknown surfaces do not
+qualify. A whole-region salinity value without an actual adjacent liquid tile is not shoreline evidence.
+
+For an original region with eligible shoreline sites, draw once at the existing **50%** chance. A success
+resolves an exposed salt-crust deposit opportunity only at those eligible sites. If there are no eligible
+shoreline sites, an arid region with known ordinary-water chemistry, salinity >=60 and available root
+water <25 may instead take the **35%** evaporite roll. Its success resolves **both salt-bearing evaporite
+and exposed salt-crust deposit opportunities** on eligible dry soil/sand sites. It does not merely create
+an inaccessible buried formation and then wait for an unspecified second exposure mechanism. A failed
+shoreline roll does not also try the arid roll. The two branches never stack their probabilities.
+
+Salt crust is a saved site-level surface deposit over its recorded base substrate. Keep the actual base
+ground, bedrock, elevation and liquid facts; do not replace every surface in the region or drain/thaw the
+map. Persist the basis, original region, roll result and exact eligible/selected anchor facts under a
+versioned new-generation contract. Exact existing soil/sand values are eligible base substrate; “exact”
+in the region adapter is not by itself an authored ban on a surface deposit. An explicitly assigned or
+protected incompatible surface, critical/occupied site or already-promised content cannot be overwritten.
+A selected salt source occupies that anchor before optional flora; it cannot also host a gatherable plant.
+No salt host flag can grant inventory without the actual placed finite producer.
+
+Use a stable separate stream per original region and branch, never per rendering, harvest, source depletion,
+new region partition or retry. Freeze host eligibility before allocating optional sources and preserve it
+through later map adapters. Old worlds keep their saved contents; missing legacy physical facts do not
+backfill new ordinary Salt or invent recession history. Existing written Salt guarantees must also resolve
+a compatible physical host; the ordinary probabilities do not veto a valid written guarantee or create an
+additional bonus deposit. No new written-Salt geometry or vocabulary is added by this clarification.
+
 One eligible Salt gather is reserved within the existing loose-earth budget after written guarantees and
 ordinary Clay reservations. If the budget or legal placement is exhausted, it competes in future eligible
 worlds; do not enlarge the starter budget to guarantee every material. It is one underfoot hand action,
@@ -139,3 +167,19 @@ while retaining every parent receipt and selected quantity. Two matching patches
 two matching animals may supply four Hide. No numerical averaging, guessed provenance, or loss of parent
 identity is permitted. In the picker, identical-result groups need no duplicate choices. Different
 measurements or colours still require an explicit choice; grouping never makes an ineligible type qualify.
+
+## Narrow implementation authority and broader creature status — 5 September 2026
+
+PM relayed Aimee's direct approval of this packet's Hide producer and required habitat projection, now
+recorded at the top of `docs/documentation-authority-current.md` in the shared checkout. Her boundary:
+“Just no further UI/integration work on the bestiary in the library. Until game design has finished the
+creature rework, and as far as I know that hasn’t happened”. This supersedes the historical blanket hold
+only for the approved Leather producer/projection scope. It does not dispatch Library Bestiary work,
+a broader creature catalogue or additional paid searches.
+
+The wider creature rework is not complete. The retained 4 September former-Design handoff still lists
+body-plan/habitat/creature-material work to finish; this packet closes only the named primary-Hide, Salt,
+processing and Leather Guard route. Additional anatomical families/consumers, expanded ecology and broad
+encounter balance remain separate. Earlier ecology specifications and their obsolete six-band passages
+are not a current comprehensive completion receipt. No Library integration automatically resumes from
+this packet's readiness or eventual bounded runtime acceptance.
