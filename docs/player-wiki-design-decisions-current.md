@@ -116,6 +116,18 @@ Suitable worlds set aside some source opportunities for the early crafts. They d
 
 The intended first healing trip needs six harvest actions before travel and encounters. Building the forge and improving the Pick needs thirteen harvest actions across enough source-bearing worlds. Those are ingredient calculations, **not measured trip lengths**. The complete route still needs testing for travel, survival, returning safely, and enough Essence left to bind another world. A useful expedition should not require clearing its whole map.
 
+### Writing Iron into the ground — decided intended behavior
+
+**Implementation is in progress; this is not current phone behavior.** Deliberately writing Iron into Substrate promises **one cluster of two reachable Iron deposits**, provided the complete promise can be fulfilled. A compound saying the same thing counts too. Repeating the request or changing Count, Scale or Intensity does not multiply the guaranteed cluster; those words keep their existing effects on the world and writing costs. Iron left for the world to choose does not receive this written guarantee. Absent Iron, Iron bound to another subject, or an Iron statement that negates its own Substrate effect does not qualify. Negating one statement does not cancel a separate positive one.
+
+The two deposits use the existing Pick 1 rule and contain twelve Iron altogether. They count within the ordinary mineral budget and satisfy its ordinary Iron reservation. They are not two bonus deposits on top of it.
+
+Use existing suitable exposed rock first. Where necessary, the world may expose compatible rock at no more than the two deposit sites in otherwise empty, dry, unfrozen ordinary soil. Both deposits belong to one compatible region. This cannot drain water, thaw ice, change heights, remove a source or object, or overwrite protected arrival, teaching or return routes. The exposed ground stops counting as growing soil.
+
+Distances refer to where you can stand to mine: the first working position is three to eight walkable steps from the entrance, and the second is at most four steps from the first. Both must remain reachable after the deposits are placed.
+
+Before Binding, the quote identifies the complete promise and the known tool requirement. If two reachable deposits cannot fit, the page is refused before spending; it does not silently promise just one. A genuine conflict between direct written guarantees follows the existing compatibility rule: the quote names which promise wins and which remains an influence before you Bind. Existing worlds keep their original contents. This first binding adds no new writable Coal, Clay or Resin vocabulary.
+
 ### T2 smelting and useful specialist crafts — decided intended behavior
 
 **Iron Ingot making opens at Blacksmith T2.** Upgrade the working forge with raw materials you can already gather. Its earlier raw-material recipes remain available. The first Ingots have two useful destinations: a better Scythe and a reinforced cloth garment at Corrin’s Tannery.
@@ -270,9 +282,13 @@ The earlier, smaller comparison contained all four starter plant sources in 16 o
 
 The previous check required all twelve cells within one terrain region. The connected check is now implemented in development and passes focused cases for split areas, unsuitable and disconnected ground, duplicate cells, missing source sites, and preserved older worlds. It does not change terrain or add plants merely to change the habitat result.
 
+**Water-channel correction, tested in development:** the single failed map had four flowing-water cells divided into channels of two, one and one, although ordinary channels needed two distinct cells. This failure occurs with the adopted conditions; the original conditions generated that world successfully. The corrected allocator uses two two-cell channels, keeping the same water total and all 102 frozen-water cells. That world now generates through material placement, with twelve reachable gathering sources.
+
+For a total of only one flowing-water cell, the intended rule is a short shallow outflow at the map boundary or into existing standing water at the same or lower elevation. The receiving water is not counted twice. With no valid outlet, generation explicitly refuses that layout instead of dropping the water or pretending it is a pond. Focused small-water, saved-world and repeat-generation checks pass. Older worlds keep their previous rules. The original full-sample results above have not been replaced by a new large run.
+
 **Connected journey, tested in development:** an arranged first world has been played through six gathers, Nessa’s invitation, full Return, Apothecary construction, Lesser Salve preparation, packing, the next Bind, and use of the carried Salve. Native use confirmed target selection, consumption and one turn on a full-health character. A separate controlled injury check confirmed the existing 10-point healing effect. Arranged sources and those checks do not establish ordinary gathering time, encounter pressure or next-Bind affordability in naturally generated worlds.
 
-**Remaining work:** investigate the generation failure, implement the explicit written early-resource guarantees and their budget credit, then check natural journey pacing and readiness for delivery. The focused placement correction is complete in development; genuine capacity reductions remain explicit. Keep the adopted intensity weights; the result does not call for another climate change. Drainage has not been adopted as the availability fix, and writing a fainter Sun did not improve the earlier results. **The overhaul remains disabled for new ordinary campaigns and is not delivered to your phone.**
+**Remaining work:** complete the Iron-first written guarantee and its budget credit, check natural journey pacing and Essence, finish material presentation and prepare delivery. The focused placement and water-channel corrections are complete in development; genuine capacity reductions remain explicit. Keep the adopted intensity weights; the result does not call for another climate change. Drainage has not been adopted as the availability fix, and writing a fainter Sun did not improve the earlier results. **The overhaul remains disabled for new ordinary campaigns and is not delivered to your phone.**
 
 ### Mineral occurrence — decided intended behavior
 
