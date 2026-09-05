@@ -178,11 +178,13 @@ Multiple-hit trees save their completed hits. Leaving, returning, backgrounding,
 | Mature | 3×3 square · 9 tiles |
 | Large | Radius-two diamond · 13 tiles |
 
-A sight line can pass through one canopy tile. A second consecutive canopy tile conceals tiles beyond it. While the party is beneath a canopy, its own tile and the eight adjacent tiles are shown in full before that same rule continues outward.
+A sight line can pass through one canopy tile. A second consecutive canopy tile conceals tiles beyond it. While the party is beneath a canopy, its own tile and the eight adjacent tiles receive the local canopy exception before that same rule continues outward. This removes canopy concealment only; it does not bypass other sight restrictions. Foreground art fading does not reveal fogged or otherwise concealed content.
 
 The final successful Axe hit removes only that trunk's own crown footprint. An overlapping crown from another standing tree remains.
 
 Once a feature has been fully revealed, its normal minimap record remains revealed permanently. Canopy may later cover it in the main world view, but cannot restore fog or erase a known resource, creature, site, hazard, or portal marker.
+
+The accepted three-quarter view targets trees at their reachable trunk base: use the selected Axe, valid-base highlight, “Chop tree” action label, and trunk impact. Art overlap does not change the footprint, turn cost, or tool requirement. Water uses local bed/surface heights; legal ground connections govern movement between elevations. Exact art sizes and fade timing follow the bounded in-game proof.
 
 ## Aquatic and flying habitat boundaries
 

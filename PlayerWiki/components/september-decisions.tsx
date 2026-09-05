@@ -14,7 +14,7 @@ const updates: Record<DecisionTopic, { current?: string; decided: string; tuning
     open: 'The new early route still needs implementation and journey testing. T2 smelting and the first cloth/Leather specialist paths are specified; the wider campaign redesign remains separate work. Current directory order remains current behavior.',
   },
   exploration: {
-    decided: 'A successful journey should usually leave worthwhile territory unexplored. Trees, canopy, and branching routes create choices without hiding required teaching or erasing earned minimap knowledge. There is no artificial reveal cap or routine full-map reward. Pinning a known recipe highlights useful sources as soon as normally visible, including new creatures, without prior inspection or a suitable tool. Random drops remain possible; fog and hidden rewards stay hidden.',
+    decided: 'A successful journey should usually leave worthwhile territory unexplored. Trees, canopy, and branching routes create choices without hiding required teaching or erasing earned minimap knowledge. There is no artificial reveal cap or routine full-map reward. Pinning a known recipe highlights useful sources as soon as normally visible, including new creatures, without prior inspection or a suitable tool. Random drops remain possible; fog and hidden rewards stay hidden. The accepted three-quarter view makes trunk-base Axe targeting clear and fades obstructing foreground art without granting extra sight.',
     open: 'Ordinary early sources are now specified for compatible land, with finite harvesting and useful reachable opportunities. Source frequency, travel, and Stability still need playtesting. No universal completion percentage is fixed.',
   },
   writing: {
@@ -23,7 +23,7 @@ const updates: Record<DecisionTopic, { current?: string; decided: string; tuning
   },
   appearance: {
     decided: 'Material colour is a worthwhile gathering goal. Every equipment component region receives its selected tint while keeping its silhouette and shading. Quality colours the name highlight and thumbnail border, not the item art; potions keep recognizable authored colours. World palettes stay stable, with separate foliage (including grass), water, and sky channels; an assigned shade takes precedence. Grass colour does not grant harvestability. Recipe tracking uses a thin soft pulsing outline, then a brief collection/completion sparkle.',
-    open: 'Final world-entry layer sizes, placement, and movement remain open. Aimee’s Library work is in progress; sky/cloud homework is optional study work.',
+    open: 'Three-quarter top-down presentation, local water heights, clear trunk-base targeting, and foreground fade are decided. Exact artwork dimensions, composition, and fade timing await the bounded in-game proof. Final world-entry layer sizes, placement, and movement remain open. Aimee’s Library work is in progress; sky/cloud homework is optional study work.',
   },
   people: {
     decided: 'The intended priority is Vance, then Nessa and Halloway, then Bryn, Corrin, and Noll. Nessa is sought in fresh growing land, Halloway near workable Iron, and Corrin near fibre-bearing growth. Early makers no longer wait behind the old three-recruit requirement. Old clues keep their discovery value and receive updated hints.',

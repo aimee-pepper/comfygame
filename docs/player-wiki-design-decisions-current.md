@@ -43,6 +43,22 @@ A good expedition can achieve one worthwhile intention, reveal something unexpec
 
 Teaching discoveries, written guarantees, and the required route home remain reachable. Once a feature is discovered, its earned minimap record remains. There is no artificial exploration cap, compulsory completion percentage, universal clear-map reward, or padding with empty travel. Small or unusually favourable worlds may still be thoroughly explored.
 
+### Three-quarter world view — decided intended behavior
+
+The world will use a **three-quarter top-down view** over the existing square grid. Ground remains readable from above, while the fronts of trees, rocks, characters, and cliffs make height clearer. This is an accepted direction awaiting an in-game proof and implementation; it is not a newly delivered renderer or finished artwork.
+
+Water belongs to a local bed and surface height. A low river and a pond on raised land can coexist. Shallow water can show its visible bed beneath the water surface, shoreline, and above-water objects; deeper water may hide more of the bed. Water in a lower area does not paint over unrelated higher ground. Its appearance does not change which liquid it is or reveal hidden deposits.
+
+The first version has one supporting ground level at each map position, with optional water above it. Legal steps and slopes connect neighbouring heights. A bare cliff is not a walking route; a larger climb needs a connected route through the land. The initial step or slope adds no movement surcharge beyond the ground’s existing cost. Shallow water remains traversable where a legal shore route reaches it, while deep water and chasms retain their ordinary movement restrictions. Multi-level bridges with walkable space underneath are outside this first version.
+
+A tree’s upper artwork may overlap several squares, but its **trunk base** owns blocking and Axe targeting. With the suitable packed Axe selected at a reachable adjacent position, a small base highlight and **Chop tree** show the valid action. The impact lands at the trunk. Looking at leaves alone does not grant a harvest. Tool requirements, one-turn successful hits, saved partial work, and each tree’s own canopy remain as already decided.
+
+Foreground trees, bushes, and objects partly fade when their artwork covers the character, then return to normal when the character emerges. A faint silhouette and the already-visible blocking base remain understandable. For raised terrain, only the obstructing foreground cliff face fades; the entire plateau does not disappear.
+
+**Fading is a visual aid, not extra sight.** It reveals only the character and surroundings already permitted by the game’s visibility rules. It cannot expose fogged terrain, hidden creatures or resources, or things still concealed by gameplay canopy. The existing canopy rule remains: a second consecutive canopy square conceals what lies beyond; standing beneath canopy gives the local exception around the party. That exception does not erase other sight restrictions. Earned minimap knowledge remains earned. Fading itself spends no turn and changes no collision, target, harvest, or discovery.
+
+Existing saved worlds keep their movement and contents. The initial proof will check a tree to walk behind and chop, a visible shallow-water bed, a raised pond, a legal height connection, and foreground overlap before final artwork is specified. Exact dimensions, composition, opacity, and fade timing remain production work. The active crafting overhaul continues alongside this bounded proof; this view does not introduce new world-writing guarantees, celestial cycles, or a fluid simulation.
+
 ### Recipe tracking
 
 Pin a known recipe to see relevant sources highlighted **as soon as they become normally visible**, including a newly generated creature. You do not need to inspect, harvest, encounter, or kill it first. The highlight means “this can provide something needed for your recipe.” A creature's random drop is still only possible. Pinning does not reveal a full loot table, hidden rewards, or anything through fog.

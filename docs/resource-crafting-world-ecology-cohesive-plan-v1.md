@@ -472,8 +472,8 @@ Tool gating should explain why a plant cannot yet be harvested without pretendin
 Trees become real world structures rather than an absent resource abstraction.
 
 - Outside a canopy, the player sees the leaves and crown.
-- Beneath the canopy, the presentation reveals the trunk and the ground beneath it.
-- The trunk becomes an eligible harvesting target when the player has the required Axe tier.
+- Beneath the canopy, the presentation reveals the trunk and ground that the normal visibility rules permit. Foreground artwork may fade, but cannot bypass fog or gameplay concealment.
+- The reachable trunk base becomes an eligible harvesting target with the required packed Axe tier. A valid-base highlight, “Chop tree” label, and trunk impact clarify the existing adjacent-direction action.
 - Dense canopy can intentionally limit the player's view. Distant ground, resources, creatures, sites, and
   undiscovered passages may remain concealed until the party approaches, moves beneath the leaves, or gains a
   clear line of sight.
@@ -491,7 +491,7 @@ Trees become real world structures rather than an absent resource abstraction.
 
 The first-pass crown footprints and two-canopy sight rule are settled in the tuning reference. Tree work is
 saved hit by hit, the last hit removes only that trunk's own crown, and overlapping standing crowns remain.
-Regrowth and stump presentation remain part of the later flora-life-cycle pass.
+The early finite flora profiles leave inert remnants and do not regrow; wider flora life cycles remain later work.
 
 ## World generation
 
@@ -504,6 +504,10 @@ The present generator is therefore a migration baseline, not the final product. 
 several different ideas: underlying material, surface texture, liquid depth, vegetation, deposit, and absence
 of ground. The final generator stores those ideas separately so two worlds can be physically different without
 inventing an unrelated movement rule for every visual variation.
+
+### Accepted three-quarter presentation and physical height
+
+Keep the square-grid game while showing meaningful fronts and height. Each position has one supporting ground/bed elevation and optional local water, with legal steps/slopes between heights. Water follows its own bed and surface rather than one global drawing layer. Tall art has a separate ground-contact footprint. Foreground objects and only the obstructing cliff face may partly fade around the character, subject to normal visibility and canopy concealment. Existing worlds retain their rules and contents. The bounded native proof comes before final art dimensions and fade tokens; this does not add stacked bridge floors or new Writing guarantees. See **Design Decisions · 4 September** for the full player-facing contract.
 
 ### Final world-generation layers
 
