@@ -1,6 +1,6 @@
 {
   "id": "early.unwritten_intensity.candidate.v1",
-  "status": "unsettled proposed experiment; not production authority",
+  "status": "historical experimental input; adopted as first-pass policy in early-progression-production-v1.json unwrittenPressurePolicy after passing fixed-source diagnostic",
   "reason": "uniform intensity gives Great/Overwhelming half of all silent-target rolls; corrected root baseline and drainage bounds do not meet ordinary-host target",
   "weights": {
     "faint": 70,

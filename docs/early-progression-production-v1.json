@@ -863,5 +863,102 @@
       "earlyMakerSelectedNearMissesBeforeGuaranteedArrival": 2
     },
     "status": "thresholds are design acceptance targets; no seed corpus or campaign pacing run claimed"
+  },
+  "unwrittenPressurePolicy": {
+    "id": "early.unwritten_intensity.v1",
+    "status": "decided intended first-pass tuning; pressure comparison passed, actual map hosts and delivery unverified",
+    "weights": {
+      "faint": 70,
+      "moderate": 25,
+      "great": 4,
+      "overwhelming": 1
+    },
+    "candidateSources": "obtain exactly the existing whole-pool rolled source/target/ID candidates once; preserve every field except unwritten intensity",
+    "stream": {
+      "hashInputUTF8": "early.intensity.candidate.v1|<target.rawValue>",
+      "hash": "SHA256",
+      "salt": "first8 hash bytes interpreted big-endian UInt64",
+      "rng": "SeededRNG(seed: worldSeed).derived(salt)",
+      "draw": "double(in:0...100)",
+      "thresholds": [
+        {
+          "lessThan": 70,
+          "intensity": "faint"
+        },
+        {
+          "lessThan": 95,
+          "intensity": "moderate"
+        },
+        {
+          "lessThan": 99,
+          "intensity": "great"
+        },
+        {
+          "otherwise": "overwhelming"
+        }
+      ],
+      "namespaceNote": "retain measured candidate namespace literally for deterministic continuity; policy public identity is early.unwritten_intensity.v1"
+    },
+    "authoredSigils": "unchanged and never reweighted; all authored intensity/scale/count/denials and existing inherent cross-target effects preserved",
+    "compatibility": "only newly bound early worlds use this saved policy; absent policy on existing records preserves prior uniform generation; frozen rolled sigils, maps, root receipts and anchor snapshots are never reweighted",
+    "consumers": [
+      "pre-Bind quote/preview",
+      "actual generation and persisted rolled sigils",
+      "same-seed causal intervention for newly silent targets only"
+    ],
+    "causality": "retain actual unrelated rolled sigils; only use same-policy deterministic replacement for targets made silent; do not reroll already-frozen candidates or claim random facts were authored",
+    "unchanged": [
+      "whole source pool",
+      "source choice/identity",
+      "all four nonabsent intensity possibilities",
+      "authored choices",
+      "habitat thresholds",
+      "drainage rules",
+      "finite population budget and guarantees",
+      "material quality",
+      "old-world generation"
+    ],
+    "evidence": {
+      "kind": "reported passing fixed-source native pressure-only diagnostic; no full map corpus",
+      "seeds": "0...999",
+      "rootBaselineCorrection": true,
+      "drainage": false,
+      "current": {
+        "blank": [
+          67,
+          60
+        ],
+        "sunModerate": [
+          203,
+          167
+        ]
+      },
+      "weighted": {
+        "blank": [
+          306,
+          270
+        ],
+        "sunModerate": [
+          417,
+          384
+        ]
+      },
+      "order": "noShore,shore",
+      "diagnostic": "testProposedUnwrittenIntensityMixWithFixedSources",
+      "log": "test_sim_2026-09-05T01-47-37-696Z_pid44441_bc3e31aa.log",
+      "sourceStateAtReport": "Engineering working continuation of86cc7ca7; Engineering must preserve exact diagnostic revision before next handoff"
+    },
+    "nextVerification": {
+      "seeds": "0...63",
+      "inputs": [
+        "blank",
+        "Sun moderate"
+      ],
+      "worldCount": 128,
+      "boundary": "actual new-policy early terrain, regional host facts and finite placement",
+      "report": "each cohort separately: pressure pass, regional12-compatible-roots plus Resin/Softwood sites, actual reserved sources, missing legal placements and exact generation refusals",
+      "interpretation": "bounded changed-case check, not proof of full1000-seed25% target or campaign affordability; inspect actual host loss before expensive full corpus"
+    },
+    "defaultGate": "remain disabled until Engineering completes connected native route/persistence/acceptance and delivery gates"
   }
 }
