@@ -12,6 +12,7 @@ export function WorldViewDirection() {
       <li>Foreground art covering the character fades partly, keeping a faint silhouette and the already-visible blocking base. Only the obstructing cliff face fades, not the whole plateau.</li>
       <li>Fading preserves fog, gameplay canopy concealment, and earned minimap knowledge. It exposes only the character and surroundings the game already allows you to see.</li>
     </ul>
+    <p><strong>Accepted for later, low priority:</strong> Trees, elevated land, bushes, resource nodes, and the player character should have shadows. Their treatment follows the new geometry and foreground visibility, behind the playable overhaul. Dynamic lighting and a day/night system are not part of this decision.</p>
     <p><strong>Still to be worked out:</strong> Exact artwork sizes, composition, and fade timing follow a bounded in-game proof. This does not add stacked bridge floors or change saved worlds.</p>
     <p><Link href="/references/design-decisions-september-4">Read the complete world-view and exploration decisions</Link></p>
   </section>;
