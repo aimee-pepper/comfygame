@@ -9,6 +9,10 @@ runtime file to copy wholesale into `Content/Data`. Engineering owns the typed a
 Current-source comparison: Apothecary delivery `e201718e5b530b140f8488ed9b4d5a4d0b889ba0`.
 No full biome, flora, creature or twenty-nine-person narrative rewrite is a prerequisite for this slice.
 
+**Three-quarter compatibility:** [the minimum height/liquid/visibility contract](three-quarter-world-semantics-v1.md)
+now governs any later physical-edge version. It does not pause this early route. Its reachable action-site
+checks must use the resolved ground-edge graph when that version is enabled; old worlds retain their rules.
+
 ## 1. Minimum resolved region model
 
 A new-generation region stores identity, tile membership, bedrock, surface, formations, resolved liquid,
