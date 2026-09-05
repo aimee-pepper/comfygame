@@ -1,5 +1,7 @@
 # Creature ecology and creature-material overhaul — current
 
+> **5 September body/habitat authority:** [Generated body plans and habitat compatibility](generated-creature-body-habitat-v1.md) and its companion JSON close the next bounded Design slice. They supersede older morphology and aerial-boundary rules for newly opted-in worlds; implementation remains unassigned. The wider creature rework and Library Bestiary UI/integration remain unfinished/held. Existing Hide and full source-colour rules stay authoritative.
+
 > **Superseded material-model boundary (3 September 2026):** the habitat, body-plan, deterministic
 > species, and anatomy-derived-drop work in this document remains useful design input. Its six-band
 > resource-wide quality, family-only stack key, generic family vocabulary, and property-gated recipe

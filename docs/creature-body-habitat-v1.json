@@ -1,0 +1,185 @@
+{
+  "schemaVersion": 1,
+  "authorityID": "generated-creature-body-habitat-v1",
+  "status": "decided-intended-awaiting-engineering-assignment",
+  "updated": "2026-09-05",
+  "nativeBaseline": "3216debd135effb453b9c8853f656323e2e058df",
+  "policyField": "creatureBodyHabitatVersion",
+  "policyValue": 1,
+  "legacyNil": "preserve-existing-generation-and-saves",
+  "enumOrder": {
+    "bodyPlan": [
+      "quadruped",
+      "biped",
+      "serpentine",
+      "segmented",
+      "radial",
+      "piscine",
+      "amorphous"
+    ],
+    "appendageType": [
+      "none",
+      "membrane",
+      "feathered",
+      "finned",
+      "limbed"
+    ]
+  },
+  "bodyPlanWeights": {
+    "terrestrial": [
+      45,
+      15,
+      15,
+      10,
+      7,
+      0,
+      8
+    ],
+    "shore": [
+      35,
+      0,
+      20,
+      15,
+      15,
+      10,
+      5
+    ],
+    "aquatic": [
+      0,
+      0,
+      25,
+      5,
+      15,
+      45,
+      10
+    ],
+    "aerial": [
+      35,
+      20,
+      25,
+      10,
+      5,
+      0,
+      5
+    ]
+  },
+  "appendageWeightMultipliers": {
+    "terrestrial": [
+      1,
+      1,
+      1,
+      0,
+      1
+    ],
+    "shore": [
+      0.75,
+      0.5,
+      0.5,
+      2,
+      1.5
+    ],
+    "aquatic": [
+      1.5,
+      0,
+      0,
+      5,
+      0.5
+    ],
+    "aerial": [
+      0,
+      1,
+      1,
+      0,
+      0
+    ]
+  },
+  "allZeroFallbackWeights": {
+    "terrestrial": [
+      1,
+      1,
+      1,
+      0,
+      1
+    ],
+    "shore": [
+      0.75,
+      0.5,
+      0.5,
+      2,
+      1.5
+    ],
+    "aquatic": [
+      1.5,
+      0,
+      0,
+      5,
+      0.5
+    ],
+    "aerial": [
+      0,
+      1,
+      1,
+      0,
+      0
+    ]
+  },
+  "conditionalOverride": {
+    "shorePiscine": {
+      "appendageType": "limbed",
+      "minimumCount": 2
+    }
+  },
+  "appendageCount": {
+    "none": 0,
+    "otherMinimum": 1,
+    "aerialMinimum": 2,
+    "maximum": 8,
+    "source": "clamp-original-count-without-reroll"
+  },
+  "cranialFeature": "preserve-original-stable-choice",
+  "morphologyRNG": {
+    "worldSalt": "0xEC010602",
+    "speciesSalt": "stored-species-id",
+    "order": [
+      "bodyPlan",
+      "appendageType-unless-forced"
+    ],
+    "gameplayAndHabitatStreams": "unchanged"
+  },
+  "habitatWeightSource": "creature-habitat-authority.json.baseWeights",
+  "repeatHabitatMultiplier": 0.65,
+  "minimumComponentTileCount": 2,
+  "componentID": "minimum-row-major-tile-index",
+  "tileSets": {
+    "liquid": "saved-unfrozen-submerged-liquid-region-and-water-or-deepWater-baseGround",
+    "terrestrial": "entry-connected-passable-non-water-baseGround",
+    "shore": "certified-shallow-liquid-or-entry-connected-passable-nonwater-cardinally-adjacent-to-liquid",
+    "aquatic": "certified-shallow-and-deep-liquid",
+    "aerial": "passable-nonwater-ground-union-certified-liquid; exclude-chasm-crumbled-blocking-trunk-blocking-deposit"
+  },
+  "contactEligibility": {
+    "terrestrial": "any-retained-component",
+    "shore": "intersects-entry-connected-passable",
+    "aquatic": "contains-entry-connected-passable-shallow-liquid",
+    "aerial": "intersects-entry-connected-passable"
+  },
+  "ordinaryContactQuota": "min(N,max(1,ceil(0.65*N)))",
+  "quotaMeaning": "requested-slots-reserved-for-contact-eligible-components-not-every-tile",
+  "movement": "same-frozen-component-intersect-current-mode-legal-tiles; no-path-hold",
+  "partyContact": "existing-legal-contact-only; no-new-deep-water-entry-or-adjacent-attack",
+  "retainedExceptions": [
+    "legacy-saved-enemies",
+    "apex",
+    "sessile-plants",
+    "authored-special-creatures"
+  ],
+  "materialBoundary": "freeze-after-final-morphology; preserve-narrow-typed-Hide-intersection-quality-roll-Anatomy-full-Coloration-and-parent-history",
+  "outOfScope": [
+    "Library-Bestiary-UI-integration",
+    "combat-balance",
+    "new-anatomical-material-families",
+    "food-nesting-weather-ecology",
+    "chasm-flight",
+    "boats-fishing-adjacent-water-combat"
+  ]
+}
