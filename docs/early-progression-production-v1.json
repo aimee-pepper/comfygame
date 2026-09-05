@@ -321,7 +321,16 @@
       "flora": "early.flora.v1",
       "clue": "early.clue.v2"
     },
-    "tinyWorldPolicy": "no duplicated placements or impossible receipts; do not declare a written guarantee feasible without capacity; ordinary reservations may be reduced with recorded reason"
+    "tinyWorldPolicy": "no duplicated placements or impossible receipts; do not declare a written guarantee feasible without capacity; ordinary reservations may be reduced with recorded reason",
+    "requiredReservationAllocation": {
+      "authority": "early-reservation-allocation-correction-v1.md",
+      "rule": "Protect scarce feasible required hosts before flexible reservations or optional filling consume them; resolve shared physical capacity jointly within existing budgets and route rules.",
+      "assignment": "Deterministic bounded reservation assignment with local reassignment where needed; no seed-specific exceptions. Greedy failure alone is not evidence of insufficient capacity.",
+      "capacity": "Count distinct usable anchors after protected content and combined work-position/route constraints; retain desired, feasible and placed counts separately. Do not confuse allocation loss with genuine joint capacity.",
+      "provenShortfalls": "Softwood 174, 505, 900 retain Resin and protected exit where applicable; insufficient joint capacity permits reduced tree reservation.",
+      "requiredRuntimeFixes": "Softwood 548 and 909 and Coal 811 must satisfy feasible reservations within unchanged budgets; test-only witnesses are not implementation.",
+      "compatibility": "Preserve saved old placements and work state, written source identity and budget credit. New early generation and counterfactuals use their selected placement policy."
+    }
   },
   "recruitment": {
     "roster": [
