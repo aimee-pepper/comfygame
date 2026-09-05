@@ -30,6 +30,8 @@ The first body-and-habitat compatibility rules are decided, but still await impl
 - [ ] **Ecological coherence:** work out how world conditions produce varied, believable creatures, including relevant food, nesting and weather relationships.
 - [ ] **The complete player experience:** review whether creatures feel distinct, make sense visually and mechanically, and support enjoyable exploration and crafting. This needs playtesting of the completed features as well as design discussion.
 
+**Partial progress on Body → materials:** the first plain Bone source is now specified, including skeleton eligibility, the retained yield and Anatomy benefit, actual-source quality/colour, Return and trading. It is not implemented. The complete anatomy catalogue and a compatible Bone crafting update are still unfinished, so the checkbox stays open. No new Bone recipe or Hollow/Dense subtype has been approved.
+
 These are unfinished goals, not claims that the generator already achieves them. Bring your preferences and examples; Game Design owns the detailed rules and content, and Engineering owns implementation and native testing. Adding these to your list does not make you the sole blocker or reopen the Library Bestiary work.
 
 See [the current creature decisions](design-decisions-september-4.html) for what is settled and what remains unfinished.

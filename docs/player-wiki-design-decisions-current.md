@@ -209,6 +209,29 @@ Existing worlds retain their creatures and movement. The completed Hide path kee
 
 **Still unfinished:** the wider creature rework, additional anatomical materials and their recipes, and food, nesting and weather relationships. The game's Library Bestiary work remains on hold. This first habitat slice needs no new Aimee decision.
 
+### Bone — first material beyond Hide
+
+**Decided intended behavior; not yet implemented.** This is partial progress on the body-to-materials design, covering Bone rewards, source history, Return and ordinary trading. It does not finish the anatomy catalogue or the new crafting route.
+
+Bone comes from a qualifying internal skeleton. A hard shell, horn or armoured hide does not automatically supply it, and an amorphous creature does not leave Bone. Aquatic and flying creatures may have skeletons; flight alone does not make their Bone hollow. The first material is simply **Bone**. Hollow Bone and Dense Bone are not newly promised subtypes.
+
+**Retained first-pass yield:** the species determines 1–3 useful Bone portions. A qualifying defeated creature supplies those portions through the normal victorious-encounter reward; Bone does not share Hide’s 70% roll. The existing Anatomy benefit raises base yields of 1, 2 or 3 to 2, 3 or 4. Individual size variation does not reroll that quantity.
+
+The actual creature’s skeletal density and size determine part quality using the agreed four-band calculation and source-world Danger. Its full source colour and material history stay recorded. Exact finished colour artwork remains pending.
+
+| Bone quality | Ordinary sell value per portion | Buy price if legitimately offered |
+|---|---:|---:|
+| Poor | 2 Gold | 4 Gold |
+| Common | 4 Gold | 8 Gold |
+| Rare | 8 Gold | 16 Gold |
+| Exceptional | 16 Gold | 32 Gold |
+
+These are the agreed raw-material prices, not the multipliers used for equipment statistics. Colour and species do not add a hidden sale premium. This does not add shop stock. Older Bone keeps its existing value and uses.
+
+**Crafting still unfinished:** the existing Bone-compatible Pointed Blade uses the older crafting rules. The new Bone material needs a compatible crafting update before entering that recipe. No new Bone weapon cost, recipe or unlock is approved by this source design. Older Bone recipes and crafted items remain available through their existing rules.
+
+The first creature Homework task stays unchecked. Bone production and trading are specified; the complete body-part catalogue, crafting connections and natural gathering experience still need work.
+
 ### Optional Hide-to-Leather path — decided intended behavior
 
 Some generated animals can provide **Smooth Skin, Supple Hide, or Tough Hide**, according to their actual covering. A feathered, scaled, shelled, or furry animal does not silently become a Hide source. Relevant creatures can be highlighted for a known recipe as soon as normally visible, but a possible drop is not a promise. Their appearance and species remain generated.
