@@ -69,7 +69,7 @@ Foreground trees, bushes, and objects partly fade when their artwork covers the 
 
 **Fading is a visual aid, not extra sight.** It reveals only the character and surroundings already permitted by the game’s visibility rules. It cannot expose fogged terrain, hidden creatures or resources, or things still concealed by gameplay canopy. The existing canopy rule remains: a second consecutive canopy square conceals what lies beyond; standing beneath canopy gives the local exception around the party. That exception does not erase other sight restrictions. Earned minimap knowledge remains earned. Fading itself spends no turn and changes no collision, target, harvest, or discovery.
 
-**Unsettled renderer proposal:** actual 3D rendering with sprites and a fixed orthographic camera is under consideration, partly for atmosphere and Blender authoring. A small on-phone comparison would show one existing grid patch, depth and foreground fading, local water, a simple shadow and one atmospheric effect. The renderer has not been chosen. This would preserve the square-grid actions, saved worlds and fog rules; it does not decide stacked floors, physics, camera rotation or a day/night system. The current playable overhaul continues before broad terrain production.
+**Unsettled renderer proposal:** actual 3D rendering with sprites and a fixed orthographic camera is under consideration, partly for atmosphere and Blender authoring. A small Simulator comparison would show one existing grid patch, depth and foreground fading, local water, a simple shadow and one atmospheric effect. Engineering recommends a separate 3D trial, but no renderer, Blender import or performance demonstration is implemented. The full shallow-water-bed demonstration still needs explicit water-depth and bed-height facts; hidden terrain must not leak through shadows or reflections. The renderer has not been chosen. This would preserve the square-grid actions, saved worlds and fog rules; it does not decide stacked floors, physics, camera rotation or a day/night system. The current playable overhaul continues before broad terrain production.
 
 **Accepted for later, low priority:** trees, elevated land, bushes, resource nodes, and the player character should have shadows in the three-quarter view. Their shape and treatment will be worked out after the new world geometry and foreground visibility are established. This is a presentation direction, not a decision to add dynamic lighting or a day/night system. The playable overhaul takes priority.
 
@@ -207,7 +207,27 @@ A habitat needs at least two connected suitable tiles. Most ordinary placement s
 
 Existing worlds retain their creatures and movement. The completed Hide path keeps its actual-source checks, drop chance, Anatomy benefit, quality, colour and material history.
 
-**Still unfinished:** the wider creature rework, additional anatomical materials and their recipes, and food, nesting and weather relationships. The game's Library Bestiary work remains on hold. This first habitat slice needs no new Aimee decision.
+**Still unfinished:** the wider creature rework, additional anatomical materials and their recipes, and food, nesting and weather relationships. Aimee has lifted the Bestiary work hold after approving the arrangement below. This first habitat slice needs no new Aimee decision.
+
+### Bestiary arrangement
+
+**Decided intended behavior · approved 5 September; not yet implemented.** Browse the Bestiary through **Sky, Water, Amphibious and Land**, then by body shape within each section: **Four-legged, Two-legged, Serpentine, Segmented, Radial, Fish-shaped and Amorphous**. For example: Sky → Serpentine → creature entry, or Water → Fish-shaped → creature entry.
+
+A creature’s supported habitat determines its section. Amphibious means suited to water and adjacent land; it does not mean the Earth animal class or unrestricted travel through every depth. Wings on a land-bound creature do not place it in Sky. Body shape describes its main body, rather than counting every wing, fin or other appendage. A category does not grant new abilities or reveal undiscovered creature information.
+
+**Bestiary work can now proceed:** Aimee explicitly lifted its hold after approving this structure. The wider creature rework remains unfinished. Materials and known source details belong inside each entry.
+
+**Browsing proposal:** show body-shape subcategories represented by recorded creatures, without suggesting that every possible combination must be collected. This display treatment remains a recommendation.
+
+### Creature descriptions that match their lives
+
+**Decided intended behavior; not yet implemented.** New creature names and role descriptions should reflect their actual supported bodies and behavior. A flying creature can be described as a flier; a land-bound membrane creature cannot. Fins and body proportions alone do not establish an eel identity, and low bone density does not establish hollow bones.
+
+An Ambusher needs the existing concealed close-range striking traits. Pursuers can still fight and chase without a separate natural weapon. Swarmer describes an existing multi-strike or area attack profile, not a promise of a colony; Sentinel does not promise nest guarding. Ordinary creatures must not gain the separate Apex identity just because they are large and well-armed.
+
+A grazing diet is not yet defined, so new descriptions will not call a creature a Grazer merely because it has weak weapons or lives near plants. Its diet stays unspecified. These naming rules add no new behavior or food simulation; existing worlds retain their names, and source materials keep their own rules.
+
+**Still open:** actual food relationships, nesting, weather responses and the full creature experience. This is partial progress on ecological coherence, not a completed ecology system.
 
 ### Bone — first material beyond Hide
 
@@ -282,6 +302,8 @@ Animal frequency, source matching during ordinary play, combat, recipe highlight
 ### Connected material development playtest
 
 **Now available as a prepared Simulator playtest; not a phone release.** One connected native run gathered Salt, returned it Home, used that exact Salt to tan the supplied Hide, made a Leather Guard, and completed the first two pack projects. The item, material history and 14-slot capacity survived reopening.
+
+**Carry presentation development check:** the updated capacity panels and full review are integrated. Opening a project review and cancelling keeps the original capacity; reopening the completed route shows 14 spaces and both projects applied. The prepared playtest now uses this presentation. Missing-stock, next-Bind affordability warnings and save-refusal presentation still need their own visual checks. Prices and purchase rules are unchanged; physical-phone acceptance remains pending.
 
 The separate player copy starts beside an unharvested Salt Crust. Four matching Common Supple Hide, coloured Fibre, Resin and supporting stock are already supplied at Home, with the relevant buildings ready. The short route is:
 

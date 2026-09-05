@@ -32,7 +32,11 @@ The first body-and-habitat compatibility rules are decided, but still await impl
 
 **Partial progress on Body → materials:** the first plain Bone source is now specified, including skeleton eligibility, the retained yield and Anatomy benefit, actual-source quality/colour, Return and trading. It is not implemented. The complete anatomy catalogue and a compatible Bone crafting update are still unfinished, so the checkbox stays open. No new Bone recipe or Hollow/Dense subtype has been approved.
 
-These are unfinished goals, not claims that the generator already achieves them. Bring your preferences and examples; Game Design owns the detailed rules and content, and Engineering owns implementation and native testing. Adding these to your list does not make you the sole blocker or reopen the Library Bestiary work.
+**Partial progress on ecological coherence:** the next naming rules are specified so movement and role descriptions agree with a creature’s actual body and habitat. A land-bound membrane does not make a flier, and weak weapons do not prove a grazing diet. This is not implemented; food, nesting and weather relationships remain open.
+
+**Bestiary arrangement — decided:** Sky, Water, Amphibious and Land, with body-shape subcategories: Four-legged, Two-legged, Serpentine, Segmented, Radial, Fish-shaped and Amorphous. Amphibious means creatures suited to both water and land, rather than the Earth animal class. You approved this structure and lifted the Bestiary work hold on 5 September. Its implementation can proceed; this does not complete the three larger goals above.
+
+These are unfinished goals, not claims that the generator already achieves them. Bring your preferences and examples; Game Design owns the detailed rules and content, and Engineering owns implementation and native testing. Adding these to your list does not make you the sole blocker. The Bestiary arrangement needs no further approval.
 
 See [the current creature decisions](design-decisions-september-4.html) for what is settled and what remains unfinished.
 
