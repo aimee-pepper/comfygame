@@ -194,7 +194,9 @@ Some generated animals can provide **Smooth Skin, Supple Hide, or Tough Hide**, 
 
 **First-pass reward tuning:** a qualifying creature has a 70% chance to provide its covering after defeat, yielding 1–4 parts according to body size. The part’s actual source determines its Poor, Common, Rare, or Exceptional quality and its colour. Better quality improves its contribution to an eligible craft; it does not make the animal drop more pieces. No tool is required to collect that defeat reward.
 
-Salt comes from real dry Salt crust around a suitable saline margin or deposit. It is gathered by hand: 2 Salt in one action, then that placement is depleted. Fresh growing country does not automatically supply Salt. This separate gathering trip is one reason Leather is optional rather than a prerequisite for the first Tannery crafts.
+Salt comes from exposed crust on suitable dry soil or sand beside saline water, or from an exposed deposit in dry saline ground. It is gathered by hand: 2 Salt in one action, then that placement is depleted. White ground alone does not promise Salt; wet mud, ice and submerged deposits are not hand-gatherable crust. Fresh growing country does not automatically supply Salt. This separate gathering trip is one reason Leather is optional rather than a prerequisite for the first Tannery crafts.
+
+**Salt generation — decided first-pass tuning:** an eligible saline-shore region has a 50% chance to provide exposed crust sites. A region without eligible shoreline sites may instead use the dry saline deposit route at 35%. A failed shoreline check does not receive a second roll. Suitable sites still share the existing gathering budget, after promised sources and ordinary Clay; these chances do not guarantee a Salt gather in every world or change the amount of water. Existing worlds keep their contents.
 
 | Optional Tannery recipe | Inputs | Result |
 | --- | --- | --- |
@@ -205,7 +207,7 @@ Both recipes cost no Essence. Matching parts can come from several animals when 
 
 Leather determines the garment’s finished quality: Poor parts make Rough work, Common makes Fine, Rare makes Superior, and Exceptional makes Exceptional. It adds no hidden Initiative, heat protection, or durability. Dismantling returns the recorded prepared Leather and Cord; it does not also refund the raw parts or spent Salt. Existing equipment and older materials remain available through their supported uses.
 
-Animal frequency, source matching, combat, and the complete gathering journey still need playtesting. This closes a small useful Leather path; the wider creature catalogue and later material families remain separate work.
+Animal frequency, source matching, combat, and the complete gathering journey still need playtesting. This specifies a small useful Leather path; it is not implemented or delivered by this design record. The wider creature rework is still unfinished, including additional body-derived materials, their uses and broader ecology. This Leather work does not update the Library Bestiary or establish that the whole creature rework is complete.
 
 ### The Binder’s own Gambits
 
