@@ -125,6 +125,25 @@ Scythe 2 can cut tall fibrous stalks on suitable thriving land for 3 Stem Fibre 
 
 From an existing basic forge, opening the Tannery and making a Woven Guard needs **20 Essence, 6 Logs, 4 Clay, and 10 Plant Fibre** in total. Adding T2 and making the Buckled version instead needs **40 Essence, 10 Logs, 8 Clay, 14 Plant Fibre, 10 Iron, and 1 Coal**. These combined costs are starting balance proposals, not measured affordability. You choose which improvement to pursue; the game does not require buying them all together.
 
+### Carrying and ordinary woven equipment — decided intended behavior
+
+The opening Storehouse handles the first two pack projects; **Corrin’s Tannery handles the larger expansion**. Sela’s existing **+2** remains a separate benefit of her built Wayfarer’s Table. Pack spaces are for the existing Items, Pages and prepared supply families. Materials remain slot-free, and gathering tools keep their own roll.
+
+| Project | Where and when | First-pass cost | Pack spaces before Sela |
+| --- | --- | --- | ---: |
+| Opening pack | Already owned | Free | 8 |
+| Reinforced Stitching | Opening Storehouse | 5 Essence, 4 Plant Fibre | 11 |
+| Balanced Straps | Storehouse, after Stitching | 10 Essence, 6 Plant Fibre, 1 Resin | 14 |
+| Deepened Satchel | Built Tannery, after both Storehouse projects | 20 Essence, 2 Plant Cloth, 2 Plant Cord, 1 Resin | 23 |
+
+**Carry opens with the Tannery, without another paid lesson.** You do not need Leather, Ingots or an attending keeper to expand this pack. Sela’s Table can add its 2 spaces at any stage: 10, 13, 16 or **25** in total. Its intended foundation costs **30 Essence, 6 Logs and 4 Plant Fibre**, after she joins; other fieldcraft benefits keep their existing rules.
+
+The three later pack increments become one worthwhile project while preserving their full combined benefit. The earlier proposed 20-space ceiling, or 22 with Sela, is replaced by **23 and 25**. Older purchases retain at least their existing capacity and cannot pay out twice. Your current expedition and packing choices remain intact. Storehouse shelving is a separate progression and keeps all nine existing improvements.
+
+The first project leaves 35 of the opening 40 Essence before other spending; both early projects leave 25. From an opening campaign without the Tannery, all three pack projects and its foundation together need **55 Essence, 26 Plant Fibre, 2 Resin, 6 Logs and 4 Clay**. These are optional stages across trips, not an opening shopping list. Journey testing must still check the actual cost of the next Bind.
+
+The built Tannery also teaches **Woven Gloves** and **Woven Boots**, with no extra lesson cost or free stock. Gloves use **1 Plant Cloth and 1 Plant Cord**. Boots use the same plus **1 Resin**. Each costs no Essence and gives **Fine equipment with total Protection 1.0** in its own slot, with no Initiative, heat protection or harvesting bonus. Either needs 6 raw Plant Fibre after processing; Boots also need the Resin. Cloth and Cord keep the chosen colours. Neither recipe requires animal materials, smelting, or the pack projects. Existing equipment and patterns remain available while the update is being made.
+
 ### Optional Hide-to-Leather path — decided intended behavior
 
 Some generated animals can provide **Smooth Skin, Supple Hide, or Tough Hide**, according to their actual covering. A feathered, scaled, shelled, or furry animal does not silently become a Hide source. Relevant creatures can be highlighted for a known recipe as soon as normally visible, but a possible drop is not a promise. Their appearance and species remain generated.
@@ -192,6 +211,9 @@ Iron is the blade's point, Log its handle, Fibre its binding, and Coal the forge
 
 These starter plants belong to compatible cool, temperate, or warm habitats with fresh damp or moist roots and sufficient daylight, without intrinsic danger, frozen or submerged roots, acid precipitation, or corrosive air. A tree has a small cross-shaped crown; its trunk and canopy change together when felled. A successful gathering hit spends one world turn. Cancelling or choosing an unsuitable tool spends none. Partly harvested sources retain their progress and do not regrow in this first set.
 
+
+Ordinary background moisture counts as water even when the written conditions only reduce its amount. Sea, Tide and Brine still carry their actual saltiness. A Mercury seam is local: it does not turn every river or plant root in the world into Mercury. Mercury itself supplies no ordinary watering, and roots actually touching Mercury, another non-water liquid, or an unidentified liquid are unsuitable for these starter plants. Nearby ordinary water keeps its own identity.
+
 Early ingredients must have ordinary gathering routes; they cannot depend exclusively on a lucky merchant offer, recycling, creature loot, or a later resource-Writing symbol. The complete gathering and return journey still needs playtesting.
 
 ### Trade and recovery
@@ -209,7 +231,8 @@ Early ingredients must have ordinary gathering routes; they cannot depend exclus
 | Iron Ingot | 4 Gold | 8 Gold |
 | Plant Cord | 1 Gold | 2 Gold |
 | Plant Cloth | 2 Gold | 4 Gold |
-| Woven Guard | 5 Gold | 10 Gold |
+| Woven Guard or Woven Gloves | 5 Gold | 10 Gold |
+| Woven Boots | 7 Gold | 14 Gold |
 | Buckled Woven Guard | 12 Gold | 24 Gold |
 | Salt | 1 Gold | 2 Gold |
 | Smooth Skin: Poor / Common / Rare / Exceptional | 2 / 2 / 3 / 3 Gold | 4 / 4 / 6 / 6 Gold |
@@ -217,7 +240,7 @@ Early ingredients must have ordinary gathering routes; they cannot depend exclus
 | Leather: Poor / Common / Rare / Exceptional | 3 / 4 / 5 / 6 Gold | 6 / 8 / 10 / 12 Gold |
 | Leather Guard: Rough / Fine / Superior / Exceptional | 8 / 10 / 13 / 15 Gold | 16 / 20 / 26 / 30 Gold |
 
-Dismantling a Woven Guard returns its Cloth and Cord. The Buckled version also returns its recorded Ingot. Prepared materials do not also refund their raw inputs, and spent fuel or Salt never returns. These are starting prices, not a promise that every merchant stocks every item.
+Dismantling a Woven Guard or Woven Gloves returns its Cloth and Cord. Woven Boots also return their recorded Resin. The Buckled version also returns its recorded Ingot. Prepared materials do not also refund their raw inputs, and spent fuel or Salt never returns. These are starting prices, not a promise that every merchant stocks every item.
 
 Buying the blade's full raw bundle costs 26 Gold. Dismantling that blade returns its recorded 4 Iron, 1 Log, and 2 Plant Fibre; the spent Coal does not return. Those recovered materials sell for 11 Gold. No new tool-dismantling route is added. Buying, making, and selling must not create an ordinary unlimited-profit loop.
 

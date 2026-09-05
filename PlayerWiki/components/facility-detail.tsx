@@ -1,3 +1,4 @@
+import { CarryingProgression } from '@/components/carrying-progression';
 import Link from '@/components/wiki-link';
 import { GuideBreadcrumbs, RelatedGuides } from '@/components/guide-navigation';
 import { SeptemberDecisions } from '@/components/september-decisions';
@@ -48,6 +49,7 @@ export function FacilityDetail({ slug }: { slug: string }) {
     <GuideBreadcrumbs items={[{ label: 'Village', href: '/village' }, { label: building.name }]} />
     <PageIntro eyebrow={buildingStatus(building)} title={building.name} summary={building.blurb} />
     <SeptemberDecisions topic={['blacksmith', 'apothecary', 'tannery'].includes(building.id) ? 'crafting' : 'progression'} />
+    {['storehouse', 'tannery', 'wayfarers_table'].includes(building.id) && <CarryingProgression />}
 
     {(building.assetURL || building.contextAssetURL) && <section className="article-section place-visuals" aria-label={`${building.name} Village visual`}>
       {building.assetURL && <figure className="place-visual place-building"><img src={building.assetURL} alt={`${building.name} building visual`} /><figcaption>The current building visual for {building.name}.</figcaption></figure>}

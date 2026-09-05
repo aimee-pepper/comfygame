@@ -188,7 +188,7 @@ export const craftingFamilyStatus: CraftingFamilyStatus[] = [
     name: 'Tannery',
     status: 'Changing in a future update',
     current: 'Supple Coat, Working Gloves, and Working Boots use individually selected samples that must meet hidden physical requirements.',
-    accepted: 'The early Tannery now has specified Plant Cord, Plant Cloth, Woven Guard, and Buckled Woven Guard recipes. Its first woven garment works without Ingots, Salt, or animal parts. An optional Leather Guard uses Leather made from matching Smooth Skin, Supple Hide, or Tough Hide plus Salt. Existing patterns keep their current behavior while their physical replacements are completed.',
+    accepted: 'The early Tannery now has specified Plant Cord, Plant Cloth, Woven Guard, Buckled Woven Guard, Woven Gloves and Woven Boots recipes. Carry opens with the building and adds 9 pack spaces after the two Storehouse projects. Its first woven garment works without Ingots, Salt, or animal parts. An optional Leather Guard uses Leather made from matching Smooth Skin, Supple Hide, or Tough Hide plus Salt. Existing patterns keep their current behavior while their physical replacements are completed.',
     changes: ['Supple Coat', 'Working Gloves', 'Working Boots'].map((name) => ({ name, current: 'Playable with the current individually selected material recipe.', accepted: 'Use visible physical part categories and player-selected quality; preview the resulting Armour and other real stat contributions.' })),
   },
   {

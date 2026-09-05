@@ -1,3 +1,4 @@
+import { CarryingProgression } from '@/components/carrying-progression';
 import { SeptemberDecisions } from '@/components/september-decisions';
 import type { Metadata } from 'next';
 import Link from '@/components/wiki-link';
@@ -50,6 +51,7 @@ export default async function PersonDetail({
           summary={person.contribution}
         /></div>
     <SeptemberDecisions topic="people" />
+    {['corrin', 'sela'].includes(person.id) && <CarryingProgression />}
       <nav className="person-record-navigation" aria-label={`${person.name} records`}>
         <a href="#meeting">
           <strong>Meeting</strong>
