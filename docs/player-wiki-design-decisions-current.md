@@ -271,13 +271,31 @@ The full animal colour and pattern data stays with the material. An exact on-scr
 
 Leather determines the garment’s finished quality: Poor parts make Rough work, Common makes Fine, Rare makes Superior, and Exceptional makes Exceptional. It adds no hidden Initiative, heat protection, or durability. Dismantling returns the recorded prepared Leather and Cord; it does not also refund the raw parts or spent Salt. Existing equipment and older materials remain available through their supported uses.
 
-**Tannery presentation development check:** the updated panels, ingredient selection and complete recipe quotes are now integrated and tested in the native app. Plant-stock checks cover Cord, Cloth and the woven garment preview. A separate existing-stock check covers the missing-Hide explanation with Review unavailable, Leather and Cord selection, the full Leather Guard quote, Cancel and reopening. Cancelling preserved all materials and Essence. This was a presentation check, not another craft. The eligible raw-Hide selector and an injected save-failure message have not yet been visually checked; final material-colour artwork and physical-phone acceptance remain pending.
+**Tannery presentation development check:** the updated panels, ingredient selection and complete recipe quotes are now integrated and tested in the native app. Plant-stock checks cover Cord, Cloth and the woven garment preview. A separate existing-stock check covers the missing-Hide explanation with Review unavailable, Leather and Cord selection, the full Leather Guard quote, Cancel and reopening. Cancelling preserved all materials and Essence. This was a presentation check, not another craft. The eligible raw-Hide selector has since passed in the connected playtest below. An injected save-failure message has not yet been visually checked; final material-colour artwork and physical-phone acceptance remain pending.
 
 **Leather crafting development check:** an arranged native playthrough now tans two Leather, makes Cord, crafts a Leather Guard and confirms the item after reopening. The chosen test materials made a Fine Guard with Protection 2.50, no Essence cost and sell/buy values of 10/20 Gold. Protection still depends on the selected Leather; 2.50 is this example, not a fixed value for every Fine Guard. A separate native Recycler check dismantled it and confirmed exactly 2 Leather and 1 Cord after reopening, with no raw Hide or spent Salt returned.
 
 All 25 focused checks in this consumer test run passed, covering exact source matching, all four quality/stat/value bands, preserved colours and parents, full storage, older Salt, saving and duplicate-action refusal. The six older compatibility failures described above remain separate and unresolved. Value records do not themselves add merchant stock or a new material-selling route.
 
 Animal frequency, source matching during ordinary play, combat, recipe highlighting and the complete gathering journey still need playtesting. Ordinary Salt, the limited animal-source rules, Leather processing and the Leather Guard now have bounded development checks; this does not establish natural affordability or phone delivery. The wider creature rework is still unfinished, including additional body-derived materials, their uses and broader ecology. This Leather work does not update the Library Bestiary or establish that the whole creature rework is complete.
+
+### Connected material development playtest
+
+**Now available as a prepared Simulator playtest; not a phone release.** One connected native run gathered Salt, returned it Home, used that exact Salt to tan the supplied Hide, made a Leather Guard, and completed the first two pack projects. The item, material history and 14-slot capacity survived reopening.
+
+The separate player copy starts beside an unharvested Salt Crust. Four matching Common Supple Hide, coloured Fibre, Resin and supporting stock are already supplied at Home, with the relevant buildings ready. The short route is:
+
+1. Gather 2 Salt by hand, then walk back to the portal and Return.
+2. At the Tannery, select the Common Supple Hide and confirm two Leather recipes.
+3. Make Plant Cord, then review and make the Leather Guard.
+4. At Storehouse → Satchel, complete Reinforced Stitching and Balanced Straps to increase capacity from 8 to 11 to 14.
+5. Reopen to check the saved results. You can Cancel at any quote.
+
+The checked materials produced a Fine Leather Guard with 2.50 Protection; that number belongs to those selected materials. The completed acceptance run ended with 10 Essence, one Guard, no raw Hide or Salt, and the two recorded Leather preparations. Village income occurred during play, so use the live quotes rather than assuming the wallet stays at its starting value.
+
+This route also checked the eligible raw-Hide selector. A repeatedly returning tutorial was corrected: **Not now** now lasts for the current app session; reopening or explicitly replaying the tutorial may show it again. It does not mark the lesson completed.
+
+**Still unproven:** finding and learning everything naturally, creature/material availability, combat and economy pacing, and affording the next expedition through ordinary play. The natural campaign remains separately preserved at Home with 29 Essence after three expeditions. No fourth search was made. The overhaul remains off for ordinary campaigns; final creature/Leather artwork, the wider creature rework and physical-phone acceptance remain unfinished.
 
 ### The Binder’s own Gambits
 
