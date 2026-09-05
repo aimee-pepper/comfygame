@@ -4,13 +4,13 @@
 
 ## Physical rule
 
-Substantial solid deposits and boulder-sized forms block at their physical base. First-cutover Iron and Coal deposits each occupy one blocking cell. Their existing Pick1 requirements, three hits and2 units per hit remain. Small loose stones, Clay, Salt crust, herbs and low gathering patches remain walkable, with their existing separate underfoot gathering action and requirements. Merely walking onto a loose source does not gather it.
+Substantial solid deposits and boulder-sized forms block at their physical base. First-cutover Iron and Coal deposits each occupy one blocking cell. Their existing Pick1 requirements, three hits and2 units per hit remain. Small loose stones, Clay, Salt crust, herbs and low gathering patches remain walkable, with their existing separate underfoot gathering action and requirements. Merely walking onto one of these finite gathering sources does not harvest it. Existing already-loose pickup items keep their current on-step pickup behavior; they are not converted into finite gathering sources.
 
 Only an explicitly defined harvestable producer grants mining output. This does not create a new Rubble producer or turn every decorative rock into loot. A new blocking deposit must sit on supporting ground whose ordinary edge and base become traversable when its obstruction is removed; this does not turn a cliff into stairs, fill a chasm or rewrite water/height rules.
 
 ## Deliberate movement becomes one mining action
 
-An explicit cardinal one-cell player step into a normally disclosed live deposit is a mining intent from the adjacent square. An explicit adjacent-cell step has the same meaning. Use the **currently selected, packed qualifying Pick**, preserving its identity and existing tier check. No automatic tool switch, tool grant, or bag change is added.
+An explicit cardinal one-cell player step into a normally disclosed live deposit is a mining intent from the adjacent square. Dispatch this only for an actually blocking, undepleted harvest source; a cleared footprint returns to ordinary movement, even if its exhausted source record remains. An explicit adjacent-cell step has the same meaning. Use the **currently selected, packed qualifying Pick**, preserving its identity and existing tier check. No automatic tool switch, tool grant, or bag change is added.
 
 Resolve that intent through the existing exact harvest proposal and durable owner (`EarlyMaterialGameplayRules.quote/apply`, `EarlyMaterialHarvestRules`, `GameStore.harvestEarlyMaterial`). A successful hit saves its finite work and exact yield, advances **one** world turn and applies the existing world effects once. The actor stays on the original adjacent square, including on the final hit. Full depletion removes this deposit’s obstruction; the next deliberate step enters the cleared square at the ordinary terrain movement cost. Do not combine final mining and movement into one ambiguous action.
 

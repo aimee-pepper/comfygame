@@ -7,7 +7,8 @@
     "coal": "blocking; Pick1;3hits;2Coal per hit",
     "looseClaySaltStonesHerbsLowPatches": "walkable; existing underfoot gathering and tool requirements unchanged; walking onto them does not auto-harvest",
     "boulders": "substantial boulder forms block; only an explicitly defined harvest producer has mining/yield behavior; no invented Rubble producer",
-    "underlyingGround": "blocking deposit requires supporting ground/edge that is traversable once deposit obstruction is removed; no cliff/chasm/height rewrite"
+    "underlyingGround": "blocking deposit requires supporting ground/edge that is traversable once deposit obstruction is removed; no cliff/chasm/height rewrite",
+    "alreadyLoosePickups": "existing on-step pickup behavior remains; this rule only distinguishes finite gathering sources"
   },
   "manualBump": {
     "intent": "explicit cardinal one-cell player step or explicit adjacent-cell step into a normally disclosed live deposit",
@@ -16,7 +17,8 @@
     "success": "one finite hit; actor remains on adjacent original cell even on final hit; exact yield and work saved; exactly one world turn/effects",
     "finalHit": "remove only this deposit obstruction; next explicit movement into cleared cell uses ordinary terrain movement cost",
     "refusal": "existing wrongTool,hiddenOrMissing,outOfReach,priorityInteraction,exhausted,stale or save refusal spends0 mining turns/materials/work and grants0 output; do not fall through to charged blocked movement",
-    "priority": "existing encounter/authored-interaction priorities retain ownership; mining cannot bypass them"
+    "priority": "existing encounter/authored-interaction priorities retain ownership; mining cannot bypass them",
+    "dispatch": "only an actually blocking undepleted harvest source; exhausted footprint uses ordinary movement"
   },
   "automaticNavigation": {
     "passability": "live blocking deposits excluded from traversal; route around or stop",
