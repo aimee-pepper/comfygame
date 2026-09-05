@@ -64,7 +64,22 @@
     "chance": 0.7,
     "quantity": "clamp(1 + floor(size / 25), 1, 4)",
     "salt": "early.creature.covering.reward.v1",
-    "policy": "replace new-generation primary-hide branch, preserve other anatomy reward branches"
+    "policy": "replace new-generation primary-hide branch, preserve other anatomy reward branches",
+    "quantityMeaning": "base yield before existing earned Anatomy bonus",
+    "anatomy": {
+      "chance": "unchanged70%; miss0",
+      "owner": "existing frozen AnatomyButcheryReceiptV1 from expedition departure",
+      "onSuccess": "base + max(1,floor(base*35/100)); strongest once",
+      "baseToBonusTotals": {
+        "1": 2,
+        "2": 3,
+        "3": 4,
+        "4": 5
+      },
+      "preserve": "no subtype/quality/colour change; same source; no late roster recomputation or duplicate application"
+    },
+    "rollReceipt": "new versioned per-foe eligibility/base quantity/policy/random decision persisted before reward evaluation; committed final quantity and applied departure bonus retained; no legacy fabrication",
+    "replacementGate": "parent species projection contains primary Hide AND actual placed primary-covering priority resolves eligible Hide; retain parent projection/actual measurements; replace legacy Hide once, preserve other families; mismatch no newly typed Hide and supported legacy behavior unchanged"
   },
   "sourceQuality": {
     "partExpression": "(covering.coverage + derived.flexibility) / 2 without intermediate rounding",
@@ -130,7 +145,8 @@
     "evaporiteExposure": "successful arid35% roll resolves formation AND exposed crust deposit on eligible dry soil/sand; no separate exposure roll",
     "physicalIdentity": "saved site-level salt-crust deposit retains base ground/bedrock/elevation/liquid; no recession history invented and no whole-region surface replacement",
     "freeze": "separate stable branch/original-region stream; save basis, original region, roll and candidate/selected anchor facts; preserve across downstream adapters; no legacy backfill",
-    "protection": "no occupied, critical, already-promised or explicitly protected incompatible surface; selected producer excludes optional flora at same anchor"
+    "protection": "no occupied, critical, already-promised or explicitly protected incompatible surface; selected producer excludes optional flora at same anchor",
+    "writtenGuaranteeStatus": "generic hand-gather promise only; exact Salt grammar/host preparation/infeasibility adapter unclosed; ordinary Salt independent; no invented trigger or chemistry rewrite"
   },
   "recipes": [
     {

@@ -28,7 +28,7 @@ Name, hue, ornament and species identity remain generated. Source colour follows
 
 For a qualified creature, a **70%** primary-covering reward roll on defeat yields the existing size-based
 quantity `clamp(1 + floor(size / 25), 1, 4)`. Freeze the possible reward, quantity and quality on the creature;
-use its persisted defeat-reward roll once. The player can see recipe relevance without inspection, but
+add a versioned per-foe covering-roll receipt and consume its frozen decision once; do not assume the current reward model already contains such a roll. The player can see recipe relevance without inspection, but
 that means a possible drop, not a promised one. This row replaces the old primary-Hide reward branch for
 new-generation creatures; it must not append a duplicate reward to the legacy family projection.
 Other anatomical rewards remain their existing versioned rules, and are not silently promoted to newly
@@ -92,9 +92,10 @@ No salt host flag can grant inventory without the actual placed finite producer.
 Use a stable separate stream per original region and branch, never per rendering, harvest, source depletion,
 new region partition or retry. Freeze host eligibility before allocating optional sources and preserve it
 through later map adapters. Old worlds keep their saved contents; missing legacy physical facts do not
-backfill new ordinary Salt or invent recession history. Existing written Salt guarantees must also resolve
-a compatible physical host; the ordinary probabilities do not veto a valid written guarantee or create an
-additional bonus deposit. No new written-Salt geometry or vocabulary is added by this clarification.
+backfill new ordinary Salt or invent recession history. The generic first-pass written-resource rules are
+intended authority, but the exact callable Salt binding is not closed and no executable written-Salt adapter
+is established by this packet. Ordinary Salt does not require that adapter. See the precise remaining
+decisions below; do not invent a trigger, terrain preparation, guarantee or before-spend refusal for Salt.
 
 One eligible Salt gather is reserved within the existing loose-earth budget after written guarantees and
 ordinary Clay reservations. If the budget or legal placement is exhausted, it competes in future eligible
@@ -183,3 +184,51 @@ processing and Leather Guard route. Additional anatomical families/consumers, ex
 encounter balance remain separate. Earlier ecology specifications and their obsolete six-band passages
 are not a current comprehensive completion receipt. No Library integration automatically resumes from
 this packet's readiness or eventual bounded runtime acceptance.
+
+## Written Salt: exact binding remains unclosed — 5 September 2026
+
+The phrase “existing written Salt guarantees” in earlier revisions overstated the retained authority.
+`resource-world-first-pass-tuning-v1.md`, Geological placement, settles a generic base-resource promise:
+one hand-gathering placement, two units, entry-connected within 3–8 movement steps, ordinary-budget credit
+and truthful quote. Its compatibility section settles a disclosed winner/influence when competing direct
+promises cannot coexist. Neither section maps Salt's concrete grammar to that promise.
+
+`pressure_sources.json` permits Salt on Hydrology, Substrate and Vitality, with their existing salinity,
+ground and life-pressure contributions. The recovered Salt lesson names a substrate source. These are not
+a closed presence-guarantee trigger. `early-written-iron-guarantee-v1.md` explicitly closes Iron only;
+copying its negation, local outcrop permission or refusal into Salt would be a new decision.
+
+Still needed for the Salt adapter: (1) exact qualifying source/target, intensity, local denial and canonical
+compound/dedup rules; (2) permitted host preparation when no exposed compatible saline site exists,
+including whether any local salinity or substrate can change; (3) exact quote/spend disposition for
+physical or capacity failure, distinguished from the already-closed competing-guarantee conflict rule.
+No automatic guarantee on every Salt sigil, new vocabulary, chemistry rewrite or inferred refusal is
+selected here. This is a Design dependency, not Aimee Homework; ordinary Salt and the approved Leather
+producer/consumer scope can proceed independently. Old worlds and pressure-only Writing stay intact.
+
+## Anatomy and placed-body compatibility — 5 September 2026
+
+The primary-covering quantity formula is **base yield**. Preserve the existing earned, expedition-frozen
+`AnatomyButcheryReceiptV1` after a successful 70% drop. Use its current strongest-once formula:
+`final = base + max(1, floor(base * 35 / 100))`. For base 1/2/3/4, Anatomy gives 2/3/4/5; without it the
+base remains 1/2/3/4. The 70% chance is unchanged, and a failed roll yields zero even with Anatomy. The
+minimum +1 must never manufacture a drop on failure. Bonus units have the same exact subtype, quality,
+source colour and parent identity. There is no new benefit, fee, stacking or quality bonus. Later roster,
+respec or health changes do not rewrite the saved departure bonus; other anatomical rewards stay unchanged.
+
+Add a real versioned per-foe covering-roll receipt for new-generation typed covering rewards, preserving
+eligibility, base quantity, policy and random decision before evaluating the reward. Persist the applied
+existing departure Anatomy receipt and final quantity in the committed reward result. Save/retry/reopen
+cannot reroll success or apply the bonus twice. Old creatures and already-resolved rewards retain their
+existing policy; missing old roll data is not fabricated. Report base and bonus separately when measuring
+yields. The earlier average-defeat calculation describes base-yield tuning without an Anatomy benefit.
+
+Typed Hide is a replacement, not an extra body reward: the persisted species projection must contain an
+existing primary Hide branch **and** the actual placed body's established primary-covering priority must
+still resolve eligible Hide. Use the actual placed measurements for the typed source, retaining the parent
+species projection and exact source evidence. A species-level Pelt branch cannot gain new typed Hide merely
+because specimen jitter looks softer; nor can an ineligible placed covering be typed as Hide. Never grant
+both the replaced legacy Hide and its typed replacement. Preserve other family branches. On a mismatch,
+keep the supported legacy reward policy, grant no newly typed Hide, and do not claim full creature-material
+migration. New Leather recipes continue to require exact Skin/Supple/Tough stock. Reprojecting all coverings
+or migrating other anatomical families remains outside this bounded slice.
