@@ -187,10 +187,14 @@ export const craftingFamilyStatus: CraftingFamilyStatus[] = [
   {
     slug: 'tannery',
     name: 'Tannery',
-    status: 'Changing in a future update',
-    current: 'Supple Coat, Working Gloves, and Working Boots use individually selected samples that must meet hidden physical requirements.',
-    accepted: 'The early Tannery now has specified Plant Cord, Plant Cloth, Woven Guard, Buckled Woven Guard, Woven Gloves and Woven Boots recipes. Carry opens with the building and adds 9 pack spaces after the two Storehouse projects. Its first woven garment works without Ingots, Salt, or animal parts. An optional Leather Guard uses Leather made from matching Smooth Skin, Supple Hide, or Tough Hide plus Salt. Existing patterns keep their current behavior while their physical replacements are completed.',
-    changes: ['Supple Coat', 'Working Gloves', 'Working Boots'].map((name) => ({ name, current: 'Playable with the current individually selected material recipe.', accepted: 'Use visible physical part categories and player-selected quality; preview the resulting Armour and other real stat contributions.' })),
+    status: 'Playable now',
+    current: 'Build323 delivers one-part Leather, seven garment variants, independent panels, exact component prices, same-item refit/remake and current-component recovery. Ordered source swatches retain actual textile colours; unknown RGB stays unknown.',
+    accepted: 'Useful woven clothing before animal materials or Ingots, no ordinary crafting Essence toll, actual source quality/colour, and preserved Carry progression. The first complete Tannery pass now implements these decisions; additional creature-material roles remain separate proposals.',
+    changes: [
+      { name: 'Leather', current: 'One eligible Skin/Hide plus one Salt makes one Leather, preserving that source and its actual input value.', accepted: 'One-to-one preparation; no invented blend or automatic repricing of older material.' },
+      { name: 'Seven garments', current: 'Woven, Buckled Woven and Leather Guards; Woven/Leather Gloves; Woven/Leather Boots. Leather panels are chosen independently.', accepted: 'Exact components and previewed Protection/workmanship, with no hidden-property sample or crafting Essence fee.' },
+      { name: 'Refit and remake', current: 'Keep the same item, use the selected complete replacement bundle, and return displaced attached components once.', accepted: 'Prepared components recover without their raw ancestors; history never supplies a second refund.' },
+    ],
   },
   {
     slug: 'bowyer',

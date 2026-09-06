@@ -2,10 +2,11 @@ import Link from '@/components/wiki-link';
 
 export function TanneryOverhaul() {
   return <section className="article-section note-card">
-    <h2>The complete Tannery first-pass plan</h2>
-    <p><strong>Current behavior:</strong> early textiles, woven garments, Leather Guard and carrying improvements have reported implementations. The complete replacement below is not yet delivered.</p>
-    <p><strong>Retained decisions:</strong> useful woven clothing before Ingots or Leather, no ordinary crafting Essence fee, real material colour and quality, and pack capacity of 8→11→14→23 plus Sela’s separate 2.</p>
-    <p><strong>New Design-authored first-pass plan:</strong> mix actual Fibre strands and sections in Cord/Cloth; dress one Skin or Hide plus Salt into one Leather; choose Leather panels independently. Three clothing families contain seven variants, with consistent component prices, recovery and ordinary refit. Existing owned materials and garments keep their saved values and properties.</p>
-    <p><Link href="/references/crafting-shop-overhaul">Read every Tannery recipe, garment and carrying rule</Link>.</p>
+    <h2>The complete first Tannery pass</h2>
+    <p><strong>Current behavior — delivered in phone build323:</strong> one eligible Skin or Hide plus Salt makes one Leather. All seven garment variants use exact selected components, with independent Leather panels and no crafting Essence fee. Mixed Cord/Cloth retains each actual source strand or section.</p>
+    <p>Free ordinary refit/remake keeps the same item. Recovery returns only its currently attached components once; prepared Leather does not also return raw Hide or Salt. New item prices use those actual components, while older receipts keep their saved values. Carry remains 8→11→14→23 plus Sela’s separate 2.</p>
+    <p>Ordered source-colour swatches now appear in stock, review and equipment details; unknown RGB stays unknown, and known Leather colour facts remain visible. Equipment comparisons preserve fractional Protection. Engineering reports the build installed and ordinarily launched on 6 September, with 47 focused checks and three native routes passed.</p>
+    <p><strong>Still proposed:</strong> additional creature-material roles and the remaining complete Forge and specialist maker work are separate from this delivery.</p>
+    <p><Link href="/references/crafting-shop-overhaul">Read every current Tannery recipe, garment and carrying rule</Link>.</p>
   </section>;
 }

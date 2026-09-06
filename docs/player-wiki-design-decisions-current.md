@@ -4,17 +4,25 @@ This is the current record of the changes agreed today. **Decided intended behav
 
 ## Whole-shop update · 5 September
 
-Complete first-pass plans now cover all 19 Apothecary preparations, Forge, Tannery, Bowyer, Weaponsmith and Armoury; the complete Apothecary implementation now has Engineering-reported focused and native checks, and is delivered in phone build322. The remaining full maker routes are still pending. [Crafting Overhaul · Shop by Shop](crafting-shop-overhaul.html) records the complete scope, current rules, accepted destination and the complete first-pass recipes, producers and services for those six makers, now including shared ordinary equipment services, the complete Survey Post, Scriptorium/Writing Desk, Distillery and nine-configuration Channelworks plans. It supersedes isolated next-recipe assignments. The ingredient bridges below are temporary compatibility steps; they do not settle the final recipes or replace the accepted excursion-long coating lifetime.
+Complete first-pass plans now cover all 19 Apothecary preparations, Forge, Tannery, Bowyer, Weaponsmith and Armoury; the complete Apothecary implementation now has Engineering-reported focused and native checks, and is delivered in phone build322. The full first Tannery pass is now delivered in build323; the other complete maker routes remain pending. [Crafting Overhaul · Shop by Shop](crafting-shop-overhaul.html) records the complete scope, current rules, accepted destination and the complete first-pass recipes, producers and services for those six makers, now including shared ordinary equipment services, the complete Survey Post, Scriptorium/Writing Desk, Distillery and nine-configuration Channelworks plans. It supersedes isolated next-recipe assignments. The ingredient bridges below are temporary compatibility steps; they do not settle the final recipes or replace the accepted excursion-long coating lifetime.
 
 ## Apothecary implementation progress · 6 September
 
-**Current behavior: the full batch is delivered in phone build322, installed and ordinarily launched on6 September.** All19 recognizable-ingredient recipes, finite named plant/mineral sources, acquisition learning, source colour/Pattern retention and all four full-excursion weapon coatings are included. The reported checks cover39 focused cases and4 native routes, including harvesting Bitter Root, returning home, learning and preparing its medicine. Shared mixed Cord/Cloth and advanced Forge/tool dependencies are included; the full Tannery garment, pricing/refit and wider equipment-composition journeys remain pending. Older books keep their existing contents.
+**Current behavior: the full batch is delivered in phone build322, installed and ordinarily launched on6 September.** All19 recognizable-ingredient recipes, finite named plant/mineral sources, acquisition learning, source colour/Pattern retention and all four full-excursion weapon coatings are included. The reported checks cover39 focused cases and4 native routes, including harvesting Bitter Root, returning home, learning and preparing its medicine. Shared mixed Cord/Cloth and advanced Forge/tool dependencies are included; build323 subsequently completes the first Tannery garment/pricing/refit and source-swatch routes; broader equipment composition remains pending. Older books keep their existing contents.
 
 The older recipes and ingredient bridges below are historical compatibility references; the delivered whole-shop recipes are current. The animal-material alternatives in the new creature proposal are separate future work and are not part of this Apothecary batch.
 
+## Tannery delivered · phone build323
+
+**Current behavior:** the complete first Tannery pass is installed and ordinarily launched on6 September. One eligible Skin/Hide plus Salt makes one Leather. All seven garment variants are available, with independently chosen Leather panels, exact component prices and no crafting Essence toll. Refit/remake keeps the same owned item, and recovery returns only its currently attached components once.
+
+Ordered source-colour swatches now appear in stock, crafting/refit review and equipment details. Mixed Cord strands and Cloth sections remain distinct; missing RGB is shown as unknown rather than guessed. Known Leather colour facts stay visible. Equipment comparisons preserve fractional Protection. Carry and supported paid improvements remain intact.
+
+Engineering reports47 focused checks and3 native routes passed. This completes the first Tannery batch, not the separate creature anatomy/equipment proposals or the remaining Forge and specialist makers.
+
 ## Wood, Hide, Apex labels and notices · 6 September
 
-**Status:** all four directions are accepted. Hide grouping is delivered in build 318, Apex labels in build 319 with their styling integrated in build 320, and notice controls in build 320. New-world wood colour through harvested Logs is delivered in build321; Mixed Cord/Cloth is delivered in build322; Hafts and the complete finished-equipment/refit/recovery journey remain pending.
+**Status:** all four directions are accepted. Hide grouping is delivered in build 318, Apex labels in build 319 with their styling integrated in build 320, and notice controls in build 320. New-world wood colour through harvested Logs is delivered in build321; Mixed Cord/Cloth is delivered in build322; Tannery equipment source swatches/refit/recovery are delivered in build323; Hafts and the broader equipment journey remain pending.
 
 **Wood comes from the world.** Trees are the main source of wood, with their actual world-derived wood colour carried into Logs, Hafts and the corresponding equipment parts. Leaves and changing light do not change the material's inherent colour. Smaller trees and fallen logs provide supporting early routes; an improved Axe must not become a circular requirement for getting its own wood.
 
@@ -24,15 +32,15 @@ Use **Logs**, **Softwood Logs** and **Hardwood Logs** consistently. Older stock 
 
 The visible woody stem and its harvested Logs now share one saved base colour for new-world sources. Leaves and changing illumination keep their separate roles; wood does not take its colour from how the leaves happen to look. Remembered trees retain their observed colour, and stock colour chips show the saved material colour. Legacy Logs retain their supported any-Log uses; older unknown colour stays unknown. Engineering reports build321 installed and ordinarily launched on6 September, with the native harvest/reopen route passing.
 
-**Decided, still pending:** carry that colour through the complete Haft, visible finished-equipment, refit and recovery journey. Build322 now adds ordered mixed Cord/Cloth constituents, but does not complete those whole-shop equipment routes. Colour itself changes no wood type, stats, price or yield.
+**Decided, still pending:** carry that colour through the complete Haft, visible finished-equipment, refit and recovery journey. Build322 adds ordered mixed Cord/Cloth; build323 completes the Tannery source-swatch/refit/recovery route. Hafts and other whole-shop equipment routes remain pending. Colour itself changes no wood type, stats, price or yield.
 
-**Flora colour — accepted clarification from Aimee, 6 September; full crafting journey pending:** harvested flora parts keep their actual source colour and pattern for crafting. Coloured Stem or Leaf Fibre carries that appearance into Cord strands, Cloth sections and the corresponding equipment bindings or woven panels. Choosing differently coloured ingredients preserves those separate contributions. Processing, returning home, reopening, refitting and recovering components must not silently replace their colours. This is visible material appearance, not just a source note.
+**Flora colour — accepted clarification from Aimee,6 September; textile and Tannery source-swatch journey delivered, wider equipment pending:** harvested flora parts keep their actual source colour and pattern for crafting. Coloured Stem or Leaf Fibre carries that appearance into Cord strands, Cloth sections and the corresponding equipment bindings or woven panels. Choosing differently coloured ingredients preserves those separate contributions. Processing, returning home, reopening, refitting and recovering components must not silently replace their colours. This is visible material appearance, not just a source note.
 
 A part with its own colour keeps that colour rather than borrowing the colour of the whole plant. New harvestable parts need an explicit source-colour mapping; older unknown colours remain unknown. Flora stays ungraded, and colour alone adds no stats. Existing remedies keep their recognizable finished colours, while extracted pigments and ink follow their specific recipes; preserving a plant's colour does not make every plant a dye ingredient.
 
 **Named flora source colours delivered in build322:** the six Apothecary plant profiles and Dyer’s Root retain their actual assigned plant species’ complete colour and Pattern through harvesting, Return and stock. Existing Stem/Leaf/Tall Stem colours remain unchanged; mixed Cord strands and Cloth sections now preserve their ordered actual constituents. No RGB colour is guessed where its approved visual mapping is absent; the source colour facts remain preserved for crafting.
 
-**Equivalent Hide — current in build 318:** Return, Storehouse and physical material selectors group equivalent portions by quantity, preserving their actual quality, useful properties and validated source colour. Genuine differences remain separate. Storehouse includes creature reserve stock and a quantity/source detail sheet. Individual ownership, provenance, destinations and exact recipe consumption remain intact. Engineering reports the native four-portions → process-two → two-remaining route passed and build 318 installed and launched on 6 September. The current Tannery recipe still consumes two portions; the later one-to-one Leather recipe is not claimed delivered by this display fix.
+**Equivalent Hide — current in build 318:** Return, Storehouse and physical material selectors group equivalent portions by quantity, preserving their actual quality, useful properties and validated source colour. Genuine differences remain separate. Storehouse includes creature reserve stock and a quantity/source detail sheet. Individual ownership, provenance, destinations and exact recipe consumption remain intact. Engineering reports the native four-portions → process-two → two-remaining route passed and build 318 installed and launched on 6 September. That earlier display fix kept the two-portion recipe. Build323 now delivers one eligible Skin/Hide plus Salt per Leather; older material receipts retain their actual values.
 
 **Apex labels — current in build 319:** actual Apex creatures are identified on the existing visible field/minimap markers, current-sight details and encounter header. Ordinary creatures that stand still do not acquire an Apex label. Existing visibility remains authoritative; this adds no hidden creature, proper name or reward reveal. Engineering reports the visible Apex → move into encounter → reopen route passed and cumulative build 319 installed and launched on 6 September. Asset styling is also integrated in build 320; Engineering reports the map → encounter → reopen route passed.
 
@@ -94,7 +102,7 @@ An improved instrument must be used on a later field Survey to improve its best 
 
 ## Shared equipment services · 6 September
 
-**Design-authored first pass complete; implementation pending.** [The full service plan](crafting-shop-overhaul.html) now explains component refit, Tannery remakes, Armoury rebuilds, Weaponsmith fitting, exact recovery and older paid-work preservation across the six makers. Ordinary refit/remake/rebuild costs no Essence beyond the actual replacement recipe; fitting uses the unchanged weapon parts.
+**Design-authored first pass complete; Tannery services delivered in build323, other full maker services pending.** [The full service plan](crafting-shop-overhaul.html) now explains component refit, Tannery remakes, Armoury rebuilds, Weaponsmith fitting, exact recovery and older paid-work preservation across the six makers. Ordinary refit/remake/rebuild costs no Essence beyond the actual replacement recipe; fitting uses the unchanged weapon parts.
 
 An item's previous constructions remain its history, not extra salvage. New material equipment gains no generic old Reforge rank bonus or historical unapproved +0.5 upgrade. Older paid upgrades stay on their supported existing route until an accurate conversion can preserve them. The later Peerless guarantee remains accepted, with its Mote-on-miss outcome unresolved; ordinary services do not wait on that answer.
 
@@ -118,7 +126,7 @@ Hardwood supplies real bow limbs, Bone is used for hard points/shot/edges, and t
 
 ## Whole Tannery first-pass plan · 5 September
 
-The complete [Tannery plan](crafting-shop-overhaul.html) now covers Cord, Cloth, Leather, three clothing families with seven variants, prices, recovery, refitting and Carry. **These are Design-authored first-pass choices, pending implementation.** Fibre portions may combine as real coloured textile constituents. Dressing uses one eligible Skin/Hide plus Salt; a Guard may use two independently chosen Leather panels. Existing stock and clothing keep their saved qualities, colours and prices.
+The complete [Tannery plan](crafting-shop-overhaul.html) now covers Cord, Cloth, Leather, three clothing families with seven variants, prices, recovery, refitting and Carry. **These Design-authored first-pass choices are delivered in build323.** Fibre portions may combine as real coloured textile constituents. Dressing uses one eligible Skin/Hide plus Salt; a Guard may use two independently chosen Leather panels. Existing stock and clothing keep their saved qualities, colours and prices.
 
 Ordinary crafts and refit cost no Essence. New garments use the same recoverable-component pricing as the Forge. Woven Guard/Gloves/Boots remain useful before ingots or animal materials; Buckled Guard uses the existing Forge T2 Ingot. Carry stays 8→11→14→23 plus Sela's separate 2, and Home shelving still reaches 70. No extra Tannery tier, root toll or individual recipe approval is introduced. The full tables and examples are in the linked shop plan.
 
@@ -626,7 +634,7 @@ The first creature Homework task stays unchecked. Bone production and trading ar
 These are Design-authored, revisable content and tuning choices under your whole-shop direction, not personal approvals attributed to you. The packet includes source availability, tools/yields, learning, prices, custody and all four excursion-long coatings. Pick-3 access remains the named later Blacksmith dependency for Rift-glass supplies. No new Mote source or merchant stock is granted.
 See [the complete Apothecary recipe matrix and all-shop plan](crafting-shop-overhaul.html).
 
-### Optional Hide-to-Leather path — decided intended behavior
+### Optional Hide-to-Leather path — current in build323
 
 Some generated animals can provide **Smooth Skin, Supple Hide, or Tough Hide**, according to their actual covering. A feathered, scaled, shelled, or furry animal does not silently become a Hide source. Relevant creatures can be highlighted for a known recipe as soon as normally visible, but a possible drop is not a promise. Their appearance and species remain generated.
 
@@ -654,16 +662,14 @@ The promised deposit uses one existing earth-gathering place before ordinary Cla
 
 | Optional Tannery recipe | Inputs | Result |
 | --- | --- | --- |
-| Leather | 2 matching Smooth Skin, Supple Hide, or Tough Hide, plus 1 Salt | 1 Leather retaining the parts’ quality and colour |
-| Leather Guard | 2 matching Leather plus 1 Plant Cord | Body equipment with Protection calculated from that Leather; the preview shows the exact result |
+| Leather |1 eligible Smooth Skin, Supple Hide or Tough Hide +1 Salt |1 Leather retaining that actual part’s quality, measurements and colour |
+| Leather Guard |2 independently chosen Leather +1 Plant Cord |Body equipment with Protection calculated from the actual selected panels; the preview shows the exact result |
 
-Both recipes cost no Essence. Matching parts can come from several animals when their type, quality, colour, and relevant properties are the same. Different qualities or colours are not silently averaged together. A complete Leather Guard uses **4 matching raw parts, 2 Salt, and 2 Plant Fibre**, including its processing steps.
-
-Before tanning, the two raw parts must be the same kind. Once prepared, matching Leather may be combined even if its original parts came from different kinds of Skin or Hide, provided the retained quality, colour and relevant physical properties are identical. Every ingredient keeps its source history; different results are not silently blended.
+Both recipes cost no Essence. A complete Leather Guard uses **2 eligible raw Skin/Hide portions,2 Salt and2 Plant Fibre**, including its Leather and Cord preparation. The two Leather panels may have different source types, qualities, colours and relevant measurements; each contributes independently. Tanning never blends raw portions into an invented average material, and crafting keeps every source history.
 
 The full animal colour and pattern data stays with the material. An exact on-screen creature-to-Leather colour conversion is not yet established, so a generic icon is not a preview of that finished colour. Retaining known source colour and completing crafting transactions does not itself prove the final artwork matches it.
 
-Leather determines the garment’s finished quality: Poor parts make Rough work, Common makes Fine, Rare makes Superior, and Exceptional makes Exceptional. It adds no hidden Initiative, heat protection, or durability. Dismantling returns the recorded prepared Leather and Cord; it does not also refund the raw parts or spent Salt. Existing equipment and older materials remain available through their supported uses.
+Leather panels determine the garment’s workmanship: their actual quality ranks are averaged and rounded once; all-Poor gives Rough, all-Common Fine, all-Rare Superior and all-Exceptional Exceptional. Minor Cord does not reduce that workmanship. It adds no hidden Initiative, heat protection, or durability. Dismantling returns the recorded prepared Leather and Cord; it does not also refund the raw parts or spent Salt. Existing equipment and older materials remain available through their supported uses.
 
 **Tannery presentation development check:** the updated panels, ingredient selection and complete recipe quotes are now integrated and tested in the native app. Plant-stock checks cover Cord, Cloth and the woven garment preview. A separate existing-stock check covers the missing-Hide explanation with Review unavailable, Leather and Cord selection, the full Leather Guard quote, Cancel and reopening. Cancelling preserved all materials and Essence. This was a presentation check, not another craft. The eligible raw-Hide selector has since passed in the connected playtest below. An injected save-failure message has not yet been visually checked; final material-colour artwork and physical-phone acceptance remain pending.
 
@@ -730,6 +736,8 @@ Tint preserves shading and recognizable material cues. Water still reads as wate
 The Library books Aimee is drawing remain in progress. Sky and cloud homework is optional exploratory artwork; final world-entry layer sizes, placement, and movement are still being worked out. These studies are not finished in-game artwork.
 
 ### Reliable progress
+
+**Current playtest compatibility:** saves between game updates are not guaranteed for now. Saving and reopening within the current version must still work reliably.
 
 Making, upgrading, and returning should preserve the exact materials and items selected. A failed save must not spend ingredients, lose a tool, or report an improvement that cannot be kept. Existing people, buildings, tools, knowledge, and crafted items remain in older saves. The wiki changes to “current behavior” only after the corresponding game change has been delivered and verified.
 
@@ -853,7 +861,7 @@ Field health ended at 24/30 and 13/24 on the first trip, then 27/30 and 21/24 on
 
 **Development fixes encountered on this route:** the same second departure exposed repeated teaching-route searches that stalled Bind preparation. Reusing those unchanged route results reduced that specific diagnostic from about 99 seconds to about 2 seconds; ten focused checks and the same native departure passed. A separate lookup correction made the existing early Substrate teaching collectable without silently reading it or granting extra knowledge; four focused checks and native pickup passed. These are development results, not physical-phone playthrough or a general performance claim. An older save refusal from an unrecorded seed remains unresolved; passing these trips does not establish its cause or fix.
 
-**Remaining work:** complete natural recruitment, healing and Essence-runway checks, finish material and garment presentation, verify the visible source-to-finished-item colour journey and prepare delivery. The written Iron guarantee and its budget credit, the forge-to-Scythe harvesting chain, the Tannery’s Cord, Cloth, two woven garments and preserved source colours, and pack projects through 23 spaces plus Sela’s separate 2 are implemented and tested in development. Woven Gloves and Boots also pass native crafting, reopening and prepared-component recovery checks. Ordinary Salt now passes its own generated-source and native hand-gather/reopen checks; typed animal-covering rewards also pass their own focused and arranged native checks. Leather processing, the Guard and exact prepared-component recovery now pass their own native and focused checks too. Written Salt now passes its quoted Bind, seven-step walk, hand-gather and reopen checks, alongside focused rule and save checks. The focused placement and water-channel corrections are complete in development; genuine capacity reductions remain explicit. Keep the adopted intensity weights; the result does not call for another climate change. Drainage has not been adopted as the availability fix, and writing a fainter Sun did not improve the earlier results. **The overhaul remains disabled for new ordinary campaigns and is not delivered to your phone.**
+**Remaining work:** complete natural recruitment, healing and Essence-runway checks, finish material and garment presentation, verify the visible source-to-finished-item colour journey and prepare delivery. The written Iron guarantee and its budget credit, the forge-to-Scythe harvesting chain, the Tannery’s Cord, Cloth, two woven garments and preserved source colours, and pack projects through 23 spaces plus Sela’s separate 2 are implemented and tested in development. Woven Gloves and Boots also pass native crafting, reopening and prepared-component recovery checks. Ordinary Salt now passes its own generated-source and native hand-gather/reopen checks; typed animal-covering rewards also pass their own focused and arranged native checks. Leather processing, the Guard and exact prepared-component recovery now pass their own native and focused checks too. Written Salt now passes its quoted Bind, seven-step walk, hand-gather and reopen checks, alongside focused rule and save checks. The focused placement and water-channel corrections are complete in development; genuine capacity reductions remain explicit. Keep the adopted intensity weights; the result does not call for another climate change. Drainage has not been adopted as the availability fix, and writing a fainter Sun did not improve the earlier results. **That earlier checkpoint was not delivered; use the current build322/323 delivery notes above for what is on the phone now.**
 
 ### Mineral occurrence — decided intended behavior
 
@@ -877,21 +885,22 @@ Clay and Salt use their separate hand-gathered deposits. Rubble is held out of t
 | Clay, either Log, or either Plant Fibre, per unit | 1 Gold | 2 Gold |
 | Starter Iron Pointed Blade | 10 Gold | 20 Gold |
 
-**Additional intended trade tuning:**
+**Current Tannery prices in build323:** new gear uses its actual recoverable-component values. Older receipts retain their existing value; mixed Leather panels use their own actual prices.
 
 | Prepared material or item | Sell | Buy, when offered |
 | --- | ---: | ---: |
 | Iron Ingot | 4 Gold | 8 Gold |
 | Plant Cord | 1 Gold | 2 Gold |
 | Plant Cloth | 2 Gold | 4 Gold |
-| Woven Guard or Woven Gloves | 5 Gold | 10 Gold |
-| Woven Boots | 7 Gold | 14 Gold |
-| Buckled Woven Guard | 12 Gold | 24 Gold |
+| New Woven Guard or Woven Gloves |3 Gold |6 Gold |
+| New Woven Boots |5 Gold |10 Gold |
+| New Buckled Woven Guard |9 Gold |18 Gold |
 | Salt | 1 Gold | 2 Gold |
-| Smooth Skin: Poor / Common / Rare / Exceptional | 2 / 2 / 3 / 3 Gold | 4 / 4 / 6 / 6 Gold |
-| Supple or Tough Hide: Poor / Common / Rare / Exceptional | 2 / 3 / 4 / 5 Gold | 4 / 6 / 8 / 10 Gold |
-| Leather: Poor / Common / Rare / Exceptional | 3 / 4 / 5 / 6 Gold | 6 / 8 / 10 / 12 Gold |
-| Leather Guard: Rough / Fine / Superior / Exceptional | 8 / 10 / 13 / 15 Gold | 16 / 20 / 26 / 30 Gold |
+| New-world Skin/Hide: Poor / Common / Rare / Exceptional |2 /3 /6 /12 Gold |4 /6 /12 /24 Gold |
+| Leather from those new raw portions, including Salt |3 /4 /7 /13 Gold |6 /8 /14 /26 Gold |
+| New Leather Guard, two equal-grade new-price panels |7 /9 /15 /27 Gold |14 /18 /30 /54 Gold |
+| New Leather Gloves, new-price Leather |4 /5 /8 /14 Gold |8 /10 /16 /28 Gold |
+| New Leather Boots, new-price Leather |6 /7 /10 /16 Gold |12 /14 /20 /32 Gold |
 
 Dismantling a Woven Guard or Woven Gloves returns its Cloth and Cord. Woven Boots also return their recorded Resin. The Buckled version also returns its recorded Ingot. Prepared materials do not also refund their raw inputs, and spent fuel or Salt never returns. These are starting prices, not a promise that every merchant stocks every item.
 

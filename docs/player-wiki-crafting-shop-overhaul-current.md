@@ -191,11 +191,11 @@ Glass remains planned until its consuming system is ready; empty processing step
 
 ## Tannery — the complete textile, Leather, clothing and carrying plan
 
-**Current behavior:** early Cord, Cloth, Leather, woven garments, Leather Guard and carrying improvements have reported implementations. Build322 adds ordered mixed Stem/Leaf Cord and Cloth while preserving each constituent’s colour. Leather still uses two matching Hide portions; its new one-portion recipe and full garment/refit batch remain pending. Older sample-based clothing recipes also exist. The complete replacement described here is **not yet implemented**.
+**Current behavior, delivered in phone build323:** one eligible Skin/Hide plus Salt makes one Leather; all seven garment variants, independent Leather panels, exact component prices, same-item refit/remake and current-component-only recovery are implemented. Ordered source swatches appear in stock, review and equipment details, with fractional Protection comparisons. Mixed Cord/Cloth was delivered in build322. Existing Carry and supported paid improvement credits remain. Engineering reports47 focused checks and3 native routes passed, with build323 installed and ordinarily launched on6 September.
 
 **Retained decisions:** Corrin makes flexible foundational clothing and prepared stock shared with other shops. Her foundation costs **20 Essence, 6 Logs, 4 Clay and 4 Plant Fibre** after recruitment. Ordinary preparation, garment crafting and the refit described below cost **no Essence**. Woven clothing and carrying remain available before Leather or Ingots. Bought capacity and existing owned items stay yours.
 
-**New Design-authored first-pass choices:** simplify material matching, dress one Hide portion at a time, combine the clothing into three families with seven variants, and use consistent component-based prices and recovery. These choices use Aimee's delegated tuning authority; they are not new personal approvals or measured balance results.
+**Delivered Design-authored first-pass choices:** simpler source selection, one Hide portion per Leather, three clothing families with seven variants, and component-based prices/recovery. These choices use Aimee's delegated tuning authority; they are not new personal approvals or measured balance results.
 
 ### Preparing usable materials
 
@@ -536,7 +536,7 @@ After those shops exist, an Ingot Rigid Body recipe expands to **8 Iron, 4 Coal 
 
 ## Shared equipment improvement and recovery · 6 September
 
-**First-pass Design plan complete; implementation pending.** The six ordinary makers now share one service plan. The complete replacement has not been reported delivered. Older supported equipment services remain available under their existing rules while the new work is implemented.
+**First-pass Design plan complete; Tannery services delivered in build323.** The six ordinary makers share one service plan. Complete service replacement for the other makers remains pending. Older supported equipment services remain available under their existing rules while the new work is implemented.
 
 ### Improving the piece you already own
 
@@ -714,7 +714,7 @@ The new primary pigment routes are:
 | Yellow | Sulfur | 4 measures per unit |
 | Depth | Obsidian | 4 measures per unit |
 
-**New source work, pending implementation:** Copper uses the accepted Pick-1 work group, Obsidian Pick 3. Dyer's Root is a named small rooted plant with a specific pigment-bearing root, gathered with Scythe 1 for two portions. Its source belongs in suitable fresh, lit, unfrozen growing ground. It joins the existing named-preparation plant pool alongside the six Apothecary profiles, sharing their budget; it is not another guaranteed bonus plant in every world. Its actual pigment profile determines the yield, not a guess from the plant's rendered colour.
+**Source status:** Dyer’s Root is delivered with build322; the new Copper/Obsidian producer changes and full pigment-processing route remain pending. Copper uses the accepted Pick-1 work group, Obsidian Pick 3. Dyer's Root is a named small rooted plant with a specific pigment-bearing root, gathered with Scythe 1 for two portions. Its source belongs in suitable fresh, lit, unfrozen growing ground. It joins the existing named-preparation plant pool alongside the six Apothecary profiles, sharing their budget; it is not another guaranteed bonus plant in every world. Its actual pigment profile determines the yield, not a guess from the plant's rendered colour.
 
 Old explicitly supported Ichor pigment stock retains its legacy conversion and existing Magenta measures stay valid. No new world-node Ichor is introduced, and an arbitrary creature fluid does not automatically supply Magenta. The new Root route makes colour mixing independent of unfinished creature-fluid harvesting. Old material prices, stock and vials remain preserved.
 
