@@ -56,7 +56,7 @@ Actual reward is the source of **confirmed recovered material** knowledge. Save 
 
 Use existing native consumers: `WorldInspectionRules`/the current Look surface, `BestiaryView`, existing encounter result and Return material rows, and `LibraryRules`/the Bestiary shelf. No new research station, notebook, collection tool or mandatory tutorial.
 
-**Look order:** existing lawful creature name and actual Apex badge; one short body/habitat sentence; any known source-appropriate possible-material hint; existing danger/interaction information; a route to its current Bestiary note when the record exists. Keep explicit inspection visible under the delivered notice preferences even when optional monster/find popups are muted. Automatic knowledge may update quietly; it does not require a second mandatory popup. Existing optional notices keep their category controls, and muting presentation never prevents legitimate recording.
+**Look keeps the existing selection/interaction range**; this contract does not add remote inspection or movement. **Look order:** existing lawful creature name and actual Apex badge; one short body/habitat sentence; any known source-appropriate possible-material hint; existing danger/interaction information; a route to its current Bestiary note when the record exists. Keep explicit inspection visible under the delivered notice preferences even when optional monster/find popups are muted. Automatic knowledge may update quietly; it does not require a second mandatory popup. Existing optional notices keep their category controls, and muting presentation never prevents legitimate recording.
 
 First-pass copy examples:
 
