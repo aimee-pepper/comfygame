@@ -30,7 +30,7 @@ The first body-and-habitat compatibility rules are decided, but still await impl
 - [ ] **Ecological coherence:** work out how world conditions produce varied, believable creatures, including relevant food, nesting and weather relationships.
 - [ ] **The complete player experience:** review whether creatures feel distinct, make sense visually and mechanically, and support enjoyable exploration and crafting. This needs playtesting of the completed features as well as design discussion.
 
-**Partial progress on Body → materials:** the first plain Bone source is now specified, including skeleton eligibility, the retained yield and Anatomy benefit, actual-source quality/colour, Return and trading. It is not implemented. The complete anatomy catalogue and a compatible Bone crafting update are still unfinished, so the checkbox stays open. No new Bone recipe or Hollow/Dense subtype has been approved.
+**Partial progress on Body → materials:** the first plain Bone source is now specified, including skeleton eligibility, the retained yield and Anatomy benefit, actual-source quality/colour, Return and trading. It is not implemented. A compatibility proposal for the existing Pointed Blade is now written, with the new Bone role/fee/resale choice in item 7. It is not approved or implemented. The complete anatomy catalogue and crafting update are still unfinished, so the checkbox stays open. No new Bone recipe or Hollow/Dense subtype has been approved.
 
 **Partial progress on ecological coherence:** the next naming rules are specified so movement and role descriptions agree with a creature’s actual body and habitat. A land-bound membrane does not make a flier, and weak weapons do not prove a grazing diet. This is not implemented. A further weather/body correction is now specified: the cold-water tendency toward additional appendages belongs only to supported water or amphibious creatures, not every cold-world body. It is also unimplemented; food, nesting and broader weather relationships remain open.
 
@@ -66,4 +66,14 @@ You chose first full sight for a small static **Dangerous growth** marker. An ac
 
 The generic marker adds no damage numbers, duration or yield information. Dedicated 2D animation remains deferred. Engineering reports the warning implemented and tested in Simulator. Phone build 307 and the separately prepared 308 do not include it; phone delivery and visual acceptance remain pending.
 
-This is a reference and to-do list rather than a form. Tell Game Design or Project Manager your answer to item 1 or your thoughts on the creature goals in item 3, or share an artwork task with Asset Lead; the recorded status will then be updated here.
+## 7. Decision needed: new Bone in the existing Pointed Blade
+
+**Status: proposal · later material-to-crafting work; current early-game testing continues.**
+
+**Approve the existing Pointed Blade using two new Bone portions, one point and one grip, with no Essence fee?** Game Design recommends this bounded option. The point's real skeletal density and quality would supply Power; both pieces would determine workmanship and retain their own colours. The grip would add no invented handling bonus.
+
+The proposed finished sale value is the two portions' combined ordinary sell value, without a crafting premium: two Common portions would make a blade worth 8 Gold. Existing Recycler rates would recover one chosen portion. The Blacksmith/schematic requirement, piercing attack and close reach stay the same. Legacy Bone recipes and the starter Iron blade keep their existing rules.
+
+This approves a compatibility rule for an existing weapon, not a new weapon recipe, creature migration or immediate phone change. Bone production and the adapter still need implementation. You can approve this option or steer the Bone role, fee or resale choice; detailed conversion and source-history work remains the team's responsibility. See [the full Bone proposal](design-decisions-september-4.html).
+
+This is a reference and to-do list rather than a form. Tell Game Design or Project Manager your answer to item 1 or 7, or your thoughts on the creature goals in item 3, or share an artwork task with Asset Lead; the recorded status will then be updated here.

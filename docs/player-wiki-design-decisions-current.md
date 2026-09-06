@@ -294,6 +294,12 @@ These are the agreed raw-material prices, not the multipliers used for equipment
 
 **Crafting still unfinished:** the existing Bone-compatible Pointed Blade uses the older crafting rules. The new Bone material needs a compatible crafting update before entering that recipe. No new Bone weapon cost, recipe or unlock is approved by this source design. Older Bone recipes and crafted items remain available through their existing rules.
 
+**New proposal — awaiting your decision:** let the existing Pointed Blade use **1 new Bone for its point + 1 new Bone for its grip, costing 0 Essence**. This keeps its existing Blacksmith/schematic requirement, close reach and piercing attack. It adds no new weapon recipe or unlock, and leaves the starter Iron blade and legacy Bone crafting unchanged. The first update would accept two new Bone portions; mixing new and legacy materials would remain unavailable.
+
+The proposed Bone point supplies Power from its actual skeletal density and material quality: **4 × (0.5 + density ÷ 200) × the material-quality multiplier**, rounded once to the nearest quarter point. This measures the weapon's Power contribution, not guaranteed damage on every hit. The grip keeps its existing structural and colour role without an extra handling statistic. Both materials determine workmanship, using the agreed 70% point / 30% grip quality weighting and Rough, Fine, Superior or Exceptional result names. Workmanship does not multiply Power again. For example, a Common point with density 40 gives 2.75 Power; pairing it with a Common grip produces Fine workmanship.
+
+**Proposed resale:** the finished Bone blade sells for the combined ordinary sell value of its two portions, without an extra crafting premium. Same-quality pairs would sell for 4, 8, 16 or 32 Gold. Each component keeps its own source and colour. The existing Recycler recovery rate would recover **one chosen portion**, not both, at its current service levels. Older items retain their own prices and recovery rules. This proposal grants no merchant stock, new Bone drops, creature migration, refit or Peerless path. See [Aimee Homework](aimee-homework.html) for the bounded choice.
+
 The first creature Homework task stays unchecked. Bone production and trading are specified; the complete body-part catalogue, crafting connections and natural gathering experience still need work.
 
 ### Optional Hide-to-Leather path — decided intended behavior
