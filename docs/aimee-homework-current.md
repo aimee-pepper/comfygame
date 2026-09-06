@@ -58,12 +58,12 @@ You approved a clearly labelled example scene showing a shallow pond on raised l
 
 The first study shows the water from a dry, level route. Interactive slopes and shore movement remain separate implementation work. The existing-world camera trial can continue alongside it. Numerical depths for generated worlds and the finished water appearance remain team work, not homework for you.
 
-## 6. Decision needed: when dangerous growth gets a warning
+## 6. Completed decision: dangerous growth warns on first full sight
 
-**Status: open · a small static warning is proposed; dedicated 2D animation is deferred.**
+**Status: approved by you on 5 September · implementation assigned · no answer needed.**
 
-**Should an actually dangerous plant patch warn as soon as it is fully visible, or only after the party has learned its danger or gained field-guide recognition?** Game Design recommends first full sight, so choosing a safe route does not require getting hurt first.
+You chose first full sight for a small static **Dangerous growth** marker. An actually harmful contact/toxin patch will warn without requiring a prior injury, learning or field-guide recognition. Ordinary plants of the same species stay unmarked, as do hidden, partly seen, remembered-only, removed or stale patches. Rooted creatures retain their separate discovery rules.
 
-Older warning plans required learning or field recognition; current Look can already describe a dangerous patch. Those records do not settle when a new map warning should appear. The proposed marker would say only that this exact patch is dangerous. Ordinary plants of the same species, hidden patches and undisclosed creatures would remain unmarked. This choice concerns contact/toxin patches, not new creature detection or a change to your current campaign's harm rules.
+The generic marker adds no damage numbers, duration or yield information. Dedicated 2D animation remains deferred. Engineering is implementing the warning; this decision does not mean it is already on your phone.
 
-This is a reference and to-do list rather than a form. Tell Game Design or Project Manager your answer to item 1 or 6, or your thoughts on the creature goals in item 3, or share an artwork task with Asset Lead; the recorded status will then be updated here.
+This is a reference and to-do list rather than a form. Tell Game Design or Project Manager your answer to item 1 or your thoughts on the creature goals in item 3, or share an artwork task with Asset Lead; the recorded status will then be updated here.
