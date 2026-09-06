@@ -524,7 +524,7 @@ The item's history can remember previous versions, but dismantling later returns
 
 Ordinary component refit replaces one complete part while preserving profile and slot. Changing Rigid/Balanced/Insulated is a full rebuild using the destination recipe; it is not a free toggle because the construction changes. Failed or stale transactions spend nothing and return nothing. Existing overflow custody remains safe, and active excursions are not rewritten by a Home recipe update.
 
-Old legacy credits, bought Reforge work, unsupported construction records and special gear are not silently erased to enter the new path. They keep their existing supported services. The later equipment-improvement batch must reconcile those services with Peerless; no new personal approval checklist is created for ordinary new-profile equipment.
+Old legacy credits, bought Reforge work, unsupported construction records and special gear are not silently erased to enter the new path. They keep their existing supported services. The shared service plan below now defines that boundary; no new personal approval checklist is created for ordinary new-profile equipment.
 
 ### Practical progression and remaining work
 
@@ -534,7 +534,47 @@ After those shops exist, an Ingot Rigid Body recipe expands to **8 Iron, 4 Coal 
 
 **Still needed:** implement the complete typed rebuild calculator, all 14 supported choices, current-versus-historical component ownership, new/legacy Heat Ward projection, shared Collar knowledge, refit/recovery and durable custody. No individual profile/material approval is needed from Aimee for this first pass.
 
-The six ordinary maker plans are now specified. **Next is the complete equipment-improvement/recovery service plan**, including retained legacy Reforge and eventual Peerless. The real existing owner question remains the experience when a Mote-funded partial attempt misses; the recommendation is lasting progress without destruction or downgrading. That answer does not gate these ordinary shop plans.
+## Shared equipment improvement and recovery · 6 September
+
+**First-pass Design plan complete; implementation pending.** The six ordinary makers now share one service plan. The complete replacement has not been reported delivered. Older supported equipment services remain available under their existing rules while the new work is implemented.
+
+### Improving the piece you already own
+
+| Service | What changes | Ordinary Essence fee |
+| --- | --- | --- |
+| Component refit | Replace a complete supported part, keeping the piece's identity and family | 0 |
+| Tannery remake | Choose another supported variant in the same clothing family, using its full recipe | 0 |
+| Armoury rebuild | Choose a supported profile for the same slot, using its full recipe | 0 |
+| Weaponsmith fitting | Switch the same fitted weapon between Balanced (+1 Initiative) and Driving (+0.75 Power), using its existing parts | 0 |
+| Dismantling | Give up one eligible unequipped piece for its currently attached recoverable components | No new fee added |
+
+Forge refit requires T2; the other named makers provide their ordinary services once built. Tools keep their own listed improvement projects. Apothecary bottles do not use equipment refit or Peerless refinement. Changing a weapon's damage family is a new craft, not a free refit.
+
+A refit pays for the new part and returns the replaced part once. A remake or Armoury rebuild uses the full destination recipe and returns the old construction once. A quote can explicitly reuse suitable old parts, so they are not both charged and returned. Your item stays the same owned piece, with its supported inscription and history. The preview shows the complete new statistics; fitting changes and repeated refits never accumulate old bonuses.
+
+Armoury's profiles require different actual construction. Switching Rigid, Balanced and Insulated therefore uses the corresponding full recipe; it is not the Weaponsmith's free fitting adjustment. A shield cannot become Insulated, and a Body piece cannot become a Helm.
+
+### Recovery and value
+
+Only **currently attached components** can be recovered. Earlier versions remain part of the item's story, not another supply of salvage. Cloth returns as Cloth, Leather as Leather and a Collar as a Collar; their original raw ingredients and processing fuel do not also return. Reforge fees, Essence and Motes are not stored materials waiting to be refunded.
+
+New ordinary equipment sells for the sum of those actual components' recorded sale values and costs twice that amount to buy. Refit updates the value from its final construction. Colour, grade and fitting add no extra sale multiplier. Older material prices stay attached to the actual selected portions.
+
+For example, a Woven Guard contains 1 Cloth and 1 Cord, worth 3 Gold in total. An all-Cloth Insulated Body uses 4 Cloth and 2 Cord, worth 10. Reusing the existing parts needs 3 more Cloth and 1 more Cord, worth 7—not a second copy of the garment. Dismantling later returns the final 4 Cloth and 2 Cord only.
+
+Full new-component recovery does not also grant older percentage salvage or a second catalogue reward. Existing protection against dismantling worn, locked, favourite or special items remains. Returned parts stay claimable when storage is full; cancel, a stale selection or a failed save cannot spend or duplicate them.
+
+### Older paid work and eventual Peerless
+
+An older piece keeps its supported existing services, statistics and price. Missing construction history is explained rather than guessed from its name. New material gear does **not** inherit the old Reforge rank ladder or the historical, unapproved single +0.5 upgrade proposal.
+
+A new refit must preserve any separately earned permanent benefit through a supported, accurate conversion. Until such a conversion exists, an older piece with paid upgrade credits stays on its existing service path. The older Armoury's separately warned rebuild may have its existing reset terms; those terms are not silently applied to a new ordinary refit.
+
+**Accepted Peerless direction:** a Mote, a maximum-level shop and its attending keeper together guarantee success. One or two advantages still offer a chance. The future earned refinement belongs to that exact piece and should survive its supported refits and rebuilds; it does not turn recovered ingredients into refined materials.
+
+**Still unsettled:** what a spent Mote buys when a partial setup misses. The recommendation remains lasting progress, with no destruction or downgrade. Eligibility, odds, benefit, service price and the precise maximum-shop route remain Design work; no empty mastery upgrade or paid attempt with an undefined outcome is offered. The old twentieth-copy guarantee stays withdrawn. This question does not block the ordinary services above.
+
+Survey Post is the next ordinary crafting batch. Peerless remains a separate later service; see [Aimee Homework](aimee-homework.html) for its one outstanding experience choice.
 
 ## Every remaining shop and crafting system
 
@@ -542,7 +582,7 @@ The sequence below follows material dependencies. It includes services and proce
 
 | System | Complete scope of its batch | Main correction or dependency |
 | --- | --- | --- |
-| Equipment improvement and recovery | Reforge, component replacement, Peerless refinement, recycling | One explanation of identity, improvement, fees and recoverable components; no repeated bonus or material duplication |
+| Peerless refinement | The later chance/guarantee journey | Ordinary refit, rebuild, legacy routing and recovery are specified above; Mote-on-miss remains open |
 | Survey Post | Eight instruments, each with Good and Fine improvements | Sixteen improvements with understandable instrument components, not a generic property sample masquerading as every instrument part |
 | Scriptorium / Writing Desk | Ink, personal Compounds, Seamward installation/erasure, later Paper and pigments | Keep making ink, using ink, recording a Compound and inscribing an item distinct |
 | Distillery | Heat, Caustic and Light Cores | Direct attunement, recognizable catalysts and preserved potency/source; no obsolete Blank Core manufacturing step |

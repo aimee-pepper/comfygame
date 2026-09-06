@@ -4,7 +4,7 @@ This is the current record of the changes agreed today. **Decided intended behav
 
 ## Whole-shop update · 5 September
 
-Complete first-pass plans now cover all 19 Apothecary preparations, Forge, Tannery, Bowyer, Weaponsmith and Armoury; replacement implementation remains queued. [Crafting Overhaul · Shop by Shop](crafting-shop-overhaul.html) records the complete scope, current rules, accepted destination and the complete first-pass recipes, producers and services for those six makers. It supersedes isolated next-recipe assignments. The ingredient bridges below are temporary compatibility steps; they do not settle the final recipes or replace the accepted excursion-long coating lifetime.
+Complete first-pass plans now cover all 19 Apothecary preparations, Forge, Tannery, Bowyer, Weaponsmith and Armoury; replacement implementation remains queued. [Crafting Overhaul · Shop by Shop](crafting-shop-overhaul.html) records the complete scope, current rules, accepted destination and the complete first-pass recipes, producers and services for those six makers, now including the shared ordinary equipment-service plan. It supersedes isolated next-recipe assignments. The ingredient bridges below are temporary compatibility steps; they do not settle the final recipes or replace the accepted excursion-long coating lifetime.
 
 ## Wood, Hide, Apex labels and notices · 6 September
 
@@ -58,23 +58,29 @@ The study should face north-up and east-right, with downward camera pitch rather
 
 The remembered image reveals no hidden enemies, resources, active hazard warnings or changed shadows/effects. Remembered trees do not cast current shadows or react to current lighting. Older saves without a sufficient actual tree observation keep honest remembered ground until a new sighting. Existing fading of currently visible trees is preserved. Engineering reports model/render checks and walking-away/restart checks; Design has not repeated them. This is a bounded stationary-tree correction, not approval of a full 3D migration.
 
+## Shared equipment services · 6 September
+
+**Design-authored first pass complete; implementation pending.** [The full service plan](crafting-shop-overhaul.html) now explains component refit, Tannery remakes, Armoury rebuilds, Weaponsmith fitting, exact recovery and older paid-work preservation across the six makers. Ordinary refit/remake/rebuild costs no Essence beyond the actual replacement recipe; fitting uses the unchanged weapon parts.
+
+An item's previous constructions remain its history, not extra salvage. New material equipment gains no generic old Reforge rank bonus or historical unapproved +0.5 upgrade. Older paid upgrades stay on their supported existing route until an accurate conversion can preserve them. The later Peerless guarantee remains accepted, with its Mote-on-miss outcome unresolved; ordinary services do not wait on that answer.
+
 ## Whole Armoury first-pass plan · 6 September
 
 The complete [Armoury plan](crafting-shop-overhaul.html) now specifies all 14 supported Rigid/Insulated/Balanced slot choices, actual materials, Protection/Heat Ward, quality, prices and exact rebuild/refit/recovery. **New Design-authored first-pass rules remain pending implementation.** The foundation is 35 Essence, 4 Ingots, 2 Cloth and 2 Cord, with ordinary rebuilds/refits at no Essence cost. Insulated still excludes shields.
 
-New linings count once through Heat Ward, retaining the existing 50-point equipment cap and 60% combined heat-mitigation cap. Mixed sets can reach the ward cap while preserving Rigid pieces. Rebuilding returns old active parts once; historical versions do not become extra salvage. Bracken's foundation teaches the same Forge Iron Collar recipe so Maud is optional. Legacy gear, credits and services stay supported. Equipment improvement/recovery is the next whole batch, with the existing Mote-on-miss question still grouped in homework.
+New linings count once through Heat Ward, retaining the existing 50-point equipment cap and 60% combined heat-mitigation cap. Mixed sets can reach the ward cap while preserving Rigid pieces. Rebuilding returns old active parts once; historical versions do not become extra salvage. Bracken's foundation teaches the same Forge Iron Collar recipe so Maud is optional. Legacy gear, credits and services stay supported. The shared equipment-service plan now specifies ordinary refit/rebuild, active-component recovery and preservation of older paid work. Its implementation is pending; the later Peerless Mote-on-miss question stays in homework.
 
 ## Whole Weaponsmith first-pass plan · 5 September
 
 The complete [Weaponsmith plan](crafting-shop-overhaul.html) now covers Fitted Point, Edge, Maul and all three Polearm damage choices, real Haft/Collar production, prices, recovery/refit and legacy services. **These are Design-authored first-pass choices, pending implementation.** The 40-Essence foundation also needs 4 Ingots, 2 Hafts and 2 Cord; ordinary crafts/refits cost no Essence. Polearm retains Maud's singular diary-teaching requirement.
 
-Choose Balanced for +1 Initiative or Driving for +0.75 Power, using existing combat stats and the same actual components. No wearer lock or extra action is added. Fen's Hafts have named consumers, and Iron Collar casts directly from Iron and Coal without a second mandatory Ingot-processing step. Early Forge recipes remain unchanged. Existing owned items and paid progress are preserved; Armoury follows next.
+Choose Balanced for +1 Initiative or Driving for +0.75 Power, using existing combat stats and the same actual components. No wearer lock or extra action is added. Fen's Hafts have named consumers, and Iron Collar casts directly from Iron and Coal without a second mandatory Ingot-processing step. Early Forge recipes remain unchanged. Existing owned items and paid progress are preserved; the complete Armoury plan is also now specified above.
 
 ## Whole Bowyer first-pass plan · 5 September
 
 The complete [Bowyer plan](crafting-shop-overhaul.html) covers Longbow/Pierce/Far, Sling/Crush/Far and Throwing Set/Rend/Far. **New Design-authored first-pass rules are pending implementation.** Fen's foundation becomes 30 Essence, 6 Logs, 2 Cord and 2 Resin, including all three families and ordinary refit; their crafts cost no Essence.
 
-Hardwood supplies real bow limbs, Bone is used for hard points/shot/edges, and the recipes share Tannery textiles/Leather and Forge Ingots. There is an animal-free Clay Sling route and no ammunition inventory or replenishment chore. New working Power, four-band workmanship, component prices/recovery and refit are specified together; owned legacy weapons stay unchanged. Every physical ranged family uses the accepted excursion-long coating lifetime. Weaponsmith is the next complete shop batch.
+Hardwood supplies real bow limbs, Bone is used for hard points/shot/edges, and the recipes share Tannery textiles/Leather and Forge Ingots. There is an animal-free Clay Sling route and no ammunition inventory or replenishment chore. New working Power, four-band workmanship, component prices/recovery and refit are specified together; owned legacy weapons stay unchanged. Every physical ranged family uses the accepted excursion-long coating lifetime. The subsequent Weaponsmith plan is also now specified above.
 
 ## Whole Tannery first-pass plan · 5 September
 
