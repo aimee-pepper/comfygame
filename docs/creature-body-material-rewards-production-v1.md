@@ -1,6 +1,6 @@
 # Creature bodies and material rewards — production contract
 
-**6 September 2026 · Game Design first pass; not implemented.** Continues Aimee's existing Body → materials homework after the settled Hide and plain Bone slices. This completes the disposition of the current eighteen-family projection and the supported solid-part reward/collection contract. It does not complete secretory anatomy, food/nesting simulation, distant-sighting knowledge or the whole creature play experience, and it does not authorize an automatic broad creature runtime rollout.
+**6 September 2026 · Game Design first pass; not implemented.** Continues Aimee's existing Body → materials homework after the settled Hide and plain Bone slices. This completes the disposition of the current eighteen-family projection and the supported solid-part reward/collection contract. The companion anatomy/material extension now defines the remaining parts and narrow optional uses; the food/shelter and discovery contracts are specified separately. This base packet does not implement those systems or complete the whole creature play experience, and it does not authorize an automatic broad creature runtime rollout.
 
 Read with [body/habitat](generated-creature-body-habitat-v1.md), [role coherence](creature-role-coherence-v1.md), [cold-water appendages](creature-cold-water-appendages-v1.md), [Bone](creature-bone-production-v1.md), [Bestiary knowledge](bestiary-knowledge-and-grouping-v1.md), and the four-band material hierarchy. Aimee's Sky/Water/Amphibious/Land arrangement and its seven body groups remain settled. No renewed Bestiary hold or new homework approval is introduced.
 
@@ -35,6 +35,8 @@ Feathered appendages supply **Flight Feathers** only for an actual supported Sky
 
 A declared Horn requires actual `cranialFeature == horns`, a non-amorphous body and meaningful dominant Crush armament (total≥30, existing stable dominance order). This is the retained useful-weapon boundary, not an assumption that every decorative cranial feature is a useful Horn. Pierce/Rend/Crush alone never creates a Fang/Claw/Tusk entry. A future tooth/claw/tusk-bearing morphology must explicitly identify the part and its physical capabilities before those typed rewards are enabled.
 
+The [remaining anatomy/material extension](creature-anatomy-material-extensions-v1.md) now supplies the required new jaw/claw/Down/sheet/fluid records and conditional typed consumers. The base policy alone still cannot invent them. Its proposed extension must be explicitly enabled with an actual producer; no legacy inference is restored.
+
 ## 3. Complete current-family disposition
 
 Category → actual type → meaningful subtype → quality → source remains the public hierarchy. New names below are first-pass physical material definitions, not Earth-species classifications. No new subtype is created solely for a rarity band.
@@ -50,19 +52,19 @@ Category → actual type → meaningful subtype → quality → source remains t
 | Shell | Shell / `creature.shell` | Actual declared shell; no inference of internal Bone or layered shell |
 | Quill | Protective Spines / `creature.spines.protective` | Existing long, hard covering becomes its own physical type; not feather quills or writing nibs |
 | Feather | Flight Feathers / `creature.feather.flight`; Contour Feathers / `creature.feather.contour` | Actual feathered appendages; flight only with supported Sky anatomy |
-| Down | No new typed reward yet | Needs an explicit separate soft down layer; insulation alone is insufficient and cannot duplicate Feathers |
+| Down | Extension-only typed source | Needs an explicit separate soft down layer; insulation alone is insufficient and cannot duplicate Feathers |
 | Fin | No generic inventory token | Needs the actual recoverable sheet/rigid-part mapping, not an assumed fin-shaped crafting resource |
 | Horn | Horn / `creature.horn` | Actual cranial horn plus retained useful Crush boundary |
-| Fang | No new typed reward yet | Needs an actual tooth-bearing part and measured capability, not Pierce dominance |
-| Claw | No new typed reward yet | Needs an actual claw-bearing part and measured capability, not Rend dominance or limbs alone |
-| Tusk | No new typed reward yet | Needs an actual tusk-bearing part and measured capability, not default Crush |
-| Oil | No new typed reward yet | Needs an actual recoverable oily tissue/secretion; aquatic insulation is insufficient |
-| Venom | No new typed reward yet | Needs actual recoverable venom anatomy/delivery; contact toxicity or warning Pattern is insufficient |
-| Ichor | No new typed reward yet | Needs an actual defined body fluid with its relevant chemistry; emanation does not establish fluid or pigment |
+| Fang | Extension-only typed source | Needs an actual tooth-bearing part and measured capability, not Pierce dominance |
+| Claw | Extension-only typed source | Needs an actual claw-bearing part and measured capability, not Rend dominance or limbs alone |
+| Tusk | Extension-only typed source | Needs an actual tusk-bearing part and measured capability, not default Crush |
+| Oil | Extension-only typed source | Needs an actual recoverable oily tissue/secretion; aquatic insulation is insufficient |
+| Venom | Extension-only typed source | Needs actual recoverable venom anatomy/delivery; contact toxicity or warning Pattern is insufficient |
+| Ichor | Extension-only typed source | Needs an actual defined body fluid with its relevant chemistry; emanation does not establish fluid or pigment |
 
 **Additional existing anatomical sheet:** membrane appendages may produce `creature.skin.membrane` only when the manifest contains the real sheet region and complete material measurements. No wing/fin membrane is inferred from water habitat, gliding role, body softness or a nearby source. This records a supported existing appendage type, not a new flight mechanic.
 
-For every held family, new-policy body reward output is explicitly zero until its named anatomy contract exists. Retain the observed creature's actual attacks, toxic defence and emanation; removing a false material inference must not remove a real combat ability. Old legitimate stock/recipes remain under their exact legacy rules. This policy owns each branch completely: do not fall through to old generic Oil/Venom/Ichor/Fang/Claw/Tusk/Down/Fin awards after the new branch says unavailable.
+For every extension-only family, the base policy alone outputs zero. The new anatomy/material extension supplies its contract; output remains zero until that extension and its actual producer are implemented and enabled. Retain the observed creature's actual attacks, toxic defence and emanation; removing a false material inference must not remove a real combat ability. Old legitimate stock/recipes remain under their exact legacy rules. This policy owns each branch completely: do not fall through to old generic Oil/Venom/Ichor/Fang/Claw/Tusk/Down/Fin awards after the new branch says unavailable.
 
 ## 4. Measurement, quality, quantity and colour
 
@@ -99,7 +101,7 @@ New typed raw parts are slot-free creature materials. Group by exact physical ty
 | --- | --- |
 | Reward → carried material → Return → Storehouse → existing raw-material sale | Complete for the ready covering/feather/horn types above, with source identity and four-band prices |
 | Bone in Forge/Bowyer/Weaponsmith/Armoury | Already specified in those complete shop contracts; do not repeat or broaden it |
-| Skin/Hide → Leather | Existing eligible types remain. New Membrane needs real sheet measurements and an explicit Tannery adapter before it can become Leather |
+| Skin/Hide → Leather | Existing eligible types remain. New Membrane uses the companion extension's real sheet measurements and explicit1 Membrane +1 Salt Tannery adapter; unavailable until implemented |
 | Fur/Scales/Chitin/Shell/Spines/Feathers/Horn in equipment | Not automatically substitutes for Bone, Leather, Ingot or Cloth. No current complete shop row admits them yet; each needs a bounded real component/measurement/value/colour/recovery extension before its recipe advertises them |
 | Distillery Heat | Complete new recipe uses Resin. Oil's missing anatomy does not block it |
 | Distillery Caustic / Apothecary Venom preparation | Complete recipes use Toxic Sap. No phantom creature Venom/Ichor or generic Toxin is needed |
@@ -114,7 +116,7 @@ Bestiary keeps the approved habitat/body arrangement and existing encounter/Read
 
 Body/habitat generation precedes the manifest. Keep accepted connected-water requirements, actual flight across allowed ground/water, shore/amphibious compatibility, fixed individual budget and the narrowly water-conditioned cold appendage tendency. Water does not imply Scales/Oil; cold does not guarantee Pelt/Down; feathered non-fliers do not acquire Sky access. Rooted and amorphous forms do not grow an internal skeleton or cranial weapon merely to fill a reward row. Harmless/weak armament does not establish grazing; piercing damage does not establish a predatory diet or fangs.
 
-Several actual parts may coexist in different regions, but total eligible tissue must not be counted twice as Hide/Pelt or Plate/Scales/Chitin, or Fin/Membrane/Bone without separate actual structures. No food, breeding, nesting, weather-immunity, meat/cooking, deep-water fishing or boats are introduced by this reward contract. Food-web/nesting authoring remains open. A material source across inaccessible deep water is not an obtainable recipe route; accepted exploration and encounter access must exist before a recipe points to it. No free remote kill/harvest or hidden map reveal is added to solve that gap.
+Several actual parts may coexist in different regions, but total eligible tissue must not be counted twice as Hide/Pelt or Plate/Scales/Chitin, or Fin/Membrane/Bone without separate actual structures. No food, breeding, nesting, weather-immunity, meat/cooking, deep-water fishing or boats are introduced by this reward contract. The separate food/habitat/shelter contract now specifies its first-pass generation relationships; implementation and broader ecology remain open. A material source across inaccessible deep water is not an obtainable recipe route; accepted exploration and encounter access must exist before a recipe points to it. No free remote kill/harvest or hidden map reveal is added to solve that gap.
 
 Ordinary world-resource and gear/curio rolls must not be relabelled as animal anatomy. Any removal of legacy incidental rewards belongs to the explicitly opted-in reward change and must preserve already saved encounter outcomes. The separate historical territory-find proposal is not automatically enabled here and creates no new Aimee approval gate. No replacement rare-find roll is needed for this bounded material contract. XP, Apex-authored trophies and explicit guardian/non-animal rewards keep their existing owners, with no duplicate ordinary-butcher award.
 
@@ -133,4 +135,4 @@ These are design examples, not executed native receipts:
 
 Engineering should extend its existing focused source/reward/custody tests and one bounded native material route when implementing a group. No new evaluator/catalogue framework, visual matrix, speculative Asset commission, Design native recheck or phone-delivery poll is requested.
 
-**Named unfinished work:** actual tooth/claw/tusk anatomy; separate Down and fin/membrane measurements; Oil/Venom/Ichor tissues and chemistry; exact equipment roles for the newly named solid parts; implementation of the now-specified separate likely-material/discovery journey; food/nesting relationships and natural exploration/crafting feel. None blocks the complete existing Resin/Toxic Sap/Dyer's Root shop routes or reopens settled Hide/Bone work. Aimee's three creature goals remain unchecked, with this recorded as concrete partial progress.
+**Specified next, not implemented:** [remaining anatomy and material extensions](creature-anatomy-material-extensions-v1.md) now defines teeth/claws/tusks, Down, fin/membrane records and fluid chemistry, with narrow equipment/preparation consumers. The separate discovery and food/shelter contracts also remain unimplemented. **Still unfinished:** other new solid-part equipment roles, natural source prevalence, broader ecology and combined exploration/crafting feel. None blocks the complete Resin/Toxic Sap/Dyer's Root routes or reopens settled Hide/Bone work. Aimee's three creature goals remain unchecked with concrete partial progress.

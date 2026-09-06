@@ -61,3 +61,7 @@ Infusion remains a later direction without a named traded-off item consumer. Omi
 Engineering's bounded cases: all three exact recipes consume once and produce60; no old property gate survives new inputs; poor/exceptional creature labels or input RGB cannot change new potency; valid legacy40/80 Cores keep their values; correct Essence wallet, stale/save failure and full storage preserve ownership; named Silver/Toxic Sap source → harvest → Return → selected Core is complete; one Core transfers into one real matching housing without a duplicate receipt item. Use ordinary focused implementation tests and native owner checks, not another Design audit or phone run.
 
 This contract supersedes the old Distillery implementation document and the Distillery recipe proposals in the 5 September batch. The companion **Channelworks whole-system production contract** owns all nine housings, permanent attacks, one-time restoration, retuning and dismantling.
+
+## Conditional anatomy extension — separate first-pass proposal
+
+[Remaining creature anatomy/material uses](creature-anatomy-material-extensions-v1.md) now defines narrow optional uses for actual typed parts, including exact eligible sockets, measures, stats, workmanship, colour and recovery. Its new anatomy producers and adapters are not implemented. This complete ordinary batch stays independently implementable; generic legacy family names cannot satisfy the new alternatives. The extension does not make every fluid an Oil/Venom/pigment, add one-strike coatings, or replace any existing world/flora route.

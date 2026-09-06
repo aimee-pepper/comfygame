@@ -189,3 +189,7 @@ Focused cases for existing tests and one ordinary mounted shop/weapon route:
 ## Shared service resolution · 6 September
 
 The [shared equipment improvement and recovery contract](equipment-improvement-recovery-production-v1.md) now resolves this packet's ordinary-service/legacy-preservation boundary. New-policy gear uses its specified deterministic refit/remake/rebuild or fitting; it does not inherit old Reforge ranks or the unapproved +0.5 proposal. Only active components are recoverable. Unsupported old paid-credit targets keep their supported legacy services. Peerless remains a separate pending service with the existing Mote-on-miss question open; Apothecary consumables gain no equipment-refinement route. This supersedes references above to an unnamed future ordinary-service batch.
+
+## Conditional anatomy extension — separate first-pass proposal
+
+[Remaining creature anatomy/material uses](creature-anatomy-material-extensions-v1.md) now defines narrow optional uses for actual typed parts, including exact eligible sockets, measures, stats, workmanship, colour and recovery. Its new anatomy producers and adapters are not implemented. This complete ordinary batch stays independently implementable; generic legacy family names cannot satisfy the new alternatives. The extension does not make every fluid an Oil/Venom/pigment, add one-strike coatings, or replace any existing world/flora route.
