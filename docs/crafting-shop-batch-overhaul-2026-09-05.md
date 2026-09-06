@@ -164,7 +164,7 @@ Leather sale values 3/4/5/6 and Leather Guard 8/10/13/15 remain early-route valu
 
 ### Armoury / reforge / refit / Peerless / recovery
 
-Catalogue rebuilds: Rigid shell = two bodies + binding; Insulated layer = two linings + outer; Balanced laminate = body + lining + binding + fitting. Cover the existing five protective slots and preserve the exact rebuilt item's identity/custody. Existing +0.5/−0.5/0 offsets and six-band quality fees are legacy behavior; the replacement must expose actual Protection/ward tradeoffs under one stat calculation.
+**Armoury production closed:** `armoury-whole-shop-production-v1.md` specifies all14 retained profile/slot combinations, real material bundles, source-based Protection and Heat Ward, included profile access, exact active-component recovery/refit and legacy routing. It replaces old+.5/0/−.5 offsets and averaged-sample insulation for new items. New Ward contributes once, with existing equipment50/combined60 heat caps; shared Iron Collar access no longer requires Maud. The ordinary Armoury has no unresolved owner/material-choice gate.
 
 Reforge currently uses its own old within-tier upgrades; do not describe it as the approved Peerless journey. Separate replacing a component, improving workmanship and changing Armoury construction. A preview must show which facts change and which old components are consumed/recovered, so repeated service calls cannot stack the same bonus. Proposed common policy: new recovery returns only committed recoverable components, at a displayed service rate; no Essence, Salt, fuel, processed raw ancestors or fabricated better-grade stock. Legacy receipts remain compatible.
 

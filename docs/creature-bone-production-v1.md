@@ -93,7 +93,7 @@ Legacy Bone retains its original units, six-band record, value and consumer acce
 
 ## 6. Consumer designs closed; implementation remains required
 
-The complete `blacksmith-whole-shop-production-v1.md`, `bowyer-whole-shop-production-v1.md` and `weaponsmith-whole-shop-production-v1.md` now supply the explicit Design-authored first-pass Bone roles, quantities, source-based Power/Protection, four-band workmanship, values and recovery under Aimee's delegated whole-shop tuning authority. The former isolated Pointed Blade proposal/approval hold is superseded. These contracts are not personal new Bone approvals attributed to Aimee or evidence of native implementation.
+The complete `blacksmith-whole-shop-production-v1.md`, `bowyer-whole-shop-production-v1.md`, `weaponsmith-whole-shop-production-v1.md` and `armoury-whole-shop-production-v1.md` now supply the explicit Design-authored first-pass Bone roles, quantities, source-based Power/Protection, four-band workmanship, values and recovery under Aimee's delegated whole-shop tuning authority. The former isolated Pointed Blade proposal/approval hold is superseded. These contracts are not personal new Bone approvals attributed to Aimee or evidence of native implementation.
 
 New typed Bone must not enter the old six-band calculator through a family-enum/name match. Implement each complete shop's exact versioned typed consumer, preserving actual measurements/colour and frozen item/custody/value/recovery. Until its consumer is implemented, that operation refuses typed Bone; custody/Return and the specified trade route remain independently implementable. This is a named implementation dependency, not a fresh design question or a permanent ban on the specified recipes. Unsupported consumers remain excluded.
 

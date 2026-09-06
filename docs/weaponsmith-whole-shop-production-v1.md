@@ -1,5 +1,7 @@
 # Whole Weaponsmith production — fitted physical melee weapons
 
+> **Shared Iron Collar knowledge — 6 September Armoury closure:** `armoury-whole-shop-production-v1.md` extends the same Forge T2 recipe grant to either Weaponsmith or Armoury foundation. Counts,0-Essence casting, value and ownership do not change; this prevents the independent Armoury requiring Maud. Bone Collar remains Maud’s optional prepared alternative.
+
 **5 September 2026 · Complete Design-authored first-pass contract; replacement implementation pending.**
 
 Authority: Aimee's delegated whole-shop recipe/cost/order tuning and PM's complete Weaponsmith assignment. Preserve the four family identities, ordinary physical combat, Maud's singular Polearm teaching, real component identity, four-band material/workmanship rules, no soulbinding, and the completed Forge/Tannery/Bowyer/Apothecary contracts. The exact foundation, processing recipes, component bundles and two fitting choices below are Design first-pass tuning, not new personal approvals attributed to Aimee or measured balance.

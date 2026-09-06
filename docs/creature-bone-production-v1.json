@@ -149,7 +149,8 @@
     "firstPassConsumerContracts": [
       "blacksmith-whole-shop-production-v1.md",
       "bowyer-whole-shop-production-v1.md",
-      "weaponsmith-whole-shop-production-v1.md"
+      "weaponsmith-whole-shop-production-v1.md",
+      "armoury-whole-shop-production-v1.md"
     ]
   },
   "examples": [

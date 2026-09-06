@@ -1,4 +1,6 @@
-# Armoury rebuild — implementation contract
+# Armoury rebuild — historical implementation contract
+
+> **Whole Armoury closure — 6 September:** `armoury-whole-shop-production-v1.md` supersedes future Armoury recipes, grade caps/fees, offsets and thermal calculation below. It specifies all14 retained slot/profile combinations, real typed bundles, source-based Protection, Heat Ward counted once, active-component replacement/recovery and legacy service routing. Existing legacy behavior remains versioned history; old quality/review holds are not new approval requirements.
 
 **Status:** Implemented first specialist rebuild slice. Profile offsets are the recommended initial
 native playtest values under DRQ-123; `armoury-profile-offset-audit-current.md` owns comparison and
