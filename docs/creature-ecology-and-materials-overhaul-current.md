@@ -10,4 +10,6 @@ The [complete crafting plans](crafting-shop-overhaul.html) already use Resin, To
 
 Bestiary arrangement stays Sky, Water, Amphibious and Land, then the seven approved body groups. Existing recorded specimens retain their knowledge without a new victory gate. The broader food/nesting, likely-material/distant-sighting and exploration/crafting experience work remains open. No new taming, cooking, deep-water harvesting or territory-find mechanic is introduced by these material rules.
 
+The complete first-sight/Look/encounter/reward/Return/Library discovery journey is now specified in [the current creature decisions](design-decisions-september-4.html), pending implementation. A Seen note is not a measured specimen and cannot consume the later first-encounter discovery reward. Actual reward confirms material knowledge; losing or spending the stock does not erase that knowledge or make it collectible again.
+
 The three goals in [Aimee's creature checklist](aimee-homework.html) stay unchecked, with this recorded as partial Design progress rather than a finished generator or another individual approval chore.

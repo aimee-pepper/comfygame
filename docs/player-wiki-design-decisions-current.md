@@ -387,6 +387,37 @@ Quality uses the actual part's two relevant source measurements: covering insula
 
 No new distant-sighting record, hidden Bestiary reveal, food system, nest, weather immunity or deep-water harvesting is introduced. Recovered material can be associated with its actual known source; existing encounter records keep their measurements without requiring a victory. Food/nesting relationships, the remaining anatomy and equipment roles, and natural exploration/crafting feel remain open. All three creature homework goals therefore stay unchecked; this is concrete partial progress, not a claim that the generator is finished.
 
+### Learning about creatures and materials — complete first-pass journey
+
+**Current:** actual encounters and the existing Read/remember action record species and individual specimens. Their earned measurements remain available without winning a fight. There is not yet a separate complete distant-sighting/material-disclosure path.
+
+**New Design-authored first pass, pending implementation:** keep **Seen**, **Encountered** and **Recovered materials** as different facts in one Bestiary entry. They are not paid ranks or a mandatory sequence. A concealed creature can be encountered before you ever see it from a distance.
+
+| Moment | What you learn | What stays separate |
+| --- | --- | --- |
+| First full sight of an actually visible creature | A Seen note with its lawful name, observed appearance, supported body shape and actual habitat chapter | No measured specimen, encounter count, XP, hidden chemistry or guaranteed drops |
+| Look | A short explanation of its visible body/movement and any supported exterior parts it could provide | Read-only: no turn, fee, harvest, reward or new analysis action |
+| Actual encounter or existing Read/remember | Existing specimen facts and measurements, even without victory | The earlier sighting neither consumes nor duplicates the normal first-encounter discovery reward |
+| Committed material reward | Exact recovered type, quality, quantity, colour/Pattern and source | Evidence from this specimen, not an automatic promise for every member of its kind |
+| Return | The actual kept/lost material outcome with its source link | Knowledge stays learned even if those portions are lost, sold or crafted |
+| Library / Bestiary | One known identity combining the facts you actually earned | A sighting is not a second species, specimen or spendable material |
+
+Only **full current sight** with the creature actually visible records a new Seen note. Fringe silhouettes, remembered ground, hidden movement, sounds and a distant Apex marker do not reveal its body or materials. Reopening the game does not scan old worlds for missed discoveries. Existing unknown habitat/shape stays honestly unclassified until a real supported observation supplies it.
+
+A full sight may record the creature's actual supported habitat for the approved Sky/Water/Amphibious/Land arrangement. Standing in shallow water or merely having wings does not determine that chapter. Sight-only entries say **“Seen in [world]. No close encounter recorded.”** Encountered entries retain their real comparison specimens; a newer distant appearance does not quietly replace their measured traits.
+
+**Look is useful without being a complete anatomy test.** It can describe a genuinely observed furry covering, scaled body, feathered appendages or horns. A **Possible materials** hint appears only when that actual visible part has a supported implemented reward/collection route. It names a possible material without promising its quality or quantity. A future-only recipe or body part does not become obtainable because the Wiki describes it.
+
+The source's visible colour and pattern can be remembered, but a sighting does not add numerical material scores or hidden chemistry. Flight does not prove hollow bones; warning colour does not prove Venom; insulation does not prove Oil; glow does not prove Ichor or pigment. Existing full specimen measurements remain accessible where already earned. Once its real source route is implemented, an internal material such as Bone can be explained from genuinely recorded anatomical facts rather than a distant silhouette.
+
+**Recovered materials are confirmed knowledge.** For example, **“Recovered: Rare Chitin Plate ×3, from this specimen.”** The Library may then say **“Recovered from this kind before.”** It must not say every future creature guarantees the same quality, count or colour. One failed Hide recovery does not prove a species lacks skin. Actual source portions remain selectable beneath grouped stock; the Library history itself cannot be sold, crafted or collected again.
+
+Look keeps its existing interaction range and remains read-only. Explicit inspection stays visible even when optional notices are muted. Automatic knowledge can update quietly; it needs no second popup. Library search/counts include only genuinely known entries, deduplicate Seen/Encountered records, and preserve old read state. No hidden-species total or locked silhouette is added. Previously earned knowledge and the existing Writing-creature unlocks remain intact; a new Seen-only note does not automatically award that separate writing knowledge.
+
+**Apex remains its own actual status.** Existing legitimate markers keep their warning role. An outside-full-sight marker is not a new specimen or a trophy reveal; a real full sight records only the lawful Apex label and appearance. Size, stillness and rare-looking material do not create Apex identity. Rooted hostile flora stays on its existing flora/discovery path.
+
+**Still unfinished:** implementation of this journey; the already named missing anatomical parts and their equipment uses; food requirements, prey/forage relationships, actual nesting/den behavior and meaningful weather responses; and playtesting the resulting exploration/crafting experience. This contract creates none of those systems, no deep-water harvesting route and no new approval chores. All three creature homework goals stay open.
+
 ### Bestiary arrangement
 
 **Implemented and tested in a later Simulator build; not included in phone build 307.** Browse the Bestiary through **Sky, Water, Amphibious and Land**, then by body shape within each section: **Four-legged, Two-legged, Serpentine, Segmented, Radial, Fish-shaped and Amorphous**. For example: Sky → Serpentine → creature entry, or Water → Fish-shaped → creature entry.
