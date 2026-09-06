@@ -1,5 +1,8 @@
 # Wayfarer's Table — Flora Recognition
 
+**5 September 2026 — direct Aimee override:** the new generic Dangerous growth marker warns on first full current sight of an exact current harmful contact/toxin placement, with no prior injury, learning or field-guide requirement. Match current cell and flora identity; exclude ordinary same-species flora, impassable/crumbled, hidden/fringe/remembered and stale patches. This supersedes the older learning gate only for that placed-hazard marker. Rooted enemies and existing Look remain separate; no level, damage, duration or yield is added. Dedicated 2D animation is deferred. Implementation is assigned, not yet reported delivered.
+
+
 **Status:** implementation-ready completion of Sela's settled station contribution  
 **Date:** 11 August 2026  
 **Owner:** Game Design; Engineering owns rules/UI/save fixtures
