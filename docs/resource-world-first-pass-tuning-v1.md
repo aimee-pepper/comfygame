@@ -150,9 +150,9 @@ The selected or transformed condition is saved in the world receipt. Later gener
 
 ## Harvesting controls and turn costs
 
-The basic Rock Pick, Axe, and Scythe are exact owned field tools in the opening expedition kit. They are packed in a dedicated three-place tool roll, one Pick, one Axe, and one Scythe, rather than consuming the item or Field Kit spaces meant for remedies, Pages, and other useful supplies. A higher tier replaces the lower tier in that tool-class place. The opening loadout packs all three by default, but the tools remain real owned expedition objects rather than invisible account-wide capabilities. Holding the centre of the movement arrows opens quick-use or Field Kit items. Holding Interact opens the field-tool selector containing only packed tools. Both holds use a 0.40-second threshold.
+The basic Rock Pick, Axe, and Scythe are exact owned field tools in the opening expedition kit. They are packed in a dedicated three-place tool roll, one Pick, one Axe, and one Scythe, rather than consuming the item or Field Kit spaces meant for remedies, Pages, and other useful supplies. A higher tier replaces the lower tier in that tool-class place. The opening loadout packs all three by default, but the tools remain real owned expedition objects rather than invisible account-wide capabilities. Holding the centre of the movement arrows opens quick-use or Field Kit items. Holding Interact opens the field-tool selector containing only packed tools. Both holds use a 0.40-second threshold. For tools, keep holding Interact, slide the same finger onto a packed tool, then release to select it. No second tap, harvest or turn cost follows selection. Release outside a tool or cancel to retain the previous valid choice; a recognized hold never falls through to an Interact tap. This continuous gesture is reaffirmed by Aimee on 5 September.
 
-Opening either menu, choosing or changing a tool, cancelling, selecting the wrong tool, lacking the required level, targeting something that moved, encountering stale state, or failing custody costs 0 turns and changes nothing. Every successful harvest hit costs exactly 1 world turn.
+Opening either menu, choosing or changing a tool, cancelling, selecting the wrong tool, lacking the required level, targeting something that moved, encountering stale state, or failing custody costs 0 turns and does not harvest, move, damage or change resource custody. Choosing a tool changes only the active-tool preference. Every successful harvest hit costs exactly 1 world turn.
 
 The active field-tool preference persists between expeditions and through a cold relaunch. At expedition start it becomes active only if that exact tool is packed; otherwise the game clears the active choice and explains why. Underfoot passable plants and explicit loose-earth gathering placements use Interact. An adjacent blocking trunk or mineral node uses the movement direction facing that placement. Ordinary movement never harvests a plant accidentally.
 
@@ -401,3 +401,10 @@ The following subjects are intentionally not filled with guessed numbers here:
 - final parallax-world visual assets and geometry.
 
 Those are separate conversations. Adding numbers for them here would make this page look complete by quietly deciding systems Aimee has not covered yet.
+
+
+## One tile, one resource node — clarified 5 September
+
+**Decided intended behavior:** all mineral, harvestable plant and loose-resource placement shares one node per tile, including written guarantees and early maker resources. Several units from one node are allowed. A canopy extending across nearby tiles is visual overhang, not another resource node. Required resources must use separate legal reachable positions; one cannot overwrite or hide beneath another to satisfy a guarantee.
+
+**Current uncertainty:** Aimee clarified that the apparent overlap may be valid adjacent mining. Actual duplicated source coordinates are unconfirmed pending Engineering's investigation. Adjacent mining remains accepted behavior; this record does not claim either a duplicate-node bug or its repair is verified.

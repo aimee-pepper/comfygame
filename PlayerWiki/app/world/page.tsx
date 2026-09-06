@@ -1,3 +1,4 @@
+import { FieldInteractionDecisions } from '@/components/field-interaction-decisions';
 import { SolidDeposits } from '@/components/solid-deposits';
 import { WorldViewDirection } from '@/components/world-view-direction';
 import { SeptemberDecisions } from '@/components/september-decisions';
@@ -14,6 +15,7 @@ export default function WorldReferencePage() {
   const terrainVisual = terrainProfiles.find((terrain) => terrain.assetURL);
   return <SiteFrame sidebar><PageIntro eyebrow="Field reference" title="World conditions, terrain, and Flora" summary="Use this reference to understand the current world facts you can inspect without predicting a bound map’s hidden tiles, deposits, sites, creatures, or exact Flora." />
     <SeptemberDecisions topic="appearance" />
+    <FieldInteractionDecisions study />
     <WorldViewDirection />
     <SolidDeposits />
     <DirectoryIndex label="Browse world conditions" entries={worldConditions.map((condition) => ({ href: `/world/conditions/${condition.slug}`, name: condition.name }))} />

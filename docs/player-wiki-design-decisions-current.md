@@ -14,6 +14,16 @@ Design is now overhauling complete crafting shops, beginning with all 19 Apothec
 
 The Binder going down already ends the excursion; a companion falling alone does not mean the whole party was defeated. Reopening should preserve the same cause without replaying damage or guessing from the enemies left nearby. This is a reporting change, not new damage or combat mechanics.
 
+## Field and terrain feedback · 5 September
+
+**Tool gesture — reaffirmed intended behavior, correction pending:** hold **Interact for 0.40 seconds**, keep the same finger down while sliding onto a packed tool, then release to select it. No second tap is needed. Release outside a choice or cancel to retain the previous valid tool. A completed hold never turns into an accidental Interact tap; choosing a tool does not harvest or spend a turn. A later Interact tap or direction toward a blocking node performs the ordinary eligible action. The movement-centre hold remains the separate quick-item menu.
+
+**One tile, one resource node — decided:** mineral, plant and loose-resource placement must share this rule, including guaranteed resources. One node may yield several units, and canopy artwork may extend over neighbouring tiles; neither means that two underlying gatherable resources may share a tile. **Actual duplicate placement remains unconfirmed:** you clarified that what looked like stacking may be the accepted ability to mine an adjacent node. Adjacent mining stays valid; source positions determine whether a conflict exists. No fix is claimed before Engineering's investigation and delivery.
+
+**Authored water study — requested illustrative tuning, pending implementation:** you found the example too shallow. The revised example makes both bodies five times deeper: lower channel bed −0.50 / surface 0.75 beside bank 1; raised pond bed 1.50 / surface 2.75 inside bank 3. Both depths are 1.25 abstract height levels, with their own independent contained surfaces and explicitly known beds. These are illustration values, not a production depth scale or new swimming rule.
+
+The study should face north-up and east-right, with downward camera pitch rather than a diagonal compass rotation. You liked the tree fading. The requested flat dry connected walking area should allow all four ordinary directions; slopes, wading and swimming are separate. This feedback does not approve a full 3D migration. The scene stays labelled **Terrain and water study — example heights, not a generated expedition**.
+
 ## 1. Current behavior
 
 The game currently contains both older rules and delivered early-overhaul paths. The table identifies those differences; the later intended/proposed sections do not become playable merely by being written here.
@@ -85,7 +95,7 @@ Foreground trees, bushes, and objects partly fade when their artwork covers the 
 
 **Approved water demonstration — implementation pending:** use a small, separate terrain study with deliberately chosen example heights: a shallow pond on raised land, a lower channel, and dry ground between them. The pond and channel will each have their own water level, with visible beds only where the study permits them. You approved this separate study on 5 September. It will be clearly labelled as an example scene, not a generated expedition. Existing saves do not contain measured water depths, so its example depths stay within the study and your campaigns remain unchanged. The existing-world camera trial can continue independently.
 
-The first water study will be viewed from a dry, level route. It demonstrates appearance; interactive slopes and shore routes still need their own implementation. The agreed movement rules still need implementation before an interactive height-crossing demonstration. Numerical depths for generated worlds remain design work; the study does not establish a universal wading depth. A visible water surface would never, by itself, reveal an unknown bottom, deposit or creature. The approval is recorded as complete in [Aimee Homework](aimee-homework.html).
+The water study uses a dry, level route; the later feedback above requests deeper example water, north-up orientation and all four directions on its connected flat walking area. It demonstrates appearance; interactive slopes and shore routes still need their own implementation. The agreed movement rules still need implementation before an interactive height-crossing demonstration. Numerical depths for generated worlds remain design work; the study does not establish a universal wading depth. A visible water surface would never, by itself, reveal an unknown bottom, deposit or creature. The approval is recorded as complete in [Aimee Homework](aimee-homework.html).
 
 **Accepted for later, low priority:** trees, elevated land, bushes, resource nodes, and the player character should have shadows in the three-quarter view. Their shape and treatment will be worked out after the new world geometry and foreground visibility are established. This is a presentation direction, not a decision to add dynamic lighting or a day/night system. The playable overhaul takes priority.
 
