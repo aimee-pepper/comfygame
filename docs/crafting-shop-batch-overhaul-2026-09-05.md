@@ -158,7 +158,7 @@ Leather sale values 3/4/5/6 and Leather Guard 8/10/13/15 remain early-route valu
 
 ### Bowyer / Weaponsmith
 
-Bowyer's three outputs are Longbow (two limbs + string, Pierce/Far), Sling (cord + projectile + pouch, Crush/Far), Throwing Set (two edges + carrier, Rend/Far). No ammunition chore. Replace old broad Fibre with explicit appropriate Cord/Cloth/Leather roles together; do not make soft wrapping a projectile. Require a physically suitable bow limb rather than every timber or bone piece. Source-shaped eligibility and role stats are needed before final typed recipes.
+**Bowyer production closed:** `bowyer-whole-shop-production-v1.md` replaces this former role-definition gap with complete Longbow/Pierce/Far, Sling/Crush/Far and Throwing Set/Rend/Far recipes, sources, values and refit. Hardwood limb construction is explicit; Longbow adds an actual maintained-points component, while Bone is admitted for hard working points/shot/edges rather than arbitrary bending limbs. No ammunition inventory or new facility. Use its typed allowlists and new calculator, not the former broad legacy list. Weaponsmith remains the next separate whole batch below.
 
 Weaponsmith's four families are Fitted Point (point/grip/fitting), Fitted Edge (edge/grip/fitting), Fitted Maul (head/brace/grip), and Fitted Polearm (chosen point/edge/crush head, haft, binding). First three are Close; polearm is Mid with explicit damage choice before materials. The legacy +0.5 specialty offset is a current compatibility fact, not automatically added again to new material ceilings. Recommend meaningful fitting/handling choices as the specialist advantage. Author all four costs/stat receipts/prices together after Blacksmith, then compare against starter gear of the same materials.
 

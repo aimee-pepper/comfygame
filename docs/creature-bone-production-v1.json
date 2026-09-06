@@ -144,8 +144,12 @@
   "crafting": {
     "existingLegacyConsumer": "PhysicalGearCraftingRules.pointedBlade point.0 or grip.0",
     "newTypedAccess": false,
-    "dependency": "explicit-four-band-actual-source-consumer-adapter",
-    "noApprovedNewRecipe": true
+    "dependency": "implement the exact versioned four-band actual-source consumer from its complete shop contract; no admission through a legacy family match",
+    "consumerDesignStatus": "Complete Design-authored first-pass roles under delegated tuning authority; implementation pending, not new personal approval attributed to Aimee.",
+    "firstPassConsumerContracts": [
+      "blacksmith-whole-shop-production-v1.md",
+      "bowyer-whole-shop-production-v1.md"
+    ]
   },
   "examples": [
     {

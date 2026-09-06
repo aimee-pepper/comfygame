@@ -91,19 +91,13 @@ Extend the exact typed-material branch of Trading Post valuation/selection/trans
 
 Legacy Bone retains its original units, six-band record, value and consumer access. New and Legacy stock never silently merge, rewrite one another or become a scalar Bone balance.
 
-## 6. Crafting consumer boundary — real gap, no invented approved recipe
+## 6. Consumer designs closed; implementation remains required
 
-**5 September adapter follow-up:** [Typed Bone → Pointed Blade](typed-bone-pointed-blade-adapter-v1.md) closes legacy isolation, source/output custody and four-band workmanship, with an explicit Bone-specific Power/fee/resale proposal awaiting Aimee. The crafting hold remains until that choice and implementation are complete.
+The complete `blacksmith-whole-shop-production-v1.md` and `bowyer-whole-shop-production-v1.md` now supply the explicit Design-authored first-pass Bone roles, quantities, source-based Power/Protection, four-band workmanship, values and recovery under Aimee's delegated whole-shop tuning authority. The former isolated Pointed Blade proposal/approval hold is superseded. These contracts are not personal new Bone approvals attributed to Aimee or evidence of native implementation.
 
-The existing Pointed Blade is a genuine Bone consumer for **legacy** Bone. Keep it and already-crafted items working unchanged. Preserve exact old quotes, eligibility, station/knowledge requirements and item profiles.
+New typed Bone must not enter the old six-band calculator through a family-enum/name match. Implement each complete shop's exact versioned typed consumer, preserving actual measurements/colour and frozen item/custody/value/recovery. Until its consumer is implemented, that operation refuses typed Bone; custody/Return and the specified trade route remain independently implementable. This is a named implementation dependency, not a fresh design question or a permanent ban on the specified recipes. Unsupported consumers remain excluded.
 
-New typed Bone must not automatically enter that six-band path through a family-enum match. It needs an explicitly versioned four-band consumer adapter that preserves actual source measurements and colour, uses the accepted component-contribution/workmanship rules, freezes final stats and preserves exact salvage. No lossy conversion to an old grade is an implementation shortcut.
-
-For new typed Bone, explicitly allow only custody/Return and the named trade operations in this slice. Other existing craft, processing or material-conversion consumers must refuse it until their adapter is closed; a broad family/category match is not sufficient. This restriction must apply through the shared material-selection path, not only the Pointed Blade screen.
-
-That adapter is the next crafting dependency, not closed by this producer packet. There is **no new approved Bone blade cost, Log recipe, schematic grant, stat formula or tuning change** here. A future recipe proposal must name those details for review; do not copy the new zero-Essence starter recipe onto Pointed Blade or reinstate the old grade costs as final overhaul design by inference.
-
-This bounded source→reward→Return→sale slice is implementable independently once body/habitat is integrated. It does not claim a completed new Bone crafting journey.
+Legacy Bone and already-crafted items retain their exact compatible old recipes, quotes, profiles and values. Do not project the new raw-Bone market values into the old family calculator. This source→reward→Return→sale packet is independently implementable after body/habitat integration; a complete crafting journey additionally requires the appropriate whole-shop consumer.
 
 ## 7. Concrete acceptance examples
 
@@ -133,4 +127,4 @@ Eventual bounded native proof: one isolated new-policy ordinary victory grants t
 
 Settled for this slice: plain Bone identity, existing skeleton predicate and species quantity, actual-source four-band quality/colour, existing Anatomy behavior, exact custody/Return, and accepted raw-material market prices. These are carried-forward rules with a bounded new typed adapter.
 
-Unfinished: full anatomical catalogue, new Bone crafting adapter, useful finer subtypes if supported by future anatomy, other materials and consumers, and natural incidence/pacing. No new user decision is required for this source/market contract. The first Homework checkbox remains **unchecked**, with Bone recorded as partial design progress; ecology and complete player experience remain untouched.
+Unfinished: full anatomical catalogue, implementation of the now-specified whole-shop Bone consumers, useful finer subtypes if supported by future anatomy, other materials and consumers, and natural incidence/pacing. No new user decision is required for this source/market contract. The first Homework checkbox remains **unchecked**, with Bone recorded as partial design progress; ecology and complete player experience remain untouched.

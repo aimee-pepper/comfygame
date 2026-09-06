@@ -1,5 +1,7 @@
 # Gear crafting families — current
 
+> **Whole Bowyer production closure — 5 September:** Bowyer future production is now defined in `bowyer-whole-shop-production-v1.md`: explicit typed components, all three Far families, four-band workmanship, 0-Essence ordinary crafting/refit and component-based value/recovery. Older Bowyer allowlists, six-band stats/fees and review holds below are historical compatibility, not a new implementation assignment. Longbow now records its working projectile points separately from its Hardwood limbs. Other shops follow their own latest completed packets; unsupported material families are not newly authorized by this note.
+
 **Status:** current structural authority for the 21 physical Schematics and their maker ownership. Exact
 socket eligibility, quality arithmetic, material effects and migration fixtures live in
 `crafting-components-and-schematics-current.md`; current catalogue-item disposition lives in

@@ -1,5 +1,7 @@
 # Weapon and gear categories + component brief — pre-implementation review
 
+> **Whole Bowyer production closure — 5 September:** Bowyer future production is now defined in `bowyer-whole-shop-production-v1.md`: explicit typed components, all three Far families, four-band workmanship, 0-Essence ordinary crafting/refit and component-based value/recovery. Older Bowyer allowlists, six-band stats/fees and review holds below are historical compatibility, not a new implementation assignment. Longbow now records its working projectile points separately from its Hardwood limbs. Other shops follow their own latest completed packets; unsupported material families are not newly authorized by this note.
+
 **Status:** awaiting Aimee review; blocks weapon/gear rules, migration and Asset production
 **Owner:** Game Design; Engineering and Asset consume only after approval
 **Updated:** 22 August 2026
