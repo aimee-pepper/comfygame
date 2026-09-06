@@ -1,16 +1,16 @@
 # Whole Tannery production — textiles, Leather, clothing and Carry
 
-**5 September 2026 · Complete Design-authored first-pass implementation contract; new behavior is pending implementation.**
+**5 September 2026 · Complete Design-authored first-pass implementation contract; delivered in phone323 on6 September2026.**
 
 Authority: Aimee delegated recipe, order and cost tuning and requested whole-shop batches. Preserve her accepted raw-to-prepared progression, real material identity/colour, creature quality, no ordinary crafting Essence toll, and capacity preservation. The changed ratios, mixed textile construction, new Leather accessories and future-craft pricing below are Design choices under that delegation, not newly attributed personal approvals or measured balance.
 
 This packet closes Corrin's whole foundational shop: three prepared materials, three clothing families with seven variants, ordinary refitting and Carry's exact relationship to existing storage. It supersedes future Tannery instructions in `tannery-system-current.md`, the Tannery rows of `crafting-shop-batch-overhaul-2026-09-05.md`, and affected rows of the early specialist, Leather and carrying packets and their companion JSON. Those earlier rows describe retained v1 compatibility; they are not the new construction table. Apothecary and Forge retain their completed contracts except that their Cord/Cloth consumers accept the complete mixed textile receipts defined here.
 
-## 1. Current behavior and the changes being made
+## 1. Earlier behavior and the delivered changes
 
-Reported early implementations make Cord from two matching Fibre portions, Cloth from four matching portions, and Leather from two matching eligible Hide/Skin plus Salt. Woven Guard, Buckled Woven Guard, Woven Gloves/Boots and Leather Guard already have delivered routes. Older sample-based Supple Coat/Working Gloves/Working Boots families coexist. The newer full-shop rules are not delivered by writing this document.
+Reported early implementations make Cord from two matching Fibre portions, Cloth from four matching portions, and Leather from two matching eligible Hide/Skin plus Salt. Woven Guard, Buckled Woven Guard, Woven Gloves/Boots and Leather Guard already have delivered routes. Older sample-based Supple Coat/Working Gloves/Working Boots families coexist. This paragraph describes the preceding routes; phone323 now delivers the full-shop rules below.
 
-| Subject | Retained legacy/current rule | New first-pass rule |
+| Subject | Earlier rule / existing receipt | Delivered first-pass rule |
 | --- | --- | --- |
 | Fibre processing | Matching Fibre type and full colour | Select any actual Stem/Leaf Fibre portions; retain each constituent |
 | Leather dressing | 2 matching raw Hide/Skin + 1 Salt → 1 Leather | 1 eligible raw portion + 1 Salt → 1 Leather |
@@ -196,3 +196,11 @@ The [shared equipment improvement and recovery contract](equipment-improvement-r
 ## Conditional anatomy extension — separate first-pass proposal
 
 [Remaining creature anatomy/material uses](creature-anatomy-material-extensions-v1.md) defines optional actual Fang/Claw components, measured Membrane-to-Leather processing and a chemically qualified creature Venom alternative, where this shop owns the exact named role. Those producers/adapters are not implemented. The complete ordinary batch remains independent, including full-excursion coatings; no generic family sample satisfies a new typed source.
+
+## Delivered checkpoint — phone323,6 September2026
+
+Engineering reports installed source9ac7301d5f53715652fd919d9ab385595eca4c1a, tree f64adbf4c785ab303bcb231d103d33ffe9cdcc9a; delivery6007b9d531f7975cc7169ff86bcf9047daa57b39, tree baa05b4712b0dcadda82e0feb17f6ed80ec1a7dc. Persistent `/Users/aimeepepper/Documents/comfygame-worktrees/early-material-regions-v1`, branch `codex/early-material-regions-v1`. Installed22:11:17UTC, ordinarily launched22:11UTC on Aimee's iPhone16Pro,402×874/default/current ordinary configuration. Source receipts: `docs/tannery-whole-shop-implementation-2026-09-06.md` and `docs/phone-build-323-delivery-2026-09-06.md` in that worktree.
+
+Delivered: one actual Skin/Hide+Salt→one Leather at frozen input value; new-world covering market policy2/3/6/12 with existing receipts preserved; all seven garment variants and independent Leather panels; actual component prices; same-instance free refit/remake with current attached-component recovery; ordered fibre swatches in stock/review/equipment; fractional equipment comparisons. Known Leather CMY stays visible without invented RGB. Carry and supported paid equipment credits remain. Complete Forge/Bone and the separate creature extensions are not included as complete systems.
+
+Engineering's47 focused tests and3 distinct native routes passed, including processing, all variants/remake/reopen and equipment composition/Equip. The seven identical baseline older-version migration failures are deferred under Aimee's explicit6 September compatibility override; this is not a claim that the broader historical suite is wholly green. Current-version save/reopen and durable transaction safety remain required and passed. No campaign deletion, reset or uninstall is authorized. Design read the supplied receipts; no duplicate native/phone verification was performed.
