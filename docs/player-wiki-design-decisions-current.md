@@ -302,6 +302,18 @@ The proposed Bone point supplies Power from its actual skeletal density and mate
 
 The first creature Homework task stays unchecked. Bone production and trading are specified; the complete body-part catalogue, crafting connections and natural gathering experience still need work.
 
+### Briar Oil — next Apothecary material update
+
+**Current behavior:** Briar Oil is an existing one-hit Bleed coating. Its older recipe uses Fibre, Resin and a separate flexible resource. The new Stem/Leaf Fibre and Resin compatibility update described here is specified but not implemented or delivered.
+
+**Decided intended adapter:** at the built Apothecary, with Briar Oil known, spend **1 Stem or Leaf Fibre + 1 Resin + 1 existing flexible world resource with Flexibility 50 or higher → 1 Briar Oil**, costing **0 Essence**. The third ingredient is separate: two new Fibre portions and Resin do not yet satisfy this recipe. The new Fibre does not gain an invented Flexibility value. Existing legacy preparation choices remain available under their own rules.
+
+The output keeps its familiar appearance and existing Uncommon item rarity, with no material-quality band or stronger effect from the selected stock. The bottle is consumed when successfully applied to an eligible physical weapon; its prepared charge survives a miss and is spent on the next successful strike. Against a surviving target, ordinary Bleed remains 2 damage at each of three round boundaries, subject to existing prevention, refresh and cure rules. The adapter changes no combat timing, target or coating lifetime.
+
+Briar Oil keeps its ordinary **5 Gold sell value** and **15 Gold price when legitimately stocked**; this adds no merchant stock. Preparing it sends it to Storehouse or Waiting and does not automatically pack it. Exact chosen ingredients and their source histories are retained, while old stock receives no invented origin. Cancel, stale stock or a failed save cannot spend ingredients or create a bottle.
+
+**Optional later proposal:** replace the separate flexible-resource requirement with one extra Stem/Leaf Fibre, for a fully new-material recipe of **2 Plant Fibre + 1 Resin**. This is not decided and is not part of the ready compatibility update. The existing third-resource requirement stays until an explicit recipe decision replaces it. No new homework answer is needed for Engineering to implement the settled adapter.
+
 ### Optional Hide-to-Leather path — decided intended behavior
 
 Some generated animals can provide **Smooth Skin, Supple Hide, or Tough Hide**, according to their actual covering. A feathered, scaled, shelled, or furry animal does not silently become a Hide source. Relevant creatures can be highlighted for a known recipe as soon as normally visible, but a possible drop is not a promise. Their appearance and species remain generated.

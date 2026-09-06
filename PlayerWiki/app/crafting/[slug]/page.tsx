@@ -1,3 +1,4 @@
+import { BriarOilMaterialUpdate } from '@/components/briar-oil-material-update';
 import { SeptemberDecisions } from '@/components/september-decisions';
 import type { Metadata } from 'next';
 import Link from '@/components/wiki-link';
@@ -104,6 +105,7 @@ export default async function CraftingSystemDetail({
         title={system.name}
         summary={system.summary}
       />
+    {system.stationID === 'apothecary' && <BriarOilMaterialUpdate />}
     <SeptemberDecisions topic="crafting" />
       {guideStatus && <section className="article-section">
         <p className="status-pill">{guideStatus.status}</p>

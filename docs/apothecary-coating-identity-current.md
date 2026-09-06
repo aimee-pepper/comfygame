@@ -1,5 +1,7 @@
 # Apothecary coating identity
 
+**5 September material update:** the intended Briar Oil compatibility adapter accepts exact Stem/Leaf Fibre and Resin while retaining one separate existing flexible World resource at 50+. It is ready for implementation, not delivered. The optional 2 Plant Fibre + 1 Resin simplification is undecided; existing Bleed and zero-Essence rules remain unchanged.
+
 **Status:** settled first-slice names, effects and recipes; native correctness patch queued
 
 **Updated:** 11 Aug 2026
