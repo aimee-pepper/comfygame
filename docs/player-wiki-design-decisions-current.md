@@ -6,6 +6,32 @@ This is the current record of the changes agreed today. **Decided intended behav
 
 Complete first-pass plans now cover all 19 Apothecary preparations, Forge, Tannery, Bowyer, Weaponsmith and Armoury; replacement implementation remains queued. [Crafting Overhaul · Shop by Shop](crafting-shop-overhaul.html) records the complete scope, current rules, accepted destination and the complete first-pass recipes, producers and services for those six makers. It supersedes isolated next-recipe assignments. The ingredient bridges below are temporary compatibility steps; they do not settle the final recipes or replace the accepted excursion-long coating lifetime.
 
+## Wood, Hide, Apex labels and notices · 6 September
+
+**Decided intended behavior — implementation pending:** these four changes are accepted. They are not yet claimed as available in the game.
+
+**Wood comes from the world.** Trees are the main source of wood, with their actual world-derived wood colour carried into Logs, Hafts and the corresponding equipment parts. Leaves and changing light do not change the material's inherent colour. Smaller trees and fallen logs provide supporting early routes; an improved Axe must not become a circular requirement for getting its own wood.
+
+Use **Logs**, **Softwood Logs** and **Hardwood Logs** consistently. Older stock called Timber keeps its quantity, value and lawful uses as Logs. Unknown old wood does not become invented Hardwood or Softwood: it can serve a requirement for any Log where appropriate, but cannot satisfy a Hardwood-only recipe without a known type. Saved colours remain saved, and unknown historic colours remain unknown. Fallen logs are finite existing-world resources; this decision does not promise a new guaranteed supply in every world.
+
+**Equivalent Hide appears together.** Return, Storehouse and ingredient selection should show a quantity for portions with the same actual material type, quality, colour and useful physical properties, even when they came from different creatures. Genuine differences remain visible. Each portion keeps its own source history underneath; selecting two consumes exactly two. Lost and retained portions remain separate outcomes, and prices use the actual selected portions. This does not introduce a matching-only requirement for the Tannery's separate Leather panels.
+
+**Visible Apex creatures are clearly labelled.** An **Apex** badge should accompany a creature already shown under the game's existing visibility rules, including its permitted Apex range. Standing still is not the definition of an Apex. The label does not reveal an otherwise hidden creature, unknown proper name or reward; “Apex creature” is enough when its name is unknown.
+
+**Optional field notices have category controls.** Monster notices and mining/gathering results can be switched separately. Muting them changes the popups, not the actual world, resource collection, map labels, Diary or inventory. A visible Apex badge remains visible.
+
+**Design first-pass defaults, open to tuning:**
+
+| Category | Starting setting | Optional notices |
+| --- | --- | --- |
+| Monster notices | On | Sightings and alerts for creatures already disclosed |
+| Mining and gathering results | Off | Routine progress, yields and depletion popups, including the separate mining result overlay |
+| Finds and learning | On | Discoveries, learned content, loot/Essence results and animal progress |
+
+You can change these settings; an existing saved choice is preserved. Damage, danger, failed actions/saves, a full satchel, required choices, combat and return summaries still explain what happened. Reading or inspecting something explicitly still shows its result. A muted gathering result must never hide damage from the same action. Fully muted results leave no empty panel, and switching notices back on does not replay old messages.
+
+The category defaults are Design-authored starting choices, not additional personal decisions attributed to Aimee. The accepted changes need no new homework approval; each becomes **current behavior** only after its implementation is reported delivered.
+
 ## Defeat summaries · delivered 6 September
 
 **Delivery reported:** Engineering reports the actual-cause return summary installed and launched in build 317 on 6 September. The real Attack → fatal poison → return summary → restart route passed its native check; Design has not repeated the delivery checks.
