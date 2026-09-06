@@ -122,3 +122,7 @@ This closes the **Design role disposition** of the existing solid families. It d
 **Three-goal progress:** Body → materials now has a deliberate role or raw-sale-only decision for every existing solid family, with exact source/stat/colour/value/recovery rules. Ecological coherence retains source anatomy and supported habitats without inventing biological functions to fill a recipe. The player journey now has concrete optional part-to-equipment choices and safe services; actual generation, presentation and natural exploration/crafting play remain the required completion evidence. Keep all three broad homework boxes open.
 
 Eventual implementation should extend its existing focused source/recipe/service checks with the arithmetic and custody cases above and one ordinary source-to-consumer route. No new evaluator, broad audit, Design native check, delivery polling, configuration matrix or speculative asset commission is requested.
+
+## Follow-on feeding and prevalence disposition
+
+The [finite feeding-support contract](creature-feeding-support-disposition-v1.md) now classifies the remaining bodies/modes against exact positive and missing evidence; it does not invent additional diets. The [natural-prevalence plan](creature-natural-prevalence-acceptance-v1.md) supplies the concrete ordinary-route acceptance questions for step6 above. Actual frequencies and unsupported intake mechanisms remain unresolved; no new run or runtime rollout follows.

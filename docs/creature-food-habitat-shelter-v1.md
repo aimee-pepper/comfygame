@@ -119,3 +119,7 @@ Eventual Engineering cases should directly cover the table, actual source refere
 ## Subsequent bounded weather contract
 
 [Climate relationships and observed-weather notes](creature-climate-observation-v1.md) supplies the next first-pass weather/body/flora evidence rules and truthful observation copy, without changing this food selection or adding dynamic hunger/weather survival. [Anatomical extensions](creature-anatomy-material-extensions-v1.md) separately specifies the previously missing parts and optional material uses. Both remain unimplemented; natural prevalence, unsupported feeding mechanisms and combined play remain unfinished.
+
+## Remaining feeding cases — bounded disposition complete
+
+[Feeding-support disposition](creature-feeding-support-disposition-v1.md) now supplies the finite supported/unsupported table for aquatic/aerial/radial/amorphous/chemical cases. It adds no fourth profile or invented source: unsupported intake and food relations remain explicitly unspecified with their exact missing evidence. The existing three profiles, actual flora viability and life gate remain unchanged. [Natural-prevalence acceptance](creature-natural-prevalence-acceptance-v1.md) defines the later ordinary-route questions without selecting cast frequencies or running a new corpus.
