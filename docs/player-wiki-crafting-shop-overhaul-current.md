@@ -4,7 +4,7 @@ Updated 5 September 2026. This is the complete crafting review you requested, be
 
 ## What the review found
 
-The early sequence is coherent: stone tools, useful raw-material equipment, ingots at Blacksmith T2, then cloth, leather and specialist components. The later recipes still contain older rules that do not fit that sequence. The Apothecary now has a complete first-pass recipe-and-source plan; implementation remains pending. Blacksmith, Tannery and subsequent shops continue as complete batches, including gathering, item effects, prices and recycling.
+The early sequence is coherent: stone tools, useful raw-material equipment, ingots at Blacksmith T2, then cloth, leather and specialist components. The later recipes still contain older rules that do not fit that sequence. The Apothecary now has a complete first-pass recipe-and-source plan; implementation remains pending. The Forge now also has its complete first-pass family/tool/material plan. Tannery and subsequent shops continue as complete batches, including gathering, item effects, prices and recycling.
 
 The biggest corrections are:
 
@@ -96,26 +96,98 @@ Each hit still follows that coating's own Poison, Burn, Bleed or Dazzle rules, i
 
 Longer-lived coatings are much stronger than single-strike bottles. Their effects and ingredient availability need to be compared together. The agreed lifetime stays intact while those numbers are tuned.
 
-## Blacksmith — starter gear, tools and the whole family
+## Blacksmith — complete Forge first-pass plan
 
-**Current behavior:** the early raw-Iron blade, tool improvements and T2 ingots have reported implementations. Older material-based Pointed Blade crafting remains a separate path. The wider eight-family catalogue is not all available: the older live Blacksmith list contains Pointed Blade, while seven additional families remain planned.
+**Current behavior:** the early raw-Iron blade, Pick/Axe improvements, T2 ingots and Scythe improvement have reported implementations. Older material-based Pointed Blade crafting remains a separate path. The complete new Forge batch below is not implemented or delivered; the older live Blacksmith list does not already contain all eight catalogue families.
 
-**Decided intended behavior and retained first-pass costs:** Halloway's early foundation costs 20 Essence, 8 Iron, 4 Plant Fibre and 4 Logs. The starter Iron blade and Pick/Axe improvements each use 4 Iron, 1 Log, 2 Plant Fibre and 1 Coal, with no Essence fee. These come before ingots.
+**Retained decisions:** stone opening tools, useful raw-material starter gear, ingots at T2 and a clear progression into prepared components. Material quality, workmanship, actual statistics and tool level remain different things.
 
-Blacksmith T2 costs 20 Essence, 8 Iron, 4 Clay and 4 Logs. It turns 2 Iron and 1 Coal into 1 Ingot without an Essence fee. The Scythe improvement uses 2 Ingots, 1 Log and 2 Plant Fibre. Ingots therefore arrive with useful tools and the Buckled Guard to make.
+**Design-authored first-pass plan:** the new T3 costs, whole-family material choices, statistics, learning, prices and refit rules are now specified together. These are revisable Design choices under your whole-shop direction, not personal approvals attributed to you. Bone’s old individual approval question has been absorbed into this plan.
 
-| Family in the complete plan | Purpose | Main construction choices |
+### Forge and tools
+
+| Operation | What you need | What you get |
 | --- | --- | --- |
-| Pointed Blade | Close piercing weapon | Point and grip |
-| Cutting Blade | Close cutting weapon | Edge and grip |
-| Hand Maul | Close crushing weapon | Head and haft |
-| Long Spear | Mid-range piercing weapon | Point, haft and binding |
-| Shield | Offhand protection | Face, brace and binding |
-| Helm | Head protection | Shell and lining |
-| Rigid Guard | Body protection | Rigid body and binding |
-| Field Pick | Mining tool | Working point, weight and haft |
+| Build Forge T1 | Halloway, 20 Essence, 8 Iron, 4 Plant Fibre, 4 Logs | The first Forge, without free equipment |
+| Pick 1→2 or Axe 1→2 | Forge T1, that owned tool, 4 Iron, 1 Log, 2 Plant Fibre, 1 Coal | The same tool at level 2; no Essence fee |
+| Forge T1→T2 | 20 Essence, 8 Iron, 4 Clay, 4 Logs | Ingot making and the next Forge recipes |
+| Make an Iron Ingot | Forge T2, 2 Iron, 1 Coal | 1 ungraded Ingot; no Essence fee |
+| Scythe 1→2 | Forge T2, that owned Scythe, 2 Ingots, 1 Log, 2 Plant Fibre | The same Scythe at level 2; no Essence fee |
+| Forge T2→T3 | 40 Essence, 6 Ingots, 8 Clay, 6 Logs, 2 Quartz | The third Forge level; no free tool or Peerless piece |
+| Pick, Axe or Scythe 2→3 | Forge T3, that owned level-2 tool, 4 Ingots, 1 Log, 1 Plant Cord, 2 Coal | The same tool at level 3; no Essence fee |
 
-**Proposals still being worked out:** review all allowed material choices, resulting statistics, prices and recoverable parts together. Keep a single understandable Pick progression; the Field Pick should not create a competing extraction level. New Bone is one possible material in the existing blade family, not a separately approved weapon recipe. Its previous two-Bone recipe and resale suggestion remain proposals inside this batch. No individual Bone-blade decision is required from you now.
+The three starting tools stay in their dedicated tool roll. Improving one preserves its identity and its selection/packing links; it does not create a duplicate tool or refund earlier construction materials. The next level is required in order. Tool level decides harvesting access, and Bone quality does not secretly bypass it.
+
+Pick 2 supplies the Quartz needed for Forge T3. Pick 3 then reaches Rift-glass for the later Apothecary recipes. Cord makes Corrin useful at this later stage while leaving the first Pick, Axe and weapon independent of the Tannery. The route needs no rare mineral before Pick 3, no Mote and no new Steel-processing step.
+
+### Every family and its exact choices
+
+T1 teaches Pointed Blade, Cutting Blade, Hand Maul and Shield. T2 adds Long Spear, Helm, Rigid Guard, Ingot making, the Scythe improvement and Refit. Existing learned schematics remain learned, while their actual facility requirement still applies. T3 adds the third tool levels.
+
+Each equipment row makes one piece for **0 Essence**. Choose one working option and the listed supporting parts. Ingot options require T2. “Fibre” means actual Stem or Leaf Fibre; “Log” means Softwood or Hardwood Log.
+
+| Family | Working part: choose one bundle | Supporting parts | Fixed role |
+| --- | --- | --- | --- |
+| Pointed Blade | 4 Iron + 1 Coal; **or** 2 Ingots; **or** 2 Quartz; **or** 1 Bone | 1 Log + 2 Fibre; **or** 1 Bone grip | Close, Pierce |
+| Cutting Blade | 4 Iron + 1 Coal; **or** 2 Ingots; **or** 1 Bone | Same grip choices | Close, Rend |
+| Hand Maul | 4 Iron + 1 Coal; **or** 2 Ingots; **or** 2 Bone | 1 Log + 2 Fibre; **or** 2 Bone + 2 Fibre | Close, Crush |
+| Long Spear | 4 Iron + 1 Coal; **or** 2 Ingots; **or** 2 Quartz; **or** 1 Bone | 2 Logs + 4 Fibre; **or** 3 Bone + 4 Fibre | Mid, Pierce |
+| Shield | 4 Iron + 1 Coal; **or** 2 Ingots; **or** 2 Softwood Logs; **or** 2 Hardwood Logs; **or** 2 Bone | 1 Log + 2 Fibre; **or** 1 Bone + 2 Fibre | Offhand protection |
+| Helm | 4 Iron + 1 Coal; **or** 2 Ingots; **or** 2 Bone | 4 Fibre; **or** 1 Cloth lining | Head protection |
+| Rigid Guard | 8 Iron + 2 Coal; **or** 4 Ingots; **or** 4 Bone | Lining: 4 Fibre or 1 Cloth; binding: 2 Fibre or 1 Cord | Body protection |
+| Field Pick | Uses the owned Pick improvement table above | Its listed upgrade materials | One Pick progression, without a second competing tool item |
+
+Raw Forge materials do not need matching colours. Separate boards, wraps, lining portions and Bone pieces keep their real colours and sources. A shield face uses the selected Softwood or Hardwood type, but its boards may differ in colour. Already prepared Cloth and Cord retain their own manufacturing rules.
+
+Bone can combine with the other supported new materials in these bundles. Older Bone or similarly named legacy stock does not automatically qualify. Bone’s actual producer still needs implementation; not every creature has a qualifying skeleton. Other older materials retain their supported older recipe paths until their new physical roles and sources are specified.
+
+### Statistics and workmanship
+
+| Working construction | Weapon Power | Shield / Helm Protection | Rigid Guard Protection |
+| --- | ---: | ---: | ---: |
+| Raw Iron | 2.0 | 1.0 | 2.0 |
+| Iron Ingot | 2.5 | 1.5 | 2.5 |
+| Quartz point, Pointed Blade or Long Spear only | 2.25 | — | — |
+| Softwood shield face | — | 0.75 | — |
+| Hardwood shield face | — | 1.0 | — |
+| Bone | From actual skeletal density and material quality | Same rule, with the smaller defensive contribution | From actual skeletal density and material quality |
+
+Bone uses the agreed material calculation: contribution ceiling × (0.5 + actual density ÷ 200) × the material-quality multiplier. The ceiling is 4 for a weapon or Body piece, 2 for a Shield or Helm. Several Bone portions in one working part are averaged, then the final statistic is rounded once to a quarter point. They do not each add another full weapon’s Power.
+
+For example, a Common Bone point at density 50 gives 3 Power; at density 40 it gives 2.75. Two Common Bone head portions at densities 0 and 100 average to 3 Power. Their separate colours remain recorded.
+
+The supporting parts supply structure, colour and workmanship without invented handling or heat bonuses. Workmanship gives the working group a 70% share and the supports 30%; ungraded stock supplies the Fine baseline. Rough, Fine, Superior and Exceptional remain the ordinary results. A better Bone grip can change that label without changing an Iron point’s actual Power, and the preview must show both facts clearly. No ordinary craft or refit creates Peerless.
+
+### Value, recovery and improving a favourite piece
+
+For new pieces made under this whole-shop plan, ordinary sale value is the sum of the actual recoverable components’ ordinary values when made. Offered purchase costs twice that sum. Fuel is spent, and neither source colour nor the workmanship label adds a hidden price premium. This does not guarantee merchant stock.
+
+| New piece | Sale value | Buy price, if offered |
+| --- | ---: | ---: |
+| Raw-Iron or Ingot Pointed Blade with Log/Fibre grip | 11 Gold | 22 Gold |
+| Quartz Pointed Blade with Log/Fibre grip | 15 Gold | 30 Gold |
+| Two Common Bone Pointed Blade | 8 Gold | 16 Gold |
+| Two Rare Bone Pointed Blade | 16 Gold | 32 Gold |
+| Softwood Shield with Log/Fibre brace | 5 Gold | 10 Gold |
+| Raw-Iron Helm with Fibre lining | 12 Gold | 24 Gold |
+| Raw-Iron Rigid Guard with Fibre lining/binding | 22 Gold | 44 Gold |
+| Ingot Rigid Guard with Cloth lining/Cord binding | 19 Gold | 38 Gold |
+
+Existing pieces keep their saved values. The earlier 10-Gold starter blade does not silently become an 11-Gold item; the new value belongs to a newly made piece under the revised rules.
+
+Recycling a supported new Forge piece returns its exact structural components, following the early crafting approach already used for these materials. It does not also return Coal, smelting fuel, Salt, fees or the raw ancestors of an Ingot, Cloth or Cord. Older gear keeps its actual recovery rules and protections. Buying, making, recycling and selling cannot create an unlimited profit loop.
+
+**New first-pass Refit service at Forge T2:** keep an eligible piece’s identity and family, replace a chosen complete working or support bundle using its listed materials, and recover the outgoing structural parts. The service costs no Essence. It recalculates the result from the final components; repeated refits cannot keep adding the same bonus. The preview shows changed statistics, colours, value and returned parts. Weapons do not silently switch damage type or reach through refitting.
+
+The older Reforge system remains for items it actually supports. It does not automatically become a new-quality calculator or a working Peerless service. The separate Mote-on-miss choice remains open for later refinement; getting Forge T3 alone grants no Peerless item.
+
+### Dependencies and remaining work
+
+This closes the Forge’s first-pass design, including the missing Pick-3 route. Engineering still needs to implement the new families, tool levels, source connections, learning, refit and recovery. The shared physical Quartz source belongs to the Apothecary source batch; Bone has its own already specified creature-source contract. Existing Corrin Cord/Cloth supplies the prepared components. Those are implementation dependencies, not new individual approval questions.
+
+The minimum raw accounting route from the starting tools to Forge T3 and Pick 3, including Corrin and one Cord, totals 100 Essence, 40 Iron, 13 Coal, 22 Logs, 12 Fibre, 16 Clay and 2 Quartz. This excludes departures, optional gear and surplus harvested units. It is a consistency check, not a promise to complete it in one world or a measured pacing claim.
+
+Glass remains planned until its consuming system is ready; empty processing steps and additional metal intermediates are not added just to fill the Forge menu. Blacksmith’s full first pass is now specified; the Tannery and later specialist batches continue in dependency order.
 
 ## Tannery — prepared stock, clothing and carrying
 

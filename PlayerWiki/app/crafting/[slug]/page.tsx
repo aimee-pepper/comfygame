@@ -1,3 +1,4 @@
+import { BlacksmithOverhaul } from '@/components/blacksmith-overhaul';
 import { ApothecaryOverhaul } from '@/components/apothecary-overhaul';
 import { SeptemberDecisions } from '@/components/september-decisions';
 import type { Metadata } from 'next';
@@ -106,6 +107,7 @@ export default async function CraftingSystemDetail({
         summary={system.summary}
       />
     {system.stationID === 'apothecary' && <ApothecaryOverhaul />}
+    {system.stationID === 'blacksmith' && <BlacksmithOverhaul />}
     <SeptemberDecisions topic="crafting" />
       {guideStatus && <section className="article-section">
         <p className="status-pill">{guideStatus.status}</p>

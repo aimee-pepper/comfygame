@@ -32,6 +32,14 @@ The study should face north-up and east-right, with downward camera pitch rather
 
 The image must not reveal hidden enemies, resources, active hazard warnings or changed shadows/effects. Older saves without a sufficient actual tree observation keep honest remembered ground until a new sighting. This is a bounded stationary-tree correction, not approval of a full 3D migration.
 
+## Whole Forge first-pass plan · 5 September
+
+The complete [Forge/Blacksmith plan](crafting-shop-overhaul.html) now covers all eight catalogue families, one coherent Pick progression, T1–T3 facilities, all three level-3 tools, Bone/metal/wood component choices, statistics, prices, recovery and deterministic refit. These are **Design-authored first-pass choices; new implementation is pending**, not personal approvals attributed to you.
+
+T3 uses 40 Essence, 6 Ingots, 8 Clay, 6 Logs and 2 Quartz. A level-2 tool improves to 3 using 4 Ingots, 1 Log, 1 Cord and 2 Coal, with no Essence fee. Pick 2 can gather the Quartz first, so the route to Rift-glass has no circular rare-material requirement. Raw starter recipes remain before ingots and do not need matching colours.
+
+New Forge pieces use a consistent component-value and recovery policy. Already owned items keep their saved stats and prices, including the earlier 10-Gold starter blade. A newly made equivalent under the revised plan is worth 11 Gold. Bone’s former isolated recipe proposal is now covered by the full shop, including valid mixtures of new Bone and other supported new materials; no individual Bone homework is needed.
+
 ## 1. Current behavior
 
 The game currently contains both older rules and delivered early-overhaul paths. The table identifies those differences; the later intended/proposed sections do not become playable merely by being written here.
@@ -324,11 +332,9 @@ These are the agreed raw-material prices, not the multipliers used for equipment
 
 **Crafting still unfinished:** the existing Bone-compatible Pointed Blade uses the older crafting rules. The new Bone material needs a compatible crafting update before entering that recipe. No new Bone weapon cost, recipe or unlock is approved by this source design. Older Bone recipes and crafted items remain available through their existing rules.
 
-**Earlier proposal — now part of the whole Blacksmith batch:** let the existing Pointed Blade use **1 new Bone for its point + 1 new Bone for its grip, costing 0 Essence**. This keeps its existing Blacksmith/schematic requirement, close reach and piercing attack. It adds no new weapon recipe or unlock, and leaves the starter Iron blade and legacy Bone crafting unchanged. The first update would accept two new Bone portions; mixing new and legacy materials would remain unavailable.
+**Now specified in the whole Forge first-pass plan:** the existing Pointed Blade can use a new Bone point and Bone grip for 0 Essence, or the other explicitly supported new-material bundles. The point uses actual skeletal density and material quality for Power; the grip adds structure, colour and its workmanship share without an invented handling bonus. A Common point at density 40 gives 2.75 Power.
 
-The proposed Bone point supplies Power from its actual skeletal density and material quality: **4 × (0.5 + density ÷ 200) × the material-quality multiplier**, rounded once to the nearest quarter point. This measures the weapon's Power contribution, not guaranteed damage on every hit. The grip keeps its existing structural and colour role without an extra handling statistic. Both materials determine workmanship, using the agreed 70% point / 30% grip quality weighting and Rough, Fine, Superior or Exceptional result names. Workmanship does not multiply Power again. For example, a Common point with density 40 gives 2.75 Power; pairing it with a Common grip produces Fine workmanship.
-
-**Proposed resale:** the finished Bone blade sells for the combined ordinary sell value of its two portions, without an extra crafting premium. Same-quality pairs would sell for 4, 8, 16 or 32 Gold. Each component keeps its own source and colour. The existing Recycler recovery rate would recover **one chosen portion**, not both, at its current service levels. Older items retain their own prices and recovery rules. This proposal grants no merchant stock, new Bone drops, creature migration, refit or Peerless path. This is no longer an individual approval question; see [the whole Blacksmith review](crafting-shop-overhaul.html).
+The new Forge plan applies one component-value and recovery policy to Bone, Iron, Ingots and wood. Two Common Bone portions give an 8-Gold blade; its eligible new-component recovery returns those actual portions. Older gear retains its existing prices and recovery. These are Design-authored first-pass rules under your whole-shop direction, not a personal approval attributed to you. Bone production and this full crafting update still need implementation. See [the complete family tables](crafting-shop-overhaul.html).
 
 The first creature Homework task stays unchecked. Bone production and trading are specified; the complete body-part catalogue, crafting connections and natural gathering experience still need work.
 
