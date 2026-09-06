@@ -185,3 +185,10 @@ folders and filenames in the actual game repository.
 - Keep only bounded active worktrees. After a checkpoint is integrated, rejected, or explicitly archived,
   propose a verified cleanup receipt rather than leaving it indefinitely registered. Never delete a worktree
   or evidence without resolving ownership and obtaining authorization when the action is destructive.
+
+
+## Accepted Design Continuity — Aimee's 5 September Follow-up
+
+- Before handing over a changed feature or whole-shop packet, compare the affected rules with the Wiki's accepted decisions. Existing code establishes current behavior, not the intended destination.
+- Label deliberately retained old behavior as either still intended or temporary pending a named replacement. Correct conflicting operative instructions and mark superseded packets; a preservation instruction must never silently reinstate a deprecated rule.
+- Include the accepted replacement in the normal implementation handoff and its focused acceptance cases. This is a bounded design check, not authorization for extra audits, frameworks, or repeated phone-delivery verification.

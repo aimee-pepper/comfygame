@@ -1,5 +1,7 @@
 # The Distillery — current design
 
+> **Historical recipe warning — 5 September:** Blank Core manufacture and its old costs below are superseded. Current direct attunement spends 16 Essence with the attunement material/catalyst. See `crafting-shop-batch-overhaul-2026-09-05.md`; this older document is not authority to restore Blank Cores.
+
 > **Incoming material-domain correction (21 August 2026):** Blank-core flow, attunements, catalysts,
 > provenance and atomic commit remain authoritative. The universal-grade potency term is superseded by the
 > exact Heat/Caustic/Light capability formulas in `loot-quality-hybrid-review-current.md`, if accepted. Keep

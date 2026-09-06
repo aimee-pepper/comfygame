@@ -1,5 +1,7 @@
 # Venom: physical Fibre compatibility adapter
 
+> **5 September batch supersession:** Retained as an interim compatibility/design record. Do not queue this as an isolated next-recipe implementation or treat its preserved legacy behavior as the final overhaul. See `crafting-shop-batch-overhaul-2026-09-05.md`. Excursion-long coatings remain the accepted destination; the Bone choice is now part of the whole Blacksmith batch.
+
 5 September 2026. **Implementation-ready Design contract; not implemented or delivered.** This is the next existing Apothecary coating migration after Briar Oil. Bone's separate proposal remains pending.
 
 ## Selection and authority
@@ -40,9 +42,9 @@ Freeze recipe/route version, output definition, count, exact Fibre lot deduction
 
 Store the ordinary gameplay-equivalent bottles through the existing merge/Waiting path and preserve the batch-to-output association when merging. Do not mint another spendable balance in the history record. Failed save, changed stock, Cancel, stale quote or replay must leave source holdings, output/history and currencies unchanged. Save first, then report success. The current Field Kit plan is unchanged; future packing, Return and item use retain their existing owners. The output is not recyclable gear and refunds no recipe ingredients.
 
-## Existing Poison and coating lifetime
+## Historical input-only scope — lifetime is not final design
 
-Bottle consumption and coating-charge consumption are separate existing events: successful preparation on the selected eligible physical weapon spends one bottle; the next successful strike spends its charge. A miss retains the charge. Keep legal-target checks, physical-versus-Channelworks restrictions, preparation action cost, replacement behavior and encounter lifetime unchanged.
+Bottle consumption and coating-charge consumption are separate existing events: successful preparation on the selected eligible physical weapon spends one bottle; the next successful strike spends its charge. A miss retains the charge. Legal-target checks, physical-versus-Channelworks restrictions and action ownership remain relevant. The instruction to preserve encounter-only lifetime is withdrawn from future implementation: it is temporary runtime behavior, and the accepted whole-shop replacement is excursion-long preparation.
 
 The current default Venom payload is Poison at **2 damage per round boundary for 4 boundaries**, from the existing Poison tuning. Do not copy Briar's three-tick Bleed duration or treat the consumable's authored potency 0 as zero Poison damage. Existing actor-owned modifiers, same-kind max refresh, Stonebark, target ownership, cures and encounter cleanup still apply; this input adapter changes none of them. Ingredient Reactivity 55 and 100 make the same standardized coating. There is no new instant tick or guaranteed total HP loss through prevention/cures/death.
 
@@ -67,4 +69,4 @@ Legacy scalar Fibre + scalar Toxin + old qualified material continue through the
 | Buy physical Fibre for 2 + legacy Toxin for 6 + legitimate third unit; craft/sell | Sale 5 is below the 8 Gold named-input subtotal; no purchase/craft/resell profit. |
 | Prepare, miss, hit surviving foe; then reload | Existing charge lifecycle and Poison 2/4/default registry behavior; no extra tick from reload. |
 
-**Implementation readiness:** closed for this one physical-Fibre/legacy-Toxin/reactive-World bridge. Engineering can proceed without a new Aimee decision; no consumer effect, fee or recipe quantity changes. **Separate unfinished design:** naming and qualifying the actual toxic plant/creature substances that may replace legacy Toxin, and any removal of the independent Reactivity slot. Neither substitution is approved here. The bridge is not a claim of a fully migrated all-new-material recipe or guaranteed fresh-campaign affordability.
+**Implementation disposition — superseded:** Do not implement this as the next isolated recipe. No Venom implementation has started. Retain this technical selection/custody analysis as reference for the complete Apothecary batch; the batch must reconcile final ingredients and the already accepted excursion-long lifetime. See `crafting-shop-batch-overhaul-2026-09-05.md`.

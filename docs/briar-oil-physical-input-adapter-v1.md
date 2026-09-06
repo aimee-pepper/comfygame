@@ -1,5 +1,7 @@
 # Briar Oil: physical-input compatibility adapter
 
+> **5 September batch supersession:** Retained as an interim compatibility/design record. Do not queue this as an isolated next-recipe implementation or treat its preserved legacy behavior as the final overhaul. See `crafting-shop-batch-overhaul-2026-09-05.md`. Excursion-long coatings remain the accepted destination; the Bone choice is now part of the whole Blacksmith batch.
+
 5 September 2026. **PM reports the bounded bridge delivered in development. Design trusts that report; phone availability is not established here.** Scope is one existing Apothecary preparation's named-input migration. It preserves the third property-qualified resource rather than inventing a replacement recipe. No new facility, coating, affliction, material producer, guarantee or creature migration.
 
 ## Why this consumer is next
@@ -39,11 +41,11 @@ No unit or quantity may satisfy two input roles. If compatibility views expose t
 
 Keep the existing shared quantity control if available; total costs for n copies are n Fibre + n Resin + n distinct flexible units, output n. Do not simulate a batch by repeatedly committing until one fails. A missing output slot follows the existing Storehouse merge/Waiting path, not silent loss or automatic Field Kit packing.
 
-## Existing output effect and use, unchanged
+## Historical input-only scope — lifetime is not final design
 
 Crafting creates a bottle. Applying it through the existing legal target/action path consumes one bottle and prepares the selected member's eligible physical weapon. Keep Channelworks restrictions, action cost, target validation and existing replacement/refusal behavior; this adapter does not introduce an extra attack or a second preparation slot.
 
-The prepared charge persists across a miss. The next successful weapon strike consumes that charge even if the hit defeats the target; a defeated target receives no new wound. Against a surviving target it applies the existing ordinary **Bleed: 2 damage at each of 3 round boundaries**, subject to the existing affliction rules. It does not add an immediate fourth tick. Existing Stonebark prevention, same-kind maximum refresh, actor/target ownership, cures and encounter cleanup remain authoritative. Ingredient properties do not change severity or duration. Keep the ordinary coating's existing encounter lifetime and save/resume behavior; no cross-encounter buff is added.
+The prepared charge persists across a miss. The next successful weapon strike consumes that charge even if the hit defeats the target; a defeated target receives no new wound. Against a surviving target it applies the existing ordinary **Bleed: 2 damage at each of 3 round boundaries**, subject to the existing affliction rules. It does not add an immediate fourth tick. Existing Stonebark prevention, same-kind maximum refresh, actor/target ownership, cures and encounter cleanup remain authoritative. Ingredient properties do not change severity or duration. That encounter-only lifetime was retained by this delivered input bridge. It is temporary runtime behavior, not intended design. The accepted replacement lasts one excursion across encounters and relaunch; see the complete Apothecary batch.
 
 Finished supplies retain the authored recognizable Briar Oil appearance. Selected raw colours stay in the preparation history rather than tinting the bottle into a different apparent supply. The output is not equipment and supplies no Recycler salvage or recipe-ingredient refund.
 
@@ -79,4 +81,4 @@ Legacy scalar Fibre/Resin, compatible property units, old quotes and already pre
 
 **Implemented per PM delivery report:** named physical Fibre/Resin admission, exact retained third World-resource requirement, existing access/inference shape, output/effect/quality/price, transaction history, Field Kit/Return and legacy coexistence. No new Aimee decision is needed for this bounded bridge. Its natural acquisition/affordability and phone availability remain separate from the reported development delivery.
 
-**Unsettled optional proposal, not part of the ready bridge:** replace the old flexible-resource slot with one additional Stem/Leaf Fibre, making the complete recipe 2 Plant Fibre + 1 Resin. This would remove the property-record dependency and make an all-new-material route, but it changes the authored eligibility rather than merely adapting custody. Do not infer or implement it from the bridge. No new homework approval is required to proceed with the settled portion; present this simplification when choosing the fully migrated Apothecary recipe, not as a blocker to current work.
+**Recipe proposal now covered by the whole-shop batch:** replace the old flexible-resource slot with one additional Stem/Leaf Fibre, making the complete recipe 2 Plant Fibre + 1 Resin. This would remove the property-record dependency and make an all-new-material route, but it changes the authored eligibility rather than merely adapting custody. Do not infer or implement it from the bridge. No new homework approval is required to proceed with the settled portion; present this simplification when choosing the fully migrated Apothecary recipe, not as a blocker to current work.

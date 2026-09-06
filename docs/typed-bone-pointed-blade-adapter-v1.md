@@ -1,5 +1,7 @@
 # Typed Bone → existing Pointed Blade: compatibility contract and proposal
 
+> **5 September batch supersession:** Retained as an interim compatibility/design record. Do not queue this as an isolated next-recipe implementation or treat its preserved legacy behavior as the final overhaul. See `crafting-shop-batch-overhaul-2026-09-05.md`. Excursion-long coatings remain the accepted destination; the Bone choice is now part of the whole Blacksmith batch.
+
 5 September 2026. **Adapter proposal; cost and Bone-specific stat mapping await Aimee. No native implementation or migration authorized.** This advances the open body-to-materials goal while current early-game testing continues.
 
 ## Existing consumer and settled rules
