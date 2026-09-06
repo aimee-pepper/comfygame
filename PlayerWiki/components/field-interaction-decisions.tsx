@@ -11,7 +11,8 @@ export function FieldInteractionDecisions({ study = false }: { study?: boolean }
     <p><strong>Current in build 318:</strong> equivalent Hide groups by quantity in Return, Storehouse and physical material selectors, with individual ownership and source details preserved. Storehouse includes creature reserve stock. Tannery still uses its current two-portion recipe; processing two from four leaves two.</p>
     <p><strong>Current in build 319:</strong> actual Apex creatures have functional labels on the existing visible field/minimap markers, current-sight details and encounter header. Ordinary stationary creatures do not. Visibility rules are unchanged; Apex styling is also integrated in build 320.</p>
     <p><strong>Current in build 320:</strong> optional notice settings start with monsters on, mining/gathering off, and finds/learning on. Your choices persist. Muting gathering also hides its separate result overlay, while damage, danger and required decisions remain visible. Collected resources are unchanged, and turning notices back on does not replay old messages.</p>
-    <p><strong>Decided, pending implementation:</strong> world-coloured tree wood carried into Logs and equipment. Older wood stock keeps its lawful uses.</p>
+    <p><strong>Current in build321:</strong> new-world wood has a saved source colour shared by the visible tree stem and its harvested Logs. Remembered trees and stock colour chips retain it. Older Logs keep their supported uses; unknown historical colour stays unknown.</p>
+    <p><strong>Decided, pending implementation:</strong> the complete colour journey through Hafts, visible finished equipment, refit/recovery and individually chosen mixed-flora components.</p>
     <p><Link href="/references/design-decisions-september-4">Read the field and terrain decisions</Link>.</p>
   </section>;
 }
