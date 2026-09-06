@@ -18,7 +18,7 @@ Consequently neither a water tile's elevation nor its shallow category proves a 
 
 **Approved scope:** add one separate, labelled, authored geometry demonstration beside the existing generated-patch camera/interaction proof. Its label should say **Terrain and water study — example heights, not a generated expedition**. It is temporary isolated test state, never a campaign conversion or additional resource world. The original generated-patch proof retains actual saved positions, actions and facts; this study does not impersonate missing geometry in that patch.
 
-The study contains a small shallow pond on raised land, a lower shallow channel, and a dry route passing their banks. Use placeholders. Numerical heights are explicit example data owned by the fixture, not renderer guesses. Aimee approved supplementing the earlier existing-generated-patch-only brief with this authored geometry study on 5 September. Both parts can proceed without another scope confirmation.
+The study contains a pond on raised land, a lower channel, and a dry route passing their banks. Aimee’s later feedback requests visibly deeper authored water; the revised example values below supersede the original quarter-level depth. Use placeholders. Numerical heights are explicit example data owned by the fixture, not renderer guesses. Aimee approved supplementing the earlier existing-generated-patch-only brief with this authored geometry study on 5 September. Both parts can proceed without another scope confirmation.
 
 For this first study, the actor's actionable route stays on equal-height dry ground using the already implemented action rules. The raised bank and pond are viewed from beside it. Do not imply that walking a rendered ramp proves new edge rules. A later interactive slope/shore demonstration depends on the shared graph implementation already required by the accepted semantics. The study can prove local water rendering; it cannot complete the entire terrain/movement milestone.
 
@@ -46,8 +46,8 @@ All heights below are authored examples, not historical world measurements.
 
 | Example | Support/bed | Surface | Depth | Expected result |
 | --- | --- | --- | --- | --- |
-| Lower channel, two adjacent cells | 0 in both | 0.25 in both | 0.25 | One local shallow surface, beside bank height 1; ends at the study boundary without inventing an outlet simulation. |
-| Raised pond, two adjacent cells | 2 in both | 2.25 in both | 0.25 | Separate local shallow surface, beside bank height 3. It does not cover lower ground elsewhere. |
+| Lower channel, two adjacent cells | −0.50 in both | 0.75 in both | 1.25 | One local surface, beside bank height 1; five times the original example depth. Ends at the study boundary without inventing outlet simulation. |
+| Raised pond, two adjacent cells | 1.50 in both | 2.75 in both | 1.25 | Separate local surface, beside containing bank height 3; five times the original example depth. It does not cover lower ground elsewhere. |
 | Dry dividing land | 1, then 2, then 3 across successive cells | absent | absent | Raised terrain remains dry even below the unrelated pond's numerical water level; a contained pond is not a world-sized flood plane. |
 | Explicit illustrative step | dry support 1 to 2 | absent | absent | Meets the accepted one-level step shape. Actual traversal awaits the physical graph; no access is inferred from mesh shape. |
 | Adjacent cliff | dry support 1 to 2, no connection | absent | absent | Same height difference, different legal connection. Do not put this boundary on a route still governed by legacy destination-only movement. |
@@ -76,3 +76,14 @@ The first study explicitly permits the simple bed in its shallow example. That a
 4. **Existing scope exclusions remain:** no save migration, stacked floors, flooding/flow simulation, new movement costs or abilities, opaque-water knowledge unlock, or new generator guarantees. Any later proposal adding those needs explicit scope approval.
 
 Design delivery is this approved bounded contract plus its player-facing Wiki/Homework summary; Engineering owns implementation. No renderer research, new evaluator, native test or phone verification is part of Design's work here.
+
+
+## Aimee trial feedback — deeper example, 5 September
+
+**Explicitly requested illustrative tuning, ready for the authored study only.** Aimee finds the first water too shallow. Use the revised table: lower channel bed −0.50, surface 0.75, containing bank 1; raised pond bed 1.50, surface 2.75, containing bank 3. Both depths are 1.25 abstract levels, five times the original 0.25. Each surface sits 0.25 below its own immediate bank. All heights remain quarter-level authored values; negative bed height is legitimate isolated example data, not permission to change production elevation bounds.
+
+The visual result should read as water with visible vertical depth between its surface and permitted bed, rather than a thin coloured film. Keep independent local surfaces, complete pond containment and separately known beds. Render support and surface with the same vertical scale; do not fake depth by separating their physical and displayed values or replacing the bed with an invented dark floor. Literal water treatment remains implementation/Asset work. No outlet, waterfall, bottom resource or hidden geometry is added.
+
+Engineering already owns Aimee's accompanying orientation and navigation corrections: north stays up, east stays right; use downward pitch without a diagonal compass rotation. Retain the tree fading she liked. Provide the requested connected flat dry walking area with ordinary four-direction movement; this does not activate slopes, wading or swimming. The raised pond remains viewable without requiring a new climb. No full 3D migration acceptance is inferred.
+
+Keep the label **Terrain and water study — example heights, not a generated expedition**. Describe the revised bodies as “deeper example water”; these numerical values do not define a production shallow/deep threshold, movement penalty, drowning rule or general water-generation policy. Existing non-traversal restrictions on water remain authoritative. Bounded cases: both independent surfaces/known beds use these values, pond remains contained, the dry route stays dry below an unrelated pond level, and all four dry directions work without new terrain movement mechanics. Engineering's normal study check is sufficient; Design requests no extra phone-delivery verification.
