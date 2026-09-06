@@ -1,5 +1,7 @@
 # Crafting overhaul — complete shop batches
 
+> **Apothecary production closure:** `apothecary-whole-shop-production-v1.md` now supersedes this audit’s proposed Apothecary recipes, unnamed chemical-source placeholders and source-choice gate. It contains all 19 exact recipes and six named plant profiles plus four mineral source contracts. This audit remains the all-shop scope and historical contradiction review; later shop tables remain their own work.
+
 5 September 2026. Design review and implementation direction, not an implementation delivery.
 
 ## Authority and disposition
