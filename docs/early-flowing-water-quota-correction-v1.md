@@ -1,5 +1,7 @@
 # Flowing-water quotas must fit physical channels
 
+> **5 September resource-occupancy clarification:** Aimee requires one tile, one node/resource across every resource pass, including guarantees and reservations. This contract never grants a per-pass stacking allowance. Preserve required quantities, legal hosts, protected content and reachability using distinct resource coordinates. See `field-tool-gesture-and-resource-occupancy-2026-09-05.md`. Implementation correction remains pending.
+
 **Decided intended correction · 4 September 2026.** Authority: Engineering diagnosis `505e55fbd404e12c25f098b41f5db5c873215b7c`, tree `7aa6c6f067c8a78e43ecf357b5208284f7ae8b55`, and PM's bounded blocker request. Original legacy pressure generates seed 264. Adopted pressure fails before material allocation under both terrain paths: standing/flowing/frozen quotas are 0/4/102, but the flowing allocation splits as 2/1/1 while its ordinary path requires distinct cells. Frozen placement is not the cause. No runtime terrain correction is claimed here.
 
 ## Partition without changing water

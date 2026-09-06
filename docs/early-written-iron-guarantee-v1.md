@@ -1,5 +1,7 @@
 # Write Iron into the ground: first callable resource guarantee
 
+> **5 September resource-occupancy clarification:** Aimee requires one tile, one node/resource across every resource pass, including guarantees and reservations. This contract never grants a per-pass stacking allowance. Preserve required quantities, legal hosts, protected content and reachability using distinct resource coordinates. See `field-tool-gesture-and-resource-occupancy-2026-09-05.md`. Implementation correction remains pending.
+
 **Decided intended binding · 4 September 2026.** This closes only the existing Iron→Substrate vocabulary for newly generated early worlds. It implements the accepted common-resource cluster, budget credit, reachable distances and truthful pre-Bind quote in the structural/host packets. Coal, Clay and Resin do not gain callable pressure-source rows. No general declaration grammar, vocabulary acquisition, Page-space or ink-cost redesign is introduced.
 
 ## 1. Trigger and quantity

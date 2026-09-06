@@ -1,5 +1,7 @@
 # Early material host and consumer contract V1
 
+> **5 September resource-occupancy clarification:** Aimee requires one tile, one node/resource across every resource pass, including guarantees and reservations. This contract never grants a per-pass stacking allowance. Preserve required quantities, legal hosts, protected content and reachability using distinct resource coordinates. See `field-tool-gesture-and-resource-occupancy-2026-09-05.md`. Implementation correction remains pending.
+
 **T2 closure:** [the specialist packet](early-specialist-implementation-packet-v1.md) now settles Blacksmith T2 Iron Ingots, its raw-material upgrade cost and first useful consumers; it supersedes the T2 proposal language below.
 
 **Status:** completed bounded Game Design specification; first-pass tuning, not shipped or play-verified.
