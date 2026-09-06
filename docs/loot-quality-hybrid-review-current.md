@@ -189,7 +189,7 @@ Rough and Peerless power values require isolated balance fixtures before they en
 - **Trading Post:** use family/item `baseValue × quality multiplier`; exact repurchase remains strictly higher.
 - **Recipe eligibility:** read family plus derived capability values. Default consumes the lowest qualifying
   band, then stable stack key; one stack quantity may supply several units only when enough count exists.
-- **Distillery:** use the derived capabilities of the selected family/band. Heat potency is
+- **Distillery — legacy/current property recipe only:** new named-material production is replaced by `distillery-whole-system-production-v1.md` and yields fixed first-pass potency60. Preserve saved old potency. For the retained legacy calculation, Heat potency is
   `round(0.65 × reactivity + 0.35 × insulation)`; Caustic is `round(reactivity)`; Light is
   `round(0.65 × lustre + 0.35 × hardness)`. Clamp 0–100.
 - **Scent Mask:** one Reagent plus one Hide, Pelt, Down or Oil of any quality. Quality is consumed and
