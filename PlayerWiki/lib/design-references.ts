@@ -45,7 +45,7 @@ export const designReferences: DesignReference[] = [
   {
     slug: 'crafting-shop-overhaul',
     title: 'Crafting Overhaul · Shop by Shop',
-    summary: 'All 19 Apothecary preparations, Blacksmith and Tannery progression, every remaining crafting system, and the corrections needed to make them coherent.',
+    summary: 'The complete first-pass source and recipe plan for all 19 Apothecary preparations, plus Blacksmith, Tannery and every remaining crafting batch.',
     source: craftingShopOverhaul,
     systemLinks,
   },

@@ -4,7 +4,7 @@ This is the current record of the changes agreed today. **Decided intended behav
 
 ## Whole-shop update · 5 September
 
-Design is now overhauling complete crafting shops, beginning with all 19 Apothecary preparations, Blacksmith and Tannery. [Crafting Overhaul · Shop by Shop](crafting-shop-overhaul.html) records the complete scope, current rules, accepted destination and proposed recipe matrix. It supersedes isolated next-recipe assignments. The ingredient bridges below are temporary compatibility steps; they do not settle the final recipes or replace the accepted excursion-long coating lifetime.
+Design is now overhauling complete crafting shops, beginning with all 19 Apothecary preparations, Blacksmith and Tannery. [Crafting Overhaul · Shop by Shop](crafting-shop-overhaul.html) records the complete scope, current rules, accepted destination and the now-closed first-pass Apothecary recipe/source matrix. It supersedes isolated next-recipe assignments. The ingredient bridges below are temporary compatibility steps; they do not settle the final recipes or replace the accepted excursion-long coating lifetime.
 
 ## Defeat summaries · decided 5 September
 
@@ -330,8 +330,9 @@ The first creature Homework task stays unchecked. Bone production and trading ar
 
 **Decided intended behavior:** all four weapon coatings last one excursion on the selected weapon, across encounters and reopening. The ingredient-only compatibility work never replaced that decision. Ordinary new preparations use recognizable material roles and cost no Essence; supernatural exceptions stay explicit.
 
-**Proposed whole-shop changes:** review all 19 preparations together, removing unrelated property ingredients and giving remedies, coatings, bait and field supplies suitable physical ingredients. The proposed Briar recipe uses 2 Plant Fibre and 1 Resin; the proposed Venom recipe uses an actual eligible raw toxin and Plant Fibre. Those complete replacements are not delivered or approved by the old compatibility packets. Exact chemical and flora sources, shop balance, prices and material recovery are Design work, not individual homework questions.
+**Complete first-pass Design plan — implementation pending:** all 19 preparations now have exact recipes using six named plant parts, four named mineral sources and the existing early materials. Aromatic Leaf, Soothing Leaf, Bitter Root, Restorative Spore, Toxic Sap and Tough Bark replace the earlier unnamed ingredient placeholders. The new Briar recipe is 2 Plant Fibre plus 1 Resin; Venom uses 1 Toxic Sap plus 1 Plant Fibre, with no extra property sample. Ordinary preparations no longer depend on unfinished creature-fluid drops or a universal Reagent/Toxin item.
 
+These are Design-authored, revisable content and tuning choices under your whole-shop direction, not personal approvals attributed to you. The packet includes source availability, tools/yields, learning, prices, custody and all four excursion-long coatings. Pick-3 access remains the named later Blacksmith dependency for Rift-glass supplies. No new Mote source or merchant stock is granted.
 See [the complete Apothecary recipe matrix and all-shop plan](crafting-shop-overhaul.html).
 
 ### Optional Hide-to-Leather path — decided intended behavior

@@ -4,7 +4,7 @@ Updated 5 September 2026. This is the complete crafting review you requested, be
 
 ## What the review found
 
-The early sequence is coherent: stone tools, useful raw-material equipment, ingots at Blacksmith T2, then cloth, leather and specialist components. The later recipes still contain older rules that do not fit that sequence. We are now revising complete shops, including gathering, recipes, item effects, prices and recycling together.
+The early sequence is coherent: stone tools, useful raw-material equipment, ingots at Blacksmith T2, then cloth, leather and specialist components. The later recipes still contain older rules that do not fit that sequence. The Apothecary now has a complete first-pass recipe-and-source plan; implementation remains pending. Blacksmith, Tannery and subsequent shops continue as complete batches, including gathering, item effects, prices and recycling.
 
 The biggest corrections are:
 
@@ -16,38 +16,75 @@ The biggest corrections are:
 
 ## Apothecary — all 19 preparations
 
-**Current behavior:** the shop has 19 recipes, including Seamlight and Scent Mask. Lesser Salve has its new Resin-and-Plant-Fibre path. Briar Oil's new material selection is reported delivered in phone build 310 alongside its older recipe. Venom's proposed ingredient update has not been implemented. These changes do not finish the full shop overhaul or establish that every ingredient is easy to find through ordinary play.
+**Current behavior:** the shop has 19 recipes, including Seamlight and Scent Mask. Lesser Salve has its new Resin-and-Plant-Fibre path. Briar Oil’s new selection is reported delivered in phone build 310 alongside its older recipe. The complete new recipe/source batch below is not implemented or delivered; Venom’s isolated ingredient update has not been implemented.
 
-**Decided intended behavior:** recognizable physical ingredients replace unrelated property requirements. Ordinary preparations cost no Essence; Stillwater and Waystone retain their explicit supernatural costs. Ingredients do not automatically change a standardized potion's colour, potency or sale price. Prepared goods stay stored or claimable until you choose to pack them.
+**Decided intended behavior:** recognizable physical ingredients replace unrelated property requirements. Ordinary preparations cost no Essence; Stillwater and Waystone retain their explicit supernatural costs. Standardized preparations do not gain colour, quality or potency from the selected ingredients. Prepared goods remain stored or claimable until deliberately packed.
 
-**Proposed whole-shop recipes:** the final column is a coherent starting proposal, not a new set of unlocked recipes. A star marks a material whose exact natural source or eligible types still need to be specified. “A masking substance” is a job an ingredient must perform, not a new universal Reagent item. Game Design owns that content work and the quantities; you do not need to approve nineteen recipes individually.
+**Design-authored first-pass production plan:** the whole shop now has exact recipes and named sources. This closes the earlier unnamed-ingredient proposals as a complete implementation plan. The new plant names, quantities, source frequency and learning choices are Game Design’s revisable first-pass tuning under your shop-overhaul direction; they are not claims that you personally approved each row, or that these changes are already playable.
 
-Every row makes one item. Existing ordinary fees are 0 Essence; Stillwater additionally costs 6 Essence and Waystone costs 12 Essence plus 1 Mote. A listed property material is a separate ingredient, not merely a description of the other ingredients. Healing and status numbers are base values; character effects, prevention and cures can matter.
+Each row makes one item. Existing ordinary recipes cost 0 Essence; existing Stillwater also costs 6 Essence and Waystone costs 12 Essence plus 1 Mote. Those fees are included explicitly in the new recipe column. A property material in the existing recipe is a separate ingredient. Base healing/status values still follow the existing character, prevention and cure rules.
 
-| Preparation | Existing recipe | What it does; ordinary sale value | Proposed whole-shop recipe |
+| Preparation | Existing recipe | What it does; ordinary sale value | New first-pass recipe, not yet delivered |
 | --- | --- | --- | --- |
-| Seamlight | Quartz 1, Resin 1, Fibre 1 | Portal guidance; 5 | Quartz 1, Resin 1, Stem/Leaf Fibre 1 |
-| Scent Mask | Reagent 1, selected Hide/Pelt/Down/Oil 1 | Scent interference, base 12 world turns; 2 | Named masking substance* 1, compatible scent-bearing creature portion* 1 |
-| Lesser Salve | New route: Resin 1, Stem/Leaf Fibre 1. Old: Resin 1, Flexibility 25 sample | Heal 10; 2 | Keep new route: Resin 1, Stem/Leaf Fibre 1 |
-| Salve | Pulp 2, Spore 1, Resin 1, Insulation 40 sample | Heal 24; 5 | Cloth 1, Resin 1, medicinal Spore* 1 |
-| Greater Salve | Ichor 1, Spore 2, Resin 2, Reactivity 60 sample | Heal 45; 10 | Cloth 1, Resin 2, medicinal Spore* 2, Ichor* 1 |
-| Clearing Draught | Pulp 1, Salt 1, Reactivity 35 sample | Clear Poison and Bleed; 5 | Pulp* 1, Salt 1 |
-| Quenching Draught | Reagent 1, Resin 1, Insulation 45 sample | Clear Burn and Dazzle; 5 | Named quenching substance* 1, Resin 1 |
-| Broad Antidote | Ichor 1, Reagent 1, Spore 1, Reactivity 65 sample | Clear one affliction; 10 | Ichor* 1, neutralizing substance* 1, medicinal Spore* 1 |
-| Stonebark Tonic | Timber 1, Resin 1, Hardness 45 sample | Prevent next affliction; 5 | Bark* 1, Resin 1; do not relabel a Log as harvested Bark |
-| Venom | Toxin 1, Fibre 1, Reactivity 55 sample | Poison, base 2 damage / 4 rounds; 5 | Eligible raw toxin* 1, Stem/Leaf Fibre 1 |
-| Firebrand | Reagent 1, Sulfur 1, Reactivity 60 sample | Burn, base 4 damage / 2 rounds; 5 | Sulfur* 1, Resin 1 |
-| Briar Oil | Old Fibre 1, Resin 1, Flexibility 50 sample. Delivered new route uses Stem/Leaf Fibre and a separately selected Resin owner plus qualifying world material | Bleed, base 2 damage / 3 rounds; 5 | Stem/Leaf Fibre 2, Resin 1 |
-| Flashsalt | Reagent 1, Mercury 1, Lustre 55 sample | Dazzle, base 2 rounds; 5 | Salt 1, Quartz 1, light-reactive substance* 1 |
-| Solvent | Reagent 1, Salt 1, Reactivity 40 sample | Identify a field curio; 5 | Named solvent substance* 1, Salt 1 |
-| Lure | Toxin 1, Pulp 1, Reactivity 50 sample | Attract nearest roaming creature; 5 | Bait substance* 1, Pulp* 1; toxin is not automatically appetizing |
-| Stillwater | Riftglass 1, Mercury 1, Lustre 60 sample | Restore Stability 25; 10 | Riftglass* 1, Mercury* 1, 6 Essence |
-| Waystone | Riftglass 1, Hardness 70 sample, 1 Mote | Return with eligible haul; 20 | Riftglass* 1, hard Stone component* 1, 1 Mote, 12 Essence |
-| Torch | Resin 1, Timber 2, Reactivity 30 sample | Journey illumination, base 2; 2 | Resin 1, Log 1, Stem/Leaf Fibre 1 |
-| Farsight Draught | Quartz 1, Ichor 1, Lustre 50 sample | Reveal nearest site and surroundings, base 2; 10 | Quartz 1, Ichor* 1 |
+| Seamlight | Quartz 1, Resin 1, Fibre 1 | Portal guidance; 5 | 1 Quartz, 1 Resin, 1 Plant Fibre |
+| Scent Mask | Reagent 1, selected Hide/Pelt/Down/Oil 1 | Scent interference, base 12 world turns; 2 | 2 Aromatic Leaf, 1 Resin |
+| Lesser Salve | New route: Resin 1, Stem/Leaf Fibre 1. Old: Resin 1, Flexibility 25 sample | Heal 10; 2 | 1 Resin, 1 Plant Fibre |
+| Salve | Pulp 2, Spore 1, Resin 1, Insulation 40 sample | Heal 24; 5 | 1 Cloth, 2 Soothing Leaf, 1 Resin |
+| Greater Salve | Ichor 1, Spore 2, Resin 2, Reactivity 60 sample | Heal 45; 10 | 1 Cloth, 2 Soothing Leaf, 2 Restorative Spore, 2 Resin |
+| Clearing Draught | Pulp 1, Salt 1, Reactivity 35 sample | Clear Poison and Bleed; 5 | 1 Bitter Root, 1 Salt |
+| Quenching Draught | Reagent 1, Resin 1, Insulation 45 sample | Clear Burn and Dazzle; 5 | 2 Soothing Leaf, 1 Salt |
+| Broad Antidote | Ichor 1, Reagent 1, Spore 1, Reactivity 65 sample | Clear one affliction; 10 | 1 Bitter Root, 1 Restorative Spore, 1 Salt |
+| Stonebark Tonic | Timber 1, Resin 1, Hardness 45 sample | Prevent next affliction; 5 | 1 Tough Bark, 1 Resin |
+| Venom | Toxin 1, Fibre 1, Reactivity 55 sample | Poison, base 2 damage / 4 rounds; 5 | 1 Toxic Sap, 1 Plant Fibre |
+| Firebrand | Reagent 1, Sulfur 1, Reactivity 60 sample | Burn, base 4 damage / 2 rounds; 5 | 1 Sulfur, 1 Resin |
+| Briar Oil | Old Fibre 1, Resin 1, Flexibility 50 sample. Delivered new route uses Stem/Leaf Fibre and a separately selected Resin owner plus qualifying world material | Bleed, base 2 damage / 3 rounds; 5 | 2 Plant Fibre, 1 Resin |
+| Flashsalt | Reagent 1, Mercury 1, Lustre 55 sample | Dazzle, base 2 rounds; 5 | 1 Quartz, 1 Sulfur, 1 Salt |
+| Solvent | Reagent 1, Salt 1, Reactivity 40 sample | Identify a field curio; 5 | 1 Bitter Root, 1 Sulfur |
+| Lure | Toxin 1, Pulp 1, Reactivity 50 sample | Attract nearest roaming creature; 5 | 1 Aromatic Leaf, 1 Plant Fibre |
+| Stillwater | Riftglass 1, Mercury 1, Lustre 60 sample | Restore Stability 25; 10 | 1 Rift-glass, 1 Mercury, 6 Essence |
+| Waystone | Riftglass 1, Hardness 70 sample, 1 Mote | Return with eligible haul; 20 | 1 Rift-glass, 1 Quartz, 12 Essence, 1 Mote |
+| Torch | Resin 1, Timber 2, Reactivity 30 sample | Journey illumination, base 2; 2 | 1 Resin, 1 Log, 1 Plant Fibre |
+| Farsight Draught | Quartz 1, Ichor 1, Lustre 50 sample | Reveal nearest site and surroundings, base 2; 10 | 1 Quartz, 1 Restorative Spore |
 
 
-The proposed Salve ladder gives Cloth another useful purpose while keeping immediate healing available before the Tannery. Medicine, bait, irritant spores and raw toxins need distinct, believable sources. We should not assume all spores are medicinal, all toxins are bait, or a Log is already harvested Bark. These source choices are one connected design job shared with flora, creatures and the Distillery.
+The new recipes remove the unrelated property ingredient completely. Briar Oil’s two Fibre and Resin are sufficient in the new plan; Venom uses actual Toxic Sap and Fibre. Neither asks for a hidden third sample. Stem and Leaf Fibre are the supported alternatives, and Softwood or Hardwood Logs fill a Log requirement. Similar names do not make other materials interchangeable.
+
+### Six useful plant parts
+
+| New ingredient | Where its real source belongs | Tool and harvest | Ordinary sell / buy per unit |
+| --- | --- | --- | --- |
+| Aromatic Leaf | Leafy herbs on fresh damp Loam or clay soil, with enough daylight | Scythe 1; one hit gives 2 | 2 / 4 Gold |
+| Soothing Leaf | Fleshy-leaved herbs on fresh moist Loam or clay soil, with enough daylight | Scythe 1; one hit gives 2 | 2 / 4 Gold |
+| Bitter Root | Root-clump herbs on fresh damp or moist Loam or clay soil | Scythe 1; one hit gives 2 | 2 / 4 Gold |
+| Restorative Spore | Actual spore-bearing fungi on fresh damp or moist ground; low light is allowed | Scythe 1; one hit gives 2 portions | 6 / 12 Gold |
+| Toxic Sap | Plants that actually bear this sap, on fresh moist growing ground | Scythe 1; one hit gives 1 portion | 6 / 12 Gold |
+| Tough Bark | Bark-bearing shrubs on fresh damp Loam over Granite or Sandstone | Scythe 2; one hit gives 3 portions | 2 / 4 Gold |
+
+These sources have unfrozen, unsubmerged roots and retain the established physical growing conditions. A plant’s colour does not prove its medicinal properties. Each species keeps its actual named material; looking, harvesting or reopening does not reroll it. Fungi do not become leaves, and an arbitrary spore is not automatically restorative.
+
+The six initial gathering profiles have no contact damage. Having a useful toxic substance is different from being an actually harmful contact patch. Existing dangerous flora still keeps its own warning, harm and tool rules; this plan does not make every Toxic Sap plant dangerous to walk over or make existing dangerous plants harmless.
+
+Existing early-maker resources keep their reserved places. For remaining suitable flora placements, the starting plan gives the new herb group one quarter of the selection weight when both it and the existing group can grow; eligible herbs share that group equally. Total flora counts stay the same. This does not put every ingredient in every world or add a second resource to an occupied tile.
+
+### Progress through the complete shop
+
+Lesser Salve, Briar Oil and Torch use the opening raw sources. Suitable worlds can provide five of the six new plant parts with Scythe 1. Corrin’s Cloth gives the stronger Salves a meaningful prepared component without blocking the first remedy. Scythe 2 adds Tough Bark for Stonebark Tonic.
+
+The new material rules put Quartz, Sulfur and Mercury at Pick 2 and Rift-glass at Pick 3. Their sources retain their existing world conditions: Quartz needs hard mineral ground, Sulfur hot volatile ground, Mercury suitable metallic/volatile ground, and Rift-glass unstable ground. Local placement still needs a legal free source position and a reachable working position. These are conditions for finding minerals, not material-quality bars that must be checked when making a potion.
+
+Pick 2 opens the relevant Seamlight, Firebrand, Flashsalt, Solvent and Farsight ingredient routes. Stillwater and Waystone remain later supernatural supplies because they require actual Rift-glass; Waystone also needs a real Mote. The complete Pick-3 upgrade route is a connected Blacksmith dependency, not claimed delivered by this Apothecary plan. None of those later items is required to make the first Salve.
+
+Nessa’s early foundation remains 20 Essence, 4 Clay and 4 Logs. No new Apothecary tier, keeper attendance, creature hunt, Isolde detour or universal extract-processing step is added. Ichor and other creature fluids remain valid materials elsewhere; ordinary preparations no longer depend on their unfinished new creature-source rules.
+
+Recipes are learned through their signature ingredients reaching Home once the shop is built; Lesser Salve remains taught at construction. Leaf, Root, Spore, Sap and Bark recipes follow their named parts. Mixed recipes may need their two signature types present, such as Quartz and Sulfur for Flashsalt. Learning never gives a free bottle, and already learned recipes stay learned after ingredients are spent.
+
+### Quality, storage and value
+
+All six plant parts are ungraded, with actual source colour and history retained. Named minerals have ordinary named stacks. These facts do not change standardized bottle appearance or potency. Existing 10/24/45 base healing, cures, prevention and field effects remain intact, apart from the already agreed shared coating lifetime below.
+
+Every new row’s full ingredient purchase cost exceeds the finished item’s ordinary sale value, even before counting Essence or Motes. Trading stock is not guaranteed. Making a useful remedy is not an unlimited buy–craft–sell profit loop, and finished preparations do not recycle into free ingredients.
+
+Batch preparation must spend the exact chosen quantities once and leave the finished items stored or claimable if storage is full. Mixing visually identical bottles must preserve their preparation history without creating extra usable stock. Legacy materials keep an honestly labelled compatible route until their actual identities can be supported; generic Toxin or Reagent never silently becomes one of these new plant parts.
 
 ### All four weapon coatings
 
