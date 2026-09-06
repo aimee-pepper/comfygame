@@ -81,6 +81,6 @@ Focused tests should compare exact RNG state and all unchanged gameplay fields/I
 
 **Closed Design correction:** cold-water appendage bias belongs to validated water-associated species; other climate allocation effects and ordinary morphological variety are preserved.
 
-**Still open:** diet and actual food relationships, nesting, meaningful dynamic weather responses, the full body/material catalogue and the complete player experience. Weather immunity, coat wetting, shelter seeking, migration, freezing/thawing bodies and seasonal anatomy are **unsettled ideas, not selected features**. No new Aimee decision is needed to implement this bounded correction; a new simulation proposal would need its own concrete decision.
+**Subsequent first-pass design:** food/habitat/shelter, remaining anatomy/material uses and climate observations now have their own contracts. [Climate relationships and observed-weather notes](creature-climate-observation-v1.md) reconciles the retained generation rules and actual sighting context; it does not change this count correction. Implementation, unsupported feeding mechanisms, natural prevalence and the complete player experience remain open. Weather immunity, coat wetting, shelter seeking, migration, freezing/thawing bodies and seasonal anatomy are **unsettled ideas, not selected features**. No new Aimee decision is needed to implement this bounded correction; a new simulation proposal would need its own concrete decision.
 
 Aimee Homework gets partial weather/body progress. All three broader creature goals remain unchecked.

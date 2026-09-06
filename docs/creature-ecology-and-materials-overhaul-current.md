@@ -23,6 +23,8 @@ The [creature discovery journey](creature-disclosure-player-journey-v1.md) now a
 
 The [food, habitat and shelter contract](creature-food-habitat-shelter-v1.md) now supplies a bounded first-pass generation proposal for actual low-leaf/fungal forage and smaller-prey relations, plus the evidence required for den/nest claims. It is not implemented and adds no hunger, breeding, population simulation or speculative shelter asset. Other diets, sufficient natural prevalence and real shelter-use behavior remain unfinished.
 
+The [climate relationships and observed-weather proposal](creature-climate-observation-v1.md) now reconciles the supported cold/hot/wet/air/flora rules with actual habitat, anatomy and food evidence, and specifies a small Seen/Bestiary weather-context extension. It is unimplemented. Weather-driven physiology and shelter/migration simulation remain unselected rather than assumed.
+
 ## Remaining real work
 
 [Remaining anatomy/material extensions](creature-anatomy-material-extensions-v1.md) now defines the missing tooth/claw/tusk, Down, fin/membrane and fluid records, plus narrow optional component/preparation uses. This is a Design-authored proposal requiring actual new anatomical producers, not a claim that existing damage axes establish those parts. Other solid-part equipment roles and natural source prevalence remain Design work. The completed Apothecary, Distillery and Scriptorium recipes already use Resin/Toxic Sap/Dyer's Root and do not depend on invented fluids. Broader food/nesting, implementation of the specified distant-sighting/likely-material journey, natural reward incidence and exploration/crafting feel remain unfinished.

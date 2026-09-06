@@ -68,7 +68,7 @@ Pressures produce a **weight per costly axis** (how much of the budget tends to 
 | Pressure | Costly-axis weights | Free-axis shifts |
 |---|---|---|
 | Thermal floor ↓ | **size ↑↑ · covering.length ↑↑ · covering.coverage ↑↑** | build → bulky · reach → close |
-| Thermal floor ↓ **+ wet** | shifts weight from covering → size and build bulk (fat, not fur) | |
+| Thermal floor ↓ **+ wet** | shifts weight from covering → size and build bulk (shape only; no inferred fat/Oil tissue) | |
 | Thermal peak ↑ | size ↓ · covering.coverage ↓ | reach → far (radiators) · coloration pale |
 | Illumination peak 10–35 | — | **sensory → vision ↑↑** · coloration dark |
 | Illumination peak <10 | — | **sensory → mechano/chemo ↑↑, vision → ~0** · coloration pale · appendages.count ↑ |
