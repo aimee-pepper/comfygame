@@ -2,7 +2,7 @@
 
 > **5 September batch supersession:** Retained as an interim compatibility/design record. Do not queue this as an isolated next-recipe implementation or treat its preserved legacy behavior as the final overhaul. See `crafting-shop-batch-overhaul-2026-09-05.md`. Excursion-long coatings remain the accepted destination; the Bone choice is now part of the whole Blacksmith batch.
 
-5 September 2026. **Adapter proposal; cost and Bone-specific stat mapping await Aimee. No native implementation or migration authorized.** This advances the open body-to-materials goal while current early-game testing continues.
+5 September 2026. **Historical isolated proposal, superseded by `blacksmith-whole-shop-production-v1.md`.** The whole-shop packet now supplies Design-authored first-pass Bone roles, mixed new-material bundles, prices and recovery under delegated tuning authority. This is not a personal Bone approval attributed to Aimee; the old isolated approval/implementation hold below is no longer the active instruction.
 
 ## Existing consumer and settled rules
 
@@ -20,7 +20,7 @@ Source owners inspected: `PhysicalGearCraftingRules.pointedBlade`, preview/craft
 
 Authority: [Bone producer](creature-bone-production-v1.md), [first-pass arithmetic](resource-world-first-pass-tuning-v1.md), cohesive overhaul, and the existing Pointed Blade socket/Balanced-material records. The old six-to-four migration table is a one-way migration policy, not permission to reverse-map new Bone into six-band crafting or migrate stock in this slice.
 
-## One bounded proposal for Aimee
+## Historical isolated proposal — no longer an approval request
 
 Let the **existing** Pointed Blade use two pieces of new typed Bone, one point and one grip, for **0 Essence**. Retain its two existing sockets, access, identity, Pierce and Close behavior. No Log, Coal, Fibre, Ingot, new recipe, new unlock or mandatory processing step is added. This is a narrow new calculator for an already-supported material combination; other legacy choices remain available under their old rules.
 

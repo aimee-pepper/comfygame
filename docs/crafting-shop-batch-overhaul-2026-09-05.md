@@ -108,6 +108,8 @@ Input migration and excursion lifetime may have separate code commits inside thi
 
 ## Batch 2 — Blacksmith, whole family and tool plan
 
+**Production closure:** `blacksmith-whole-shop-production-v1.md` supersedes the provisional choices and unfinished Forge role/value/tool tables in this audit. It supplies all eight family dispositions, T1–T3 and Pick-3 access, whole-shop Bone/metal mappings, new-gear recovery and deterministic refit. Older unchanged items and the audit history remain preserved.
+
 Retain accepted early progression: stone Pick/Axe/Scythe in the dedicated tool roll; Halloway's 20 Essence / 8 Iron / 4 Fibre / 4 Logs foundation; starter Iron Pointed Blade and Pick/Axe improvements each 4 Iron + 1 Log + 2 Fibre + 1 Coal, zero Essence. Forge T2 costs 20 Essence + 8 Iron + 4 Clay + 4 Logs and makes 1 Ingot from 2 Iron + 1 Coal for zero Essence. Scythe improvement uses 2 Ingots + 1 Log + 2 Fibre. Do not move ingots back ahead of the first blade/Pick/Axe.
 
 | Family | Catalogue construction / fixed role | Whole-shop disposition |
