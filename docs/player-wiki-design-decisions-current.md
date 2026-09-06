@@ -32,6 +32,12 @@ The study should face north-up and east-right, with downward camera pitch rather
 
 The image must not reveal hidden enemies, resources, active hazard warnings or changed shadows/effects. Older saves without a sufficient actual tree observation keep honest remembered ground until a new sighting. This is a bounded stationary-tree correction, not approval of a full 3D migration.
 
+## Whole Bowyer first-pass plan · 5 September
+
+The complete [Bowyer plan](crafting-shop-overhaul.html) covers Longbow/Pierce/Far, Sling/Crush/Far and Throwing Set/Rend/Far. **New Design-authored first-pass rules are pending implementation.** Fen's foundation becomes 30 Essence, 6 Logs, 2 Cord and 2 Resin, including all three families and ordinary refit; their crafts cost no Essence.
+
+Hardwood supplies real bow limbs, Bone is used for hard points/shot/edges, and the recipes share Tannery textiles/Leather and Forge Ingots. There is an animal-free Clay Sling route and no ammunition inventory or replenishment chore. New working Power, four-band workmanship, component prices/recovery and refit are specified together; owned legacy weapons stay unchanged. Every physical ranged family uses the accepted excursion-long coating lifetime. Weaponsmith is the next complete shop batch.
+
 ## Whole Tannery first-pass plan · 5 September
 
 The complete [Tannery plan](crafting-shop-overhaul.html) now covers Cord, Cloth, Leather, three clothing families with seven variants, prices, recovery, refitting and Carry. **These are Design-authored first-pass choices, pending implementation.** Fibre portions may combine as real coloured textile constituents. Dressing uses one eligible Skin/Hide plus Salt; a Guard may use two independently chosen Leather panels. Existing stock and clothing keep their saved qualities, colours and prices.

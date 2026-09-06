@@ -4,7 +4,7 @@ Updated 5 September 2026. This is the complete crafting review you requested, be
 
 ## What the review found
 
-The early sequence is coherent: stone tools, useful raw-material equipment, ingots at Blacksmith T2, then cloth, leather and specialist components. The later recipes still contain older rules that do not fit that sequence. The Apothecary now has a complete first-pass recipe-and-source plan; implementation remains pending. The Forge now also has its complete first-pass family/tool/material plan. The Tannery also has its complete first-pass textile, Leather, clothing and carrying plan below. Subsequent shops continue as complete batches, including gathering, item effects, prices and recycling.
+Stone tools lead to useful raw-material equipment. Blacksmith T2 introduces Ingots, while Tannery textiles provide a parallel route into clothing and later specialist components. The later recipes still contain older rules that do not fit that sequence. The Apothecary now has a complete first-pass recipe-and-source plan; implementation remains pending. The Forge now also has its complete first-pass family/tool/material plan. The Tannery also has its complete first-pass textile, Leather, clothing and carrying plan below. The Bowyer now also has its complete three-family first-pass plan. Subsequent shops continue as complete batches, including gathering, item effects, prices and recycling.
 
 The biggest corrections are:
 
@@ -270,13 +270,86 @@ Apothecary's Salve ladder and Forge's linings, bindings and tool improvements co
 
 **Implementation still needed:** mixed-textile selection and appearance, one-to-one Leather dressing and price preservation, all seven garment variants, refit and their connected save/trade/recovery behavior. This is a complete first-pass plan, not seven new homework approvals. The broader creature catalogue and the existing Mote-on-miss decision remain separate open work.
 
+## Bowyer — the complete three-family first-pass plan
+
+**Current behavior:** the Bowyer has Longbow, Sling and Throwing Set recipe definitions and an existing native crafting screen. Those routes use older broad material families, six-band crafting calculations and Essence fees. The new plan below has not yet been implemented; this is not a new playtest or delivery claim.
+
+**Retained decisions:** Longbow is **Pierce · Far**, Sling **Crush · Far**, and Throwing Set **Rend · Far**. Each occupies the ordinary weapon slot. Maintained projectiles are part of the weapon: no ammunition inventory, replenishment, retrieval roll, durability or extra attack is added.
+
+**Design-authored first-pass choices:** Fen's foundation becomes **30 Essence, 6 Logs, 2 Cord and 2 Resin** after recruitment, replacing the older 110-Essence legacy-material foundation. All three families and ordinary refit are included at the built shop. There is no extra pattern fee, Study, paid research root, attending-keeper requirement or new Bowyer tier for these recipes. Ordinary crafting and refit cost **0 Essence**, regardless of input quality. Fen's existing recruitment/story timing stays unchanged; these are base construction prices, subject to existing applicable staffing rules.
+
+### All three complete recipes
+
+Choose one listed alternative within each working part or support. Every other ingredient in its row is required.
+
+| Weapon | Working material | Complete supports |
+| --- | --- | --- |
+| Longbow | Maintained points: 1 Iron Ingot **or** 2 Quartz **or** 1 Bone | 2 Hardwood Logs, 1 Resin, 1 Cord |
+| Sling | Shot: 2 Clay + 1 Coal **or** 1 Iron Ingot **or** 1 Bone | 2 Cord; pouch of 1 Cloth **or** 1 Leather |
+| Throwing Set | Two edges, each independently 1 Iron Ingot **or** 1 Bone | Carrier of 1 Cloth **or** 1 Leather, plus 1 Cord |
+
+Fen shapes and laminates Hardwood into the Longbow's bending limbs. Softwood, a generic Timber sample or ordinary Bone is not automatically a suitable spring limb. Hardwood is the explicit first-pass material choice; there is no new hidden springiness threshold or seasoning timer. The added points are a deliberate component change: Bone makes a hard point without pretending every bone can bend into a bow. They stay part of the maintained weapon, not a separate arrow stockpile.
+
+Clay is shaped and fired during the Sling craft using its Coal; no fired-shot inventory or new kiln building appears. Metal and Bone shot need no extra Coal. Soft cloth is a pouch, never the hard shot. Quartz is allowed for Longbow points, not slicing Throwing edges. The two edges may differ, but still produce one maintained weapon and one ordinary attack per action.
+
+All prepared materials are the same shared Tannery/Forge stock. Different-colour Cord, Cloth, Leather, Logs and Bone retain their actual components and source histories. No matching-colour chore or invented averaged material is added. Ordinary world/plant materials stay ungraded. Bone and Leather keep their actual source quality, and an old same-name sample does not silently become a new typed material.
+
+### How the weapons perform
+
+| Working choice | New weapon Power before final rounding |
+| --- | ---: |
+| Iron Ingot point, shot or one throwing edge | 2.0 |
+| Quartz Longbow points | 1.75 |
+| Fired Clay Sling shot | 1.5 |
+| Bone working piece | 3 × (0.5 + actual skeletal Density ÷ 200) × its quality multiplier |
+
+Bone multipliers remain 0.75/1/1.25/1.5 for Poor/Common/Rare/Exceptional. Longbow and Sling use their working group's result. Throwing Set averages its two edge contributions; it does not double the damage. Round final Power once to the nearest quarter, with the existing one-decimal preview. Power is an equipment contribution, not a promise of that much final HP loss.
+
+These first-pass ranged values account for Far reach's existing tactical benefit. They sit below comparable Forge working values without adding another ranged penalty to combat. Existing damage matchups, formation, action timing and skill rules remain. Supports add no hidden Initiative, ward, HP, damage bonus or automatic affliction.
+
+Workmanship uses the accepted 70% working parts / 30% designated structural supports rule. Ungraded inputs count as Fine; Bone or Leather uses its actual band. Longbow's working group is its maintained points, with limbs and string as supports. Sling's supports are cords and pouch; Throwing Set's are carrier and ties. Resin and Coal do not vote. This does not change Tannery's separate rule that minor garment closures have no quality vote.
+
+For example, Common Bone with Density 60 makes a **2.5-Power Fine Longbow**. Rare Bone at 60 makes a **3.0-Power Superior Sling** with a Cloth pouch. A Throwing Set with Poor Bone at 20 and Exceptional Bone at 80 makes **2.75 Power**; its workmanship is Fine with Cloth/Cord support or Superior with an Exceptional Leather carrier. The actual two bones stay distinct. Ordinary crafting/refit does not produce Peerless.
+
+All three physical weapons use the accepted **one-weapon, one-excursion coating** rule. One bottle prepares the maintained weapon, not one projectile. Hits, misses, encounters and reopening do not consume it; ending the excursion does. Individual target afflictions keep their own durations and cures. This adds no new preparation location, free coating or one-strike exception.
+
+### Prices, recovery and refit
+
+New weapons sell for their actual recoverable components' recorded sale value and cost twice that to buy, as in Forge and Tannery. Existing owned weapons and old material lots keep their frozen values.
+
+| Complete weapon | New sale / buy |
+| --- | --- |
+| Ingot Longbow | 9 / 18 Gold |
+| Quartz Longbow | 17 / 34 Gold |
+| Bone Longbow, Poor/Common/Rare/Exceptional | 7/9/13/21 sale; buy twice |
+| Clay Sling with Cloth pouch | 6 / 12 Gold |
+| Ingot Sling with Cloth pouch | 8 / 16 Gold |
+| Bone Sling with Cloth pouch | 6/8/12/20 sale; buy twice |
+| Two-Ingot Throwing Set with Cloth carrier | 11 / 22 Gold |
+| Two same-band Bone edges with Cloth carrier | 7/11/19/35 sale; buy twice |
+
+A Leather pouch/carrier changes the price by that exact Leather piece's recorded value minus the replaced Cloth's 2 Gold. Mixed edges use their actual individual prices. No extra quality, species or colour premium is multiplied on top.
+
+Dismantling returns the selected construction materials once; Coal never returns. Selected Clay returns under the game's component-recycling convention without creating an unfiring recipe or extra shot item. Prepared Cloth/Cord/Leather/Ingots return intact, not their raw ancestors as well. Resin follows the existing recoverable construction-material rule. Older equipment keeps its own supported recovery policy. No ammunition is returned as a second reward.
+
+Ordinary refit replaces a complete selected part, pays its new inputs and returns the old recoverable part once. The weapon keeps its exact identity, family, damage type and Far reach, with stats and price recalculated from the final components. Throwing edges can be replaced independently. Repeating a refit cannot stack Power, duplicate a weapon or restore a previous excursion's coating. Old items without a compatible construction record keep their existing supported service path; missing new Longbow points are not guessed into them.
+
+### Progression and shared producers
+
+A **Clay Sling** needs Tannery stock, ordinary Clay and Coal, without animals or Forge upgrades. A Longbow's Hardwood comes from an appropriate Axe-2 tree; metal points come from Forge T2, Quartz from its specified Pick-2 source, and Bone from the existing planned skeleton reward. Throwing Set also has a fully animal-free Ingot route. None requires Pick 3, a new Bowyer facility or a guaranteed material placement.
+
+At base prices, Corrin's foundation, Fen's foundation and a Clay/Cloth Sling total **50 Essence, 12 Logs, 6 Clay, 16 Fibre, 2 Resin and 1 Coal**. A full shop/tool route to an Ingot Longbow, including Forge T1/T2 and Axe 2, totals **90 Essence, 22 Iron, 2 Coal, 23 Logs (at least 2 Hardwood), 16 Fibre, 8 Clay and 3 Resin**. These staged production totals exclude recruitment/search/Binding costs; they are not an opening shopping list or completed affordability playtest.
+
+Fen retains ownership of future Plank/Haft shaping, but this batch adds no unused processing menu. Longbow limbs are shaped in their actual craft, and Forge's early raw-Log recipes do not gain a retroactive Haft prerequisite. Weaponsmith is the next complete shop batch and will close its own useful Haft and fitting choices.
+
+**Still needed:** implement the complete new Bowyer recipes/calculator, shared typed producer dependencies, actual combat projection, prices, refit/recovery and save/custody behavior. The three weapon families move together. Existing Mote/Peerless and broader creature-anatomy questions remain separate grouped work; this first pass adds no individual recipe approval homework.
+
 ## Every remaining shop and crafting system
 
 The sequence below follows material dependencies. It includes services and processing that do not appear as ordinary recipe cards.
 
 | System | Complete scope of its batch | Main correction or dependency |
 | --- | --- | --- |
-| Bowyer | Longbow, Sling, Throwing Set | Three far-reaching damage choices; suitable limbs, Cord, projectiles and carriers, without ammunition chores |
 | Weaponsmith | Fitted Point, Fitted Edge, Fitted Maul, Fitted Polearm | Useful specialist fittings and explicit damage/reach choices; compare all four against Blacksmith gear |
 | Armoury | Rigid, Insulated and Balanced rebuilds across the five protective slots | Show actual Protection/ward tradeoffs and preserve the piece being rebuilt |
 | Equipment improvement and recovery | Reforge, component replacement, Peerless refinement, recycling | One explanation of identity, improvement, fees and recoverable components; no repeated bonus or material duplication |
