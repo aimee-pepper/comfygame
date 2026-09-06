@@ -4,7 +4,7 @@
 
 [The current creature decisions](design-decisions-september-4.html) now record the complete first-pass disposition of the old material families. Actual Fur Pelt, Scales, Chitin/Chitin Plate, Shell, Protective Spines, Flight/Contour Feathers and useful Horns have a specified source, quantity, four-band quality, full colour/Pattern, Return and trade path. Body covering and appendages remain separate, with no duplicate tissue rewards. Implementation is pending.
 
-The older six-band, generic Plate/Fin and automatic Oil/Venom/Ichor rules formerly on this page are superseded for new production. Existing worlds and inventory retain their actual saved behavior and provenance. Tooth/claw/tusk parts, separate Down, fin/membrane measurements, real fluid tissues and additional equipment recipes remain unfinished. A toxic or glowing creature does not automatically yield usable venom or pigment.
+The older six-band, generic Plate/Fin and automatic Oil/Venom/Ichor rules formerly on this page are superseded for new production. Existing worlds and inventory retain their actual saved behavior and provenance. A new first-pass proposal now specifies tooth/claw/tusk parts, separate Down, measured fin/membrane sheets and actual fluid chemistry, with narrow optional equipment/preparation uses. These need new anatomical producers and are not implemented. Other solid-part equipment roles and natural source prevalence remain unfinished. A toxic or glowing creature does not automatically yield usable venom or pigment.
 
 The [complete crafting plans](crafting-shop-overhaul.html) already use Resin, Toxic Sap and Dyer's Root without needing those unfinished fluids. No generic new material is silently interchangeable with Bone, Leather, Cloth or Ingots.
 
@@ -15,3 +15,5 @@ The complete first-sight/Look/encounter/reward/Return/Library discovery journey 
 The new food/habitat/shelter proposal defines supported low-leaf/fungal forage and smaller-prey relations at generation, with actual local access and no circular food chain. It also requires a real structure and use relationship before nest/den ownership is claimed. This is unimplemented generation consistency, not hunger, breeding, feeding AI or a population simulation; other diets, natural support and shelter behavior remain open.
 
 The three goals in [Aimee's creature checklist](aimee-homework.html) stay unchecked, with this recorded as partial Design progress rather than a finished generator or another individual approval chore.
+
+The new climate/observation proposal keeps cold/hot/wet/air and flora tendencies separate from actual survival, material anatomy and food evidence. A future Bestiary note may remember weather genuinely presented at a sighting, without claiming immunity or revealing hidden creatures. Dynamic wetting, migration and seasonal breeding remain unselected proposals; no climate simulation is enabled.

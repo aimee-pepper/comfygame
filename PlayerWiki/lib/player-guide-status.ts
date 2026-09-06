@@ -52,9 +52,9 @@ export const worldMaterialFamilies = [
 export const creatureMaterialFamilies = [
   ['Hide', 'Short, soft, or bare skin prepared for wrapping and tanning.'],
   ['Pelt', 'Hide with long, dense fur still attached.'],
-  ['Down', 'A separate soft underfeather layer; the new typed source still needs actual layer anatomy.'],
+  ['Down', 'A separate soft body-feather layer. Its source and optional Insulated lining use are proposed, not implemented.'],
   ['Feather', 'A developed vane or flight feather.'],
-  ['Fin', 'Legacy projected family. The new source must resolve its actual membrane or rigid part; no generic Fin token.'],
+  ['Fin', 'Legacy projected family. The new proposal recovers Membrane only from a real measured skin web; solid fleshy fins give no generic token.'],
   ['Scale', 'Overlapping individual hard covering.'],
   ['Plate', 'Legacy projected family. New anatomy resolves Armoured Scales, Chitin Plate or actual Shell rather than universal Plate.'],
   ['Chitin', 'A segmented, jointed hard case.'],
@@ -65,9 +65,9 @@ export const creatureMaterialFamilies = [
   ['Claw', 'Requires actual claw anatomy; rending damage or limbs alone do not establish a new typed source.'],
   ['Tusk', 'Requires an actual tusk; crushing damage alone does not establish a new typed source.'],
   ['Horn', 'A cranial horn used as bracing or crushing stock.'],
-  ['Oil', 'New production needs actual oily tissue or secretion; water habitat and insulation are insufficient.'],
-  ['Venom', 'New production needs actual recoverable venom anatomy; contact toxicity alone is insufficient.'],
-  ['Ichor', 'New production needs a real defined body fluid and chemistry; emanation does not establish fluid or pigment.'],
+  ['Oil', 'Proposed actual oil reservoir and combustible chemistry, with an optional Heat Core use; not implemented. Water and insulation are insufficient.'],
+  ['Venom', 'Proposed gland, duct, injection structure and Poison-preparation chemistry; not implemented. Contact toxicity alone is insufficient.'],
+  ['Ichor', 'Proposed dye-bearing body fluid with explicit Magenta chemistry; not implemented. Emanation does not establish fluid or pigment.'],
 ] as const;
 
 export const lootPaths = [
@@ -123,26 +123,27 @@ export const lootPaths = [
 ] as const;
 
 const apothecaryChanges: CraftingChange[] = ([
-  ['Lesser Salve', 'One flexible sample at 25 or better, plus 1 Resin.', "Complete first pass: 1 Resin + 1 Stem/Leaf Fibre; 0 Essence; existing healing effect."],
-  ['Salve', 'One insulating sample at 40 or better, plus 2 Pulp, 1 Spore, and 1 Resin.', "Complete first pass: 1 Cloth + 2 Soothing Leaf + 1 Resin; 0 Essence."],
-  ['Greater Salve', 'One reactive sample at 60 or better, plus 1 Ichor, 2 Spore, and 2 Resin.', "Complete first pass: 1 Cloth + 2 Soothing Leaf + 2 Restorative Spore + 2 Resin; 0 Essence."],
-  ['Clearing Draught', 'One reactive sample at 35 or better, 1 Pulp, and 1 Salt.', "Complete first pass: 1 Bitter Root + 1 Salt; 0 Essence."],
-  ['Quenching Draught', 'One insulating sample at 45 or better, 1 Reagent, and 1 Resin.', "Complete first pass: 2 Soothing Leaf + 1 Salt; 0 Essence; presented as Quenching Balm."],
-  ['Broad Antidote', 'One reactive sample at 65 or better, 1 Ichor, 1 Reagent, and 1 Spore.', "Complete first pass: 1 Bitter Root + 1 Restorative Spore + 1 Salt; 0 Essence."],
-  ['Stonebark Tonic', 'One hard sample at 45 or better, 1 Timber, and 1 Resin.', "Complete first pass: 1 Tough Bark + 1 Resin; 0 Essence."],
-  ['Venom coating', 'One reactive sample at 55 or better, 1 Toxin, and 1 Fibre.', "Complete first pass: 1 Toxic Sap + 1 Stem/Leaf Fibre; 0 Essence; exact weapon retains coating for the excursion."],
-  ['Firebrand', 'One reactive sample at 60 or better, 1 Reagent, and 1 Sulfur.', "Complete first pass: 1 Sulfur + 1 Resin; 0 Essence; exact weapon retains coating for the excursion."],
-  ['Briar Oil', 'One flexible sample at 50 or better, 1 Fibre, and 1 Resin.', "Complete first pass: 2 Stem/Leaf Fibre + 1 Resin; 0 Essence; mixed sources allowed; coating lasts the excursion."],
-  ['Flashsalt', 'One lustrous sample at 55 or better, 1 Reagent, and 1 Mercury.', "Complete first pass: 1 Quartz + 1 Sulfur + 1 Salt; 0 Essence; coating lasts the excursion."],
-  ['Solvent', 'One reactive sample at 40 or better, 1 Reagent, and 1 Salt.', "Complete first pass: 1 Bitter Root + 1 Sulfur; 0 Essence."],
-  ['Lure', 'One reactive sample at 50 or better, 1 Toxin, and 1 Pulp.', "Complete first pass: 1 Aromatic Leaf + 1 Stem/Leaf Fibre; 0 Essence."],
-  ['Stillwater', 'One lustrous sample at 60 or better, 1 Rift-glass, 1 Mercury, and 6 Essence.', "Complete first pass: 1 Rift-glass + 1 Mercury + 6 Essence."],
-  ['Waystone', 'One hard sample at 70 or better, 1 Rift-glass, 1 Mote, and 12 Essence.', "Complete first pass: 1 Rift-glass + 1 Quartz + 12 Essence + 1 Mote."],
-  ['Torch', 'One reactive sample at 30 or better, 1 Resin, and 2 Timber.', "Complete first pass: 1 Resin + 1 Log + 1 Stem/Leaf Fibre; 0 Essence."],
-  ['Farsight Draught', 'One lustrous sample at 50 or better, 1 Quartz, and 1 Ichor.', "Complete first pass: 1 Quartz + 1 Restorative Spore; 0 Essence."],
-  ['Scent Mask', 'One individual creature Hide, Pelt, Down, or Oil, plus 1 Reagent.', "Complete first pass: 2 Aromatic Leaf + 1 Resin; 0 Essence."],
-  ['Seamlight', '1 Quartz, 1 Resin, and 1 Fibre. It can be made; Field Kit use is unverified for the current phone build.', "Complete first pass: 1 Quartz + 1 Resin + 1 Stem/Leaf Fibre; 0 Essence; guides toward a portal without creating light."],
+  ['Lesser Salve', "Delivered in build322: 1 Resin + 1 Stem/Leaf Fibre; 0 Essence; existing healing effect.", "Complete first pass: 1 Resin + 1 Stem/Leaf Fibre; 0 Essence; existing healing effect."],
+  ['Salve', "Delivered in build322: 1 Cloth + 2 Soothing Leaf + 1 Resin; 0 Essence.", "Complete first pass: 1 Cloth + 2 Soothing Leaf + 1 Resin; 0 Essence."],
+  ['Greater Salve', "Delivered in build322: 1 Cloth + 2 Soothing Leaf + 2 Restorative Spore + 2 Resin; 0 Essence.", "Complete first pass: 1 Cloth + 2 Soothing Leaf + 2 Restorative Spore + 2 Resin; 0 Essence."],
+  ['Clearing Draught', "Delivered in build322: 1 Bitter Root + 1 Salt; 0 Essence.", "Complete first pass: 1 Bitter Root + 1 Salt; 0 Essence."],
+  ['Quenching Draught', "Delivered in build322: 2 Soothing Leaf + 1 Salt; 0 Essence; presented as Quenching Balm.", "Complete first pass: 2 Soothing Leaf + 1 Salt; 0 Essence; presented as Quenching Balm."],
+  ['Broad Antidote', "Delivered in build322: 1 Bitter Root + 1 Restorative Spore + 1 Salt; 0 Essence.", "Complete first pass: 1 Bitter Root + 1 Restorative Spore + 1 Salt; 0 Essence."],
+  ['Stonebark Tonic', "Delivered in build322: 1 Tough Bark + 1 Resin; 0 Essence.", "Complete first pass: 1 Tough Bark + 1 Resin; 0 Essence."],
+  ['Venom coating', "Delivered in build322: 1 Toxic Sap + 1 Stem/Leaf Fibre; 0 Essence; exact weapon retains coating for the excursion.", "Complete first pass: 1 Toxic Sap + 1 Stem/Leaf Fibre; 0 Essence; exact weapon retains coating for the excursion."],
+  ['Firebrand', "Delivered in build322: 1 Sulfur + 1 Resin; 0 Essence; exact weapon retains coating for the excursion.", "Complete first pass: 1 Sulfur + 1 Resin; 0 Essence; exact weapon retains coating for the excursion."],
+  ['Briar Oil', "Delivered in build322: 2 Stem/Leaf Fibre + 1 Resin; 0 Essence; mixed sources allowed; coating lasts the excursion.", "Complete first pass: 2 Stem/Leaf Fibre + 1 Resin; 0 Essence; mixed sources allowed; coating lasts the excursion."],
+  ['Flashsalt', "Delivered in build322: 1 Quartz + 1 Sulfur + 1 Salt; 0 Essence; coating lasts the excursion.", "Complete first pass: 1 Quartz + 1 Sulfur + 1 Salt; 0 Essence; coating lasts the excursion."],
+  ['Solvent', "Delivered in build322: 1 Bitter Root + 1 Sulfur; 0 Essence.", "Complete first pass: 1 Bitter Root + 1 Sulfur; 0 Essence."],
+  ['Lure', "Delivered in build322: 1 Aromatic Leaf + 1 Stem/Leaf Fibre; 0 Essence.", "Complete first pass: 1 Aromatic Leaf + 1 Stem/Leaf Fibre; 0 Essence."],
+  ['Stillwater', "Delivered in build322: 1 Rift-glass + 1 Mercury + 6 Essence.", "Complete first pass: 1 Rift-glass + 1 Mercury + 6 Essence."],
+  ['Waystone', "Delivered in build322: 1 Rift-glass + 1 Quartz + 12 Essence + 1 Mote.", "Complete first pass: 1 Rift-glass + 1 Quartz + 12 Essence + 1 Mote."],
+  ['Torch', "Delivered in build322: 1 Resin + 1 Log + 1 Stem/Leaf Fibre; 0 Essence.", "Complete first pass: 1 Resin + 1 Log + 1 Stem/Leaf Fibre; 0 Essence."],
+  ['Farsight Draught', "Delivered in build322: 1 Quartz + 1 Restorative Spore; 0 Essence.", "Complete first pass: 1 Quartz + 1 Restorative Spore; 0 Essence."],
+  ['Scent Mask', "Delivered in build322: 2 Aromatic Leaf + 1 Resin; 0 Essence.", "Complete first pass: 2 Aromatic Leaf + 1 Resin; 0 Essence."],
+  ['Seamlight', "Delivered in build322: 1 Quartz + 1 Resin + 1 Stem/Leaf Fibre; 0 Essence; guides toward a portal without creating light.", "Complete first pass: 1 Quartz + 1 Resin + 1 Stem/Leaf Fibre; 0 Essence; guides toward a portal without creating light."],
 ] as const).map(([name, current, accepted]) => ({ name, current, accepted }));
+
 
 export const craftingFamilyStatus: CraftingFamilyStatus[] = [
   {
@@ -160,8 +161,8 @@ export const craftingFamilyStatus: CraftingFamilyStatus[] = [
   {
     slug: 'apothecary',
     name: 'Apothecary',
-    status: 'Partly playable',
-    current: 'Nineteen preparations can be learned and made. Scent Mask and Seamlight Field Kit use has not yet been verified for the current phone build.',
+    status: 'Playable now',
+    current: 'All nineteen actual-ingredient preparations, acquisition learning, named sources, source colour and full-excursion exact-weapon coatings are delivered. The separately labelled legacy route preserves older stock.',
     accepted: 'Keep all nineteen results and their completed Field uses, while replacing arbitrary hidden-property samples with recognizable physical ingredients.',
     changes: apothecaryChanges,
   },
@@ -295,7 +296,7 @@ export function craftingStatusFor(slug: string) {
 export function futureResourceCopy(name: string) {
   if (name === 'Raw Essence') return 'Raw Essence remains a quality-free precursor. Return it to the Cottage and refine it at the Essence Spring.';
   if (name === 'Mote') return 'Motes remain permanent Reality currency, with no material quality or storage slot.';
-  if (name === 'Ichor') return 'New Ichor production still needs actual creature-fluid anatomy and chemistry. Emanation alone is insufficient. Existing stock keeps its supported uses and provenance; no creature source is invented.';
+  if (name === 'Ichor') return 'A proposed dye-bearing Ichor source now requires actual fluid anatomy and explicit Magenta chemistry. It is not implemented; emanation alone is insufficient. Existing stock keeps its supported uses and provenance.';
   if (name === 'Rubble') return 'Rubble will remain a simple, ungraded mixed find. Noll’s Recycler will separate selected Rubble into materials supported by its source region: mostly common finds, less-frequent uncommon finds, and only a small chance of a rare local bonus.';
   if (['Clay', 'Ore', 'Iron Ore', 'Copper', 'Silver', 'Gold', 'Quartz', 'Obsidian', 'Salt', 'Sulfur', 'Mercury', 'Adamant', 'Rift-glass'].includes(name)) {
     const intendedName = name === 'Ore' || name === 'Iron Ore' ? 'Iron' : name;

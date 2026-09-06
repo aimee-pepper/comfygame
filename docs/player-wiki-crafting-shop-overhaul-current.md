@@ -4,27 +4,27 @@ Updated 6 September 2026. This is the complete crafting review you requested, be
 
 ## What the review found
 
-Stone tools lead to useful raw-material equipment. Blacksmith T2 introduces Ingots, while Tannery textiles provide a parallel route into clothing and later specialist components. The later recipes still contain older rules that do not fit that sequence. The Apothecary now has a complete first-pass recipe-and-source plan; implementation remains pending. The Forge now also has its complete first-pass family/tool/material plan. The Tannery also has its complete first-pass textile, Leather, clothing and carrying plan below. The Bowyer, Weaponsmith and Armoury now also have complete first-pass plans, followed by shared equipment services, the full Survey Post, Scriptorium/Writing Desk, Distillery and Channelworks plans below. Subsequent shops continue as complete batches, including gathering, item effects, prices and recycling.
+Stone tools lead to useful raw-material equipment. Blacksmith T2 introduces Ingots, while Tannery textiles provide a parallel route into clothing and later specialist components. The later recipes still contain older rules that do not fit that sequence. The complete Apothecary recipe/source batch is delivered in phone build322, installed and ordinarily launched on6 September. The Forge now also has its complete first-pass family/tool/material plan. The Tannery also has its complete first-pass textile, Leather, clothing and carrying plan below. The Bowyer, Weaponsmith and Armoury now also have complete first-pass plans, followed by shared equipment services, the full Survey Post, Scriptorium/Writing Desk, Distillery and Channelworks plans below. Subsequent shops continue as complete batches, including gathering, item effects, prices and recycling.
 
 The biggest corrections are:
 
 - An unrelated material should not become medicine just because it has a high Insulation or Reactivity number. New recipes should ask for recognizable ingredients that actually do the job.
-- Coatings are intended to last an entire excursion. Recent ingredient updates preserved the current one-strike rule temporarily; that did not change the agreed destination.
+- Coatings now last an entire excursion in build322. Earlier ingredient bridges temporarily retained the old one-strike rule; that lifetime is superseded.
 - Material quality, workmanship and actual equipment statistics must remain distinct. A better-looking grip must not secretly multiply blade Power a second time.
 - Prepared Cord, Cloth, Leather and Ingots need useful consumers. Starter gear should not require a long chain of specialist buildings.
 - Making, selling and recycling must use consistent values and return the actual recoverable components, without also returning the raw materials used to prepare them.
 
 ## Apothecary — all 19 preparations
 
-**Current behavior:** the shop has 19 recipes, including Seamlight and Scent Mask. Lesser Salve has its new Resin-and-Plant-Fibre path. Briar Oil’s new selection is reported delivered in phone build 310 alongside its older recipe. The complete new recipe/source batch below is not implemented or delivered; Venom’s isolated ingredient update has not been implemented.
+**Current behavior:** the shop has 19 recipes, including Seamlight and Scent Mask. Lesser Salve has its new Resin-and-Plant-Fibre path. Briar Oil’s new selection is reported delivered in phone build 310 alongside its older recipe. These describe the older phone route. Build322 now delivers all19 new recipes and full-excursion coatings, with39 focused checks and4 native routes reported passed. The separately labelled legacy recipe route preserves supported older stock.
 
 **Decided intended behavior:** recognizable physical ingredients replace unrelated property requirements. Ordinary preparations cost no Essence; Stillwater and Waystone retain their explicit supernatural costs. Standardized preparations do not gain colour, quality or potency from the selected ingredients. Prepared goods remain stored or claimable until deliberately packed.
 
-**Design-authored first-pass production plan:** the whole shop now has exact recipes and named sources. This closes the earlier unnamed-ingredient proposals as a complete implementation plan. The new plant names, quantities, source frequency and learning choices are Game Design’s revisable first-pass tuning under your shop-overhaul direction; they are not claims that you personally approved each row, or that these changes are already playable.
+**Design-authored first-pass production plan:** the whole shop now has exact recipes and named sources. This closes the earlier unnamed-ingredient proposals as a complete implementation plan. The new plant names, quantities, source frequency and learning choices are Game Design’s revisable first-pass tuning under your shop-overhaul direction; they are not claims that you personally approved each row, or permanently balanced. The full recipe/source batch is now delivered in build322.
 
 Each row makes one item. Existing ordinary recipes cost 0 Essence; existing Stillwater also costs 6 Essence and Waystone costs 12 Essence plus 1 Mote. Those fees are included explicitly in the new recipe column. A property material in the existing recipe is a separate ingredient. Base healing/status values still follow the existing character, prevention and cure rules.
 
-| Preparation | Existing recipe | What it does; ordinary sale value | New first-pass recipe, not yet delivered |
+| Preparation | Legacy recipe | What it does; ordinary sale value | Current recipe, delivered in build322 |
 | --- | --- | --- | --- |
 | Seamlight | Quartz 1, Resin 1, Fibre 1 | Portal guidance; 5 | 1 Quartz, 1 Resin, 1 Plant Fibre |
 | Scent Mask | Reagent 1, selected Hide/Pelt/Down/Oil 1 | Scent interference, base 12 world turns; 2 | 2 Aromatic Leaf, 1 Resin |
@@ -88,7 +88,7 @@ Batch preparation must spend the exact chosen quantities once and leave the fini
 
 ### All four weapon coatings
 
-**Current behavior:** Venom, Firebrand, Briar Oil and Flashsalt use up their prepared coating on the next successful applicable strike. A miss retains it.
+**Current behavior, delivered in build322:** Venom, Firebrand, Briar Oil and Flashsalt remain prepared on their exact weapon for the entire excursion. Hits, misses, encounters and reopening do not consume them; ending the excursion does. The former one-strike lifetime is superseded.
 
 **Decided intended behavior:** one preparation lasts exactly one world excursion on the chosen weapon. It survives travel, encounters and reopening the game during that excursion. Strikes and elapsed time do not consume it. Returning home or otherwise ending the excursion ends the preparation; it cannot carry into another world or jump to another weapon.
 
@@ -191,7 +191,7 @@ Glass remains planned until its consuming system is ready; empty processing step
 
 ## Tannery — the complete textile, Leather, clothing and carrying plan
 
-**Current behavior:** early Cord, Cloth, Leather, woven garments, Leather Guard and carrying improvements have reported implementations. The current processing routes require matching Fibre and two matching Hide portions for Leather. Older sample-based clothing recipes also exist. The complete replacement described here is **not yet implemented**.
+**Current behavior:** early Cord, Cloth, Leather, woven garments, Leather Guard and carrying improvements have reported implementations. Build322 adds ordered mixed Stem/Leaf Cord and Cloth while preserving each constituent’s colour. Leather still uses two matching Hide portions; its new one-portion recipe and full garment/refit batch remain pending. Older sample-based clothing recipes also exist. The complete replacement described here is **not yet implemented**.
 
 **Retained decisions:** Corrin makes flexible foundational clothing and prepared stock shared with other shops. Her foundation costs **20 Essence, 6 Logs, 4 Clay and 4 Plant Fibre** after recruitment. Ordinary preparation, garment crafting and the refit described below cost **no Essence**. Woven clothing and carrying remain available before Leather or Ingots. Bought capacity and existing owned items stay yours.
 
@@ -856,7 +856,7 @@ The complete Scriptorium plan above now supplies the ink/Pulp/material review an
 
 ## Keeping accepted decisions intact
 
-The one-strike coating rule remained in the game while its replacement was unfinished. The newer ingredient plans then mistakenly instructed Engineering to preserve that old lifetime without naming it as temporary. Those instructions have now been withdrawn from future work; the accepted destination remains one full excursion.
+The one-strike coating rule remained in the game while its replacement was unfinished. The newer ingredient plans then mistakenly instructed Engineering to preserve that old lifetime without naming it as temporary. Those instructions were withdrawn from future work; build322 now implements the accepted full-excursion lifetime.
 
 For each shop, Design will compare its proposed ingredients, item effects, progression and costs with the accepted decisions before handing it over. Any old behavior deliberately kept must say whether it is still intended or temporary until a named replacement. Conflicting older instructions will be marked superseded, and the replacement will be included in the ordinary implementation checks. This does not add another phone-delivery verification step.
 
@@ -867,3 +867,7 @@ The actual crafting choice still waiting on you is **what a spent Mote should bu
 Recipe quantities, individual Bone roles, the named ingredient catalogue, shop prices and recovery tables are Design work. We will bring you a grouped question if a broader player-experience choice needs your preference, rather than asking you to approve one recipe after another.
 
 See [Aimee Homework](aimee-homework.html) for that choice and your creature-generator goals. See [the existing decisions](design-decisions-september-4.html) for the wider world, material and early-progression plan.
+
+## Optional creature-material extensions — proposal, not implemented
+
+The [creature decisions](design-decisions-september-4.html) now define actual Fang/Claw/Tusk weapon parts, Down for Insulated lining, measured Membrane for Leather, and chemically qualified Oil, Venom and dye-bearing Ichor for optional preparations. These require real new anatomical sources and their exact recipe adapters. Existing Bone/metal/textile, Resin, Toxic Sap and Dyer's Root routes remain sufficient; none of these alternatives blocks the complete ordinary shops. Source colour/Pattern stays with selected components. Fluid quality does not increase Core potency or coating damage, and Venom preparation remains on its weapon for the full excursion.

@@ -4,11 +4,17 @@ This is the current record of the changes agreed today. **Decided intended behav
 
 ## Whole-shop update · 5 September
 
-Complete first-pass plans now cover all 19 Apothecary preparations, Forge, Tannery, Bowyer, Weaponsmith and Armoury; replacement implementation remains queued. [Crafting Overhaul · Shop by Shop](crafting-shop-overhaul.html) records the complete scope, current rules, accepted destination and the complete first-pass recipes, producers and services for those six makers, now including shared ordinary equipment services, the complete Survey Post, Scriptorium/Writing Desk, Distillery and nine-configuration Channelworks plans. It supersedes isolated next-recipe assignments. The ingredient bridges below are temporary compatibility steps; they do not settle the final recipes or replace the accepted excursion-long coating lifetime.
+Complete first-pass plans now cover all 19 Apothecary preparations, Forge, Tannery, Bowyer, Weaponsmith and Armoury; the complete Apothecary implementation now has Engineering-reported focused and native checks, and is delivered in phone build322. The remaining full maker routes are still pending. [Crafting Overhaul · Shop by Shop](crafting-shop-overhaul.html) records the complete scope, current rules, accepted destination and the complete first-pass recipes, producers and services for those six makers, now including shared ordinary equipment services, the complete Survey Post, Scriptorium/Writing Desk, Distillery and nine-configuration Channelworks plans. It supersedes isolated next-recipe assignments. The ingredient bridges below are temporary compatibility steps; they do not settle the final recipes or replace the accepted excursion-long coating lifetime.
+
+## Apothecary implementation progress · 6 September
+
+**Current behavior: the full batch is delivered in phone build322, installed and ordinarily launched on6 September.** All19 recognizable-ingredient recipes, finite named plant/mineral sources, acquisition learning, source colour/Pattern retention and all four full-excursion weapon coatings are included. The reported checks cover39 focused cases and4 native routes, including harvesting Bitter Root, returning home, learning and preparing its medicine. Shared mixed Cord/Cloth and advanced Forge/tool dependencies are included; the full Tannery garment, pricing/refit and wider equipment-composition journeys remain pending. Older books keep their existing contents.
+
+The older recipes and ingredient bridges below are historical compatibility references; the delivered whole-shop recipes are current. The animal-material alternatives in the new creature proposal are separate future work and are not part of this Apothecary batch.
 
 ## Wood, Hide, Apex labels and notices · 6 September
 
-**Status:** all four directions are accepted. Hide grouping is delivered in build 318, Apex labels in build 319 with their styling integrated in build 320, and notice controls in build 320. New-world wood colour through harvested Logs is delivered in build321; Hafts, finished equipment, refit/recovery and mixed-flora crafting remain pending.
+**Status:** all four directions are accepted. Hide grouping is delivered in build 318, Apex labels in build 319 with their styling integrated in build 320, and notice controls in build 320. New-world wood colour through harvested Logs is delivered in build321; Mixed Cord/Cloth is delivered in build322; Hafts and the complete finished-equipment/refit/recovery journey remain pending.
 
 **Wood comes from the world.** Trees are the main source of wood, with their actual world-derived wood colour carried into Logs, Hafts and the corresponding equipment parts. Leaves and changing light do not change the material's inherent colour. Smaller trees and fallen logs provide supporting early routes; an improved Axe must not become a circular requirement for getting its own wood.
 
@@ -18,13 +24,13 @@ Use **Logs**, **Softwood Logs** and **Hardwood Logs** consistently. Older stock 
 
 The visible woody stem and its harvested Logs now share one saved base colour for new-world sources. Leaves and changing illumination keep their separate roles; wood does not take its colour from how the leaves happen to look. Remembered trees retain their observed colour, and stock colour chips show the saved material colour. Legacy Logs retain their supported any-Log uses; older unknown colour stays unknown. Engineering reports build321 installed and ordinarily launched on6 September, with the native harvest/reopen route passing.
 
-**Decided, still pending:** carry that colour through the complete Haft, visible finished-equipment, refit and recovery journey. Build321 does not complete those whole-shop routes or the mixed-flora constituent journey. Colour itself changes no wood type, stats, price or yield.
+**Decided, still pending:** carry that colour through the complete Haft, visible finished-equipment, refit and recovery journey. Build322 now adds ordered mixed Cord/Cloth constituents, but does not complete those whole-shop equipment routes. Colour itself changes no wood type, stats, price or yield.
 
 **Flora colour — accepted clarification from Aimee, 6 September; full crafting journey pending:** harvested flora parts keep their actual source colour and pattern for crafting. Coloured Stem or Leaf Fibre carries that appearance into Cord strands, Cloth sections and the corresponding equipment bindings or woven panels. Choosing differently coloured ingredients preserves those separate contributions. Processing, returning home, reopening, refitting and recovering components must not silently replace their colours. This is visible material appearance, not just a source note.
 
 A part with its own colour keeps that colour rather than borrowing the colour of the whole plant. New harvestable parts need an explicit source-colour mapping; older unknown colours remain unknown. Flora stays ungraded, and colour alone adds no stats. Existing remedies keep their recognizable finished colours, while extracted pigments and ink follow their specific recipes; preserving a plant's colour does not make every plant a dye ingredient.
 
-**Named flora implementation mapping, not yet delivered:** Engineering has specified that the six Apothecary plant profiles retain the actual assigned plant species' complete colour and Pattern as the harvested part's inherited appearance. Existing Stem/Leaf/Tall Stem colours remain unchanged. No RGB colour is guessed where its approved visual mapping is absent; the source colour facts remain preserved for crafting.
+**Named flora source colours delivered in build322:** the six Apothecary plant profiles and Dyer’s Root retain their actual assigned plant species’ complete colour and Pattern through harvesting, Return and stock. Existing Stem/Leaf/Tall Stem colours remain unchanged; mixed Cord strands and Cloth sections now preserve their ordered actual constituents. No RGB colour is guessed where its approved visual mapping is absent; the source colour facts remain preserved for crafting.
 
 **Equivalent Hide — current in build 318:** Return, Storehouse and physical material selectors group equivalent portions by quantity, preserving their actual quality, useful properties and validated source colour. Genuine differences remain separate. Storehouse includes creature reserve stock and a quantity/source detail sheet. Individual ownership, provenance, destinations and exact recipe consumption remain intact. Engineering reports the native four-portions → process-two → two-remaining route passed and build 318 installed and launched on 6 September. The current Tannery recipe still consumes two portions; the later one-to-one Leather recipe is not claimed delivered by this display fix.
 
@@ -131,7 +137,7 @@ The game currently contains both older rules and delivered early-overhaul paths.
 | System | Current behavior |
 | --- | --- |
 | Blacksmith | The early overhaul has reported raw-Iron blade/tool and T2-ingot implementations. Older material-based Pointed Blade crafting remains separate. The earlier 30-Essence foundation and quality-based crafting fee describe the legacy route, not the replacement progression. |
-| Apothecary | The early overhaul has a reported 20-Essence foundation and Lesser Salve from Resin plus Plant Fibre. Briar Oil’s new material selection is reported delivered in phone build 310. Other older recipes remain; the whole-shop overhaul and excursion-long coatings are unfinished. |
+| Apothecary | The early overhaul has a reported 20-Essence foundation and Lesser Salve from Resin plus Plant Fibre. Briar Oil’s new material selection is reported delivered in phone build 310. Other older recipes remain; the complete19-recipe overhaul and excursion-long coatings are delivered in build322. |
 | Refinement | The complete new refinement journey is not available. This guide does not promise a paid Reforge improvement or a Mote-based Peerless attempt. |
 | First Writing | A fresh campaign currently begins with known symbols and starter World Pages. The learn-Illumination-and-Sun opening below is intended behavior. |
 | Scent Mask and Seamlight | Both can be prepared. Field Kit use has not yet been verified for the current phone build. Earlier descriptions disagreed about their availability; neither a working field action nor its absence is confirmed here. |
@@ -371,11 +377,11 @@ The creature's body will declare what it is actually made of before rewards are 
 | Feathered flying appendages | Flight Feathers | Actual supported Sky/winged body required |
 | Other feathered appendages | Contour Feathers | No flight claim |
 | Actual useful cranial horns | Horn | Meaningful crushing armament and a real horn, not any head ornament |
-| Actual membrane sheet | Membrane | Still needs its complete sheet measurements before collection is enabled |
+| Actual membrane sheet | Membrane | Complete sheet and Tannery proposal below; not implemented |
 
 The new covering choices are starting generation rules: coverage below15 supplies no primary covering; hard, long covering becomes protective spines; hard segmented/radial covering becomes chitin/shell; other hardness70 or more gives armoured scales,35 or more gives overlapping scales; dense long soft covering gives fur. These rules define the structure the new body will actually have. They are not an inventory screen guessing anatomy from appearance, and they do not rewrite old creatures.
 
-**Explicitly unfinished anatomy:** a piercing attack does not prove teeth, a rending attack does not prove claws, and crushing does not prove tusks. Down needs a real separate soft-feather layer. A fin needs its actual useful membrane or rigid-part mapping rather than a generic Fin token. Insulation does not prove recoverable Oil; contact toxicity does not prove Venom; an emanation does not prove Ichor. Those new typed rewards remain unavailable until their actual anatomy is defined. The creature keeps its real attacks and defenses.
+**Additional anatomy now specified as a proposal:** teeth/claws/tusks, a separate Down layer, fin/membrane sheets and actual fluid reservoirs/chemistry are detailed below. These require real new anatomical records. Damage, insulation, warning colour or emanation never substitutes for the missing part; the current creature keeps its real attacks and defenses.
 
 **Quantity and quality:** eligible new solid parts are recovered on the existing successful-victory reward route, with no new knife, harvesting turn, fee or separate chance roll. Body-covering portions use the existing1–4 size scale, feathers the existing1–4 size/appendage scale, and useful horns1–2 portions. These are material portions, not literal counts of wings or horns. Anatomy applies once; quantities1/2/3/4 become2/3/4/5. Bone keeps its separate1–3 base rule and Hide its own recovery rule.
 
@@ -383,9 +389,32 @@ Quality uses the actual part's two relevant source measurements: covering insula
 
 **Colour and Pattern:** each recovered part retains its actual specimen colour and Pattern, or its explicit part-specific colour when one exists. Pelt is not automatically brown, Feather white or Shell neutral. Exact source portions remain selectable beneath grouped stock and carry their appearance into any later supported crafting component. Old unknown colours stay unknown. New raw solid-part sale values start at2/4/8/16 by quality, with buy values twice sale; this does not create merchant stock or change older prices.
 
-**Real uses and remaining work:** source → reward → Return → storage → ordinary raw-material sale is specified for the ready solid parts above. Their additional equipment recipes are still Design work; they are not automatic substitutes for Bone, Leather, Ingot or Cloth. The complete Apothecary and Distillery recipes already use actual Resin/Toxic Sap, and new Magenta uses Dyer's Root, so unfinished creature fluids do not block those shops. Membrane needs a complete Tannery-compatible part record before becoming Leather.
+**Real uses and remaining work:** source → reward → Return → storage → ordinary raw-material sale is specified for the ready solid parts above. Their additional equipment recipes are still Design work; they are not automatic substitutes for Bone, Leather, Ingot or Cloth. The complete Apothecary and Distillery recipes already use actual Resin/Toxic Sap, and new Magenta uses Dyer's Root, so unfinished creature fluids do not block those shops. The conditional Membrane-to-Leather source and adapter are now specified below, pending implementation.
 
 No new distant-sighting record, hidden Bestiary reveal, food system, nest, weather immunity or deep-water harvesting is introduced. Recovered material can be associated with its actual known source; existing encounter records keep their measurements without requiring a victory. Food/nesting relationships, the remaining anatomy and equipment roles, and natural exploration/crafting feel remain open. All three creature homework goals therefore stay unchecked; this is concrete partial progress, not a claim that the generator is finished.
+
+### Remaining anatomical materials — first-pass proposal, not implemented
+
+The missing parts now have proposed physical definitions and optional crafting uses. **These require new actual anatomy records; the present attack types do not establish them.** A piercing creature may have no useful Fang, a toxic creature may have no Venom gland, and a glowing creature may have no dye-bearing fluid.
+
+| Actual source required | Proposed material | Narrow optional use |
+| --- | --- | --- |
+| A jaw-anchored elongated tooth with a usable point | Fang | A point for the Forge Pointed Blade, Longbow or Weaponsmith Pointed Weapon/Polearm |
+| A usable hard cutting claw on an actual limb | Claw | A Forge/Weaponsmith cutting edge, or either separately chosen Throwing Set edge |
+| A projecting tooth with a usable long point | Tusk | A Weaponsmith Polearm point |
+| A real separate soft body-feather layer | Down | The Armoury's Insulated lining:2 portions for Body,1 for Head/Hands/Feet, instead of that lining's Cloth |
+| A measured skin sheet on a membrane appendage or webbed fin | Membrane |1 Membrane +1 Salt makes1 Leather |
+| A real reservoir of suitable combustible oil | Creature Oil | Optional Heat Core:16 Essence,2 Sulfur and1 Oil; still potency60 |
+| A real Venom gland, duct and injection structure with suitable chemistry | Creature Venom | Optional Venom coating:1 Venom +1 Plant Fibre; the same full-excursion preparation |
+| Actual body fluid with extractable Magenta chemistry | Dye-bearing Ichor |1 portion makes4 Magenta pigment measures |
+
+Ordinary teeth and solid fleshy fins need no generic stock token. Fins only provide Membrane when they actually have a useful skin web. A tusk is not also a Fang; one feathered body region cannot also pay out as Fur Pelt or Hide. Separate wing feathers and a genuine Down layer can coexist.
+
+Hard points/edges use their actual hardness and structural integrity, with the existing four quality bands. These alternatives replace only the named Bone component, retaining every other grip, haft, binding and fitting. Down changes its lining's workmanship contribution and source appearance, not the profile's fixed Heat Ward or Protection. It grants no weather immunity. Membrane Leather retains the actual sheet measurements and source colour.
+
+Recoverable portions belong to the actual species part or reservoir, not the attack score. Anatomy improves recovery once without inventing organs. Actual colour/Pattern stays with the selected material through Return, crafting and component recovery; unknown old appearance is not guessed. An explicitly pigment-bearing fluid can produce Magenta even when the creature's outside is another colour, but a pink or luminous creature does not automatically supply dye.
+
+**Existing routes remain sufficient:** ordinary gear still uses its existing Bone/metal/textile alternatives; Heat Cores use Resin, Venom preparation uses Toxic Sap, and Magenta uses Dyer's Root. No new hunt or individual recipe approval blocks those shops. New creature anatomy, these optional adapters and natural source prevalence still require implementation and combined playtesting. Other solid materials' equipment roles remain Design work. All three broader creature goals stay open.
 
 ### Learning about creatures and materials — complete first-pass journey
 
@@ -450,6 +479,18 @@ An already authored abandoned nest can remain an abandoned nest without assignin
 
 **Remaining work:** aquatic/aerial and other unsupported feeding mechanisms, chemosynthetic intake, other food types if useful, natural source prevalence and population support, actual shelter use where worthwhile, useful weather responses, learning particular food relationships, remaining anatomy/recipes and playtesting the combined experience. The three creature goals remain incomplete. No new owner decision blocks the independent proposal above.
 
+### Climate and creature observations — first-pass proposal, not implemented
+
+World conditions already influence how bodies are generated: cold tends toward larger, more covered creatures; the wetter cold branch favours bulk with less extra covering; heat favours smaller, less covered bodies. These are tendencies within the same individual budget. Cold lows and hot highs can both shape one world's creatures. None guarantees a particular material, safe temperature range or immunity.
+
+The next proposal keeps those relationships explicit for plants and animals. Cold can favour lower, woodier, clustered flora, while hot dry conditions can favour smaller, fleshy, defended growth. Food still needs its actual suitable plant part, physical host and reachable source. Rain does not create a river or edible forage; snow alone does not determine whether a particular water component is liquid. A sheltered-looking tree does not establish a den or weather protection. Ordinary plant material still keeps its own colour for crafting.
+
+**Proposed Bestiary addition:** an actual sighting can retain a short note such as “Seen in a world with rain,” “Seen in a world with snow,” or “Seen in a world with mist.” Smoke, airborne ash, miasma, mixed rain/snow and strong moving air have equally specific notes. They use conditions actually presented during the sighting, with up to three distinct recent condition notes and their source worlds.
+
+These are past observations about where the creature was seen. They do not mean that it thrives there, is immune to the atmosphere, hunts during storms or cannot occur elsewhere. Hidden creatures earn no note; opening the Library, repeated frames and old unknown weather do not invent observations. A sighting grants no extra specimen measurements, materials, temperature readings or discovery reward.
+
+**Still unselected:** wet coats, body-temperature meters, weather-driven migration, shelter seeking and seasonal breeding. These are possible future systems, not accepted promises or prerequisites for this first pass. The three broader creature goals remain open pending the named implementations and natural exploration/crafting playtests.
+
 ### Bestiary arrangement
 
 **Implemented and tested in a later Simulator build; not included in phone build 307.** Browse the Bestiary through **Sky, Water, Amphibious and Land**, then by body shape within each section: **Four-legged, Two-legged, Serpentine, Segmented, Radial, Fish-shaped and Amorphous**. For example: Sky → Serpentine → creature entry, or Water → Fish-shaped → creature entry.
@@ -472,7 +513,7 @@ A kind’s body-shape grouping follows its **latest recorded shape**. Some broad
 
 Empty collections and searches explain that no recorded creatures match; empty chapter and body groups are omitted. There is no hidden-species total, completion percentage, or search suggestion drawn from undiscovered creatures. Opening or sorting the Bestiary does not create a new discovery, specimen or material reward.
 
-**Intended but unfinished:** recording a genuine distant sighting, including an unreachable water creature, without pretending it is a measured specimen. The exact extra information such a sighting would reveal, and any new analysis or likely-material reveal stages, remain unsettled. The sorting update does not add those actions or infer a complete material list from appearance, an encounter or a victory.
+**Specified, awaiting implementation:** the separate full-sight Seen note, read-only Look and actual-reward material knowledge are now defined in the discovery journey above, including unreachable visible creatures without pretending they are measured specimens. The sorting update alone does not implement that journey. The proposed weather-context notes use the same lawful observation event and never infer a complete material list or immunity.
 
 ### Creature descriptions that match their lives
 
@@ -523,7 +564,7 @@ The first creature Homework task stays unchecked. Bone production and trading ar
 
 ### Apothecary — whole-shop review replaces separate recipe assignments
 
-**Current behavior:** Briar Oil’s new Stem/Leaf Fibre and Resin selection is reported delivered in phone build 310, alongside its older recipe. It still requires a separate flexible world material at Flexibility 50 or higher. Venom’s proposed Fibre update has not been implemented. Both coatings currently retain their one-strike preparation rules.
+**Historical ingredient bridge, before build322:** Briar Oil’s build310 recipe still used a separate flexible sample and coatings lasted one strike. Build322 supersedes that bridge with the complete recognizable-ingredient recipes and all four coatings lasting the full excursion on their exact weapon. The separately labelled legacy recipe route remains available for supported older stock.
 
 **Decided intended behavior:** all four weapon coatings last one excursion on the selected weapon, across encounters and reopening. The ingredient-only compatibility work never replaced that decision. Ordinary new preparations use recognizable material roles and cost no Essence; supernatural exceptions stay explicit.
 
