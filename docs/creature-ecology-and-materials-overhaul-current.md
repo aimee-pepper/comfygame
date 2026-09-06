@@ -21,6 +21,8 @@ These contracts do not reinterpret saved worlds. Engineering owns versioned inte
 
 The [creature discovery journey](creature-disclosure-player-journey-v1.md) now also defines full-sight notes, read-only Look, preserved encounter/Read knowledge, confirmed recovered-material facts and the shared Library/Bestiary display union. It is intended and unimplemented. First sight neither grants a measured specimen nor consumes the existing first-encounter discovery reward.
 
+The [food, habitat and shelter contract](creature-food-habitat-shelter-v1.md) now supplies a bounded first-pass generation proposal for actual low-leaf/fungal forage and smaller-prey relations, plus the evidence required for den/nest claims. It is not implemented and adds no hunger, breeding, population simulation or speculative shelter asset. Other diets, sufficient natural prevalence and real shelter-use behavior remain unfinished.
+
 ## Remaining real work
 
 Tooth/claw/tusk anatomy, separate Down, fin/membrane measurements, recoverable Oil/Venom/Ichor chemistry and exact new solid-part equipment roles remain Design dependencies. The completed Apothecary, Distillery and Scriptorium recipes already use Resin/Toxic Sap/Dyer's Root and do not depend on invented fluids. Broader food/nesting, implementation of the specified distant-sighting/likely-material journey, natural reward incidence and exploration/crafting feel remain unfinished.

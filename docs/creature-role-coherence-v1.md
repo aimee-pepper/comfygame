@@ -42,7 +42,7 @@ All rows require a valid new-policy body/habitat pair with an eligible component
 | Ambusher | armament total >=25; dominant Pierce; Close reach; defence is Crypsis | Existing concealed, close-range striking form; no new surprise attack |
 | Pursuer | ordinary mobile creature, not sessile or Apex | Existing pursuit-capable form, confined to its habitat; limbs are a fit tendency, not a requirement for a flying pursuer |
 | Tank | covering armourValue >0 | A robust protective build; existing size/covering fit decides strength of match |
-| Grazer | **Unavailable for the new ordinary policy until plant-feeding identity is actually defined** | Weak weapons or nearby plants alone cannot certify diet |
+| Grazer | The future food-support policy must select a fully supported `low_leaf_browser` profile; unavailable until that policy is implemented | Weak weapons or nearby plants alone cannot certify diet; preserve the existing role fit after this hard gate |
 | Swarmer | Delivery is Multi or Area | Existing small multi-strike/area form; not proof of a colony, pack size or new group behavior |
 | Apex | **Unavailable in ordinary cast classification** | Only the separate actual Apex system establishes Apex status |
 | Drifter | Aquatic or Aerial habitat | Existing light, sinuous fin/membrane form in a compatible medium; no wind-drift physics or immunity |
@@ -52,13 +52,11 @@ Use the current `Armament.isUnarmed` definition (total <25) and existing dominan
 
 Crypsis already controls field concealment. Awareness/detection still decides when it breaks, and the current attack rules decide damage. A label never grants stealth, range, additional attacks or access across impassable terrain.
 
-### Why Grazer remains unresolved
+### Grazer food dependency — now specified, not implemented
 
-The model currently has no confirmed diet, edible-forage relationship or feeding behavior. The retained principle “if nothing grows, nothing grazes” rules out inventing a feeding claim from weak armament; positive producer potential alone does not prove a particular animal eats it either.
+The [food/habitat/shelter contract](creature-food-habitat-shelter-v1.md) defines a bounded future low-leaf-browser profile using actual ordinary forage sources, assigned feeding capability and real access in every occupied habitat component. Only that selected, supported profile can enable the plant-feeding Grazer candidate; fungal foraging alone does not. Its existing fit/threshold still decides whether the name wins. No role forces a body, trait budget or new behavior.
 
-For this new policy, a former Grazer candidate receives another genuinely supported role or a physical description. Its body, ordinary existence and behavior remain unchanged. Diet is **unspecified**, not secretly carnivorous, photosynthetic or arcane-fed. Old Grazer records remain untouched.
-
-This is the bounded Design resolution of an unsupported label, not a new feeding mechanic. A future plant-feeding design must establish its own actual body/food/habitat relation before enabling Grazer. That wider choice is not silently settled here, and this packet does not ask Aimee to approve a made-up food-chain simulation.
+Until the new policy is implemented, the existing intended guard still leaves Grazer unavailable and uses another genuinely supported role or physical description. Old Grazer records are preserved. Diet unspecified never means secretly carnivorous, arcane-fed or starved. The new contract creates no runtime feeding, hunger, nesting or extra Aimee approval gate.
 
 ## 4. Movement nouns read habitat plus body
 

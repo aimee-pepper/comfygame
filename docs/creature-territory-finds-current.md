@@ -120,16 +120,18 @@ The only eligible key is `cache_key`, at every source band. It opens an ordinary
 is not tied to this animal or world. `anchor_frame`, story keys, quest objects, traveller objects and future
 unique lock identities are always excluded.
 
+> **6 September structure correction:** this historical proposal is not automatically enabled by the creature food or material work. The complete `creature-food-habitat-shelter-v1.md` contract governs any future den/nest claim. A habitat-only `den_pack` or `high_nest` choice cannot create a structure or its owner; require actual persisted structure evidence, otherwise choose a genuinely supported different trace or neutral “Found nearby.” Preserve old saved prose. This creates no new approval chore or permission to implement a loot roll.
+
 ## Territory trace and presentation
 
 The reward card says **Found nearby**, never **Dropped**, and uses one deterministic habitat-compatible trace:
 
 | Habitat | Trace IDs and plain copy |
 |---|---|
-| terrestrial | `den_pack` — *Recovered from a torn pack in the den.*; `dragged_scrap` — *Found among objects dragged into the territory.* |
+| terrestrial | `den_pack` — *Recovered from a torn pack in the den.* **Only with an actual persisted den; habitat alone is insufficient.**; `dragged_scrap` — *Found among objects dragged into the territory.* |
 | shore | `wrack_line` — *Recovered from the wrack at the edge of the territory.*; `mud_pack` — *Found in a pack half-buried in shore mud.* |
 | aquatic | `silt_cache` — *Recovered from a cache lodged in the silt.*; `waterlogged_pack` — *Found in a waterlogged pack caught nearby.* |
-| aerial | `high_nest` — *Recovered from debris woven into a high nest.*; `ledge_pack` — *Found in a pack caught on the creature's ledge.* |
+| aerial | `high_nest` — *Recovered from debris woven into a high nest.* **Only with an actual persisted nest; flight alone is insufficient.**; `ledge_pack` — *Found in a pack caught on the creature's ledge.* |
 
 Trace choice is visual/provenance flavour only and never changes the item roll. Use the encounter's persisted
 habitat. If a legacy encounter has no habitat identity, use neutral copy: *Found among traces in the
