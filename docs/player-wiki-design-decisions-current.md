@@ -418,6 +418,38 @@ Look keeps its existing interaction range and remains read-only. Explicit inspec
 
 **Still unfinished:** implementation of this journey; the already named missing anatomical parts and their equipment uses; food requirements, prey/forage relationships, actual nesting/den behavior and meaningful weather responses; and playtesting the resulting exploration/crafting experience. This contract creates none of those systems, no deep-water harvesting route and no new approval chores. All three creature homework goals stay open.
 
+### Food, habitat and nesting — bounded first-pass proposal
+
+**Current behavior:** the generator already uses photosynthetic, fungal and chemosynthetic producers to support life. Dark worlds can have fungal or chemosynthetic ecosystems. Individual creature traits and combat roles do not yet establish exact diets, food sources or nest ownership.
+
+**Proposed generation consistency, not implemented:** record a small supported food relationship where a creature's actual body, habitat and placed sources justify it. This adds no hunger, breeding, feeding animation, hunting AI, population replacement, food item or player-eating action. Existing creatures, world generation and shop production remain unchanged until explicit implementation.
+
+The first pass covers ordinary mobile Land/Amphibious creatures with supported four-legged, two-legged, serpentine or segmented bodies. A feeding profile is explicitly assigned; body shape or weak weapons alone does not prove diet. Other bodies and habitats remain valid creatures with diet unspecified by this narrow pass.
+
+| Proposed relationship | Actual support required | What cannot substitute |
+| --- | --- | --- |
+| Browsing low leafy growth | An assigned browsing capability and actual reachable ordinary low leaf-bearing growth with an explicit forage profile in each occupied habitat area | Green terrain, a growth score, harvested Fibre, Logs, Cloth, or a plant across an impassable river |
+| Feeding on soft fungal growth | An assigned fungal-feeding capability and actual reachable fleshy fungal growth in a suitable damp/unfrozen host, with its own forage profile | Fungal potential alone, every Spore item, medicinal mushrooms or presumed poison immunity |
+| Feeding on smaller ordinary prey | An assigned hunting profile, meaningful natural armament and actual reachable smaller non-toxic ordinary prey whose own food support is established | Apex creatures, guardians, party animals, unreachable prey or a circular chain with nothing at its base |
+
+Food profiles are new explicit ecological declarations for the compatible animal, **not claims that these plants are safe for the player to eat**. The first pass excludes defended/predatory or unresolved chemical sources. It also excludes all six named Apothecary plant profiles and Dyer's Root unless a future exact dual-use relation is authored. A soothing ingredient is not automatically food; Toxic Sap being safe to harvest does not make it edible.
+
+The starting predator rule requires prey at least15 lower on the existing size scale. Species are resolved from smaller to larger, so a prey chain must eventually reach an actual forage source. When several supported feeding profiles are available, the starting choice is uniform among them. These are Design-authored tuning proposals, not personal Aimee approvals or a simulation of who would win a fight.
+
+A source must be reachable using that creature's existing movement and actual connected habitat. Amphibious bank access is not unrestricted deep-water access; a tree canopy is not low forage. If no supported relation exists, the result is **diet unspecified**. The pass does not add food patches, remove the creature, reroll its traits or claim starvation. Existing chemosynthetic life remains valid even though this narrow proposal does not yet define its particular consumers' chemical intake.
+
+Food support is a fact about **when the world was generated**. Later harvesting or defeating prey does not trigger hunger, replacement spawns, migration or altered loot. A source can support several plausible relationships, but this presence check does not claim sufficient calories or a solved population balance. Materials and their colour/Pattern remain with their actual sources; eating relationships do not create new meat, Bone, Venom or other drops.
+
+**Roles stay honest:** only an actually selected, supported leaf-browser profile can make the future Grazer label eligible, and the existing role fit still decides whether that name is appropriate. Horns do not prove carnivory. Pursuer/Ambusher describe behavior, not a diet; Tank does not mean herbivore; Swarmer does not mean colony. New feeding profiles change no hostility, attacks, movement or rewards.
+
+**Cover is not a nest.** Reachable vegetation or a sheltered bank may offer cover; it does not prove a den, nest, eggs or young. Calling a structure a nest/den requires an actual persisted structure or authored site with suitable access. Calling it *this creature's* home additionally requires an explicit real ownership/use relationship. Nearby presence, a Sentinel label, a tree mesh or a loot story is insufficient. Fliers retain their accepted lack of a perch requirement.
+
+An already authored abandoned nest can remain an abandoned nest without assigning its present owner. The older optional territory-find proposal cannot invent a high nest or den just because the animal's habitat fits; those descriptions need real structure evidence. No territory-find roll, shelter asset, nesting behavior or additional approval task is enabled here.
+
+**Player knowledge remains separate:** first sight does not reveal hidden digestion or every linked prey species. A future implemented feeding-profile description could truthfully say **“Can browse low leafy growth,”** but it must not say a feeding event was observed or reveal an undiscovered food source. Existing earned Bestiary facts stay intact.
+
+**Remaining work:** aquatic/aerial and other unsupported feeding mechanisms, chemosynthetic intake, other food types if useful, natural source prevalence and population support, actual shelter use where worthwhile, useful weather responses, learning particular food relationships, remaining anatomy/recipes and playtesting the combined experience. The three creature goals remain incomplete. No new owner decision blocks the independent proposal above.
+
 ### Bestiary arrangement
 
 **Implemented and tested in a later Simulator build; not included in phone build 307.** Browse the Bestiary through **Sky, Water, Amphibious and Land**, then by body shape within each section: **Four-legged, Two-legged, Serpentine, Segmented, Radial, Fish-shaped and Amorphous**. For example: Sky → Serpentine → creature entry, or Water → Fish-shaped → creature entry.

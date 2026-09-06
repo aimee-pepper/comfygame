@@ -12,4 +12,6 @@ Bestiary arrangement stays Sky, Water, Amphibious and Land, then the seven appro
 
 The complete first-sight/Look/encounter/reward/Return/Library discovery journey is now specified in [the current creature decisions](design-decisions-september-4.html), pending implementation. A Seen note is not a measured specimen and cannot consume the later first-encounter discovery reward. Actual reward confirms material knowledge; losing or spending the stock does not erase that knowledge or make it collectible again.
 
+The new food/habitat/shelter proposal defines supported low-leaf/fungal forage and smaller-prey relations at generation, with actual local access and no circular food chain. It also requires a real structure and use relationship before nest/den ownership is claimed. This is unimplemented generation consistency, not hunger, breeding, feeding AI or a population simulation; other diets, natural support and shelter behavior remain open.
+
 The three goals in [Aimee's creature checklist](aimee-homework.html) stay unchecked, with this recorded as partial Design progress rather than a finished generator or another individual approval chore.

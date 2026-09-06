@@ -120,16 +120,18 @@ The only eligible key is `cache_key`, at every source band. It opens an ordinary
 is not tied to this animal or world. `anchor_frame`, story keys, quest objects, traveller objects and future
 unique lock identities are always excluded.
 
+> **6 September correction:** this older proposal is not enabled by the new food/material plans. A den or high-nest description requires a real persisted structure; habitat or a nearby creature is insufficient. A claimed owner additionally needs an actual use link. Otherwise use another genuinely supported trace or neutral “Found nearby,” without inventing shelter. Existing saved prose is preserved. The current creature decisions explain this boundary; it adds no new approval chore.
+
 ## Territory trace and presentation
 
 The reward card says **Found nearby**, never **Dropped**, and uses one deterministic habitat-compatible trace:
 
 | Habitat | Trace IDs and plain copy |
 |---|---|
-| terrestrial | `den_pack` — *Recovered from a torn pack in the den.*; `dragged_scrap` — *Found among objects dragged into the territory.* |
+| terrestrial | `den_pack` — *Recovered from a torn pack in the den.* **Requires an actual den.**; `dragged_scrap` — *Found among objects dragged into the territory.* |
 | shore | `wrack_line` — *Recovered from the wrack at the edge of the territory.*; `mud_pack` — *Found in a pack half-buried in shore mud.* |
 | aquatic | `silt_cache` — *Recovered from a cache lodged in the silt.*; `waterlogged_pack` — *Found in a waterlogged pack caught nearby.* |
-| aerial | `high_nest` — *Recovered from debris woven into a high nest.*; `ledge_pack` — *Found in a pack caught on the creature's ledge.* |
+| aerial | `high_nest` — *Recovered from debris woven into a high nest.* **Requires an actual nest.**; `ledge_pack` — *Found in a pack caught on the creature's ledge.* |
 
 Trace choice is visual/provenance flavour only and never changes the item roll. Use the encounter's persisted
 habitat. If a legacy encounter has no habitat identity, use neutral copy: *Found among traces in the
