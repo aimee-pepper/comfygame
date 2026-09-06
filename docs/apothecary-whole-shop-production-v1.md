@@ -2,7 +2,7 @@
 
 > **Shared textile dependency update — 5 September:** `tannery-whole-shop-production-v1.md` now defines Cord/Cloth from mixed actual Stem/Leaf constituents. Accept complete prepared-unit receipts with their nested source appearance; prior matching-only manufacturing references are superseded. This changes no recipe count, output effect, finished quality role or nominal Cord/Cloth value in this shop. Never count or recover prepared ancestors twice.
 
-5 September 2026. **Ready Design implementation contract for all 19 preparations and their shared ingredient sources. Not implemented or delivered.**
+5 September 2026. **Ready Design implementation contract for all 19 preparations and their shared ingredient sources. Engineering reports the complete implementation at d03e2ea0c8bb4b5fb2fcd6426f864fa0b7aec5d4 on6 September, with39 focused tests and4 native routes passed. Phone322 build/install is in progress; delivery is not yet confirmed.**
 
 ## Authority and what this closes
 
@@ -185,3 +185,7 @@ The [shared equipment improvement and recovery contract](equipment-improvement-r
 ## Conditional anatomy extension — separate first-pass proposal
 
 [Remaining creature anatomy/material uses](creature-anatomy-material-extensions-v1.md) defines optional actual Fang/Claw components, measured Membrane-to-Leather processing and a chemically qualified creature Venom alternative, where this shop owns the exact named role. Those producers/adapters are not implemented. The complete ordinary batch remains independent, including full-excursion coatings; no generic family sample satisfies a new typed source.
+
+## Engineering progress reported6 September
+
+Source d03e2ea0c8bb4b5fb2fcd6426f864fa0b7aec5d4, tree8f41896adea74329a74a9f17b637997098573f3c, branch codex/early-material-regions-v1 in `/Users/aimeepepper/Documents/comfygame-worktrees/early-material-regions-v1`. Engineering reports all19 recipes, acquisition learning, finite named plant/mineral sources, full source-colour/Pattern retention, batch/Waiting/history/save safety, explicit legacy routes and excursion-bound exact-weapon coatings. Shared mixed Cloth/Cord and ForgeT3/tool3 dependencies are included; whole Tannery garments/pricing/refit and broader equipment composition are not.39 focused tests and4 native routes include actual Bitter Root harvest→Return→learning→preparation at402×874/default/current configuration. Phone322 build/install is underway. This is Engineering-provided evidence, not a Design native/delivery recheck; older books remain unbackfilled.
