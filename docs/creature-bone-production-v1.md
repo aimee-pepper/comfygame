@@ -93,6 +93,8 @@ Legacy Bone retains its original units, six-band record, value and consumer acce
 
 ## 6. Crafting consumer boundary — real gap, no invented approved recipe
 
+**5 September adapter follow-up:** [Typed Bone → Pointed Blade](typed-bone-pointed-blade-adapter-v1.md) closes legacy isolation, source/output custody and four-band workmanship, with an explicit Bone-specific Power/fee/resale proposal awaiting Aimee. The crafting hold remains until that choice and implementation are complete.
+
 The existing Pointed Blade is a genuine Bone consumer for **legacy** Bone. Keep it and already-crafted items working unchanged. Preserve exact old quotes, eligibility, station/knowledge requirements and item profiles.
 
 New typed Bone must not automatically enter that six-band path through a family-enum match. It needs an explicitly versioned four-band consumer adapter that preserves actual source measurements and colour, uses the accepted component-contribution/workmanship rules, freezes final stats and preserves exact salvage. No lossy conversion to an old grade is an implementation shortcut.
