@@ -1,5 +1,7 @@
 # Apothecary coating identity
 
+**Next compatible coating, 5 September:** [Venom physical-Fibre bridge](venom-physical-fibre-adapter-v1.md) is ready: 1 Stem/Leaf Fibre + 1 legacy Toxin + 1 separate reactive World unit at 55+, for the unchanged existing Venom preparation. No new typed Toxin or raw-creature Venom conversion is authorized.
+
 **5 September physical-input follow-up:** [Briar Oil compatibility bridge](briar-oil-physical-input-adapter-v1.md) is ready for implementation: exact Stem/Leaf Fibre and Resin feed the existing recipe while its separate flexible World-resource requirement remains. The all-Plant-Fibre simplification is only a proposal; the existing coating effect and zero-Essence cost remain unchanged.
 
 **Status:** settled first-slice names, effects and recipes; native correctness patch queued

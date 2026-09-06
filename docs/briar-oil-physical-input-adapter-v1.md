@@ -1,6 +1,6 @@
 # Briar Oil: physical-input compatibility adapter
 
-5 September 2026. **Ready for bounded Engineering implementation; not implemented or phone-delivered.** Scope is one existing Apothecary preparation's named-input migration. It preserves the third property-qualified resource rather than inventing a replacement recipe. No new facility, coating, affliction, material producer, guarantee or creature migration.
+5 September 2026. **PM reports the bounded bridge delivered in development. Design trusts that report; phone availability is not established here.** Scope is one existing Apothecary preparation's named-input migration. It preserves the third property-qualified resource rather than inventing a replacement recipe. No new facility, coating, affliction, material producer, guarantee or creature migration.
 
 ## Why this consumer is next
 
@@ -77,6 +77,6 @@ Legacy scalar Fibre/Resin, compatible property units, old quotes and already pre
 
 ## Readiness and the one optional later simplification
 
-**Ready now:** named physical Fibre/Resin admission, exact retained third World-resource requirement, existing access/inference shape, output/effect/quality/price, transaction history, Field Kit/Return and legacy coexistence. Engineering may implement this one bridge without waiting for the Bone choice or a new Aimee decision. No claim of native implementation, natural affordability or delivery is made.
+**Implemented per PM delivery report:** named physical Fibre/Resin admission, exact retained third World-resource requirement, existing access/inference shape, output/effect/quality/price, transaction history, Field Kit/Return and legacy coexistence. No new Aimee decision is needed for this bounded bridge. Its natural acquisition/affordability and phone availability remain separate from the reported development delivery.
 
 **Unsettled optional proposal, not part of the ready bridge:** replace the old flexible-resource slot with one additional Stem/Leaf Fibre, making the complete recipe 2 Plant Fibre + 1 Resin. This would remove the property-record dependency and make an all-new-material route, but it changes the authored eligibility rather than merely adapting custody. Do not infer or implement it from the bridge. No new homework approval is required to proceed with the settled portion; present this simplification when choosing the fully migrated Apothecary recipe, not as a blocker to current work.
