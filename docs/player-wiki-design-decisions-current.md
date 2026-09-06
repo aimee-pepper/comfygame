@@ -4,7 +4,7 @@ This is the current record of the changes agreed today. **Decided intended behav
 
 ## Whole-shop update · 5 September
 
-Complete first-pass plans now cover all 19 Apothecary preparations, Forge, Tannery, Bowyer, Weaponsmith and Armoury; replacement implementation remains queued. [Crafting Overhaul · Shop by Shop](crafting-shop-overhaul.html) records the complete scope, current rules, accepted destination and the complete first-pass recipes, producers and services for those six makers, now including the shared ordinary equipment-service plan. It supersedes isolated next-recipe assignments. The ingredient bridges below are temporary compatibility steps; they do not settle the final recipes or replace the accepted excursion-long coating lifetime.
+Complete first-pass plans now cover all 19 Apothecary preparations, Forge, Tannery, Bowyer, Weaponsmith and Armoury; replacement implementation remains queued. [Crafting Overhaul · Shop by Shop](crafting-shop-overhaul.html) records the complete scope, current rules, accepted destination and the complete first-pass recipes, producers and services for those six makers, now including shared ordinary equipment services and the complete Survey Post instrument plan. It supersedes isolated next-recipe assignments. The ingredient bridges below are temporary compatibility steps; they do not settle the final recipes or replace the accepted excursion-long coating lifetime.
 
 ## Wood, Hide, Apex labels and notices · 6 September
 
@@ -57,6 +57,14 @@ The study should face north-up and east-right, with downward camera pitch rather
 **Accepted behavior, now delivered:** remembered ground retains a tree’s last-observed shape and position. It refreshes when legitimately seen again, including a stump or observed absence. Unseen growth, removal or new trees remain unknown; an old remembered tree is not proof that it still exists now. A glimpse of canopy or previously seen ground alone does not reveal a new tree.
 
 The remembered image reveals no hidden enemies, resources, active hazard warnings or changed shadows/effects. Remembered trees do not cast current shadows or react to current lighting. Older saves without a sufficient actual tree observation keep honest remembered ground until a new sighting. Existing fading of currently visible trees is preserved. Engineering reports model/render checks and walking-away/restart checks; Design has not repeated them. This is a bounded stationary-tree correction, not approval of a full 3D migration.
+
+## Complete Survey Post first pass · 6 September
+
+**Design-authored first-pass plan complete; implementation pending.** The [Survey Post tables](crafting-shop-overhaul.html) now cover its foundation, eight initial instruments and all sixteen Good/Fine improvements. Named physical ingredients replace the old property-sample search. Instruments remain permanent capabilities: one Survey reads all carried subjects for one turn, and actual fieldwork calibrates the page lens.
+
+The new foundation is 20 Essence plus 6 Logs, 4 Clay and 4 Plant Fibre. Level and Hygrometer provide a route before Quartz or Ingots: foundation plus those two Crude instruments totals 55 Essence before discounts. Good and Fine retain the deliberate first-pass 20/50 Essence service fees. No animal-fluid producer, random grade, extra station tier or equipment slot is required.
+
+An improved instrument must be used on a later field Survey to improve its best calibration. Existing precision, observations, explicit packing choices and ongoing excursions remain intact. The page lens's separate 2/4/6/8 distinct-subject gates and costs remain. This batch adds no owner homework; Scriptorium/Writing Desk follows next.
 
 ## Shared equipment services · 6 September
 

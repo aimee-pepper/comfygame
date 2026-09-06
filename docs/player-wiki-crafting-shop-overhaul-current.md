@@ -1,10 +1,10 @@
 # Crafting overhaul, shop by shop
 
-Updated 5 September 2026. This is the complete crafting review you requested, beginning with Apothecary, Blacksmith and Tannery. **Current behavior** means existing rules or reported delivered changes. **Decided intended behavior** means the agreed destination. **Proposals** are the whole-shop recipe and balance changes still being worked out; they are not already playable.
+Updated 6 September 2026. This is the complete crafting review you requested, beginning with Apothecary, Blacksmith and Tannery. **Current behavior** means existing rules or reported delivered changes. **Decided intended behavior** means the agreed destination. **Proposals** are the whole-shop recipe and balance changes still being worked out; they are not already playable.
 
 ## What the review found
 
-Stone tools lead to useful raw-material equipment. Blacksmith T2 introduces Ingots, while Tannery textiles provide a parallel route into clothing and later specialist components. The later recipes still contain older rules that do not fit that sequence. The Apothecary now has a complete first-pass recipe-and-source plan; implementation remains pending. The Forge now also has its complete first-pass family/tool/material plan. The Tannery also has its complete first-pass textile, Leather, clothing and carrying plan below. The Bowyer, Weaponsmith and Armoury now also have complete first-pass plans. Subsequent shops continue as complete batches, including gathering, item effects, prices and recycling.
+Stone tools lead to useful raw-material equipment. Blacksmith T2 introduces Ingots, while Tannery textiles provide a parallel route into clothing and later specialist components. The later recipes still contain older rules that do not fit that sequence. The Apothecary now has a complete first-pass recipe-and-source plan; implementation remains pending. The Forge now also has its complete first-pass family/tool/material plan. The Tannery also has its complete first-pass textile, Leather, clothing and carrying plan below. The Bowyer, Weaponsmith and Armoury now also have complete first-pass plans, followed by shared equipment services and the full Survey Post plan below. Subsequent shops continue as complete batches, including gathering, item effects, prices and recycling.
 
 The biggest corrections are:
 
@@ -574,7 +574,81 @@ A new refit must preserve any separately earned permanent benefit through a supp
 
 **Still unsettled:** what a spent Mote buys when a partial setup misses. The recommendation remains lasting progress, with no destruction or downgrade. Eligibility, odds, benefit, service price and the precise maximum-shop route remain Design work; no empty mastery upgrade or paid attempt with an undefined outcome is offered. The old twentieth-copy guarantee stays withdrawn. This question does not block the ordinary services above.
 
-Survey Post is the next ordinary crafting batch. Peerless remains a separate later service; see [Aimee Homework](aimee-homework.html) for its one outstanding experience choice.
+The Survey Post plan follows below. Peerless remains a separate later service; see [Aimee Homework](aimee-homework.html) for its one outstanding experience choice.
+
+## Survey Post — all eight instruments and sixteen improvements
+
+**Current behavior:** Mara's Survey Post has eight permanent instruments. Its existing foundation costs 50 Essence, 10 Timber, 8 Iron Ore and 2 Quartz. Research teaches one subject at Crude precision. Good currently costs 20 Essence plus two suitable property-35+ materials; Fine costs 50 Essence plus three property-65+ materials. The game automatically chooses the weakest suitable samples.
+
+**Accepted behavior retained:** choose which learned instruments to take at Home. One **Survey** outside an encounter reads every carried instrument for one world turn. An actual reading calibrates that subject for the page lens; buying an instrument alone does not. Instruments are permanent capabilities, so they consume no Storehouse, satchel or consumable slot.
+
+**Complete Design-authored first-pass plan — implementation pending:** replace the property hunt with the exact named bills below. All eight initial instruments and sixteen improvements are specified together. The quantities and fees are revisable tuning, not sixteen new approvals for Aimee.
+
+### Foundation and the first instruments
+
+After Mara joins, the new Survey Post foundation costs **20 Essence, 6 Logs, 4 Clay and 4 Plant Fibre**. It opens all eight independent Research choices. It grants no free instrument or reading, and adds no paid branch root or separate station tier for precision upgrades.
+
+| Instrument | Reads | Initial Crude study: materials and Essence before Research discounts |
+| --- | --- | --- |
+| Level | Relief | 15 Essence; 2 Iron, 1 Log, 2 Plant Fibre |
+| Hygrometer | Hydrology | 20 Essence; 4 Plant Fibre, 2 Iron, 1 Resin |
+| Sunglass | Illumination | 20 Essence; 2 Quartz, 2 Iron, 1 Coal, 1 Resin |
+| Loupe | Substrate | 25 Essence; 2 Quartz, 1 Log, 1 Resin |
+| Thermoscope | Thermal | 30 Essence; 1 Mercury, 2 Quartz, 1 Resin |
+| Vivometer | Vitality | 35 Essence; 2 Restorative Spore, 2 Quartz, 2 Resin |
+| Barometer | Atmosphere | 40 Essence; 2 Mercury, 2 Quartz, 1 Iron Ingot, 1 Resin |
+| Chronometer | Cycle | 60 Essence; 2 Iron Ingots, 2 Quartz, 1 Resin |
+
+This is a suggested order, not a compulsory chain. Level uses a plumb weight and line; Hygrometer uses responsive plant strands. Optical instruments use worked Quartz. Mercury supplies the thermal and pressure instruments, and the Vivometer uses a spore preparation during calibration. Mara shapes the parts as part of the work: no separate Plank, lens, tube or gear-train recipe is required.
+
+Mara's existing Home Research discount applies to initial study, with each positive material quantity rounded up and never removed from the bill. The preview shows the actual price. Her absence changes that discount, not your learned instruments or access to the built Post. The separate Good/Fine service fees below stay fixed at their stated first-pass amounts.
+
+### Good and Fine: the complete improvement table
+
+Each Good bill also costs **20 Essence**; each Fine bill also costs **50 Essence**. Improve the same permanent instrument from Crude to Good, then Good to Fine. Fine is the cap. These purchases are deterministic, with no Mote, random miss, animal-material grade requirement or extra hidden property test.
+
+| Instrument | Good materials, plus 20 Essence | Fine materials, plus 50 Essence |
+| --- | --- | --- |
+| Level | 1 Iron Ingot, 1 Plant Cord | 2 Iron Ingots, 1 Hardwood Log, 1 Plant Cord |
+| Hygrometer | 1 Plant Cord, 1 Resin | 1 Plant Cloth, 1 Iron Ingot, 1 Resin |
+| Sunglass | 1 Quartz, 1 Coal, 1 Resin | 2 Quartz, 1 Iron Ingot, 1 Resin |
+| Loupe | 1 Quartz, 1 Resin | 2 Quartz, 1 Iron Ingot, 1 Resin |
+| Thermoscope | 1 Mercury, 1 Quartz, 1 Resin | 1 Mercury, 2 Quartz, 1 Iron Ingot, 1 Resin |
+| Vivometer | 1 Restorative Spore, 1 Quartz, 1 Resin | 2 Restorative Spore, 2 Quartz, 1 Iron Ingot, 1 Resin |
+| Barometer | 1 Mercury, 2 Quartz, 1 Resin | 2 Mercury, 2 Quartz, 1 Iron Ingot, 1 Resin |
+| Chronometer | 1 Iron Ingot, 1 Quartz, 1 Resin | 2 Iron Ingots, 2 Quartz, 1 Mercury, 1 Resin |
+
+These are preparation and calibration costs for a permanent capability. They do not leave an old physical instrument to sell or dismantle. Ingredient colours and source history remain accurate, but they do not create extra precision, combat stats or a new equipment colour system. No Copper, Silver, Adamant, creature Ichor or unfinished animal-part producer is required by these new bills.
+
+### What better precision tells you
+
+| Precision | Reading | What the fieldwork earns |
+| --- | --- | --- |
+| Crude | A qualitative description and a broad 20-point interval | The first actual reading calibrates the subject |
+| Good | Rounded value ±5, limited to 0–100 | A Good field reading raises its best measured precision |
+| Fine | The value rounded to a whole number | A Fine field reading raises its best measured precision to Fine |
+
+For a displayed magnitude of 47, the intervals are 40–60 at Crude and 42–52 at Good; Fine shows 47. Illumination and Thermal retain their two readings for peak and floor. The other instruments report their subject's single magnitude. These are world measurements, not hidden deposit locations, creature counts, safe-water guarantees or tile-by-tile heights.
+
+An upgrade at Home changes the instrument you can take next time. **Use that improved instrument in the field before the Desk benefits from its better precision.** An expedition already underway keeps the instruments and precision chosen at departure. Your explicit subset—or an intentionally empty kit—stays saved. An unconfigured kit keeps the existing default of carrying every owned instrument.
+
+The page lens remains separate. Its four upgrades require **2, 4, 6 and 8 distinct calibrated subjects**, along with their own costs and prerequisites. Buying Good/Fine or repeatedly surveying the same subject does not add another distinct subject. A Crude reading is enough for that subject to count. No new repeated-reading quota is added.
+
+Survey is an action you deliberately request, so its result remains visible when optional discovery or gathering notices are muted. Its ordinary turn can still bring hazards or instability; both the reading and any essential consequence remain clear. A failed or stale action records no observation and spends no turn.
+
+### Sources, old saves and practical progression
+
+The new foundation, Level and Hygrometer need no Quartz or ingots. Later optical work uses Pick-2 Quartz; Mercury instruments use the same named Pick-2 source as the Apothecary plan. Restorative Spore comes from its actual fungal source with Scythe 1. Forge T2 supplies Ingots; Corrin supplies mixed-fibre Cord and Cloth. The new source and recipe work still needs implementation, and no material is guaranteed on every excursion.
+
+Any-Log requirements can use either known wood type. The Fine Level explicitly needs Hardwood. Older wood keeps its lawful uses without being guessed into Hardwood, and existing stock is never deleted or spent twice during conversion.
+
+Before discounts, **the Post plus Crude Level and Hygrometer totals 55 Essence, 7 Logs, 4 Clay, 10 Plant Fibre, 4 Iron and 1 Resin**. One Survey with both gives the two distinct calibrations needed by the first page-lens gate; Isolde and that lens's own requirements still apply.
+
+The foundation and all eight at Crude total **265 Essence** before discounts. Taking all eight through both improvements adds **560 Essence**, for **825 Essence** plus the actual materials over the entire journey. That full catalogue is optional long-term progress, not a departure requirement or a demand to make every instrument Fine. These totals exclude other facilities, recruitment, Binding and the separate lens.
+
+Older learned instruments, Good/Fine precision, observations and packed choices stay intact. A legacy Crude instrument can use the new Good bill; a legacy Good instrument can use Fine; an existing Fine instrument stays complete. No old purchase is charged again, downgraded or refunded because the price changed. Storehouse capacity does not block a permanent-capability purchase. A failed save leaves the actual materials, currency and progress unchanged.
+
+**Next whole batch:** Scriptorium/Writing Desk, followed by Distillery/Channelworks. Their existing effects and costs remain distinct until their complete plans are reconciled. The separate proposed Survey Needle is not made playable by this pressure-instrument plan. No new Aimee homework decision is needed here.
 
 ## Every remaining shop and crafting system
 
@@ -583,7 +657,6 @@ The sequence below follows material dependencies. It includes services and proce
 | System | Complete scope of its batch | Main correction or dependency |
 | --- | --- | --- |
 | Peerless refinement | The later chance/guarantee journey | Ordinary refit, rebuild, legacy routing and recovery are specified above; Mote-on-miss remains open |
-| Survey Post | Eight instruments, each with Good and Fine improvements | Sixteen improvements with understandable instrument components, not a generic property sample masquerading as every instrument part |
 | Scriptorium / Writing Desk | Ink, personal Compounds, Seamward installation/erasure, later Paper and pigments | Keep making ink, using ink, recording a Compound and inscribing an item distinct |
 | Distillery | Heat, Caustic and Light Cores | Direct attunement, recognizable catalysts and preserved potency/source; no obsolete Blank Core manufacturing step |
 | Channelworks | Current Heat Fixture and restoration; planned three attunements across three reaches | A complete nine-configuration plan; a stored fixture does not mean every planned weapon is playable |
@@ -592,7 +665,7 @@ The sequence below follows material dependencies. It includes services and proce
 | Processing | Recycler/Rubble sorting, Planks/Hafts, Pulp/Paper/pigments, Blocks and Glass | Each new intermediate arrives with a real use and consistent prices |
 | Shared progression and storage | Building foundations, research, staffing, carrying, Storehouse and Waiting | An obtainable route into each shop, honest missing requirements and claimable outputs |
 
-Existing instrument improvements cost 20 Essence plus two suitable materials for Good, and 50 Essence plus three for Fine. The eventual physical component choices remain design work. These fees have not silently become zero because ordinary crafting is moving away from Essence fees.
+The Survey Post plan above replaces the old property-sample ingredient lists while deliberately retaining the 20/50 Essence calibration fees as first-pass tuning. Its complete replacement remains pending implementation.
 
 Existing direct Core attunement costs 16 Essence plus the appropriate material and catalyst. Current repeatable Channelworks work consumes a Heat Core to make a Heat Fixture; the complete Heat/Caustic/Light weapon family remains intended work. Older references to making Blank Cores are historical.
 
