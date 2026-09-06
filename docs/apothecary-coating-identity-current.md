@@ -1,6 +1,8 @@
 # Apothecary coating identity
 
-**5 September material update:** the intended Briar Oil compatibility adapter accepts exact Stem/Leaf Fibre and Resin while retaining one separate existing flexible World resource at 50+. It is ready for implementation, not delivered. The optional 2 Plant Fibre + 1 Resin simplification is undecided; existing Bleed and zero-Essence rules remain unchanged.
+**Next coating update, 5 September:** Venom’s ready physical-Fibre adapter retains one legacy Toxin and one separate reactive World resource at 55+, with the existing Poison effect and zero Essence cost. It is not implemented. No new typed Toxin, raw-venom conversion or simplified third ingredient is approved.
+
+**5 September material update:** the intended Briar Oil compatibility adapter accepts exact Stem/Leaf Fibre and Resin while retaining one separate existing flexible World resource at 50+. Its bounded development delivery is now reported; phone availability is separate. The optional 2 Plant Fibre + 1 Resin simplification is undecided; existing Bleed and zero-Essence rules remain unchanged.
 
 **Status:** settled first-slice names, effects and recipes; native correctness patch queued
 

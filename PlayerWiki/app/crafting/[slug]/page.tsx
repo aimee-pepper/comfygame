@@ -1,3 +1,4 @@
+import { VenomMaterialUpdate } from '@/components/venom-material-update';
 import { BriarOilMaterialUpdate } from '@/components/briar-oil-material-update';
 import { SeptemberDecisions } from '@/components/september-decisions';
 import type { Metadata } from 'next';
@@ -105,6 +106,7 @@ export default async function CraftingSystemDetail({
         title={system.name}
         summary={system.summary}
       />
+    {system.stationID === 'apothecary' && <VenomMaterialUpdate />}
     {system.stationID === 'apothecary' && <BriarOilMaterialUpdate />}
     <SeptemberDecisions topic="crafting" />
       {guideStatus && <section className="article-section">

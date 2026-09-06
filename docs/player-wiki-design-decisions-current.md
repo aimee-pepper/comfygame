@@ -304,7 +304,7 @@ The first creature Homework task stays unchecked. Bone production and trading ar
 
 ### Briar Oil — next Apothecary material update
 
-**Current behavior:** Briar Oil is an existing one-hit Bleed coating. Its older recipe uses Fibre, Resin and a separate flexible resource. The new Stem/Leaf Fibre and Resin compatibility update described here is specified but not implemented or delivered.
+**Current behavior:** Briar Oil is an existing one-hit Bleed coating. Its older recipe uses Fibre, Resin and a separate flexible resource. The compatibility update accepting new Stem/Leaf Fibre and Resin has now been reported delivered in development. Phone availability and natural acquisition are not established by that report.
 
 **Decided intended adapter:** at the built Apothecary, with Briar Oil known, spend **1 Stem or Leaf Fibre + 1 Resin + 1 existing flexible world resource with Flexibility 50 or higher → 1 Briar Oil**, costing **0 Essence**. The third ingredient is separate: two new Fibre portions and Resin do not yet satisfy this recipe. The new Fibre does not gain an invented Flexibility value. Existing legacy preparation choices remain available under their own rules.
 
@@ -313,6 +313,18 @@ The output keeps its familiar appearance and existing Uncommon item rarity, with
 Briar Oil keeps its ordinary **5 Gold sell value** and **15 Gold price when legitimately stocked**; this adds no merchant stock. Preparing it sends it to Storehouse or Waiting and does not automatically pack it. Exact chosen ingredients and their source histories are retained, while old stock receives no invented origin. Cancel, stale stock or a failed save cannot spend ingredients or create a bottle.
 
 **Optional later proposal:** replace the separate flexible-resource requirement with one extra Stem/Leaf Fibre, for a fully new-material recipe of **2 Plant Fibre + 1 Resin**. This is not decided and is not part of the ready compatibility update. The existing third-resource requirement stays until an explicit recipe decision replaces it. No new homework answer is needed for Engineering to implement the settled adapter.
+
+### Venom — next existing coating compatibility update
+
+**Current behavior:** Venom is an existing physical-weapon Poison coating. Its legacy recipe and effects stay available. The new Plant Fibre compatibility update below is ready for implementation but is not delivered.
+
+**Decided intended adapter:** at the built Apothecary, with Venom known, use **1 Stem or Leaf Fibre + 1 legacy Toxin + 1 separate existing reactive world resource with Reactivity 55 or higher → 1 Venom coating**, for **0 Essence**. Each is a separate ingredient; neither Fibre nor scalar Toxin gains an invented Reactivity value. Existing legacy preparation choices keep their own rules.
+
+Legacy Toxin keeps its old identity. This update does not turn it into a named toxic sap or raw creature venom, and the finished Venom coating cannot be fed back into its own recipe. Fully naming the toxic ingredients remains later material work. No new toxic creature, gathering route or merchant stock is promised.
+
+The output keeps its existing recognizable appearance, Uncommon item rarity and ordinary **5 Gold sell value / 15 Gold price when stocked**. Ingredient quality and Reactivity above the threshold do not strengthen its Poison. Applying the bottle spends it to prepare the selected eligible physical weapon; a miss keeps the charge, and a successful strike spends it. Existing Poison duration, modifiers, prevention, cures and encounter cleanup stay unchanged.
+
+The player confirms the exact reactive resources and Fibre type. Preparing a batch saves every deduction, bottle and source-history record together, sends the output to Storehouse or Waiting, and leaves the Field Kit plan unchanged. Old Toxin receives no invented species or colour history. Cancel, stale stock or save failure spends nothing. This bounded compatibility update needs no new decision from you; replacing legacy Toxin or removing the separate reactive ingredient would need its own explicit design.
 
 ### Optional Hide-to-Leather path — decided intended behavior
 
