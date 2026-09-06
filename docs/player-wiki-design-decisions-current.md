@@ -6,6 +6,14 @@ This is the current record of the changes agreed today. **Decided intended behav
 
 Design is now overhauling complete crafting shops, beginning with all 19 Apothecary preparations, Blacksmith and Tannery. [Crafting Overhaul · Shop by Shop](crafting-shop-overhaul.html) records the complete scope, current rules, accepted destination and proposed recipe matrix. It supersedes isolated next-recipe assignments. The ingredient bridges below are temporary compatibility steps; they do not settle the final recipes or replace the accepted excursion-long coating lifetime.
 
+## Defeat summaries · decided 5 September
+
+**Current behavior:** combat defeats can give only “You were carried home.” Some world hazards already have a more specific message, but selecting a cause from everything that happened that turn can attribute the wrong final injury.
+
+**Decided intended behavior — implementation pending:** the return summary names the event that actually brought you down: for example, “Defeated by poison” for a fatal poison tick, or “Defeated by [known creature]” for its fatal attack. Burning, bleeding, toxic air and dangerous growth use their own supported causes. An undisclosed creature stays unnamed, and an unavailable older cause is honestly unknown. The following line still explains that you were carried home; this does not add permanent death or change the haul rules.
+
+The Binder going down already ends the excursion; a companion falling alone does not mean the whole party was defeated. Reopening should preserve the same cause without replaying damage or guessing from the enemies left nearby. This is a reporting change, not new damage or combat mechanics.
+
 ## 1. Current behavior
 
 The game currently contains both older rules and delivered early-overhaul paths. The table identifies those differences; the later intended/proposed sections do not become playable merely by being written here.

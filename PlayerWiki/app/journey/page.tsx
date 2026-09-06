@@ -39,6 +39,12 @@ export default function JourneyGuide() {
           <li><span><strong>Review the return at the Village</strong><p>Use the expedition result to review what came back, resolve any capacity decision, then prepare the next trip or put returned resources toward a current construction, recipe, or Research cost.</p></span></li>
         </ol>
       </section>
+      <section className="article-section note-card">
+        <h2>Understanding a defeat</h2>
+        <p><strong>Current behavior:</strong> combat can report only that you were carried home. Some world hazards already give a more specific reason.</p>
+        <p><strong>Decided intended behavior, not yet delivered:</strong> the return summary will name the actual cause that brought you down, such as poison or a known creature’s attack. Unknown causes stay unknown, and a companion falling alone is not a party defeat. Revival and haul rules remain the same.</p>
+        <p><Link href="/references/design-decisions-september-4">Read the defeat-summary decision</Link>.</p>
+      </section>
       <section className="article-section journey-strip"><Link href="/resources/progression"><img src={content.writingAssetURL} alt="Writing Desk parchment" /><span><strong>Current task checklist</strong><small>Move from the next Page through resources, Village work, Research, party preparation, and return.</small></span></Link><Link href="/systems/exploration"><img src={content.explorationVisuals.entryPortal} alt="Entry portal" /><span><strong>World journey</strong><small>Use the entry portal and the world’s visible details as you explore.</small></span></Link>{firstGear?.assetURL && <Link href={`/equipment/${firstGear.slug}`}><PixelImage src={firstGear.assetURL} alt={`${firstGear.name} icon`} size={58} /><span><strong>Party preparation</strong><small>Check where the gear is and whether it fits the current slot before equipping.</small></span></Link>}</section>
       <section className="article-section two-column">
         <div>
