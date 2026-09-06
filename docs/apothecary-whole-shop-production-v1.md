@@ -1,5 +1,7 @@
 # Apothecary — complete first-pass production batch
 
+> **Shared textile dependency update — 5 September:** `tannery-whole-shop-production-v1.md` now defines Cord/Cloth from mixed actual Stem/Leaf constituents. Accept complete prepared-unit receipts with their nested source appearance; prior matching-only manufacturing references are superseded. This changes no recipe count, output effect, finished quality role or nominal Cord/Cloth value in this shop. Never count or recover prepared ancestors twice.
+
 5 September 2026. **Ready Design implementation contract for all 19 preparations and their shared ingredient sources. Not implemented or delivered.**
 
 ## Authority and what this closes

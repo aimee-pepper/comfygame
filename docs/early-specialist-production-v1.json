@@ -1,6 +1,6 @@
 {
   "id": "early.specialists.v1",
-  "status": "decided intended behavior; first-pass numerical tuning, not shipped or measured",
+  "status": "Historical v1 rows retained for compatibility. Future Tannery processing, garment, value and refit rules are superseded by tannery-whole-shop-production-v1.md; its Carry entitlements retain the existing accepted values. Forge follows blacksmith-whole-shop-production-v1.md.",
   "materials": [
     {
       "id": "processed.ingot.iron",
@@ -258,5 +258,6 @@
     "lineage": "retain every parent and quantity; Cord/Cloth inherit RGB unchanged; garment body uses Cloth, ties Cord; two Buckled Cloth units output-equivalent; recorded prepared salvage preserves colour",
     "unknownGroups": "unknown colours cannot be treated as proven output-equivalent",
     "scope": "only named early fibre producers; no grading, species assignment, placement change, old-world reroll or final-art claim"
-  }
+  },
+  "supersedingTanneryContract": "tannery-whole-shop-production-v1.md"
 }

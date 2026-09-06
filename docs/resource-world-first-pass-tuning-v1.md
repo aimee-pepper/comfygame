@@ -235,7 +235,7 @@ There is no universal processing station and no return of the standalone Worksho
 
 The processed output keeps a recognizable identity. There is no universal Metal, Reagent, Toxin, or Prepared Extract item. Every process declares exactly one quality behavior:
 
-- **Preserve:** Leather retains the selected Hide or Skin's creature-material quality, inherited colour, and source detail. One batch cannot mix quality bands.
+- **Preserve:** Leather retains the selected Hide or Skin's creature-material quality, inherited colour, and source detail. Each dressed Leather unit preserves its one raw portion; multi-count processing keeps separate units and never blends their bands. A garment may combine separately chosen Leather panels under the whole Tannery contract without creating averaged Leather.
 - **Standardize:** Glass, refined named metals, Planks, Hafts, Pulp, Paper, Cord, Cloth, pigments, and writing ink are ungraded processed stock. Their exact raw source and colour remain in the batch receipt where relevant, but the output does not invent creature-material quality.
 - **Recipe-defined:** a named extract has an authored potency calculation and disclosure. It does not inherit a generic quality multiplier unless that exact recipe says it does.
 
@@ -404,3 +404,8 @@ Those are separate conversations. Adding numbers for them here would make this p
 ## Cross-resource occupancy — Aimee clarification, 5 September
 
 One tile supports at most one gatherable node/resource across geology, flora, loose deposits, source reservations and written guarantees. Multiple units yielded by that one source are allowed; overlapping independently gatherable placements are not. Visual canopy/overhang is not a second node. All passes share occupancy and preserve existing required quantities, legal host positions and reachable guarantees. Conflicts require another legal free location or explicit generation failure, never stacking, silent overwrite or pretending a guarantee was met. Actual duplicate occupancy remains unconfirmed: Aimee clarified that the apparent overlap may be accepted adjacent mining. Preserve that behavior; source coordinates, not visual proximity, determine whether two nodes share a tile. Exact scope and cases: `field-tool-gesture-and-resource-occupancy-2026-09-05.md`.
+
+
+## Whole Tannery production closure · 5 September
+
+`tannery-whole-shop-production-v1.md` is the future whole-shop implementation authority. Its Design-authored first pass permits mixed actual Stem/Leaf constituents in Cord/Cloth, one Skin/Hide plus Salt per Leather, three garment families/seven variants, explicit per-panel stats and prepared-component value/recovery/refit. Cord/Cloth remain ungraded; Leather keeps its original band. New raw Hide/Skin uses the common-base-3 market table while old lot values stay frozen. Carry remains 8→11→14→23, plus Sela’s separate 2. These choices are pending implementation, not personal approvals newly attributed to Aimee.

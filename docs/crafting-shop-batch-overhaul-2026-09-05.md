@@ -1,5 +1,7 @@
 # Crafting overhaul — complete shop batches
 
+> **Tannery production closure — 5 September:** [tannery-whole-shop-production-v1.md](tannery-whole-shop-production-v1.md). The complete Tannery production packet supersedes the proposed Tannery table and unresolved clothing consolidation below, including mixed textiles, one-to-one dressing, seven variants, values, recovery/refit and unchanged Carry entitlements.
+
 > **Apothecary production closure:** `apothecary-whole-shop-production-v1.md` now supersedes this audit’s proposed Apothecary recipes, unnamed chemical-source placeholders and source-choice gate. It contains all 19 exact recipes and six named plant profiles plus four mineral source contracts. This audit remains the all-shop scope and historical contradiction review; later shop tables remain their own work.
 
 5 September 2026. Design review and implementation direction, not an implementation delivery.
@@ -146,7 +148,7 @@ Corrin's accepted foundation is 20 Essence + 6 Logs + 4 Clay + 4 Fibre. Keep pre
 | Pack upgrades | Capacity 8→11: 5 Essence + Fibre 4; 11→14: 10 Essence + Fibre 6 + Resin 1; 14→23: Corrin, 20 Essence + Cloth 2 + Cord 2 + Resin 1 | Improve owned capacity; do not duplicate containers or automatically pack outputs. |
 | Sela's extra capacity | Separate +2, 30 Essence + Logs 6 + Fibre 4 | Keep separate from Corrin's capacity sequence. |
 
-The legacy catalogue also contains Supple Coat (outer + lining), Working Gloves (hand + facing) and Working Boots (upper + sole + binding). Reconcile these as later material choices within three clear wearable families; do not show two unrelated recipes with the same gloves/boots name and unexplained quality rules. Preserve existing items and all eight early operations above while the broader family mapping is authored.
+The legacy catalogue also contains Supple Coat (outer + lining), Working Gloves (hand + facing) and Working Boots (upper + sole + binding). Reconcile these as later material choices within three clear wearable families; do not show two unrelated recipes with the same gloves/boots name and unexplained quality rules. Preserve existing items and v1 compatibility. Future crafting uses the complete three-family/seven-variant mapping and changed processing/value rules in the whole Tannery packet; this earlier proposed table is not a new implementation assignment.
 
 Leather sale values 3/4/5/6 and Leather Guard 8/10/13/15 remain early-route values. Its existing recovery returns prepared Leather/Cord, never both raw Hide and Leather, and never Salt. Audit that full prepared-component recovery against the older partial Recycler rates across the full clothing set. Retain safe existing receipts; choose the final consistent recovery policy at the equipment-services batch, with visible before/after terms for new crafts.
 

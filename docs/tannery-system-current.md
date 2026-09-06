@@ -1,4 +1,6 @@
-# The Tannery — current design
+# The Tannery — historical structural design, superseded for future production
+
+> **Tannery production closure — 5 September:** [tannery-whole-shop-production-v1.md](tannery-whole-shop-production-v1.md). The complete Tannery batch replaces the operative future costs, property-threshold recipes, Wear/Carry/Keep gates, quality hold and capacity instructions below. Preserve existing owned items and purchase history; do not implement these historical directions as new rules.
 
 **Status:** implementation-facing structural design. Costs and late capacity thresholds are
 playtest values. This document resolves Corrin's station boundary against the Blacksmith, Storehouse,

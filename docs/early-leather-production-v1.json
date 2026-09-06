@@ -1,6 +1,6 @@
 {
   "id": "early.leather.v1",
-  "status": "decided intended; first-pass tuning; not runtime-delivered",
+  "status": "Historical v1 rows retained for compatibility. Future Tannery processing, garment, value and refit rules are superseded by tannery-whole-shop-production-v1.md; its Carry entitlements retain the existing accepted values. Forge follows blacksmith-whole-shop-production-v1.md.",
   "materials": [
     {
       "id": "creature.skin.smooth",
@@ -322,5 +322,6 @@
     "missingSource": "no matching group and no default-value or species-lookup backfill",
     "lineage": "retain source Coloration through Leather, Guard body and prepared salvage; Cord owns ties separately",
     "presentation": "placeholder/text does not prove source-colour rendering; exact native RGB/pattern acceptance pending"
-  }
+  },
+  "supersedingTanneryContract": "tannery-whole-shop-production-v1.md"
 }

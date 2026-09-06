@@ -1,6 +1,6 @@
 {
   "id": "early.carrying.v1",
-  "status": "decided intended behavior; numerical first-pass tuning; not delivered or campaign-tested",
+  "status": "Historical v1 rows retained for compatibility. Future Tannery processing, garment, value and refit rules are superseded by tannery-whole-shop-production-v1.md; its Carry entitlements retain the existing accepted values. Forge follows blacksmith-whole-shop-production-v1.md.",
   "materialSets": {
     "early.log.v1": [
       "flora.log.softwood",
@@ -68,7 +68,7 @@
     },
     {
       "id": "early.build.wayfarer.v1",
-      "name": "Wayfarer\u2019s Table",
+      "name": "Wayfarer’s Table",
       "owner": "Sela",
       "requires": [
         "Sela recruited"
@@ -263,5 +263,6 @@
     }
   },
   "nextBindCheck": "quote actual next legal Bind in campaign state; from opening 40 Essence, first project leaves 35 and first two leave 25 before other purchases; do not assume flat Bind cost or assert campaign pacing from arithmetic",
-  "unchanged": "slot-free materials, dedicated tool roll, packing plan, item custody, nine shelving benefits, Sela non-capacity behavior"
+  "unchanged": "slot-free materials, dedicated tool roll, packing plan, item custody, nine shelving benefits, Sela non-capacity behavior",
+  "supersedingTanneryContract": "tannery-whole-shop-production-v1.md"
 }

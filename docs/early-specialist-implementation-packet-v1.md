@@ -1,5 +1,7 @@
 # T2 smelting and the first useful specialist crafts — V1
 
+> **Tannery production closure — 5 September:** [tannery-whole-shop-production-v1.md](tannery-whole-shop-production-v1.md). Future Tannery crafts use mixed Fibre constituents, the complete garment families and receipt-based values in the whole-shop packet. Matching-only textile rules and old garment prices below remain v1 compatibility history. Forge production follows its own complete Blacksmith packet.
+
 **4 September 2026 · Decided intended behavior. All costs/statistics are first-pass tuning.**
 
 Companion authored data: [early-specialist-production-v1.json](early-specialist-production-v1.json).
@@ -46,13 +48,7 @@ is added to the already-simple Blacksmith T1 recipes.
 
 The three new prepared materials are exact **ungraded World-material** stocks. Preserve ingredient-source
 lots through processing so cloth/ties use the selected fibre colour and the Ingot keeps its metal receipt.
-One processing operation selects one exact fibre subtype and source-colour group across its inputs; if the
-player lacks that output-equivalent quantity, do not silently blend colours. Mixing source lots needs a later
-explicit recipe, not an arbitrary averaged colour. Several same-colour units from the same eligible group
-may supply a batch. Both Stem and Leaf Fibre are eligible; Bark and generic legacy Fibre remain excluded.
-
-A finished garment's body and ties may deliberately use different source colours. The buckled version's
-two Cloth units must share one selected group/colour; its buckles use Iron. Show a source picker only where
+For future processing, use the whole Tannery contract: any selected Stem/Leaf constituents may combine as actual strands/sections, with full ordered source appearance. No averaged colour or made-up plant is created. Buckled Guard may use two different Cloth compositions. Matching-only groups describe the older v1 route, not new manufacturing eligibility. Show a source picker only where
 that choice changes visible output. Standard Iron processing requires no chooser when its result is
 identical. Chosen units, intermediate provenance, displayed result, value and destination freeze before
 spending. All processing/crafting/upgrading is durable-save-first, idempotent and capacity-independent for
@@ -185,27 +181,12 @@ at generation, before any harvest; harvest freezes that exact source receipt in 
 with no colour decode as **unresolved**, not a neutral colour. Never backfill old lots by sampling their
 saved seed, adding a species link, or reading the currently rendered world. Keep old stock and old crafted
 items usable under their existing rules, including colour-independent foundation and raw-material costs.
-For a new colour-bearing Cord/Cloth quote, exclude unresolved sources and explain “Choose fibres with a
-known colour.” No eligible complete group means refusal before spending, not conversion into generic
-beige output or an automatic material grant. Legacy finished equipment is not invalidated.
-
-Known inputs group only by exact material subtype, ungraded quality, channel, exact sRGB and every other
-recipe-relevant measurement; source/world IDs and ancestry are retained but do not split identical-result
-choices. Different worlds with the same exact eligible result may combine. Unknown is never equal to a
-known colour or to another unknown as proof of output equivalence. Stem and Leaf remain distinct groups;
-Stem Patch and Tall Stem Patch may share a Stem group when their relevant values match.
-
-Cord and Cloth persist their selected colour plus every parent source/quantity through the prepared
-receipt. Processing does not bleach, average, shade-shift or grade fibre. Garment body uses the selected
-Cloth RGB, ties the selected Cord RGB; those two component colours may differ. Buckled Guard's two Cloth
-units must be output-equivalent. Iron buckles keep their metal appearance/receipt. Salvage returns the
-recorded prepared components with the same colours and parents, never a new raw-fibre refund. Display,
-source selection, spending and saved result must agree on the frozen component values.
+For future Cord/Cloth quotes, the whole Tannery contract replaces matching-only eligibility: consume exact typed Stem/Leaf portions, retain each actual source and appearance, and represent unresolved legacy colour explicitly as unknown without guessing. Known CMY/Depth/Pattern is not missing merely because final RGB artwork is pending. Buckled Cloth panels may differ. Every prepared component returns intact on supported garment recovery; no raw Fibre refund is added. Earlier matching/known-RGB-only validation remains historical v1 behavior, not the new acceptance target.
 
 The same saved source base must be exposed to the implemented plant and material/garment presentation
 consumers; renderer lighting and preserved shading do not rewrite inherent RGB. This closes rules and
 lineage, not final pixels or an Asset assignment. Engineering must name the exact consumer/state protocol
 before Asset receives work. Scoped acceptance: assigned-shade precedence, saved tendency and absent-base
-branches, identical/different/unknown grouping, multi-parent processing, selected garment panels,
+branches, exact mixed/unknown constituent retention under the whole-shop contract, multi-parent processing, selected garment panels,
 stale/failure/reopen and legacy preservation. No extra natural search, grading, eligibility expansion,
 world-palette rewrite, new species or phone-delivery claim is authorized by this section.

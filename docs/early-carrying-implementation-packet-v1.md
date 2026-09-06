@@ -1,5 +1,7 @@
 # Early carrying and ordinary Tannery — implementation packet v1
 
+> **Tannery production closure — 5 September:** [tannery-whole-shop-production-v1.md](tannery-whole-shop-production-v1.md). Carry capacities, prices and purchase-preserving migration below remain intended. Future textile selection and garment construction/value/refit use the whole-shop packet; the old garment prices and matching-textile directions below and in the companion JSON are v1 compatibility only.
+
 **Authority:** 4 September 2026 PM-directed continuation of Aimee’s early-progression redesign. Decided intended behavior; exact prices and stats are first-pass tuning. No runtime change or phone delivery is claimed. Companion authored rows: `early-carrying-production-v1.json`.
 
 ## Current versus intended
@@ -21,9 +23,9 @@ Deepened Satchel is a sewn cloth body with reinforced straps and sealed seams. I
 
 Sela’s Table requires her recruitment and costs **30 Essence, 6 Logs, 4 Plant Fibre**. Its built passive gives +2 independently at any pack stage: **10 / 13 / 16 / 25**. No active posting or second purchase is required. This raw-material foundation replaces the old Pulp-dependent building price; recruitment and all other fieldcraft behavior stay unchanged. In particular this packet does not retune organic harvest yields.
 
-Logs mean exactly Softwood or Hardwood Logs; Plant Fibre means exactly Stem or Leaf Fibre from the existing early material set. Existing ambiguous Timber/Fibre holdings require the established legacy-stock adapter, never silent relabelling. Permanent capacity is independent of material colour and quality, so no meaningless quality chooser is required. Prepared Cloth/Cord may use multiple matching source receipts under the earlier specialist stock rules.
+Logs mean exactly Softwood or Hardwood Logs; Plant Fibre means exactly Stem or Leaf Fibre from the existing early material set. Existing ambiguous Timber/Fibre holdings require the established legacy-stock adapter, never silent relabelling. Permanent capacity is independent of material colour and quality, so no meaningless quality chooser is required. Prepared Cloth/Cord uses complete actual constituent receipts under the whole Tannery contract; a permanent capacity project adds no colour-matching requirement.
 
-## Useful ordinary Tannery choices
+## Historical v1 ordinary Tannery choices — future values in whole-shop contract
 
 The existing early Tannery foundation also teaches **Woven Gloves** and **Woven Boots**, with no free items, additional study, or paid pattern toll. Both are Fine, add exactly **1.0 total Protection** in their own slot, have zero Initiative change and no ward or extraction bonus. These are alternatives for empty slots, not prerequisites for Carry or later equipment.
 

@@ -1,5 +1,7 @@
 # First creature-material consumer: Hide to Leather — V1
 
+> **Tannery production closure — 5 September:** [tannery-whole-shop-production-v1.md](tannery-whole-shop-production-v1.md). Future dressing uses ONE eligible raw Skin/Hide plus ONE Salt per Leather; future Guards select two independent panels. New price policies and full garment/refit rules are in the whole-shop packet. The two-matching-raw recipe, matching-Guard restriction and earlier price tables below and in the companion JSON remain legacy compatibility, not future implementation instructions. The existing anatomical source/quality rules remain unless expressly superseded.
+
 **4 September 2026 · Decided intended behavior; unmeasured first-pass numerical tuning.**
 
 This is the bounded next production extension after the early plant-cloth Tannery. It adds only the actual
@@ -103,35 +105,13 @@ worlds; do not enlarge the starter budget to guarantee every material. It is one
 2 Salt, then depleted. No Pick, tool level, regrowth, hidden hazard or arbitrary Salt appearing in fresh
 forest is added. Ordinary source route targets remain 4–12/6–24, with recorded legal small-map fallbacks.
 
-## 4. Corrin processes Leather and makes a useful garment
+## 4. Corrin processing and garment destination — superseded by whole-shop contract
 
-At the built T1 Tannery, learn **2 of one exact eligible Hide/Skin subtype, one band and one output-equivalent source group +
-1 Salt → 1 Leather** for zero Essence. Eligible inputs are exactly Smooth Skin, Supple Hide and Tough Hide.
-Leather retains that input quality, source measurements and colour beneath its stack. Two Poor parts do
-not become Common; two qualities or colours cannot silently average into a new one. Pelt, Chitin, generic
-legacy Hide, Cloth and unrelated soft material are not implicit substitutes. This is a new optional recipe,
-not a replacement for the initial Cloth/Cord crafts and not a new facility gate.
+Future dressing consumes **1 eligible raw Skin/Hide + 1 Salt → 1 Leather**, preserving that portion's exact quality, source colour and measurements. It does not combine or average raw bodies. The whole-shop contract replaces the former two-matching-raw recipe and four-band fixed Leather price table for new crafts, while preserving those old lots intact.
 
-**Leather Guard:** 2 matching Leather from one output-equivalent source group/band/colour + 1 Plant Cord, no Essence,
-Tannery T1, Body slot. This adds an alternative physical garment, never automatic replacement/equipment.
-Its total Protection is:
+Future Leather Guard consumes **2 separately chosen Leather panels + 1 Cord**, with the whole-shop per-panel Protection calculation, retained explicit .25 construction contribution and primary-only quality vote. Different panels need not match type ancestry, band, colour or measurements. The former formula remains exactly reproduced when two panels match; no hidden Initiative, ward or extra quality-base is added. Full garment recovery returns the actual two Leather and Cord once, not raw Hide/Salt. New prices, Gloves/Boots, family consolidation and refit are all specified in `tannery-whole-shop-production-v1.md`; the companion v1 JSON is retained compatibility history.
 
-`roundToQuarter(4 * (0.50 + retainedCoveringProtection / 200) * qualityMultiplier + 0.25)`.
-
-The 4-point primary ceiling and baseline/measurement/quality formula follow the published role model;
-Cord contributes the fixed 0.25 structural amount and no Initiative. There is no extra quality-base added
-afterwards, heat ward, accuracy, durability or random affix. Show the actual final Protection before paying.
-Only the Leather primary socket votes for finished quality: Poor→Rough, Common→Fine, Rare→Superior,
-Exceptional→Exceptional. Minor Cord does not drag quality toward Fine. Body and ties keep their chosen
-material colours; quality stays on name/border. Leather remains intermediate stock, not Peerless equipment.
-
-Dismantle the finished garment to its recorded 2 Leather + 1 Cord, not raw Hide/Salt as well. Processing
-has no reverse action. Salt is consumed and never returned. JSON gives four-band sale values and twice-sale
-purchase values; purchase listings remain subject to normal stock. These values are chosen so buying raw
-parts, processing, crafting or dismantling cannot generate profit at base prices. Preserve legacy values.
-Source-lot selection, durable save, Return custody and finished-item destination follow the earlier packets.
-
-## 5. Minimum production and acceptance evidence
+## 5. Historical v1 production and acceptance evidence
 
 Hand-authored fixtures in JSON close two distinct physical producers using the existing primary-covering
 rules: one terrestrial soft-covered body and one shallow-water soft-covered body. They are **integration
@@ -160,7 +140,7 @@ new region adapter and source-lot/custody implementation; not a whole replacemen
 **Still separate:** additional anatomical families and consumers, expanded creature ecology, broad encounter
 balance and later facilities. This packet does not claim those catalogues are finished or runtime-delivered.
 
-## Source grouping clarification
+## Historical v1 source grouping clarification — matching restrictions superseded
 
 A source group is not one harvested instance or one historical receipt. Combine owned units whose exact
 material subtype, quality (when present), colour and recipe-relevant source measurements are identical,
@@ -237,7 +217,7 @@ keep the supported legacy reward policy, grant no newly typed Hide, and do not c
 migration. New Leather recipes continue to require exact Skin/Supple/Tough stock. Reprojecting all coverings
 or migrating other anatomical families remains outside this bounded slice.
 
-## Leather colour identity and prepared grouping — 5 September 2026
+## Leather colour identity and historical v1 prepared grouping — matching restrictions superseded
 
 No exact accepted native creature-to-sRGB conversion is established by the inspected source. The current
 `CreaturePixelIdentity` uses primary/orange functional silhouettes; the world-grade species conversion
