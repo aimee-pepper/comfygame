@@ -1,3 +1,4 @@
+import { TanneryOverhaul } from '@/components/tannery-overhaul';
 import { BlacksmithOverhaul } from '@/components/blacksmith-overhaul';
 import { ApothecaryOverhaul } from '@/components/apothecary-overhaul';
 import { SeptemberDecisions } from '@/components/september-decisions';
@@ -108,6 +109,7 @@ export default async function CraftingSystemDetail({
       />
     {system.stationID === 'apothecary' && <ApothecaryOverhaul />}
     {system.stationID === 'blacksmith' && <BlacksmithOverhaul />}
+    {system.stationID === 'tannery' && <TanneryOverhaul />}
     <SeptemberDecisions topic="crafting" />
       {guideStatus && <section className="article-section">
         <p className="status-pill">{guideStatus.status}</p>

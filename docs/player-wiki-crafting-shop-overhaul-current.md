@@ -4,7 +4,7 @@ Updated 5 September 2026. This is the complete crafting review you requested, be
 
 ## What the review found
 
-The early sequence is coherent: stone tools, useful raw-material equipment, ingots at Blacksmith T2, then cloth, leather and specialist components. The later recipes still contain older rules that do not fit that sequence. The Apothecary now has a complete first-pass recipe-and-source plan; implementation remains pending. The Forge now also has its complete first-pass family/tool/material plan. Tannery and subsequent shops continue as complete batches, including gathering, item effects, prices and recycling.
+The early sequence is coherent: stone tools, useful raw-material equipment, ingots at Blacksmith T2, then cloth, leather and specialist components. The later recipes still contain older rules that do not fit that sequence. The Apothecary now has a complete first-pass recipe-and-source plan; implementation remains pending. The Forge now also has its complete first-pass family/tool/material plan. The Tannery also has its complete first-pass textile, Leather, clothing and carrying plan below. Subsequent shops continue as complete batches, including gathering, item effects, prices and recycling.
 
 The biggest corrections are:
 
@@ -187,30 +187,88 @@ This closes the Forge’s first-pass design, including the missing Pick-3 route.
 
 The minimum raw accounting route from the starting tools to Forge T3 and Pick 3, including Corrin and one Cord, totals 100 Essence, 40 Iron, 13 Coal, 22 Logs, 12 Fibre, 16 Clay and 2 Quartz. This excludes departures, optional gear and surplus harvested units. It is a consistency check, not a promise to complete it in one world or a measured pacing claim.
 
-Glass remains planned until its consuming system is ready; empty processing steps and additional metal intermediates are not added just to fill the Forge menu. Blacksmith’s full first pass is now specified; the Tannery and later specialist batches continue in dependency order.
+Glass remains planned until its consuming system is ready; empty processing steps and additional metal intermediates are not added just to fill the Forge menu. Blacksmith’s and Tannery’s full first passes are now specified; later specialist batches continue in dependency order.
 
-## Tannery — prepared stock, clothing and carrying
+## Tannery — the complete textile, Leather, clothing and carrying plan
 
-**Current behavior:** the early Cord, Cloth, Leather, garments and carrying paths have reported implementations alongside older sample-based clothing recipes. These are useful foundations, not proof that every later clothing choice has been reconciled.
+**Current behavior:** early Cord, Cloth, Leather, woven garments, Leather Guard and carrying improvements have reported implementations. The current processing routes require matching Fibre and two matching Hide portions for Leather. Older sample-based clothing recipes also exist. The complete replacement described here is **not yet implemented**.
 
-**Decided intended behavior and retained first-pass recipes:** Corrin's foundation costs 20 Essence, 6 Logs, 4 Clay and 4 Plant Fibre. Preparing these materials and making the ordinary garments below costs no Essence.
+**Retained decisions:** Corrin makes flexible foundational clothing and prepared stock shared with other shops. Her foundation costs **20 Essence, 6 Logs, 4 Clay and 4 Plant Fibre** after recruitment. Ordinary preparation, garment crafting and the refit described below cost **no Essence**. Woven clothing and carrying remain available before Leather or Ingots. Bought capacity and existing owned items stay yours.
 
-| Make | Ingredients | Result |
-| --- | --- | --- |
-| Plant Cord | 2 matching Plant Fibre | 1 Cord |
-| Plant Cloth | 4 matching Plant Fibre | 1 Cloth |
-| Leather | 2 compatible matching Hide portions and 1 Salt | 1 Leather, retaining its material character |
-| Woven Guard | 1 Cloth and 1 Cord | Fine workmanship, 1.5 Protection |
-| Buckled Woven Guard | 2 Cloth, 1 Cord and 1 Ingot | Fine workmanship, 2 Protection |
-| Woven Gloves | 1 Cloth and 1 Cord | 1 Protection |
-| Woven Boots | 1 Cloth, 1 Cord and 1 Resin | 1 Protection |
-| Leather Guard | 2 Leather and 1 Cord | Protection from the actual Leather, with no hidden handling or heat bonus |
+**New Design-authored first-pass choices:** simplify material matching, dress one Hide portion at a time, combine the clothing into three families with seven variants, and use consistent component-based prices and recovery. These choices use Aimee's delegated tuning authority; they are not new personal approvals or measured balance results.
 
-Matching matters where type, quality, colour and the material's actual properties affect the result. Preparing Leather does not erase its source, and recycling it does not also refund the raw Hide and Salt.
+### Preparing usable materials
 
-Carrying grows from 8 to 11 spaces for 5 Essence and 4 Fibre, then to 14 for 10 Essence, 6 Fibre and 1 Resin. Corrin's later improvement reaches 23 for 20 Essence, 2 Cloth, 2 Cord and 1 Resin. Sela's separate +2 improvement remains separate.
+| Make | New ingredients | What is retained | New sale / buy |
+| --- | --- | --- | --- |
+| 1 Plant Cord | 2 Stem and/or Leaf Fibre | The two actual strands and their source colours | 1 / 2 Gold |
+| 1 Plant Cloth | 4 Stem and/or Leaf Fibre | Four actual constituent sections and their source colours | 2 / 4 Gold |
+| 1 Leather | 1 eligible Smooth Skin, Supple Hide or Tough Hide, plus 1 Salt | That raw portion's quality, colour and material properties | Raw portion's recorded sale value plus Salt's; buy twice the result |
 
-**Proposed consolidation:** Supple Coat, Working Gloves and Working Boots are the broader clothing families. Their later material choices should connect clearly to the early woven and leather garments. They should not become two confusing sets of similarly named clothes with unrelated quality rules. The full clothing batch also needs one consistent explanation of recovery and sale value.
+The Fibre portions may come from different plants and have different colours. They become a composite textile; the game does not average them into an invented plant or colour. You can choose the strands/sections for appearance, or accept the ordinary stock selection. Known source colours stay recorded even when final artwork is unfinished; genuinely unknown old colour stays honestly unknown. Mixing does not add a new material type or make plants Rare/Exceptional.
+
+One-to-one dressing makes a small creature's single Hide drop useful. Leather inherits that exact portion's quality and properties. A garment can use two different Leather panels without requiring identical creatures or blending their measurements into fictional Leather. Salt does not improve its grade or add another colour.
+
+Existing gathering stays: medium Stem Fibre gives 2 with Scythe 1, low Leaf Fibre gives 1 with Scythe 1, and Tall Stem gives 3 with Scythe 2. Salt remains hand-gathered from actual deposits. These recipes add no free resources, extra source placements or guaranteed Hide-bearing animals.
+
+Only creatures whose actual primary covering supports Hide produce these new covering parts: aquatic/piscine bodies give Smooth Skin; other eligible bodies give Supple or Tough Hide according to their hardness. The existing 70% covering-drop chance and size-based quantity remain. Anatomy improves a successful quantity once, from 1/2/3/4 to 2/3/4/5; it does not make a missed roll succeed. Existing quality still comes from the real covering/flexibility and source-world Danger. Other body materials are not silently treated as Hide, and the broader creature anatomy catalogue remains unfinished.
+
+### Three clothing families, seven complete variants
+
+Building Corrin's shop teaches these ordinary choices without a second paid pattern, Study or shop-upgrade toll. The Buckled Guard's Ingot comes from Blacksmith T2; that ingredient is its progression requirement. Corrin need not be actively attending for normal crafting. Existing applicable construction/staffing price rules remain; the foundation and project prices on this page are their base quotes.
+
+| Family and garment | Complete ingredients | Total Protection | New sale value using newly produced Common Leather |
+| --- | --- | --- | ---: |
+| Guards — Woven Guard | 1 Cloth, 1 Cord | 1.5 | 3 Gold |
+| Guards — Buckled Woven Guard | 2 Cloth, 1 Cord, 1 Iron Ingot | 2.0 | 9 Gold |
+| Guards — Leather Guard | 2 separately chosen Leather panels, 1 Cord | From each panel, plus the existing 0.25 construction contribution | 9 Gold |
+| Gloves — Woven Gloves | 1 Cloth, 1 Cord | 1.0 | 3 Gold |
+| Gloves — Leather Gloves | 1 Leather, 1 Cord | From its Leather, plus 0.25 construction contribution | 5 Gold |
+| Boots — Woven Boots | 1 Cloth, 1 Cord, 1 Resin | 1.0 | 5 Gold |
+| Boots — Leather Boots | 1 Leather, 1 Cord, 1 Resin | From its Leather, plus 0.25 construction contribution | 7 Gold |
+
+Guards use the Body slot, Gloves the Hands slot and Boots the Feet slot. These are the existing Supple Coat, Working Gloves and Working Boots families organized into clear material choices, not a second unrelated clothing catalogue. Older owned clothing keeps its identity and saved statistics. The older hidden-property recipe offers retire from new ordinary crafting when the full replacement is enabled; unsupported old samples do not become new Leather by name alone.
+
+Woven garments remain Fine workmanship. They add exactly the listed Protection, with no hidden Initiative, ward, handling, harvesting or carrying bonus. The two Cloth pieces of a Buckled Guard may have different compositions. Resin seals Boots; it adds no quality vote or separate colour region.
+
+Leather Protection uses the actual hardness and coverage of each selected panel, scaled by that panel's quality. In exact terms, covering protection is hardness × coverage ÷ 100. Each Leather piece contributes **2 × (0.5 + covering protection ÷ 200) × its quality multiplier**; the Guard has two pieces, Gloves/Boots one. Add 0.25 for construction, then round the final total to the nearest quarter. Poor/Common/Rare/Exceptional multipliers are 0.75/1/1.25/1.5. This preserves the existing Guard result when its two panels match.
+
+For example, two Common panels with covering protection 50 produce **3.25 Protection** and Fine workmanship. A Poor panel at 20 plus an Exceptional panel at 80 produces **3.75 Protection** and Superior workmanship. The exact preview retains quarter-point calculation with the game's usual one-decimal display. Workmanship averages only the Leather panels' quality ranks and rounds half up; minor Cord does not drag Exceptional Leather toward Fine. Processing never applies quality twice or upgrades the original Hide.
+
+### Value, recovery and changing a garment
+
+A newly made garment sells for the sum of its actual recoverable components' recorded sale values, and costs twice that to buy. This matches the new Forge rule. No extra grade, colour or species multiplier is added to that sum. Finished items retain their frozen prices when later tuning changes.
+
+New Skin/Hide rewards use **2 / 3 / 6 / 12 Gold** sale value at Poor/Common/Rare/Exceptional, consistent with the existing common-base-3 creature market plan. With ordinary Salt worth 1, newly dressed Leather is **3 / 4 / 7 / 13 Gold**. Existing raw Hide, Skin and Leather keep their old values. Dressing cheap older stock uses its actual old value plus the Salt value, so buying an old cheap Exceptional Skin cannot create a newly expensive Leather profit. The quote shows the actual total for the selected pieces.
+
+With newly produced same-band Leather, a Guard sells for **7 / 9 / 15 / 27**, Gloves for **4 / 5 / 8 / 14**, and Boots for **6 / 7 / 10 / 16 Gold**. Mixed panels use their actual values. Existing early garments keep their older prices: these new numbers apply to future crafts.
+
+Dismantling a supported garment returns its recorded prepared pieces once: Cloth, Cord, Leather and any recorded Ingot or Resin. It does not also return the Fibre inside a textile, Hide inside Leather, Salt used in dressing, or crafting currencies. Loose prepared stock has no reverse-processing recipe. Older equipment with a different recorded recovery rule keeps that rule.
+
+**Ordinary refit:** at Corrin's built shop, replace a selected complete component of a garment whose construction is recorded. Pay the new inputs, receive the replaced recoverable pieces once, and preview the final stats, appearance and value before confirming. The exact owned item remains the same; the result is recalculated from its final parts, not given a repeating bonus.
+
+You may also explicitly remake a garment as another known variant in its own family, such as Woven Guard → Buckled Woven Guard or Woven Gloves → Leather Gloves. This uses the complete new recipe and returns the old recoverable construction once. Repeatedly adding a buckle cannot accumulate Protection. Older pieces without sufficient component records remain usable and sellable but cannot have missing materials guessed for refitting. Peerless refinement remains a separate unfinished service.
+
+### Carry and useful paths through the shop
+
+| Improvement | Access and price | Field-pack spaces before Sela |
+| --- | --- | ---: |
+| Opening pack | Already owned | 8 |
+| Reinforced Stitching | Opening Storehouse; 5 Essence, 4 Fibre | 11 |
+| Balanced Straps | After Stitching; 10 Essence, 6 Fibre, 1 Resin | 14 |
+| Deepened Satchel | Both previous improvements and built Tannery; 20 Essence, 2 Cloth, 2 Cord, 1 Resin | 23 |
+
+Sela's separate Wayfarer Table costs **30 Essence, 6 Logs and 4 Fibre** after recruitment and adds **2** at any stage: 10/13/16/25. No active posting or duplicate purchase is required. Carry has no extra root fee, Leather requirement, paid pattern, T2 Tannery gate or sellable bag item. Colour and quality do not change its capacity.
+
+Old ranks 0/1/2 map to 8/11/14 spaces; old ranks 3/4/5 receive the completed three-project capacity of 23. Repeated historical records do not grant extra slots, and supported higher old capacity remains preserved. An excursion already underway keeps its bound capacity until the next Home packing boundary. Nothing is discarded or automatically packed. Home shelving remains **16 plus nine improvements of 6, through 70**, under its existing owners and prerequisites; this plan adds no Tannery toll to it.
+
+After building Corrin's shop, a complete basic woven outfit needs **18 Fibre and 1 Resin**, for 3.5 total Protection. Choosing the Buckled Guard instead needs **22 Fibre, 1 Ingot and 1 Resin**, for 4.0. A full Leather outfit needs **4 eligible raw portions, 4 Salt, 6 Fibre and 1 Resin**; at Common quality and covering protection 50 throughout, it gives 6.75. These are choices across gathering trips, not an opening checklist or required purchase order.
+
+The first two pack improvements remain **15 Essence, 10 Fibre and 1 Resin**, leaving 25 of the opening 40 Essence before other spending. All three plus the Tannery foundation remain **55 Essence, 26 Fibre, 2 Resin, 6 Logs and 4 Clay**. The actual next-Bind quote determines departure affordability; there is no invented universal departure price.
+
+Apothecary's Salve ladder and Forge's linings, bindings and tool improvements consume these same prepared textiles, with their complete source records. Their recipe counts, effects and quality rules stay as specified; mixed textiles add no new colour gate. Later specialist shops can build on these outputs without a new arbitrary facility.
+
+**Implementation still needed:** mixed-textile selection and appearance, one-to-one Leather dressing and price preservation, all seven garment variants, refit and their connected save/trade/recovery behavior. This is a complete first-pass plan, not seven new homework approvals. The broader creature catalogue and the existing Mote-on-miss decision remain separate open work.
 
 ## Every remaining shop and crafting system
 

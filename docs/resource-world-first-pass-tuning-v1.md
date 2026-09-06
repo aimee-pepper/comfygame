@@ -237,7 +237,7 @@ There is no universal processing station and no return of the standalone Worksho
 
 The processed output keeps a recognizable identity. There is no universal Metal, Reagent, Toxin, or Prepared Extract item. Every process declares exactly one quality behavior:
 
-- **Preserve:** Leather retains the selected Hide or Skin's creature-material quality, inherited colour, and source detail. One batch cannot mix quality bands.
+- **Preserve:** Leather retains the selected Hide or Skin's creature-material quality, inherited colour, and source detail. Each dressed Leather unit preserves its one raw portion; preparing several units keeps their bands separate. A garment may combine individually selected Leather panels without creating averaged Leather.
 - **Standardize:** Glass, refined named metals, Planks, Hafts, Pulp, Paper, Cord, Cloth, pigments, and writing ink are ungraded processed stock. Their exact raw source and colour remain in the batch receipt where relevant, but the output does not invent creature-material quality.
 - **Recipe-defined:** a named extract has an authored potency calculation and disclosure. It does not inherit a generic quality multiplier unless that exact recipe says it does.
 
@@ -408,3 +408,8 @@ Those are separate conversations. Adding numbers for them here would make this p
 **Decided intended behavior:** all mineral, harvestable plant and loose-resource placement shares one node per tile, including written guarantees and early maker resources. Several units from one node are allowed. A canopy extending across nearby tiles is visual overhang, not another resource node. Required resources must use separate legal reachable positions; one cannot overwrite or hide beneath another to satisfy a guarantee.
 
 **Current uncertainty:** Aimee clarified that the apparent overlap may be valid adjacent mining. Actual duplicated source coordinates are unconfirmed pending Engineering's investigation. Adjacent mining remains accepted behavior; this record does not claim either a duplicate-node bug or its repair is verified.
+
+
+## Complete Tannery first-pass plan · 5 September
+
+The [complete shop plan](crafting-shop-overhaul.html) now specifies the Tannery's future rules: mixed actual Stem/Leaf constituents in Cord/Cloth, one Skin/Hide plus Salt per Leather, three clothing families with seven variants, per-panel Protection, consistent component prices, recovery and refit. These are Design-authored first-pass choices pending implementation. Cord/Cloth stay ungraded, Leather retains its source band, and existing stock keeps its saved values. Carry stays 8→11→14→23 plus Sela’s separate 2; no new facility or root toll is added. The new constituent rule replaces earlier matching-only manufacturing requirements while preserving actual colour and source history.

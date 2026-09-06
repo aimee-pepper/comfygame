@@ -32,6 +32,12 @@ The study should face north-up and east-right, with downward camera pitch rather
 
 The image must not reveal hidden enemies, resources, active hazard warnings or changed shadows/effects. Older saves without a sufficient actual tree observation keep honest remembered ground until a new sighting. This is a bounded stationary-tree correction, not approval of a full 3D migration.
 
+## Whole Tannery first-pass plan · 5 September
+
+The complete [Tannery plan](crafting-shop-overhaul.html) now covers Cord, Cloth, Leather, three clothing families with seven variants, prices, recovery, refitting and Carry. **These are Design-authored first-pass choices, pending implementation.** Fibre portions may combine as real coloured textile constituents. Dressing uses one eligible Skin/Hide plus Salt; a Guard may use two independently chosen Leather panels. Existing stock and clothing keep their saved qualities, colours and prices.
+
+Ordinary crafts and refit cost no Essence. New garments use the same recoverable-component pricing as the Forge. Woven Guard/Gloves/Boots remain useful before ingots or animal materials; Buckled Guard uses the existing Forge T2 Ingot. Carry stays 8→11→14→23 plus Sela's separate 2, and Home shelving still reaches 70. No extra Tannery tier, root toll or individual recipe approval is introduced. The full tables and examples are in the linked shop plan.
+
 ## Whole Forge first-pass plan · 5 September
 
 The complete [Forge/Blacksmith plan](crafting-shop-overhaul.html) now covers all eight catalogue families, one coherent Pick progression, T1–T3 facilities, all three level-3 tools, Bone/metal/wood component choices, statistics, prices, recovery and deterministic refit. These are **Design-authored first-pass choices; new implementation is pending**, not personal approvals attributed to you.
