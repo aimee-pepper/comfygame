@@ -148,7 +148,8 @@
     "consumerDesignStatus": "Complete Design-authored first-pass roles under delegated tuning authority; implementation pending, not new personal approval attributed to Aimee.",
     "firstPassConsumerContracts": [
       "blacksmith-whole-shop-production-v1.md",
-      "bowyer-whole-shop-production-v1.md"
+      "bowyer-whole-shop-production-v1.md",
+      "weaponsmith-whole-shop-production-v1.md"
     ]
   },
   "examples": [

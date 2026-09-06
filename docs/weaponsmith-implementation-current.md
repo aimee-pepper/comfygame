@@ -1,4 +1,6 @@
-# Weaponsmith — Current Implementation Contract
+# Weaponsmith — historical implementation contract, superseded for future production
+
+> **Whole Weaponsmith closure — 5 September:** `weaponsmith-whole-shop-production-v1.md` replaces the future Weaponsmith fees/caps/property lists and automatic specialty offset below. It specifies all four families, retained Polearm teaching, actual Hafts/collars, two explicit fitting choices, four-band source-based stats, values/recovery/refit and legacy services. New choices use delegated first-pass Design authority, not new personal approvals or native delivery claims.
 
 **Status:** implementation-ready with reversible balance values  
 **Owner:** Maud  
