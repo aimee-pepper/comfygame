@@ -82,7 +82,7 @@ Fine instrument readings mean whole-number precision under the existing formatte
 
 ## 5. Pulp and the deliberately held Paper step
 
-Building Isolde's Scriptorium teaches **2 Stem and/or Leaf Fibre →2 Pulp**,0 Essence. Use `processed.pulp.plant`, ungraded, nominal sell1/buy2 per unit. Two actual Fibre units yield two actual Pulp units, each retaining its own source/colour history; mixed input is allowed. No matching-colour gate, creature quality, invented Water bucket, Resin fee or repeated raw-ancestor ownership. Bulk preparation multiplies whole pairs only and uses exact available units once.
+Building Isolde's Scriptorium teaches **2 Stem and/or Leaf Fibre →2 Pulp**,0 Essence. Use `processed.pulp.plant`, ungraded, nominal sell1/buy2 per unit. Two actual Fibre units yield two actual Pulp units, each retaining its own source colour as material appearance as well as history, under Aimee’s 6 September flora clarification; mixed input is allowed. No matching-colour gate, creature quality, invented Water bucket, Resin fee or repeated raw-ancestor ownership. Bulk preparation multiplies whole pairs only and uses exact available units once.
 
 Compound Assembly's2 Pulp and each formalization's4 Pulp are the immediate consumers. Isolde makes the working sheets as part of that service. The previously proposed separate Paper ratio remains a held preparation rule until a named independently owned Paper consumer needs it; this batch adds neither a Paper bill to ordinary Binding nor an empty stack of craftable sheets. Pulp is not a pigment and never supplies Magenta by its name.
 

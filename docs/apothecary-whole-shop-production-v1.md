@@ -70,7 +70,7 @@ Names below are real distinct stock identities. New IDs are reserved content IDs
 | Mercury | `world.mercury` | 6 / 12 |
 | Rift-glass | `world.rift_glass` | 18 / 36 |
 
-Only the two explicit Fibre and Log allowlists accept alternatives. The two Fibre in Briar inputs can draw from selected Stem and Leaf lots; this standardized preparation does not require matching colours. That does not weaken Cord/Cloth manufacturing's separate matching rules. No anatomy inference, automatic legacy renaming or invented source measurement is allowed.
+Only the two explicit Fibre and Log allowlists accept alternatives. The two Fibre in Briar inputs can draw from selected Stem and Leaf lots; this standardized preparation does not require matching colours. Cord/Cloth likewise accept mixed actual sources under the complete Tannery contract, preserving each strand/section's colour; the old matching-only manufacturing gate is superseded. No anatomy inference, automatic legacy renaming or invented source measurement is allowed.
 
 ## Six named plant-part producers
 
