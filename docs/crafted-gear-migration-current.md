@@ -1,10 +1,6 @@
 # Crafted gear instance and reforge migration
 
-**Status:** Implementation-facing migration contract. It specializes
-`gear-crafting-families-current.md` without changing the settled shop hierarchy. Numerical reforge
-strength is under active correction review: `reforge-progression-audit-current.md` supersedes this
-file's future-facing 0.2×3 recommendation if Aimee approves DRQ-065. Existing paid power and the
-legacy construction/credit migration remain invariant.
+**Status: historical legacy migration reference, not the new equipment-service design.** The 6 September [shared equipment improvement and recovery contract](equipment-improvement-recovery-production-v1.md) governs future service dispatch. Preserve actual legacy paid power and source history; do not re-run old migration arithmetic on already-migrated instances. The old +0.2 ranks remain supported legacy behavior only. The August +0.5 alternative was not approved and is not an implementation dependency. Below, construction-tier formulas and rebuild behavior describe the older model; they do not apply to new-policy material gear. The actual versioned decoder remains the authority for existing saved fields, including the distinction between display credit and effective credit.
 
 ## Problem being migrated
 

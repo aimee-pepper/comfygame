@@ -193,3 +193,7 @@ Freeze exact canonical input owners, quantities, source/composition, recipe/fitt
 **Remaining implementation gates:** exact four producer registrations/custody and event-owned knowledge; the complete new Weaponsmith calculator/menu and combat projection; shared new-policy Bone/Leather/textile/Quartz support; legacy service routing; accepted shared coating lifetime. None is a new personal recipe approval request. Mote-on-miss/Peerless and wider anatomical work remain existing grouped homework. No new Aimee decision is required for this first pass.
 
 **Next existing whole-shop batch:** Armoury — Rigid/Insulated/Balanced rebuilds across supported protective slots, actual protection/ward tradeoffs, fitting/recovery services and legacy migration, using the now-defined prepared material producers.
+
+## Shared service resolution · 6 September
+
+The [shared equipment improvement and recovery contract](equipment-improvement-recovery-production-v1.md) now resolves this packet's ordinary-service/legacy-preservation boundary. New-policy gear uses its specified deterministic refit/remake/rebuild or fitting; it does not inherit old Reforge ranks or the unapproved +0.5 proposal. Only active components are recoverable. Unsupported old paid-credit targets keep their supported legacy services. Peerless remains a separate pending service with the existing Mote-on-miss question open; Apothecary consumables gain no equipment-refinement route. This supersedes references above to an unnamed future ordinary-service batch.

@@ -175,3 +175,7 @@ Engineering may divide code commits inside this **one complete shop batch**, but
 ## Design checks and delivery status
 
 The 19-row count, unique existing item IDs, complete input registry references and strict input-purchase-versus-output-sale inequalities were checked during authoring. Existing named-mineral `requires` were read from content; current item effects and accepted tool/source rules are cited above. These are design arithmetic/source checks, not claims of a working implementation. Repository organization and whitespace checks accompany the checkpoint. No native run, phone check, deployment polling or new audit framework was performed. Engineering remains undisturbed on its active renderer blocker until its normal queue reaches this packet.
+
+## Shared service resolution · 6 September
+
+The [shared equipment improvement and recovery contract](equipment-improvement-recovery-production-v1.md) now resolves this packet's ordinary-service/legacy-preservation boundary. New-policy gear uses its specified deterministic refit/remake/rebuild or fitting; it does not inherit old Reforge ranks or the unapproved +0.5 proposal. Only active components are recoverable. Unsupported old paid-credit targets keep their supported legacy services. Peerless remains a separate pending service with the existing Mote-on-miss question open; Apothecary consumables gain no equipment-refinement route. This supersedes references above to an unnamed future ordinary-service batch.
