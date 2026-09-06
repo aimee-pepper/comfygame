@@ -1,3 +1,4 @@
+import { ArmouryOverhaul } from '@/components/armoury-overhaul';
 import { WeaponsmithOverhaul } from '@/components/weaponsmith-overhaul';
 import { BowyerOverhaul } from '@/components/bowyer-overhaul';
 import { TanneryOverhaul } from '@/components/tannery-overhaul';
@@ -114,6 +115,7 @@ export default async function CraftingSystemDetail({
     {system.stationID === 'tannery' && <TanneryOverhaul />}
     {system.stationID === 'bowyer' && <BowyerOverhaul />}
     {system.stationID === 'weaponsmith' && <WeaponsmithOverhaul />}
+    {system.stationID === 'armoury' && <ArmouryOverhaul />}
     <SeptemberDecisions topic="crafting" />
       {guideStatus && <section className="article-section">
         <p className="status-pill">{guideStatus.status}</p>

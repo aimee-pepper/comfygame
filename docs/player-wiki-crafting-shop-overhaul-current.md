@@ -4,7 +4,7 @@ Updated 5 September 2026. This is the complete crafting review you requested, be
 
 ## What the review found
 
-Stone tools lead to useful raw-material equipment. Blacksmith T2 introduces Ingots, while Tannery textiles provide a parallel route into clothing and later specialist components. The later recipes still contain older rules that do not fit that sequence. The Apothecary now has a complete first-pass recipe-and-source plan; implementation remains pending. The Forge now also has its complete first-pass family/tool/material plan. The Tannery also has its complete first-pass textile, Leather, clothing and carrying plan below. The Bowyer and Weaponsmith now also have their complete first-pass plans. Subsequent shops continue as complete batches, including gathering, item effects, prices and recycling.
+Stone tools lead to useful raw-material equipment. Blacksmith T2 introduces Ingots, while Tannery textiles provide a parallel route into clothing and later specialist components. The later recipes still contain older rules that do not fit that sequence. The Apothecary now has a complete first-pass recipe-and-source plan; implementation remains pending. The Forge now also has its complete first-pass family/tool/material plan. The Tannery also has its complete first-pass textile, Leather, clothing and carrying plan below. The Bowyer, Weaponsmith and Armoury now also have complete first-pass plans. Subsequent shops continue as complete batches, including gathering, item effects, prices and recycling.
 
 The biggest corrections are:
 
@@ -354,13 +354,13 @@ The Weaponsmith plan below now gives Fen's Hafts actual consumers: one Softwood 
 
 ### Useful Hafts and collars, with no circular unlock
 
-Maud's recruitment teaches the Haft recipes. Fen can then make them at the built Bowyer **before** the Weaponsmith foundation needs them. Building the Weaponsmith teaches the Collar recipes. Knowledge stays saved if its producer is not built yet. Existing legitimate trade can also supply prepared parts without granting a missing facility tier or inventing merchant stock.
+Maud's recruitment teaches the Haft recipes. Fen can then make them at the built Bowyer **before** the Weaponsmith foundation needs them. Building the Weaponsmith teaches the Collar recipes; Armoury construction also teaches the same Iron Collar recipe, so Bracken does not require Maud. Knowledge stays saved if its producer is not built yet. Existing legitimate trade can also supply prepared parts without granting a missing facility tier or inventing merchant stock.
 
 | Prepared material | Maker and access | Ingredients | Quality and sale / buy |
 | --- | --- | --- | --- |
 | Softwood Haft | Bowyer; Maud recruited | 1 Softwood Log | Ungraded; 1 / 2 Gold |
 | Hardwood Haft | Bowyer; Maud recruited | 1 Hardwood Log | Ungraded; 1 / 2 Gold |
-| Iron Collar | Blacksmith T2; Weaponsmith built | 2 Iron, 1 Coal | Ungraded; 4 / 8 Gold |
+| Iron Collar | Blacksmith T2; Weaponsmith or Armoury built | 2 Iron, 1 Coal | Ungraded; 4 / 8 Gold |
 | Bone Collar | Built Weaponsmith | 1 eligible typed Bone | Same Bone quality and actual recorded value; buy twice |
 
 A Haft is a shaped handle or shaft component; a Collar secures the fitted assembly. The Log's type and colour stay recognizable. Bone Collar preserves its exact Bone source, band and colour without applying quality twice or inventing a new skeletal subtype.
@@ -432,13 +432,116 @@ A full base-price production route through Forge T1/T2, Corrin, Fen, Weaponsmith
 
 **Still needed:** implement the four prepared-material routes, actual event-owned knowledge, complete new recipe/fitting calculator, combat projection, trade/recovery/refit and legacy routing. No individual recipe approval is needed from Aimee for this first pass. Mote/Peerless and wider creature-anatomy work remain the existing grouped questions. **Armoury is the next complete shop batch.**
 
+## Armoury — the complete protective-rebuild first-pass plan
+
+**Current behavior:** Bracken already has a protective rebuild screen and Rigid Shell, Insulated Layer and Balanced Laminate profiles. Older routes use broad material families, six-band calculations, profile offsets and selected-sample insulation. The complete new plan below is **pending implementation**.
+
+**Retained decisions:** rebuild one existing ordinary physical protective piece while keeping its identity, supported inscriptions, slot and ownership. Profiles are defensive choices, not quality ranks. Unique/apex/narrative gear, magical housings, weapons, field tools and keepsakes are excluded. Worn equipment can remain on its existing wearer when the legitimate Home service supports it. Unsupported old construction/upgrade records retain their existing service paths rather than having missing history guessed.
+
+### Every supported profile and slot
+
+| Slot | Rigid Shell | Insulated Layer | Balanced Laminate |
+| --- | --- | --- | --- |
+| Offhand shield | Yes | No | Yes |
+| Head | Yes | Yes | Yes |
+| Body | Yes | Yes | Yes |
+| Hands | Yes | Yes | Yes |
+| Feet | Yes | Yes | Yes |
+
+These are **14 supported combinations**. The existing Insulated offhand exclusion stays: a carried shield does not become an Insulated worn layer. A rebuild cannot turn boots into a Helm or add another equipment slot. The piece keeps its name/origin history, with its current profile and real materials shown separately.
+
+**New Design-authored first-pass choices:** the Armoury foundation is **35 Essence, 4 Ingots, 2 Cloth and 2 Cord** after recruiting Bracken. All applicable profiles and ordinary component refit are included. Rebuilds/refits cost **0 Essence**, with no extra profile research fee, Study, attending-keeper or new shop-tier requirement. Existing applicable construction/staffing rules still govern the base quote; old paid progress is preserved. These choices are not newly attributed personal approvals or completed balance tests.
+
+Armoury construction teaches the **same Iron Collar recipe at Forge T2** as Weaponsmith construction: 2 Iron and 1 Coal make 1 Collar. This gives Balanced a complete metal route without requiring Maud. Bone Collar remains Maud's optional alternative. No new facility or duplicate material is introduced.
+
+### Complete construction materials
+
+Body uses the large recipe. Other allowed slots use the small recipe. Choose one listed alternative within each part; every other part is required.
+
+| Profile and size | Structural outer | Lining | Binding | Fitting |
+| --- | --- | --- | --- | --- |
+| Rigid Body | 4 Ingots **or** 4 Bone | — | 2 Cord **or** 2 Leather | — |
+| Rigid other slots | 2 Ingots **or** 2 Bone | — | 1 Cord **or** 1 Leather | — |
+| Balanced Body | 2 Ingots **or** 2 Bone **or** 2 Leather | 2 Cloth | 2 Cord **or** 2 Leather | 1 Iron **or** Bone Collar |
+| Balanced other slots | 1 Ingot **or** 1 Bone **or** 1 Leather | 1 Cloth | 1 Cord **or** 1 Leather | Same |
+| Insulated Body | 2 Cloth **or** 2 Leather | 2 Cloth | 2 Cord **or** 2 Leather | — |
+| Insulated Head/Hands/Feet | 1 Cloth **or** 1 Leather | 1 Cloth | 1 Cord **or** 1 Leather | — |
+
+Every profile has an animal-free route. Cloth supplies the actual lining; the plan does not wait for an invented Pelt/Down producer or require an unrelated “insulation sample.” Bone and Leather pieces may differ in quality, measurements, colour and source. The actual Tannery textiles retain their mixed strands/sections. A piece cannot supply both an outer and a binding unless the owned quantity really supports both allocations.
+
+### Protection and Heat Ward tradeoffs
+
+These are the **complete new Protection results**, not bonuses added to the item's old statistics.
+
+| Profile / outer material | Body Protection | Other allowed slots |
+| --- | --- | --- |
+| Rigid Ingot | 3.25 | 2.0 |
+| Rigid Bone | Source formula with ceiling 4.5 | Ceiling 2.5 |
+| Balanced Ingot | 2.5 | 1.5 |
+| Balanced Bone or Leather | Source formula with ceiling 4 | Ceiling 2 |
+| Insulated Cloth | 2.0 | 1.0 |
+| Insulated Leather | Source formula with ceiling 3 | Ceiling 1.5 |
+
+For Bone, the source formula is **ceiling × (0.5 + actual Density ÷ 200) × quality multiplier**. Leather uses its preserved covering protection—hardness × coverage ÷ 100—in place of Density. Poor/Common/Rare/Exceptional multipliers stay 0.75/1/1.25/1.5. Average several outer pieces' contributions, then round the final total once to the nearest quarter. Do not create averaged raw material or add the old item's Protection again.
+
+The actual Cloth-lined construction gives these fixed **Heat Ward percentage points**:
+
+| Profile | Shield | Head | Body | Hands | Feet |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| Rigid | 0 | 0 | 0 | 0 | 0 |
+| Balanced | 5 | 8 | 15 | 5 | 5 |
+| Insulated | Unavailable | 15 | 25 | 10 | 10 |
+
+Heat Ward uses the existing Heat emanation damage rule. This plan does not change Burn ticks, weather exposure or other damage types. It adds no new resistance stat or immunity.
+
+**A lining counts once.** New Armoury pieces use Heat Ward without also adding the same lining to the older insulation calculation. Other old equipment keeps its recorded behavior. Equipment Heat Ward still caps at **50 points**, and the existing combined heat mitigation calculation with legacy insulation retains its **60% cap** and existing skill rules.
+
+Examples make the choices clearer:
+
+- An Ingot Rigid Body gives **3.25 Protection / 0 Heat Ward**; Balanced gives **2.5 / 15**; an all-Cloth Insulated Body gives **2.0 / 25**.
+- Common Bone at Density 50 gives **3.5 / 0** as Rigid Body or **3.0 / 15** as Balanced.
+- Common Leather at covering protection 50 gives **3.0 / 15** as Balanced Body or **2.25 / 25** as Insulated. An older Leather Guard may already have 3.25 Protection: the comparison must show the trade, not promise that every rebuild increases every stat.
+- At the ordinary world-material values, five Rigid pieces total **11.25 Protection / 0 Ward**; five Balanced pieces total **8.5 / 38**.
+- Insulated Body, Head and Hands with Rigid Feet and shield total **8.0 Protection / 50 Ward**. Making the Feet Insulated too drops Protection to 7.0 without improving the capped Ward; the extra ten points are already covered.
+
+These are first-pass arithmetic, not completed encounter balancing. The actual before/after view must show the wearer's resulting totals, including the cap, so a mixed set can be a deliberate choice.
+
+### Quality, prices and exact recovery
+
+Workmanship keeps the accepted 70% structural outer / 30% designated support rule. Rigid's support is its binding; Balanced's supports are lining, binding and Collar; Insulated's are lining and binding. Ungraded Cloth/Cord/Ingot counts as Fine, while creature-derived parts use their actual bands. Multiple units do not gain extra group votes. No ordinary rebuild creates Peerless or applies quality twice to combat stats.
+
+New sale value is the sum of the actual recoverable components' recorded values, and buy price is twice that. No profile or finished-grade premium is added. Existing cheaper Leather stays at its actual old value.
+
+| Full world-material route with Cord binding | Body sale / buy | Other allowed slots sale / buy |
+| --- | --- | --- |
+| Rigid Ingot | 18 / 36 Gold | 9 / 18 Gold |
+| Balanced Ingot with Cloth lining and Iron Collar | 18 / 36 Gold | 11 / 22 Gold |
+| Insulated Cloth outer and lining | 10 / 20 Gold | 5 / 10 Gold |
+
+A full rebuild uses the complete new recipe and **returns the outgoing active construction's recoverable parts once**, keeping the same item. The quote may explicitly reuse those parts, accounting for each once. Its old sale value is not another ingredient or a hidden Gold refund.
+
+The item's history can remember previous versions, but dismantling later returns **only the currently attached components**. It cannot refund old parts already returned by an earlier rebuild. Cloth, Cord, Leather and Collars return as their exact prepared units; their original Fibre, Hide, Salt, Iron, Bone or fuel do not also return. No old base item is duplicated.
+
+Ordinary component refit replaces one complete part while preserving profile and slot. Changing Rigid/Balanced/Insulated is a full rebuild using the destination recipe; it is not a free toggle because the construction changes. Failed or stale transactions spend nothing and return nothing. Existing overflow custody remains safe, and active excursions are not rewritten by a Home recipe update.
+
+Old legacy credits, bought Reforge work, unsupported construction records and special gear are not silently erased to enter the new path. They keep their existing supported services. The later equipment-improvement batch must reconcile those services with Peerless; no new personal approval checklist is created for ordinary new-profile equipment.
+
+### Practical progression and remaining work
+
+The foundation's prepared materials expand to **8 Iron, 4 Coal and 12 Fibre**, plus 35 Essence. Including Forge T1/T2 and Corrin's foundations gives **95 Essence, 24 Iron, 4 Coal, 14 Logs, 20 Fibre and 8 Clay**, before the chosen base item/rebuild and any recruitment/search/Binding costs. Bracken does not require Fen or Maud for ordinary profiles.
+
+After those shops exist, an Ingot Rigid Body recipe expands to **8 Iron, 4 Coal and 4 Fibre**; Balanced Ingot Body to **6 Iron, 3 Coal and 12 Fibre**; an all-Cloth Insulated Body to **20 Fibre**. These are complete destination recipes; the exact old parts being returned or reused are quoted separately. They are staged options, not a required full wardrobe or an affordability playtest.
+
+**Still needed:** implement the complete typed rebuild calculator, all 14 supported choices, current-versus-historical component ownership, new/legacy Heat Ward projection, shared Collar knowledge, refit/recovery and durable custody. No individual profile/material approval is needed from Aimee for this first pass.
+
+The six ordinary maker plans are now specified. **Next is the complete equipment-improvement/recovery service plan**, including retained legacy Reforge and eventual Peerless. The real existing owner question remains the experience when a Mote-funded partial attempt misses; the recommendation is lasting progress without destruction or downgrading. That answer does not gate these ordinary shop plans.
+
 ## Every remaining shop and crafting system
 
 The sequence below follows material dependencies. It includes services and processing that do not appear as ordinary recipe cards.
 
 | System | Complete scope of its batch | Main correction or dependency |
 | --- | --- | --- |
-| Armoury | Rigid, Insulated and Balanced rebuilds across the five protective slots | Show actual Protection/ward tradeoffs and preserve the piece being rebuilt |
 | Equipment improvement and recovery | Reforge, component replacement, Peerless refinement, recycling | One explanation of identity, improvement, fees and recoverable components; no repeated bonus or material duplication |
 | Survey Post | Eight instruments, each with Good and Fine improvements | Sixteen improvements with understandable instrument components, not a generic property sample masquerading as every instrument part |
 | Scriptorium / Writing Desk | Ink, personal Compounds, Seamward installation/erasure, later Paper and pigments | Keep making ink, using ink, recording a Compound and inscribing an item distinct |

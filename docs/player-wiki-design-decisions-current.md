@@ -4,15 +4,15 @@ This is the current record of the changes agreed today. **Decided intended behav
 
 ## Whole-shop update · 5 September
 
-Design is now overhauling complete crafting shops, beginning with all 19 Apothecary preparations, Blacksmith and Tannery. [Crafting Overhaul · Shop by Shop](crafting-shop-overhaul.html) records the complete scope, current rules, accepted destination and the now-closed first-pass Apothecary recipe/source matrix. It supersedes isolated next-recipe assignments. The ingredient bridges below are temporary compatibility steps; they do not settle the final recipes or replace the accepted excursion-long coating lifetime.
+Complete first-pass plans now cover all 19 Apothecary preparations, Forge, Tannery, Bowyer, Weaponsmith and Armoury; replacement implementation remains queued. [Crafting Overhaul · Shop by Shop](crafting-shop-overhaul.html) records the complete scope, current rules, accepted destination and the complete first-pass recipes, producers and services for those six makers. It supersedes isolated next-recipe assignments. The ingredient bridges below are temporary compatibility steps; they do not settle the final recipes or replace the accepted excursion-long coating lifetime.
 
-## Defeat summaries · decided 5 September
+## Defeat summaries · delivered 6 September
 
-**Current behavior:** combat defeats can give only “You were carried home.” Some world hazards already have a more specific message, but selecting a cause from everything that happened that turn can attribute the wrong final injury.
+**Delivery reported:** Engineering reports the actual-cause return summary installed and launched in build 317 on 6 September. The real Attack → fatal poison → return summary → restart route passed its native check; Design has not repeated the delivery checks.
 
-**Decided intended behavior — implementation pending:** the return summary names the event that actually brought you down: for example, “Defeated by poison” for a fatal poison tick, or “Defeated by [known creature]” for its fatal attack. Burning, bleeding, toxic air and dangerous growth use their own supported causes. An undisclosed creature stays unnamed, and an unavailable older cause is honestly unknown. The following line still explains that you were carried home; this does not add permanent death or change the haul rules.
+**Current behavior:** the return summary names the event that actually brought you down: for example, “Defeated by poison” for a fatal poison tick, or “Defeated by [known creature]” for its fatal attack. Burning, bleeding, toxic air and dangerous growth use their own supported causes. An undisclosed creature stays unnamed, and an unavailable older cause is honestly unknown. The following line still explains that you were carried home; this does not add permanent death or change the haul rules.
 
-The Binder going down already ends the excursion; a companion falling alone does not mean the whole party was defeated. Reopening should preserve the same cause without replaying damage or guessing from the enemies left nearby. This is a reporting change, not new damage or combat mechanics.
+The Binder going down already ends the excursion; a companion falling alone does not mean the whole party was defeated. Reopening preserves the same recorded cause without replaying damage or guessing from the enemies left nearby. This is a reporting change, not new damage or combat mechanics.
 
 ## Field and terrain feedback · 5 September
 
@@ -31,6 +31,12 @@ The study should face north-up and east-right, with downward camera pitch rather
 **Accepted behavior, now delivered:** remembered ground retains a tree’s last-observed shape and position. It refreshes when legitimately seen again, including a stump or observed absence. Unseen growth, removal or new trees remain unknown; an old remembered tree is not proof that it still exists now. A glimpse of canopy or previously seen ground alone does not reveal a new tree.
 
 The remembered image reveals no hidden enemies, resources, active hazard warnings or changed shadows/effects. Remembered trees do not cast current shadows or react to current lighting. Older saves without a sufficient actual tree observation keep honest remembered ground until a new sighting. Existing fading of currently visible trees is preserved. Engineering reports model/render checks and walking-away/restart checks; Design has not repeated them. This is a bounded stationary-tree correction, not approval of a full 3D migration.
+
+## Whole Armoury first-pass plan · 6 September
+
+The complete [Armoury plan](crafting-shop-overhaul.html) now specifies all 14 supported Rigid/Insulated/Balanced slot choices, actual materials, Protection/Heat Ward, quality, prices and exact rebuild/refit/recovery. **New Design-authored first-pass rules remain pending implementation.** The foundation is 35 Essence, 4 Ingots, 2 Cloth and 2 Cord, with ordinary rebuilds/refits at no Essence cost. Insulated still excludes shields.
+
+New linings count once through Heat Ward, retaining the existing 50-point equipment cap and 60% combined heat-mitigation cap. Mixed sets can reach the ward cap while preserving Rigid pieces. Rebuilding returns old active parts once; historical versions do not become extra salvage. Bracken's foundation teaches the same Forge Iron Collar recipe so Maud is optional. Legacy gear, credits and services stay supported. Equipment improvement/recovery is the next whole batch, with the existing Mote-on-miss question still grouped in homework.
 
 ## Whole Weaponsmith first-pass plan · 5 September
 
