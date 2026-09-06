@@ -36,7 +36,7 @@ Source measurements are clamped to 0–100. The final score is rounded half up o
 
 Each physical part uses measurements that make sense for that part. Covering and flexibility can describe Hide; covering and insulation can describe Pelt; armour and coverage can describe Scales; hardness and armour can describe Shell or Chitin; mass and skeletal strength can describe Bone; natural-weapon strength and skeletal strength can describe Fang, Claw, Tusk, or Horn. The first plain Bone source now has a bounded intended contract: a qualifying internal skeleton, the retained 1–3 species yield and Anatomy benefit, actual-source quality/colour, Return and ordinary trading. It awaits implementation and a compatible crafting update. The rest of the creature-generation catalogue remains unfinished; no Hollow/Dense subtype or additional body-part mapping is inferred.
 
-Flora-derived materials are ungraded. They stack by their resolved physical type or subtype, while species, colour, source world, and any useful source measurements remain available beneath that stack. A recipe may use a relevant plant measurement or inherited colour in its preview, but it does not turn that plant into Poor, Common, Rare, or Exceptional stock.
+Flora-derived materials are ungraded. They stack by their resolved physical type or subtype, while species, colour, source world, and any useful source measurements remain available beneath that stack. Recipes preserve inherited colour in the actual flora-derived material components, as well as showing it in previews; relevant plant measurements remain available without turning that plant into Poor, Common, Rare, or Exceptional stock.
 
 ## How a selected creature material changes an item
 
@@ -238,7 +238,7 @@ There is no universal processing station and no return of the standalone Worksho
 The processed output keeps a recognizable identity. There is no universal Metal, Reagent, Toxin, or Prepared Extract item. Every process declares exactly one quality behavior:
 
 - **Preserve:** Leather retains the selected Hide or Skin's creature-material quality, inherited colour, and source detail. Each dressed Leather unit preserves its one raw portion; preparing several units keeps their bands separate. A garment may combine individually selected Leather panels without creating averaged Leather.
-- **Standardize:** Glass, refined named metals, Planks, Hafts, Pulp, Paper, Cord, Cloth, pigments, and writing ink are ungraded processed stock. Their exact raw source and colour remain in the batch receipt where relevant, but the output does not invent creature-material quality.
+- **Standardize:** Glass, refined named metals, Planks, Hafts, Pulp, Paper, Cord, Cloth, pigments, and writing ink are ungraded processed stock. Ungraded does not erase appearance: Hafts, Pulp, Cord and Cloth retain the actual selected wood or flora colours in their material appearance and constituent records. Those colours carry into the corresponding visible crafted components. Mixed Cord/Cloth preserve separate source-coloured strands/sections. Explicitly transformed pigments and ink keep their recipe-defined colour rules and input provenance. No output invents creature-material quality.
 - **Recipe-defined:** a named extract has an authored potency calculation and disclosure. It does not inherit a generic quality multiplier unless that exact recipe says it does.
 
 Quality is applied once when the final stat-bearing item is calculated; processing never multiplies it a second time. Pelt remains Pelt unless a later recipe has a real need for a distinct cured form. Rift-glass remains Rift-glass rather than becoming ordinary Glass.
@@ -252,7 +252,7 @@ The first-pass conversion rules are below. Each is one immediate Cottage transac
 | Smelt a named solid metal when a real recipe requires it | 2 matching raw metal + 1 Coal | 1 matching named Ingot |
 | Make ordinary Glass from bulk material | 2 Sand + 1 Coal | 1 Glass |
 | Make clear Glass from crystal | 1 Quartz + 1 Coal | 1 Glass |
-| Make Leather | 2 Hide or Skin of one quality band + 1 Salt | 1 Leather of that band |
+| Make Leather | 1 eligible Hide or Skin portion + 1 Salt | 1 Leather preserving that portion’s band and colour |
 | Make Cord | 2 eligible Plant Fibre | 1 Cord |
 | Make Cloth | 4 eligible Plant Fibre | 1 Cloth |
 | Make Planks | 1 eligible Log | 2 matching Planks |
