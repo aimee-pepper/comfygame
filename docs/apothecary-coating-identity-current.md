@@ -1,5 +1,7 @@
 # Apothecary coating identity
 
+**5 September physical-input follow-up:** [Briar Oil compatibility bridge](briar-oil-physical-input-adapter-v1.md) is ready for implementation: exact Stem/Leaf Fibre and Resin feed the existing recipe while its separate flexible World-resource requirement remains. The all-Plant-Fibre simplification is only a proposal; the existing coating effect and zero-Essence cost remain unchanged.
+
 **Status:** settled first-slice names, effects and recipes; native correctness patch queued
 
 **Updated:** 11 Aug 2026
