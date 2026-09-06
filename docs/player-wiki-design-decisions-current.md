@@ -503,6 +503,35 @@ An already authored abandoned nest can remain an abandoned nest without assignin
 
 **Remaining work:** aquatic/aerial and other unsupported feeding mechanisms, chemosynthetic intake, other food types if useful, natural source prevalence and population support, actual shelter use where worthwhile, useful weather responses, learning particular food relationships, implementation of the specified anatomy/recipes and playtesting the combined experience. The three creature goals remain incomplete. No new owner decision blocks the independent proposal above.
 
+### Remaining diets — supported and unspecified
+
+**First-pass Design disposition, not implemented feeding behavior.** The existing proposal supports three explicitly assigned relationships: low-leaf browsing, soft-fungal feeding and smaller-prey hunting for its compatible mobile Land/Amphibious bodies. Each needs actual suitable food, access in every occupied habitat area and, for prey, a supported chain back to forage. Body shape and movement alone do not establish any of these.
+
+| Remaining case | What is still missing before a diet can be claimed |
+| --- | --- |
+| Fully aquatic plant feeder | Actual suitable submerged food and a supported way for that body to take it in |
+| Fully aquatic predator | A supported in-water feeding relation, real contact and prey with a supported food chain |
+| Fish-shaped Amphibious creature | A supported feeding capability; its real walking limbs do not establish what it eats |
+| Aerial plant/fungal feeder or predator | A real way to obtain and handle the food; flying over it does not establish landing, perching, diving or feeding |
+| Radial animal | Its actual intake capability and suitable food; radial shape does not prove filter feeding |
+| Amorphous animal | An actual intake/processing mechanism and compatible food; shape does not prove absorption |
+| Chemical-energy animal | Animal metabolic capability and an actual usable chemical source; smell/taste, glow and toxic defence are insufficient |
+| Eating chemosynthetic growth, detritus, carrion, nectar, seeds or hazardous tissue | The actual edible part/chemistry, availability and a compatible feeding relation; nearby appearance or a material name is insufficient |
+
+These cases remain **diet unspecified** in this first pass. That does not mean the animal does not eat, is starving or should disappear. Real photosynthetic, fungal and chemosynthetic flora retain their existing world-support rules; chemical growth can support a dark world without proving that a nearby animal eats minerals. A high chemical-sense trait means smell and taste, not chemical metabolism.
+
+A land-bound feathered or membrane creature can still qualify for one of the supported ground profiles when its actual body, capability and food access fit. Wings alone do not change its diet. No fourth generic diet, invented food patch, feeding simulation, new recipe or owner approval is added.
+
+### Natural availability and play — next acceptance questions
+
+**Plan only; no new world sample or spawn frequency has been chosen.** Once an actual creature source and its named crafting use are implemented, use the ordinary source-to-craft route already being played. Record what was seen, what was reachable, what was actually recovered and kept, and what choice the real recipe offered. A second normal route is useful only for a concrete unanswered question; there is no requirement to clear a map or search a quota of worlds.
+
+The questions are practical: could the player understand and reach the source, was its recovery useful, did colour/Pattern survive into the component, did quality match the preview, and did the optional creature material offer a worthwhile choice while ordinary crafting remained possible? For food, only an actual supported relation justifies the claim. An intentionally unspecified diet is not a failed simulation.
+
+Not encountering a material does not prove zero availability. Seeing an unreachable swimmer does not make its drop obtainable. Losing a reward before Return is different from never receiving it. A rare lining may leave the rounded workmanship label unchanged. Repeated sale-only drops may justify adjusting which families appear, rather than inventing recipes for every part.
+
+The later handoff should state what happened, what remains unknown and the one change or observation that would resolve the concern. Whole-world material counts, hidden cast lists and assumed spawn percentages are unnecessary. All three broader creature goals remain open until the actual integrated exploration/crafting experience supports closing them.
+
 ### Climate and creature observations — first-pass proposal, not implemented
 
 World conditions already influence how bodies are generated: cold tends toward larger, more covered creatures; the wetter cold branch favours bulk with less extra covering; heat favours smaller, less covered bodies. These are tendencies within the same individual budget. Cold lows and hot highs can both shape one world's creatures. None guarantees a particular material, safe temperature range or immunity.
