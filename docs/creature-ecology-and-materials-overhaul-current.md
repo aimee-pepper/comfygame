@@ -19,9 +19,11 @@ The older six-band material model, family-only source grouping, generic Plate/Fi
 
 These contracts do not reinterpret saved worlds. Engineering owns versioned integration, the supported real native consumers and delivery. Do not commission speculative final art, extra review matrices or Design phone checks from this page.
 
+The [creature discovery journey](creature-disclosure-player-journey-v1.md) now also defines full-sight notes, read-only Look, preserved encounter/Read knowledge, confirmed recovered-material facts and the shared Library/Bestiary display union. It is intended and unimplemented. First sight neither grants a measured specimen nor consumes the existing first-encounter discovery reward.
+
 ## Remaining real work
 
-Tooth/claw/tusk anatomy, separate Down, fin/membrane measurements, recoverable Oil/Venom/Ichor chemistry and exact new solid-part equipment roles remain Design dependencies. The completed Apothecary, Distillery and Scriptorium recipes already use Resin/Toxic Sap/Dyer's Root and do not depend on invented fluids. Broader food/nesting, distant-sighting/likely-material knowledge, natural reward incidence and exploration/crafting feel remain unfinished.
+Tooth/claw/tusk anatomy, separate Down, fin/membrane measurements, recoverable Oil/Venom/Ichor chemistry and exact new solid-part equipment roles remain Design dependencies. The completed Apothecary, Distillery and Scriptorium recipes already use Resin/Toxic Sap/Dyer's Root and do not depend on invented fluids. Broader food/nesting, implementation of the specified distant-sighting/likely-material journey, natural reward incidence and exploration/crafting feel remain unfinished.
 
 Ordinary animal bodies do not contain generic world ore, swords or keys. Removal of legacy incidental rolls requires its own explicit new reward policy and preservation of saved results. The separate historical territory-find proposal is not automatically enabled, does not establish a nest or food web, and adds no new Aimee approval chore to this batch. Existing Apex/guardian/site rewards remain independently owned. Spent Emanation Housing is its existing site, not a body-part or free-Core source.
 

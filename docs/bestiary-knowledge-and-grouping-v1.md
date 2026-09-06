@@ -4,6 +4,10 @@
 
 Source baseline inspected: Engineering `594cb61c23c198337b2c42ad4ccebc10023a1817`, tree `1c8501453bd2c360a3dced3f047e18dad95c8a55`. Source owners are `Discovery.swift`, `BestiaryRules.swift`, `BestiaryView.swift`, `WorldRules.swift`, `CombatRules.swift`, and the Library shelf adapter in `LibraryRules.swift`. This is source inspection, not a mounted sorting receipt.
 
+## 6 September disclosure continuation
+
+[Creature discovery and material disclosure](creature-disclosure-player-journey-v1.md) now defines the future full-sight/Look/material-knowledge path. It is unimplemented. Once integrated, a separate sight-only record joins the Library/Bestiary display union without calling encounter recording, granting a specimen/XP, or consuming first-encounter discovery. The current-source facts below still describe the existing encounter-only admission; they must not be treated as a ban on the explicitly specified new sighting event. Existing full measurements, known habitat/shape, counts/read state and old saves remain protected. No new victory or analysis gate is introduced.
+
 ## Current facts and the boundary
 
 - Both the current entry adapter and habitat-volume adapter require a persisted species discovery record with `firstSeenRunIndex != nil`. A generated cast, habitat map entry or stored-looking trait vector alone is not an admitted entry.
