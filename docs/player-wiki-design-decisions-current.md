@@ -8,7 +8,7 @@ Complete first-pass plans now cover all 19 Apothecary preparations, Forge, Tanne
 
 ## Wood, Hide, Apex labels and notices · 6 September
 
-**Status:** all four directions are accepted. Hide grouping is delivered in build 318 and functional Apex labels in build 319; wood consistency and notice controls remain pending.
+**Status:** all four directions are accepted. Hide grouping is delivered in build 318, Apex labels in build 319 with their styling integrated in build 320, and notice controls in build 320. Wood consistency remains pending.
 
 **Wood comes from the world.** Trees are the main source of wood, with their actual world-derived wood colour carried into Logs, Hafts and the corresponding equipment parts. Leaves and changing light do not change the material's inherent colour. Smaller trees and fallen logs provide supporting early routes; an improved Axe must not become a circular requirement for getting its own wood.
 
@@ -16,11 +16,11 @@ Use **Logs**, **Softwood Logs** and **Hardwood Logs** consistently. Older stock 
 
 **Equivalent Hide — current in build 318:** Return, Storehouse and physical material selectors group equivalent portions by quantity, preserving their actual quality, useful properties and validated source colour. Genuine differences remain separate. Storehouse includes creature reserve stock and a quantity/source detail sheet. Individual ownership, provenance, destinations and exact recipe consumption remain intact. Engineering reports the native four-portions → process-two → two-remaining route passed and build 318 installed and launched on 6 September. The current Tannery recipe still consumes two portions; the later one-to-one Leather recipe is not claimed delivered by this display fix.
 
-**Apex labels — current in build 319:** actual Apex creatures are identified on the existing visible field/minimap markers, current-sight details and encounter header. Ordinary creatures that stand still do not acquire an Apex label. Existing visibility remains authoritative; this adds no hidden creature, proper name or reward reveal. Engineering reports the visible Apex → move into encounter → reopen route passed and cumulative build 319 installed and launched on 6 September. Functional labels are delivered; Asset styling remains in progress.
+**Apex labels — current in build 319:** actual Apex creatures are identified on the existing visible field/minimap markers, current-sight details and encounter header. Ordinary creatures that stand still do not acquire an Apex label. Existing visibility remains authoritative; this adds no hidden creature, proper name or reward reveal. Engineering reports the visible Apex → move into encounter → reopen route passed and cumulative build 319 installed and launched on 6 September. Asset styling is also integrated in build 320; Engineering reports the map → encounter → reopen route passed.
 
-**Optional field notices have category controls.** Monster notices and mining/gathering results can be switched separately. Muting them changes the popups, not the actual world, resource collection, map labels, Diary or inventory. A visible Apex badge remains visible.
+**Optional field notices — current in build 320:** Monster notices and mining/gathering results can be switched separately. Muting them changes the popups, not the actual world, resource collection, map labels, Diary or inventory. A visible Apex badge remains visible.
 
-**Design first-pass defaults, open to tuning:**
+**Current starting settings — Design first-pass tuning:**
 
 | Category | Starting setting | Optional notices |
 | --- | --- | --- |
@@ -30,7 +30,7 @@ Use **Logs**, **Softwood Logs** and **Hardwood Logs** consistently. Older stock 
 
 You can change these settings; an existing saved choice is preserved. Damage, danger, failed actions/saves, a full satchel, required choices, combat and return summaries still explain what happened. Reading or inspecting something explicitly still shows its result. A muted gathering result must never hide damage from the same action. Fully muted results leave no empty panel, and switching notices back on does not replay old messages.
 
-The category defaults are Design-authored starting choices, not additional personal decisions attributed to Aimee. The accepted changes need no new homework approval; each becomes **current behavior** only after its implementation is reported delivered.
+The category defaults are Design-authored starting choices, not additional personal decisions attributed to Aimee. Engineering reports build 320 installed and launched on 6 September: saved settings → muted Salt gathering → reopening retained both the settings and the two collected Salt. Notice controls and Apex styling are current; wood and the whole-shop replacements remain pending.
 
 ## Defeat summaries · delivered 6 September
 
