@@ -17,18 +17,11 @@ no new way to play, and it makes Auber a tax-efficiency character.
 remains one currency. Distilled outputs are crafted objects or modifications, never additional
 wallet balances.
 
-### Three operations
+### Current production direction
 
-| Operation | Input | Output | Player decision |
-|---|---|---|---|
-| **Crystallise** | Essence + a mineral world resource | An essence crystal used in high-tier recipes, Channelworks and anchoring | Which resource properties should the crystal inherit? |
-| **Attune** | An essence crystal + a chosen world resource | A crystal biased toward a pressure, emanation or Craft behaviour | What kind of effect should this finite component carry? |
-| **Infuse** | Essence + an existing crafted object/material | One chosen property or authored behaviour strengthened, with a compensating limit or cost | Which part of this object’s identity is worth intensifying? |
+The complete [Distillery production contract](distillery-whole-system-production-v1.md) replaces this identity proposal's former Crystallise/blank-crystal operation and speculative recipe sequence. Direct Heat/Caustic/Light attunement costs16 Essence plus its actual named ingredients. New first-pass Cores have potency60; old saved Cores keep their actual potency. Infusion remains held until a named crafted-item consumer has a complete traded-off effect. There is no Crystallise Research or blank intermediate.
 
-These operations are a design direction, not implementation-ready recipes. They share one rule:
-**distillation concentrates difference; it never creates value from nothing.** A stronger chosen
-property should narrow flexibility elsewhere, require a difficult catalyst, increase reactivity, or
-consume a finite crystal.
+Auber's theme remains **distillation concentrates difference; it never creates value from nothing**. The character connections below are narrative possibilities, not additional anchoring/writing recipes or currently available services.
 
 ### What this connects
 
@@ -199,12 +192,11 @@ the same thing as safety.
 
 ## Approved direction
 
-1. Keep the Refinery’s basic conversion and make the Distillery about **crystallise, attune and
-   infuse**.
+1. Keep the Refinery’s basic conversion and make the Distillery’s complete ordinary production **direct attunement**; infusion is held and blank crystallisation retired.
 2. Keep spendable essence as one currency; distilled outputs are items/modifications.
 3. Use existing **world resources** in Distillery operations before considering provenance-bearing
    raw essence instances.
 4. Auber’s identity centres separation, residue and the danger of mistaking purity for moral
    improvement.
 5. **Brine** replaces Amber and becomes diary-exclusive.
-6. Treat exact recipes, costs and property changes as a later system-design pass.
+6. Exact ordinary recipes, costs, source dependencies, potency and preservation are now specified in the complete Distillery production contract; the earlier placeholders are superseded.
