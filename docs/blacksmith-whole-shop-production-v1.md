@@ -4,7 +4,7 @@
 
 > **Shared textile dependency update — 5 September:** `tannery-whole-shop-production-v1.md` now defines Cord/Cloth from mixed actual Stem/Leaf constituents. Accept complete prepared-unit receipts with their nested source appearance; prior matching-only manufacturing references are superseded. This changes no recipe count, output effect, finished quality role or nominal Cord/Cloth value in this shop. Never count or recover prepared ancestors twice.
 
-5 September 2026. **Ready Design implementation contract; new portions are not implemented or delivered.** Covers all eight catalogue families, the entire three-level field-tool progression, Iron Ingots, facility upgrades, material statistics/workmanship, pricing, deterministic refit and recovery compatibility.
+5 September 2026. **Complete first-pass Forge equipment contract delivered in phone324; tool/smelting/T3 dependencies were delivered in322. Iron Collar remains the separate later consumer-backed extension.** Covers all eight catalogue families, the entire three-level field-tool progression, Iron Ingots, facility upgrades, material statistics/workmanship, pricing, deterministic refit and recovery compatibility.
 
 ## Authority and retained decisions
 
@@ -37,7 +37,7 @@ Only the next legal tier is offered for an owned tool; no 1→3 skip, repeat tie
 
 **Access now closed:** Pick 2 gathers Quartz, Sulfur and Mercury under the accepted new material table. Quartz can therefore help build T3 before Pick 3 exists. Pick 3 gathers Obsidian, Adamant and Rift-glass using the accepted rare-node two hits of one unit. This closes the late Apothecary dependency for Stillwater and Waystone; it does not make Rift-glass common or guarantee a node in every world. Axe 3 and Scythe 3 retain their already specified tree/plant access and yields, including actual dangerous-flora admission.
 
-Plant Cord makes Corrin a useful later collaborator, while the first Pick/Axe/blade do not depend on the Tannery. Cord needs only 2 matching ordinary Fibre; Corrin's existing foundation requires 20 Essence, 6 Logs, 4 Clay and 4 Fibre. Neither Cord nor Forge T3 requires rare minerals, a creature drop, Nessa, Isolde, Distillery or Motes. Existing cheaper-next-Bind safety checks and actual currency ownership remain where applicable; never invent an extra fee or silently show 40 Essence while charging a different amount.
+Plant Cord makes Corrin a useful later collaborator, while the first Pick/Axe/blade do not depend on the Tannery. Cord needs only2 eligible actual Stem/Leaf Fibre, with ordered mixed source constituents supported; Corrin's existing foundation requires 20 Essence, 6 Logs, 4 Clay and 4 Fibre. Neither Cord nor Forge T3 requires rare minerals, a creature drop, Nessa, Isolde, Distillery or Motes. Existing cheaper-next-Bind safety checks and actual currency ownership remain where applicable; never invent an extra fee or silently show 40 Essence while charging a different amount.
 
 ## Complete family register and knowledge
 
@@ -205,3 +205,11 @@ The [shared equipment improvement and recovery contract](equipment-improvement-r
 ## Conditional solid-material extension — later first-pass proposal
 
 [Solid creature equipment uses](creature-solid-equipment-extensions-v1.md) now defines the exact applicable Shell Shield, Horn grip/Collar, scaled/chitin/shell Armoury outer and Fur Pelt lining sockets, with complete stat/quality/colour/value/recovery rules. Its typed source producers and adapters remain unimplemented. This ordinary batch keeps its present recipes and progression; no legacy generic family automatically enters the alternatives. Spines and Feathers are intentionally raw-sale-only, not a request for another recipe.
+
+## Delivered checkpoint — phone324,6 September2026
+
+Engineering reports installed source f6466a0b69285e67c432294e3fc9dd0f43a9eb5a, tree52937b4cd1df5091cd30dafe1ff595a3ad5732ce; delivery4ec0ec8ae2ca621a86cc9c12ea18b79a8a14cf0d, tree6b2abecb6086600d535e513a0709128658a256fa. Persistent `/Users/aimeepepper/Documents/comfygame-worktrees/early-material-regions-v1`, branch `codex/early-material-regions-v1`. Installed23:41:13UTC, ordinarily launched23:42UTC on Aimee's iPhone16Pro; acceptance used402×874/default/current ordinary configuration. Supplied receipts: `docs/phone-build-324-delivery-2026-09-06.md` and `docs/forge-whole-shop-implementation-2026-09-06.md` in that worktree.
+
+Delivered seven Forge equipment families, exact world/Bone working/support choices and tier gates, quarter-precision stats, four-band workmanship, fixed version-one prices, same-instance refitting across stored/Waiting/worn gear and current-component recovery. Existing322 Pick/Axe/Scythe and smelting/T3 routes remain their owners. New opted-in Bone keeps full actual source measurements/CMY/Depth/Pattern, species quantity and frozen Anatomy, has no additional roll/generic duplicate, and survives reward/Return/current saves/sale with2/4/8/16 values and2× repurchase. Unsupported legacy property-only services refuse typed Bone.
+
+Sixteen distinct focused/native tests passed, including50 working/support combinations, seven default constructions, two native journeys and injected write-failure/recovery/replay. This is Engineering-provided evidence, not a Design native/phone recheck. Older-version migrations remain deferred under Aimee's instruction; current-version durability remains required. Iron Collar, Bowyer/specialist complete batches, wider creature anatomy and Asset's separate Forge polish are not claimed delivered here. No reset/uninstall or new runtime rollout is authorized by this record.

@@ -1,12 +1,12 @@
 # Bone from generated bodies — bounded producer and custody contract
 
-**5 September 2026 · Decided intended contract, awaiting implementation assignment.** This advances the first creature Homework goal; it does not complete that goal or the wider rework. Bone implementation remains separate from the Bestiary arrangement, whose work hold Aimee lifted on 5 September; see creature-role-coherence-v1.md section 8.
+**5 September 2026 · Source/reward/Return/trade and Forge typed consumers delivered in phone324.** This advances the first creature Homework goal; it does not complete that goal or the wider rework. Bone implementation remains separate from the Bestiary arrangement, whose work hold Aimee lifted on 5 September; see creature-role-coherence-v1.md section 8.
 
-**Scope:** one canonical raw material, **Bone**, from generated ordinary creatures, through reward, carried stock, Return, Storehouse and the existing Trading Post material-sale consumer. Current Bone-compatible crafting is recorded accurately below; a new-material crafting adapter is a separate unfinished dependency. No new weapon recipe, maker unlock, anatomy catalogue or final art is approved here.
+**Scope:** one canonical raw material, **Bone**, from generated ordinary creatures, through reward, carried stock, Return, Storehouse and the existing Trading Post material-sale consumer. Current Bone-compatible crafting is recorded accurately below; Forge typed consumers are now delivered; other whole-shop adapters remain separate dependencies. No new weapon recipe, maker unlock, anatomy catalogue or final art is approved here.
 
 **Starting authority:** body/habitat slice `b0c24016c626cc69687fefb071c72d9058b8946d`; accepted physical Bone vocabulary, four-band quality/source-colour/market rules in the cohesive plan and first-pass tuning; retained skeletal eligibility and species quantity from `creature-material-projection-authority.json`; actual-body provenance discipline from the completed Hide path. Exact companion: `creature-bone-production-v1.json`.
 
-## 1. Current behavior versus this intended slice
+## 1. Historical source comparison preceding phone324
 
 Inspected native source `d273b408a0e46061fa4de5ffc1164ff06bc3ecaf` in `early-material-regions-v1`. This is source inspection, not a new native acceptance claim.
 
@@ -91,9 +91,9 @@ Extend the exact typed-material branch of Trading Post valuation/selection/trans
 
 Legacy Bone retains its original units, six-band record, value and consumer access. New and Legacy stock never silently merge, rewrite one another or become a scalar Bone balance.
 
-## 6. Consumer designs closed; implementation remains required
+## 6. Forge consumer delivered; other whole-shop consumers remain pending
 
-The complete `blacksmith-whole-shop-production-v1.md`, `bowyer-whole-shop-production-v1.md`, `weaponsmith-whole-shop-production-v1.md` and `armoury-whole-shop-production-v1.md` now supply the explicit Design-authored first-pass Bone roles, quantities, source-based Power/Protection, four-band workmanship, values and recovery under Aimee's delegated whole-shop tuning authority. The former isolated Pointed Blade proposal/approval hold is superseded. These contracts are not personal new Bone approvals attributed to Aimee or evidence of native implementation.
+The complete `blacksmith-whole-shop-production-v1.md`, `bowyer-whole-shop-production-v1.md`, `weaponsmith-whole-shop-production-v1.md` and `armoury-whole-shop-production-v1.md` now supply the explicit Design-authored first-pass Bone roles, quantities, source-based Power/Protection, four-band workmanship, values and recovery under Aimee's delegated whole-shop tuning authority. The former isolated Pointed Blade proposal/approval hold is superseded. These are Design-authored choices, not personal new Bone approvals attributed to Aimee. Phone324 now supplies native/delivery evidence for Forge; Bowyer/Weaponsmith/Armoury implementation remains separate.
 
 New typed Bone must not enter the old six-band calculator through a family-enum/name match. Implement each complete shop's exact versioned typed consumer, preserving actual measurements/colour and frozen item/custody/value/recovery. Until its consumer is implemented, that operation refuses typed Bone; custody/Return and the specified trade route remain independently implementable. This is a named implementation dependency, not a fresh design question or a permanent ban on the specified recipes. Unsupported consumers remain excluded.
 
@@ -127,4 +127,12 @@ Eventual bounded native proof: one isolated new-policy ordinary victory grants t
 
 Settled for this slice: plain Bone identity, existing skeleton predicate and species quantity, actual-source four-band quality/colour, existing Anatomy behavior, exact custody/Return, and accepted raw-material market prices. These are carried-forward rules with a bounded new typed adapter.
 
-Unfinished: full anatomical catalogue, implementation of the now-specified whole-shop Bone consumers, useful finer subtypes if supported by future anatomy, other materials and consumers, and natural incidence/pacing. No new user decision is required for this source/market contract. The first Homework checkbox remains **unchecked**, with Bone recorded as partial design progress; ecology and complete player experience remain untouched.
+Unfinished: full anatomical catalogue, implementation of the remaining Bowyer/Weaponsmith/Armoury Bone consumers, useful finer subtypes if supported by future anatomy, other materials and consumers, and natural incidence/pacing. No new user decision is required for this source/market contract. The first Homework checkbox remains **unchecked**, with Bone source and Forge use recorded as delivered partial progress; ecology and complete player experience remain untouched.
+
+## Delivered checkpoint — phone324,6 September2026
+
+Engineering reports installed source f6466a0b69285e67c432294e3fc9dd0f43a9eb5a, tree52937b4cd1df5091cd30dafe1ff595a3ad5732ce; delivery4ec0ec8ae2ca621a86cc9c12ea18b79a8a14cf0d, tree6b2abecb6086600d535e513a0709128658a256fa. Persistent `/Users/aimeepepper/Documents/comfygame-worktrees/early-material-regions-v1`, branch `codex/early-material-regions-v1`. Installed23:41:13UTC, ordinarily launched23:42UTC on Aimee's iPhone16Pro; acceptance used402×874/default/current ordinary configuration. Supplied receipts: `docs/phone-build-324-delivery-2026-09-06.md` and `docs/forge-whole-shop-implementation-2026-09-06.md` in that worktree.
+
+Delivered seven Forge equipment families, exact world/Bone working/support choices and tier gates, quarter-precision stats, four-band workmanship, fixed version-one prices, same-instance refitting across stored/Waiting/worn gear and current-component recovery. Existing322 Pick/Axe/Scythe and smelting/T3 routes remain their owners. New opted-in Bone keeps full actual source measurements/CMY/Depth/Pattern, species quantity and frozen Anatomy, has no additional roll/generic duplicate, and survives reward/Return/current saves/sale with2/4/8/16 values and2× repurchase. Unsupported legacy property-only services refuse typed Bone.
+
+Sixteen distinct focused/native tests passed, including50 working/support combinations, seven default constructions, two native journeys and injected write-failure/recovery/replay. This is Engineering-provided evidence, not a Design native/phone recheck. Older-version migrations remain deferred under Aimee's instruction; current-version durability remains required. Iron Collar, Bowyer/specialist complete batches, wider creature anatomy and Asset's separate Forge polish are not claimed delivered here. No reset/uninstall or new runtime rollout is authorized by this record.

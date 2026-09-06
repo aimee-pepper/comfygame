@@ -4,16 +4,16 @@
 
 ## Current and preserved behavior
 
-The current runtime has trait-based morphology, habitat placement, a generic eighteen-family material projection and a separately supported narrow typed Hide route. Legacy projections and older material values remain saved facts. Generic legacy Bone and other stock retain their supported uses. Existing encounter/Read knowledge is not newly gated on victory.
+The current runtime has trait-based morphology, habitat placement, a generic eighteen-family material projection and a separately supported narrow typed Hide route, plus phone324’s delivered typed Bone source/reward/Return/trade and Forge consumers. Legacy projections and older material values remain saved facts. Generic legacy Bone and other stock retain their supported uses. Existing encounter/Read knowledge is not newly gated on victory.
 
 The older six-band material model, family-only source grouping, generic Plate/Fin vocabulary, automatic Oil/Venom/Ichor inference and distant-sighting/material-reveal assumptions formerly described here are **not new-production instructions**. Historical `creature-habitat-authority.json` and `creature-material-projection-authority.json` remain evidence for their retained runtime versions; their validators do not approve a new policy. Git history retains the earlier proposal for reference.
 
-## Decided and specified, pending implementation
+## Contract status — delivered Bone, other bounded work pending
 
 - [Generated bodies and habitat compatibility](generated-creature-body-habitat-v1.md): actual admitted habitat, seven body shapes, separate appendages, connected liquid and truthful flight/movement.
 - [Role coherence](creature-role-coherence-v1.md): names agree with actual movement and capability; weak armament does not prove grazing or diet.
 - [Cold-water appendages](creature-cold-water-appendages-v1.md): the extra-appendage tendency is narrowly conditioned on supported liquid habitat, with no cold-world material guarantee.
-- [Plain Bone](creature-bone-production-v1.md): the settled skeleton predicate,1–3 species portions, four-band source quality, full colour/Pattern, Anatomy, custody and trade. Complete shop contracts separately define its intended gear roles; no Hollow/Dense subtype is implied.
+- [Plain Bone](creature-bone-production-v1.md): delivered in phone324, including the settled skeleton predicate,1–3 species portions, four-band source quality, full colour/Pattern, Anatomy, custody, trade and Forge roles. Other complete shop consumers remain pending; no Hollow/Dense subtype is implied.
 - [Creature bodies and material rewards](creature-body-material-rewards-production-v1.md): complete disposition of the eighteen old families, supported solid-part identity/measurements/quantity/colour/Pattern/collection/trade, separate covering and appendages, no duplicate tissue, and exact held anatomy/recipe dependencies. Its new opt-in is the authority for new rewards; an unavailable family cannot fall through to the old generic projection.
 - [Bestiary knowledge and grouping](bestiary-knowledge-and-grouping-v1.md): Aimee-approved Sky/Water/Amphibious/Land, then seven body groups. The hold was lifted. Preserve reported sorting implementation and existing discoveries; no hidden cast counts or fabricated older shape/habitat.
 
