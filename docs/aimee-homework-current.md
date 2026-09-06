@@ -60,10 +60,10 @@ The first study shows the water from a dry, level route. Interactive slopes and 
 
 ## 6. Completed decision: dangerous growth warns on first full sight
 
-**Status: approved by you on 5 September · implementation assigned · no answer needed.**
+**Status: approved by you on 5 September · tested in Simulator · no answer needed.**
 
 You chose first full sight for a small static **Dangerous growth** marker. An actually harmful contact/toxin patch will warn without requiring a prior injury, learning or field-guide recognition. Ordinary plants of the same species stay unmarked, as do hidden, partly seen, remembered-only, removed or stale patches. Rooted creatures retain their separate discovery rules.
 
-The generic marker adds no damage numbers, duration or yield information. Dedicated 2D animation remains deferred. Engineering is implementing the warning; this decision does not mean it is already on your phone.
+The generic marker adds no damage numbers, duration or yield information. Dedicated 2D animation remains deferred. Engineering reports the warning implemented and tested in Simulator. Phone build 307 and the separately prepared 308 do not include it; phone delivery and visual acceptance remain pending.
 
 This is a reference and to-do list rather than a form. Tell Game Design or Project Manager your answer to item 1 or your thoughts on the creature goals in item 3, or share an artwork task with Asset Lead; the recorded status will then be updated here.

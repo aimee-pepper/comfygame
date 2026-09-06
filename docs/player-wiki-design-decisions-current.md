@@ -81,11 +81,13 @@ Existing saved worlds keep their movement and contents. The initial proof will c
 
 ### Harmful flora warnings
 
-**Current behavior and reported issue:** a dangerous plant patch is a specific hazard; other plants of the same species are not automatically harmful. Look can describe that patch, but you reported that harmful flora is not visually distinguished by animation. No corrected map warning has been delivered for this report.
+**Current development behavior — tested in Simulator:** a generic static **Dangerous growth** marker now appears on first full sight of an actual harmful contact/toxin patch. Engineering reports five focused admission/native checks passing, including a turn-zero view where only hazardous bases are marked and closing/reopening without entry harm or purchases. Ordinary plants of the same species, hidden or partly seen patches, remembered-only terrain, removed/stale patches and harmless placements remain unmarked. The warning disappears when full sight is lost.
+
+**Phone availability:** phone build 307 and the separately prepared build 308 do not include this later warning update. Phone delivery and your visual acceptance remain pending.
 
 **Existing intended behavior:** known nearby harm should have a readable warning that works without animation. Dedicated 2D flora animation is deferred while the 3D work proceeds. Warning artwork must respect current sight and must never identify hidden plants, creatures or resources.
 
-**Decided intended behavior — implementation assigned:** you approved a small static **Dangerous growth** marker on first full sight of an actual harmful contact/toxin patch. No prior injury, learning, Look action or field-guide recognition is required. This replaces the older learning requirement for this marker. It appears only while that exact harmful patch is fully visible, still present and enterable. Ordinary plants of the same species, hidden or partly seen growth, remembered-only terrain and stale patches stay unmarked. Rooted creatures keep their separate discovery rules. The generic marker adds no level, damage, duration, yield or unseen-enemy information; existing Look and harm rules remain unchanged. Your decision is complete in [Aimee Homework](aimee-homework.html).
+**Decided behavior — awaiting phone delivery:** you approved a small static **Dangerous growth** marker on first full sight of an actual harmful contact/toxin patch. No prior injury, learning, Look action or field-guide recognition is required. This replaces the older learning requirement for this marker. It appears only while that exact harmful patch is fully visible, still present and enterable. Ordinary plants of the same species, hidden or partly seen growth, remembered-only terrain and stale patches stay unmarked. Rooted creatures keep their separate discovery rules. The generic marker adds no level, damage, duration, yield or unseen-enemy information; existing Look and harm rules remain unchanged. Your decision is complete in [Aimee Homework](aimee-homework.html).
 
 ### Recipe tracking
 
