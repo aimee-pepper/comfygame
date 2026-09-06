@@ -52,22 +52,22 @@ export const worldMaterialFamilies = [
 export const creatureMaterialFamilies = [
   ['Hide', 'Short, soft, or bare skin prepared for wrapping and tanning.'],
   ['Pelt', 'Hide with long, dense fur still attached.'],
-  ['Down', 'Soft insulating underfeather.'],
+  ['Down', 'A separate soft underfeather layer; the new typed source still needs actual layer anatomy.'],
   ['Feather', 'A developed vane or flight feather.'],
-  ['Fin', 'Flexible fin tissue and rays.'],
+  ['Fin', 'Legacy projected family. The new source must resolve its actual membrane or rigid part; no generic Fin token.'],
   ['Scale', 'Overlapping individual hard covering.'],
-  ['Plate', 'A broad dermal armour plate.'],
+  ['Plate', 'Legacy projected family. New anatomy resolves Armoured Scales, Chitin Plate or actual Shell rather than universal Plate.'],
   ['Chitin', 'A segmented, jointed hard case.'],
   ['Shell', 'A rigid enclosing or radial case.'],
-  ['Quill', 'A long hardened covering shaft.'],
+  ['Quill', 'Legacy long hard covering. The new solid-part plan distinguishes Protective Spines from actual feather quills.'],
   ['Bone', 'Mineralized internal structure.'],
-  ['Fang', 'A dominant piercing tooth.'],
-  ['Claw', 'A dominant rending armament.'],
-  ['Tusk', 'A dense protruding crushing structure.'],
+  ['Fang', 'Requires an actual tooth-bearing part; piercing damage alone does not establish a new typed source.'],
+  ['Claw', 'Requires actual claw anatomy; rending damage or limbs alone do not establish a new typed source.'],
+  ['Tusk', 'Requires an actual tusk; crushing damage alone does not establish a new typed source.'],
   ['Horn', 'A cranial horn used as bracing or crushing stock.'],
-  ['Oil', 'Insulating aquatic body oil.'],
-  ['Venom', 'A toxic creature secretion.'],
-  ['Ichor', 'A reactive or emanating creature fluid.'],
+  ['Oil', 'New production needs actual oily tissue or secretion; water habitat and insulation are insufficient.'],
+  ['Venom', 'New production needs actual recoverable venom anatomy; contact toxicity alone is insufficient.'],
+  ['Ichor', 'New production needs a real defined body fluid and chemistry; emanation does not establish fluid or pigment.'],
 ] as const;
 
 export const lootPaths = [
@@ -123,25 +123,25 @@ export const lootPaths = [
 ] as const;
 
 const apothecaryChanges: CraftingChange[] = ([
-  ['Lesser Salve', 'One flexible sample at 25 or better, plus 1 Resin.', '1 Stem or Leaf Fibre and 1 Resin; no Essence. Intended first-pass recipe, with the existing base healing of 10.'],
-  ['Salve', 'One insulating sample at 40 or better, plus 2 Pulp, 1 Spore, and 1 Resin.', '2 Pulp, 1 Spore, and 1 Resin.'],
-  ['Greater Salve', 'One reactive sample at 60 or better, plus 1 Ichor, 2 Spore, and 2 Resin.', '1 Creature Ichor, 2 Spore, and 2 Resin.'],
-  ['Clearing Draught', 'One reactive sample at 35 or better, 1 Pulp, and 1 Salt.', 'Planned: 1 named cleansing or reactive plant substance from the recipe’s disclosed eligibility list, 1 Pulp, and 1 Salt; displayed as Clearing Wash. The final named list is still being authored.'],
-  ['Quenching Draught', 'One insulating sample at 45 or better, 1 Reagent, and 1 Resin.', 'Planned: 1 Creature Oil, 1 named cooling or stabilizing substance from the recipe’s disclosed list, and 1 Resin; displayed as Quenching Balm. The final named list is still being authored.'],
-  ['Broad Antidote', 'One reactive sample at 65 or better, 1 Ichor, 1 Reagent, and 1 Spore.', 'Planned: 1 Creature Venom, 1 named neutralizing plant substance from the recipe’s disclosed list, and 1 Spore. The final named list is still being authored.'],
-  ['Stonebark Tonic', 'One hard sample at 45 or better, 1 Timber, and 1 Resin.', '1 eligible Bark or Bark Fibre material and 1 Resin.'],
-  ['Venom coating', 'One reactive sample at 55 or better, 1 Toxin, and 1 Fibre.', '1 named toxic substance—such as Creature Venom, Toxic Sap, or Irritant Spore—from the recipe’s disclosed list, plus 1 eligible Plant Fibre.'],
-  ['Firebrand', 'One reactive sample at 60 or better, 1 Reagent, and 1 Sulfur.', 'Planned: 1 Creature Oil or Resin, 1 named combustible or stabilizing substance from the recipe’s disclosed list, and 1 Sulfur. The final named list is still being authored.'],
-  ['Briar Oil', 'One flexible sample at 50 or better, 1 Fibre, and 1 Resin.', '1 Creature Oil, 1 eligible Plant Fibre, and 1 Resin.'],
-  ['Flashsalt', 'One lustrous sample at 55 or better, 1 Reagent, and 1 Mercury.', '1 Salt, 1 Mercury, and 1 Quartz.'],
-  ['Solvent', 'One reactive sample at 40 or better, 1 Reagent, and 1 Salt.', 'Planned: 1 named dissolving or reactive substance from the recipe’s disclosed list and 1 Salt. The final named list is still being authored.'],
-  ['Lure', 'One reactive sample at 50 or better, 1 Toxin, and 1 Pulp.', '1 creature Hide, Pelt, Down, or Oil, plus 1 Pulp.'],
-  ['Stillwater', 'One lustrous sample at 60 or better, 1 Rift-glass, 1 Mercury, and 6 Essence.', '1 Silver, 1 Rift-glass, 1 Mercury, and 6 Essence.'],
-  ['Waystone', 'One hard sample at 70 or better, 1 Rift-glass, 1 Mote, and 12 Essence.', 'Planned: 1 Obsidian, 1 Rift-glass, 1 Mote, and 12 Essence. Obsidian forms the hard body while Rift-glass provides the boundary-crossing element.'],
-  ['Torch', 'One reactive sample at 30 or better, 1 Resin, and 2 Timber.', '2 eligible Logs and 1 Resin.'],
-  ['Farsight Draught', 'One lustrous sample at 50 or better, 1 Quartz, and 1 Ichor.', '1 Quartz and 1 Creature Ichor.'],
-  ['Scent Mask', 'One individual creature Hide, Pelt, Down, or Oil, plus 1 Reagent.', 'Planned: one visible scent-bearing creature-material category and one named masking plant substance. The final type/subtype list is still being authored.'],
-  ['Seamlight', '1 Quartz, 1 Resin, and 1 Fibre. It can be made; Field Kit use is unverified for the current phone build.', '1 Quartz, 1 Resin, and 1 eligible Plant Fibre; the completed field action guides toward a portal without creating light.'],
+  ['Lesser Salve', 'One flexible sample at 25 or better, plus 1 Resin.', "Complete first pass: 1 Resin + 1 Stem/Leaf Fibre; 0 Essence; existing healing effect."],
+  ['Salve', 'One insulating sample at 40 or better, plus 2 Pulp, 1 Spore, and 1 Resin.', "Complete first pass: 1 Cloth + 2 Soothing Leaf + 1 Resin; 0 Essence."],
+  ['Greater Salve', 'One reactive sample at 60 or better, plus 1 Ichor, 2 Spore, and 2 Resin.', "Complete first pass: 1 Cloth + 2 Soothing Leaf + 2 Restorative Spore + 2 Resin; 0 Essence."],
+  ['Clearing Draught', 'One reactive sample at 35 or better, 1 Pulp, and 1 Salt.', "Complete first pass: 1 Bitter Root + 1 Salt; 0 Essence."],
+  ['Quenching Draught', 'One insulating sample at 45 or better, 1 Reagent, and 1 Resin.', "Complete first pass: 2 Soothing Leaf + 1 Salt; 0 Essence; presented as Quenching Balm."],
+  ['Broad Antidote', 'One reactive sample at 65 or better, 1 Ichor, 1 Reagent, and 1 Spore.', "Complete first pass: 1 Bitter Root + 1 Restorative Spore + 1 Salt; 0 Essence."],
+  ['Stonebark Tonic', 'One hard sample at 45 or better, 1 Timber, and 1 Resin.', "Complete first pass: 1 Tough Bark + 1 Resin; 0 Essence."],
+  ['Venom coating', 'One reactive sample at 55 or better, 1 Toxin, and 1 Fibre.', "Complete first pass: 1 Toxic Sap + 1 Stem/Leaf Fibre; 0 Essence; exact weapon retains coating for the excursion."],
+  ['Firebrand', 'One reactive sample at 60 or better, 1 Reagent, and 1 Sulfur.', "Complete first pass: 1 Sulfur + 1 Resin; 0 Essence; exact weapon retains coating for the excursion."],
+  ['Briar Oil', 'One flexible sample at 50 or better, 1 Fibre, and 1 Resin.', "Complete first pass: 2 Stem/Leaf Fibre + 1 Resin; 0 Essence; mixed sources allowed; coating lasts the excursion."],
+  ['Flashsalt', 'One lustrous sample at 55 or better, 1 Reagent, and 1 Mercury.', "Complete first pass: 1 Quartz + 1 Sulfur + 1 Salt; 0 Essence; coating lasts the excursion."],
+  ['Solvent', 'One reactive sample at 40 or better, 1 Reagent, and 1 Salt.', "Complete first pass: 1 Bitter Root + 1 Sulfur; 0 Essence."],
+  ['Lure', 'One reactive sample at 50 or better, 1 Toxin, and 1 Pulp.', "Complete first pass: 1 Aromatic Leaf + 1 Stem/Leaf Fibre; 0 Essence."],
+  ['Stillwater', 'One lustrous sample at 60 or better, 1 Rift-glass, 1 Mercury, and 6 Essence.', "Complete first pass: 1 Rift-glass + 1 Mercury + 6 Essence."],
+  ['Waystone', 'One hard sample at 70 or better, 1 Rift-glass, 1 Mote, and 12 Essence.', "Complete first pass: 1 Rift-glass + 1 Quartz + 12 Essence + 1 Mote."],
+  ['Torch', 'One reactive sample at 30 or better, 1 Resin, and 2 Timber.', "Complete first pass: 1 Resin + 1 Log + 1 Stem/Leaf Fibre; 0 Essence."],
+  ['Farsight Draught', 'One lustrous sample at 50 or better, 1 Quartz, and 1 Ichor.', "Complete first pass: 1 Quartz + 1 Restorative Spore; 0 Essence."],
+  ['Scent Mask', 'One individual creature Hide, Pelt, Down, or Oil, plus 1 Reagent.', "Complete first pass: 2 Aromatic Leaf + 1 Resin; 0 Essence."],
+  ['Seamlight', '1 Quartz, 1 Resin, and 1 Fibre. It can be made; Field Kit use is unverified for the current phone build.', "Complete first pass: 1 Quartz + 1 Resin + 1 Stem/Leaf Fibre; 0 Essence; guides toward a portal without creating light."],
 ] as const).map(([name, current, accepted]) => ({ name, current, accepted }));
 
 export const craftingFamilyStatus: CraftingFamilyStatus[] = [
@@ -295,7 +295,7 @@ export function craftingStatusFor(slug: string) {
 export function futureResourceCopy(name: string) {
   if (name === 'Raw Essence') return 'Raw Essence remains a quality-free precursor. Return it to the Cottage and refine it at the Essence Spring.';
   if (name === 'Mote') return 'Motes remain permanent Reality currency, with no material quality or storage slot.';
-  if (name === 'Ichor') return 'Ichor will use its settled physical source category and one of four resource qualities. Older stock must move into the new system without inventing a creature source.';
+  if (name === 'Ichor') return 'New Ichor production still needs actual creature-fluid anatomy and chemistry. Emanation alone is insufficient. Existing stock keeps its supported uses and provenance; no creature source is invented.';
   if (name === 'Rubble') return 'Rubble will remain a simple, ungraded mixed find. Noll’s Recycler will separate selected Rubble into materials supported by its source region: mostly common finds, less-frequent uncommon finds, and only a small chance of a rare local bonus.';
   if (['Clay', 'Ore', 'Iron Ore', 'Copper', 'Silver', 'Gold', 'Quartz', 'Obsidian', 'Salt', 'Sulfur', 'Mercury', 'Adamant', 'Rift-glass'].includes(name)) {
     const intendedName = name === 'Ore' || name === 'Iron Ore' ? 'Iron' : name;

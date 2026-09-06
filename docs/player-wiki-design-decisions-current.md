@@ -24,6 +24,8 @@ The visible woody stem and its harvested Logs now share one saved base colour fo
 
 A part with its own colour keeps that colour rather than borrowing the colour of the whole plant. New harvestable parts need an explicit source-colour mapping; older unknown colours remain unknown. Flora stays ungraded, and colour alone adds no stats. Existing remedies keep their recognizable finished colours, while extracted pigments and ink follow their specific recipes; preserving a plant's colour does not make every plant a dye ingredient.
 
+**Named flora implementation mapping, not yet delivered:** Engineering has specified that the six Apothecary plant profiles retain the actual assigned plant species' complete colour and Pattern as the harvested part's inherited appearance. Existing Stem/Leaf/Tall Stem colours remain unchanged. No RGB colour is guessed where its approved visual mapping is absent; the source colour facts remain preserved for crafting.
+
 **Equivalent Hide — current in build 318:** Return, Storehouse and physical material selectors group equivalent portions by quantity, preserving their actual quality, useful properties and validated source colour. Genuine differences remain separate. Storehouse includes creature reserve stock and a quantity/source detail sheet. Individual ownership, provenance, destinations and exact recipe consumption remain intact. Engineering reports the native four-portions → process-two → two-remaining route passed and build 318 installed and launched on 6 September. The current Tannery recipe still consumes two portions; the later one-to-one Leather recipe is not claimed delivered by this display fix.
 
 **Apex labels — current in build 319:** actual Apex creatures are identified on the existing visible field/minimap markers, current-sight details and encounter header. Ordinary creatures that stand still do not acquire an Apex label. Existing visibility remains authoritative; this adds no hidden creature, proper name or reward reveal. Engineering reports the visible Apex → move into encounter → reopen route passed and cumulative build 319 installed and launched on 6 September. Asset styling is also integrated in build 320; Engineering reports the map → encounter → reopen route passed.
@@ -350,6 +352,40 @@ A habitat needs at least two connected suitable tiles. Most ordinary placement s
 Existing worlds retain their creatures and movement. The completed Hide path keeps its actual-source checks, drop chance, Anatomy benefit, quality, colour and material history.
 
 **Still unfinished:** the wider creature rework, additional anatomical materials and their recipes, and food, nesting and weather relationships. Aimee has lifted the Bestiary work hold after approving the arrangement below. This first habitat slice needs no new Aimee decision.
+
+### Body-to-material rewards — 6 September first pass
+
+**Current:** existing creature traits already project generic material families, with a separately supported typed Hide path. The plain Bone and new body/habitat contracts remain intended work. The following solid-part reward plan is **new Design-authored first-pass work, not delivered**; it does not enable a broad creature rollout.
+
+The creature's body will declare what it is actually made of before rewards are calculated. Body covering, appendages, horns and skeleton are separate regions. Feathers on wings do not erase a hard or furry body covering, and water habitat does not automatically mean Scales or Oil. A tissue cannot be recovered twice under different names.
+
+| Actual body part | Intended recovered material | Boundary |
+| --- | --- | --- |
+| Supported soft skin or hide | Existing Smooth Skin, Supple Hide or Tough Hide | Retains the existing Hide rules and recovery chance |
+| Internal mineralized skeleton | Bone | Retains the specified plain Bone rules; no automatic Hollow Bone |
+| Dense fur covering | Fur Pelt | One actual fur-bearing covering |
+| Overlapping scaled covering | Overlapping Scales or Armoured Scales | No invented Fish/Lizard classification or generic Plate |
+| Jointed segmented hard covering | Chitin or Chitin Plate | One type/subtype, not two rewards from the same tissue |
+| Declared rigid shell | Shell | No invented layered subtype or internal skeleton |
+| Long rigid protective covering | Protective Spines | Not feather quills or an automatic writing ingredient |
+| Feathered flying appendages | Flight Feathers | Actual supported Sky/winged body required |
+| Other feathered appendages | Contour Feathers | No flight claim |
+| Actual useful cranial horns | Horn | Meaningful crushing armament and a real horn, not any head ornament |
+| Actual membrane sheet | Membrane | Still needs its complete sheet measurements before collection is enabled |
+
+The new covering choices are starting generation rules: coverage below15 supplies no primary covering; hard, long covering becomes protective spines; hard segmented/radial covering becomes chitin/shell; other hardness70 or more gives armoured scales,35 or more gives overlapping scales; dense long soft covering gives fur. These rules define the structure the new body will actually have. They are not an inventory screen guessing anatomy from appearance, and they do not rewrite old creatures.
+
+**Explicitly unfinished anatomy:** a piercing attack does not prove teeth, a rending attack does not prove claws, and crushing does not prove tusks. Down needs a real separate soft-feather layer. A fin needs its actual useful membrane or rigid-part mapping rather than a generic Fin token. Insulation does not prove recoverable Oil; contact toxicity does not prove Venom; an emanation does not prove Ichor. Those new typed rewards remain unavailable until their actual anatomy is defined. The creature keeps its real attacks and defenses.
+
+**Quantity and quality:** eligible new solid parts are recovered on the existing successful-victory reward route, with no new knife, harvesting turn, fee or separate chance roll. Body-covering portions use the existing1–4 size scale, feathers the existing1–4 size/appendage scale, and useful horns1–2 portions. These are material portions, not literal counts of wings or horns. Anatomy applies once; quantities1/2/3/4 become2/3/4/5. Bone keeps its separate1–3 base rule and Hide its own recovery rule.
+
+Quality uses the actual part's two relevant source measurements: covering insulation/coverage for Pelt, protection/coverage for Scales, hardness/protection for Chitin or Shell, hardness/length for Spines, appendage extent/lustre for Feathers, and crushing strength/skeletal density for Horn. The existing75% part-expression plus25% source-Danger rule produces Poor, Common, Rare or Exceptional, with one final rounding. Species quantity is frozen; actual specimen measurements determine that specimen's quality.
+
+**Colour and Pattern:** each recovered part retains its actual specimen colour and Pattern, or its explicit part-specific colour when one exists. Pelt is not automatically brown, Feather white or Shell neutral. Exact source portions remain selectable beneath grouped stock and carry their appearance into any later supported crafting component. Old unknown colours stay unknown. New raw solid-part sale values start at2/4/8/16 by quality, with buy values twice sale; this does not create merchant stock or change older prices.
+
+**Real uses and remaining work:** source → reward → Return → storage → ordinary raw-material sale is specified for the ready solid parts above. Their additional equipment recipes are still Design work; they are not automatic substitutes for Bone, Leather, Ingot or Cloth. The complete Apothecary and Distillery recipes already use actual Resin/Toxic Sap, and new Magenta uses Dyer's Root, so unfinished creature fluids do not block those shops. Membrane needs a complete Tannery-compatible part record before becoming Leather.
+
+No new distant-sighting record, hidden Bestiary reveal, food system, nest, weather immunity or deep-water harvesting is introduced. Recovered material can be associated with its actual known source; existing encounter records keep their measurements without requiring a victory. Food/nesting relationships, the remaining anatomy and equipment roles, and natural exploration/crafting feel remain open. All three creature homework goals therefore stay unchecked; this is concrete partial progress, not a claim that the generator is finished.
 
 ### Bestiary arrangement
 
