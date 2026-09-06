@@ -871,3 +871,7 @@ See [Aimee Homework](aimee-homework.html) for that choice and your creature-gene
 ## Optional creature-material extensions — proposal, not implemented
 
 The [creature decisions](design-decisions-september-4.html) now define actual Fang/Claw/Tusk weapon parts, Down for Insulated lining, measured Membrane for Leather, and chemically qualified Oil, Venom and dye-bearing Ichor for optional preparations. These require real new anatomical sources and their exact recipe adapters. Existing Bone/metal/textile, Resin, Toxic Sap and Dyer's Root routes remain sufficient; none of these alternatives blocks the complete ordinary shops. Source colour/Pattern stays with selected components. Fluid quality does not increase Core potency or coating damage, and Venom preparation remains on its weapon for the full excursion.
+
+## Optional solid creature equipment — proposal, not implemented
+
+The [creature equipment decisions](design-decisions-september-4.html) now define Shell Shield faces, Scales/Chitin/Shell Armoury outer panels, Fur Pelt Insulated lining and Horn grips/Collars. Their exact component quantities, statistics, source quality/colour/Pattern, frozen prices and recovery are specified as a separate later extension. Spines and Flight/Contour Feathers stay deliberately raw-sale-only. No ordinary recipe, tool, foundation or active Tannery milestone depends on these alternatives.

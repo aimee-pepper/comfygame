@@ -389,9 +389,9 @@ Quality uses the actual part's two relevant source measurements: covering insula
 
 **Colour and Pattern:** each recovered part retains its actual specimen colour and Pattern, or its explicit part-specific colour when one exists. Pelt is not automatically brown, Feather white or Shell neutral. Exact source portions remain selectable beneath grouped stock and carry their appearance into any later supported crafting component. Old unknown colours stay unknown. New raw solid-part sale values start at2/4/8/16 by quality, with buy values twice sale; this does not create merchant stock or change older prices.
 
-**Real uses and remaining work:** source → reward → Return → storage → ordinary raw-material sale is specified for the ready solid parts above. Their additional equipment recipes are still Design work; they are not automatic substitutes for Bone, Leather, Ingot or Cloth. The complete Apothecary and Distillery recipes already use actual Resin/Toxic Sap, and new Magenta uses Dyer's Root, so unfinished creature fluids do not block those shops. The conditional Membrane-to-Leather source and adapter are now specified below, pending implementation.
+**Real uses and remaining work:** source → reward → Return → storage → ordinary raw-material sale is specified for the ready solid parts above. Their optional equipment roles are now specified below, with deliberate raw-sale-only families; none is a universal substitute for Bone, Leather, Ingot or Cloth. The complete Apothecary and Distillery recipes already use actual Resin/Toxic Sap, and new Magenta uses Dyer's Root, so unfinished creature fluids do not block those shops. The conditional Membrane-to-Leather source and adapter are now specified below, pending implementation.
 
-No new distant-sighting record, hidden Bestiary reveal, food system, nest, weather immunity or deep-water harvesting is introduced. Recovered material can be associated with its actual known source; existing encounter records keep their measurements without requiring a victory. Food/nesting relationships, the remaining anatomy and equipment roles, and natural exploration/crafting feel remain open. All three creature homework goals therefore stay unchecked; this is concrete partial progress, not a claim that the generator is finished.
+No new distant-sighting record, hidden Bestiary reveal, food system, nest, weather immunity or deep-water harvesting is introduced. Recovered material can be associated with its actual known source; existing encounter records keep their measurements without requiring a victory. Implementation of the specified food/anatomy/equipment relationships, unsupported feeding mechanisms and natural exploration/crafting feel remain open. All three creature homework goals therefore stay unchecked; this is concrete partial progress, not a claim that the generator is finished.
 
 ### Remaining anatomical materials — first-pass proposal, not implemented
 
@@ -414,7 +414,31 @@ Hard points/edges use their actual hardness and structural integrity, with the e
 
 Recoverable portions belong to the actual species part or reservoir, not the attack score. Anatomy improves recovery once without inventing organs. Actual colour/Pattern stays with the selected material through Return, crafting and component recovery; unknown old appearance is not guessed. An explicitly pigment-bearing fluid can produce Magenta even when the creature's outside is another colour, but a pink or luminous creature does not automatically supply dye.
 
-**Existing routes remain sufficient:** ordinary gear still uses its existing Bone/metal/textile alternatives; Heat Cores use Resin, Venom preparation uses Toxic Sap, and Magenta uses Dyer's Root. No new hunt or individual recipe approval blocks those shops. New creature anatomy, these optional adapters and natural source prevalence still require implementation and combined playtesting. Other solid materials' equipment roles remain Design work. All three broader creature goals stay open.
+**Existing routes remain sufficient:** ordinary gear still uses its existing Bone/metal/textile alternatives; Heat Cores use Resin, Venom preparation uses Toxic Sap, and Magenta uses Dyer's Root. No new hunt or individual recipe approval blocks those shops. New creature anatomy, these optional adapters and natural source prevalence still require implementation and combined playtesting. The solid-material roles below are now specified; their actual integration and natural prevalence remain unfinished. All three broader creature goals stay open.
+
+### Solid materials in equipment — optional first-pass proposal, not implemented
+
+The remaining solid parts now have deliberate equipment roles. **Not every drop needs a recipe:** Protective Spines and both Flight and Contour Feathers remain raw-sale-only in this first pass. A useful anatomical material does not automatically become a blade, bow spring, fletching bonus or magical insulator.
+
+| Material | Proposed exact use | Quantity |
+| --- | --- | --- |
+| Shell | Forge Shield face |2 portions, with the ordinary brace paid separately |
+| Overlapping Scales or Chitin | Armoury Balanced outer |2 portions for Body;1 for Offhand/Head/Hands/Feet |
+| Armoured Scales, Chitin Plate or Shell | Armoury Rigid outer |4 portions for Body;2 for Offhand/Head/Hands/Feet |
+| Fur Pelt | Armoury Insulated lining, as an alternative to Cloth or the separate Down proposal |2 portions for Body;1 for Head/Hands/Feet; the ordinary outer and binding remain required |
+| Horn | Forge Pointed Blade or Cutting Blade short grip |1 portion; the working point/edge is paid separately |
+| Horn | Weaponsmith Horn Collar, then an existing Weaponsmith or Balanced Armoury Collar socket |1 Horn makes1 Collar for no Essence; the full ordinary equipment bundle remains required |
+| Protective Spines; Flight/Contour Feathers | Ordinary raw-material trading |No new equipment recipe, damage bonus or writing requirement |
+
+Scales, Chitin and Shell panels use their actual covering protection and source quality for the named structural role. Horn grips/Collars and Pelt lining contribute to the existing workmanship calculation and their own visible material appearance; they add no hidden Power or Protection. Heat Ward remains fixed by the Armoury profile, so a rarer Pelt does not secretly grant weather protection or stronger ward. A better support can leave the rounded workmanship label unchanged; the preview must show the actual result.
+
+Choose each complete material group explicitly. Two Shell panels can come from differently coloured sources, but the recipe does not silently combine Shell with Chitin Plate in one all-of-type bundle. Each actual colour and Pattern survives crafting, Return and refitting. Inner lining colours appear where the lining is exposed, without repainting the outer. Horn is not automatically ivory and Pelt is not automatically brown.
+
+New gear value is the sum of its actual active components' preserved values. Horn Collar retains the selected Horn's value and quality. Refit replaces only the chosen component group, returns old parts once and keeps the same item identity. A recovered Horn Collar remains a Collar; its recorded raw Horn is not also returned. No recipe recovers both a prepared part and its ancestors.
+
+**Example:** Rare Shell with actual protection64 gives a Forge Shield2.0 Protection; the brace adds no hidden protection. An Exceptional Horn grip can improve a Common Bone blade's workmanship to Superior while leaving its3.0 Power unchanged. Two Rare Pelt lining portions with ordinary Cloth/Cord still give the Insulated Body profile's2.0 Protection and25 Heat Ward, even if workmanship remains Fine.
+
+**Implementation order:** ordinary Tannery and the existing maker/service batches continue first. Future creature work pairs each actual typed source with its real component, colour, knowledge and recovery route; Shell-to-Shield is one concrete starting route. Specialist panels/lining/supports follow their implemented shops, then the separately specified new anatomy and ecological/knowledge extensions. Natural source frequency, useful repeated rewards, unsupported feeding mechanisms and the combined exploration/crafting experience remain the real unresolved work. No new Aimee decision blocks these recipes, and the three broader creature goals stay open.
 
 ### Learning about creatures and materials — complete first-pass journey
 
@@ -477,7 +501,7 @@ An already authored abandoned nest can remain an abandoned nest without assignin
 
 **Player knowledge remains separate:** first sight does not reveal hidden digestion or every linked prey species. A future implemented feeding-profile description could truthfully say **“Can browse low leafy growth,”** but it must not say a feeding event was observed or reveal an undiscovered food source. Existing earned Bestiary facts stay intact.
 
-**Remaining work:** aquatic/aerial and other unsupported feeding mechanisms, chemosynthetic intake, other food types if useful, natural source prevalence and population support, actual shelter use where worthwhile, useful weather responses, learning particular food relationships, remaining anatomy/recipes and playtesting the combined experience. The three creature goals remain incomplete. No new owner decision blocks the independent proposal above.
+**Remaining work:** aquatic/aerial and other unsupported feeding mechanisms, chemosynthetic intake, other food types if useful, natural source prevalence and population support, actual shelter use where worthwhile, useful weather responses, learning particular food relationships, implementation of the specified anatomy/recipes and playtesting the combined experience. The three creature goals remain incomplete. No new owner decision blocks the independent proposal above.
 
 ### Climate and creature observations — first-pass proposal, not implemented
 
