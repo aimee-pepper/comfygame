@@ -1,3 +1,4 @@
+import { ScriptoriumOverhaul } from '@/components/scriptorium-overhaul';
 import { SurveyPostOverhaul } from '@/components/survey-post-overhaul';
 import { ArmouryOverhaul } from '@/components/armoury-overhaul';
 import { WeaponsmithOverhaul } from '@/components/weaponsmith-overhaul';
@@ -118,6 +119,7 @@ export default async function CraftingSystemDetail({
     {system.stationID === 'weaponsmith' && <WeaponsmithOverhaul />}
     {system.stationID === 'armoury' && <ArmouryOverhaul />}
     <SeptemberDecisions topic="crafting" />
+    {system.slug === 'writing-ink' && <ScriptoriumOverhaul />}
       {guideStatus && <section className="article-section">
         <p className="status-pill">{guideStatus.status}</p>
         <h2>How it works now and how it will change</h2>

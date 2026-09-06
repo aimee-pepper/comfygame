@@ -4,7 +4,7 @@ Updated 6 September 2026. This is the complete crafting review you requested, be
 
 ## What the review found
 
-Stone tools lead to useful raw-material equipment. Blacksmith T2 introduces Ingots, while Tannery textiles provide a parallel route into clothing and later specialist components. The later recipes still contain older rules that do not fit that sequence. The Apothecary now has a complete first-pass recipe-and-source plan; implementation remains pending. The Forge now also has its complete first-pass family/tool/material plan. The Tannery also has its complete first-pass textile, Leather, clothing and carrying plan below. The Bowyer, Weaponsmith and Armoury now also have complete first-pass plans, followed by shared equipment services and the full Survey Post plan below. Subsequent shops continue as complete batches, including gathering, item effects, prices and recycling.
+Stone tools lead to useful raw-material equipment. Blacksmith T2 introduces Ingots, while Tannery textiles provide a parallel route into clothing and later specialist components. The later recipes still contain older rules that do not fit that sequence. The Apothecary now has a complete first-pass recipe-and-source plan; implementation remains pending. The Forge now also has its complete first-pass family/tool/material plan. The Tannery also has its complete first-pass textile, Leather, clothing and carrying plan below. The Bowyer, Weaponsmith and Armoury now also have complete first-pass plans, followed by shared equipment services the full Survey Post plan and Scriptorium/Writing Desk plan below. Subsequent shops continue as complete batches, including gathering, item effects, prices and recycling.
 
 The biggest corrections are:
 
@@ -648,7 +648,109 @@ The foundation and all eight at Crude total **265 Essence** before discounts. Ta
 
 Older learned instruments, Good/Fine precision, observations and packed choices stay intact. A legacy Crude instrument can use the new Good bill; a legacy Good instrument can use Fine; an existing Fine instrument stays complete. No old purchase is charged again, downgraded or refunded because the price changed. Storehouse capacity does not block a permanent-capability purchase. A failed save leaves the actual materials, currency and progress unchanged.
 
-**Next whole batch:** Scriptorium/Writing Desk, followed by Distillery/Channelworks. Their existing effects and costs remain distinct until their complete plans are reconciled. The separate proposed Survey Needle is not made playable by this pressure-instrument plan. No new Aimee homework decision is needed here.
+The complete Scriptorium/Writing Desk plan follows below. Distillery/Channelworks is next. The separate proposed Survey Needle is not made playable by this pressure-instrument plan. No new Aimee homework decision is needed here.
+
+## Scriptorium and Writing Desk — the complete writing plan
+
+**Current behavior:** Rough charcoal, Brush and Fountain pen, Penmanship research, prepared ink, personal Compounds and Seamward have existing routes. The current Scriptorium foundation is 60 Essence, 14 Timber and 10 Clay; Brush is 45 Essence with its older Copper/Fibre/Timber bill. Chaining still lists a Mote that its current purchase path cannot safely spend. The complete replacement below has **not** been delivered.
+
+**Accepted behavior retained:** better tools make smaller marks on the same fixed page. Brush introduces unlimited Ash ink; Ink Mixing, Compound Assembly and Chaining remain separate choices. Colour, notation, page space and analysis depth are different kinds of progress. Existing campaigns keep their knowledge, Pages, purchases and worlds.
+
+**Complete Design-authored first pass — pending implementation:** the following foundation, seven Penmanship choices, four lens upgrades, Pulp, pigment sources and services replace earlier cost proposals as one system. Costs remain revisable tuning; these are not new personal approvals attributed to Aimee.
+
+### The opening already agreed
+
+The accepted new-campaign design begins with **no known runes**. The first broadly generated introductory world provides Illumination and Sun along a safe unavoidable path. Missing either does not block a retry in that same world, and learned discoveries survive defeat, Return and reopening.
+
+**Current mismatch:** the new-game rules still grant Sun/Illumination and starter Compounds immediately; Modifier availability also needs the intended knowledge checks. This is unfinished implementation of an existing decision, not a new zero-rune instruction inferred from a question. It must be corrected together with the usable introductory lesson and startup behavior, rather than simply emptying the palette.
+
+**Design first-pass retry detail:** after the introductory world's first entry, retrying its unfinished lesson adds no new Bind fee or Page consumption. The same lessons and collected/depleted rewards stay recorded; it cannot generate new loot through replay. The missing lesson stays safely reachable. This is not a free reset of later worlds. Existing physical starter Pages remain distinct from knowing their words, and existing campaigns lose no vocabulary or Pages.
+
+After learning both words, connect Illumination to Sun in Rough charcoal. What you leave unwritten remains generated; Sun alone does not promise a safe forest or a completed map. No forced Template, automatic Binding or new improved-hand requirement is added.
+
+### Foundation and Penmanship
+
+The new Scriptorium foundation costs **30 Essence, 8 Logs and 4 Clay** after Isolde joins. It opens the station, its research and basic Pulp preparation. It does not grant a Brush, pigment or free knowledge upgrade.
+
+| Choice | Requires | New bill before existing Research discounts | What it gives |
+| --- | --- | --- | --- |
+| Brush | Built Scriptorium | 35 Essence; 2 Iron, 4 Plant Fibre, 1 Log | Controlled 2–3-cell marks and unlimited Ash ink |
+| A table that doesn't rock | Brush | 35 Essence; 4 Logs, 4 Clay | Station tier 1 |
+| Ink Mixing | Brush and effective tier 1 | 30 Essence; 2 Clay, 1 Quartz, 2 Resin | Mixer, saved formulas and vial preparation |
+| Compound Assembly | Brush and effective tier 1 | 40 Essence; 2 Pulp, 1 Quartz, 1 Resin | Formalize an eligible proven statement |
+| Chaining | Brush and effective tier 1 | 90 Essence; 2 Mercury; **1 Mote** | The existing statement-joining capability |
+| A ruling frame | Chaining and effective tier 1 | 80 Essence; 2 Ingots, 2 Quartz, 2 Hardwood Logs | Station tier 2 |
+| Fountain pen | Chaining and effective tier 2 | 150 Essence; 2 Ingots, 2 Quartz, 2 Resin | One-cell marks with Ash or learned mixed ink |
+
+Rough charcoal stays the free starting hand, with its existing irregular 4–6-cell marks. A new hand never shrinks or rearranges marks already on a Page; rewriting is an explicit edit with the normal space checks. Brush uses Iron for its ferrule, Fibre for bristles and a Log for its handle, so Copper is no longer compulsory for this first improved hand.
+
+Ink Mixing, Compound Assembly and Chaining are siblings. Fountain pen does not require the other two practices: a one-cell Ash-only route stays valid. If Isolde has already supplied the required effective station tier through the existing keeper system, you do not buy the table or frame again just to satisfy another copy of the same gate. Her existing Research discounts remain visible in the actual quote; the Mote stays exactly one.
+
+Chaining must spend the actual Mote and the rest of its bill together, or change nothing. No new Mote source or partial payment is introduced. This guaranteed capability purchase is separate from the unresolved chance-based Peerless refinement question. Older completed Chaining remains learned without a second charge.
+
+### All four page-lens upgrades
+
+The page lens starts at prose. Its branch remains separate from Penmanship: a built Scriptorium and the actual field-calibration requirements apply, without a new Brush or Ink Mixing prerequisite.
+
+| Lens upgrade | Distinct calibrated subjects | New bill before Research discounts | Existing explanation |
+| --- | --- | --- | --- |
+| Ground and true · tier 2 | 2 | 40 Essence; 2 Quartz, 1 Ingot, 1 Resin | Measured subjects at their best field precision |
+| Aligned lenses · tier 3 | 4, plus prior upgrade | 70 Essence; 4 Quartz, 1 Mercury, 1 Ingot, 1 Resin | Written Focus contributions and secondaries |
+| The fine scale · tier 4 | 6, plus prior upgrade | 110 Essence; 4 Quartz, 1 Rift-glass, 2 Ingots, 1 Resin | The existing Greed and contradiction explanation |
+| The long glass · tier 5 | 8, plus prior upgrade | 160 Essence; 4 Quartz, 2 Restorative Spore, 2 Ingots, 2 Resin | Existing detailed living-layer tendencies |
+
+Aligned lenses is the new name for the same previously named Silvered back upgrade; an old purchase stays earned. A better lens does not calibrate a missing subject. Good/Fine instrument purchases and repeated readings of the same subject do not count as additional subjects. These material changes do not add hidden creature locations or claim that the broader ecology rework is finished.
+
+### Pulp, pigments and prepared ink
+
+At the built Scriptorium, **2 Stem and/or Leaf Fibre makes 2 Pulp for no Essence**. Each portion keeps its actual source history; mixed Fibre is allowed. New Pulp is ungraded and has a nominal sale/buy value of 1/2 Gold per unit. Isolde makes the working sheets within the Compound service. Separate Paper manufacturing remains held until it has an actual independent use; ordinary Binding gains no Paper toll.
+
+The new primary pigment routes are:
+
+| Channel | Source | Yield |
+| --- | --- | --- |
+| Cyan | Copper | 4 measures per unit |
+| Magenta | Dyer's Root | 4 measures per unit |
+| Yellow | Sulfur | 4 measures per unit |
+| Depth | Obsidian | 4 measures per unit |
+
+**New source work, pending implementation:** Copper uses the accepted Pick-1 work group, Obsidian Pick 3. Dyer's Root is a named small rooted plant with a specific pigment-bearing root, gathered with Scythe 1 for two portions. Its source belongs in suitable fresh, lit, unfrozen growing ground. It joins the existing named-preparation plant pool alongside the six Apothecary profiles, sharing their budget; it is not another guaranteed bonus plant in every world. Its actual pigment profile determines the yield, not a guess from the plant's rendered colour.
+
+Old explicitly supported Ichor pigment stock retains its legacy conversion and existing Magenta measures stay valid. No new world-node Ichor is introduced, and an arbitrary creature fluid does not automatically supply Magenta. The new Root route makes colour mixing independent of unfinished creature-fluid harvesting. Old material prices, stock and vials remain preserved.
+
+Keep the current **single preparation action**: choose the exact Cyan/Magenta/Yellow/Depth formula, preview the bill, confirm. Each positive channel costs one measure per started 25 points. Existing measures are used first; only the minimum whole source units needed for the shortfall are processed. Surplus measures stay at the station. **One Resin and no Essence** complete a vial with **12 applications**; no separate bottle or mandatory pigment-processing chore is added.
+
+For Cyan 26 with no stock, one Copper supplies four measures, two are spent and two remain; one Resin finishes the vial. Another identical vial can use those two remaining measures and another Resin. Cyan 100 plus Yellow 100 uses one Copper, one Sulfur and one Resin from empty stocks. Depth is later material, while the other channels and open-colour writing remain usable before it.
+
+All-zero sliders mean no mixed ink, not White. Charcoal and Ash leave world colour open. Explicit mixed black is an actual colour instruction, even if its Page mark resembles Ash. Drafting, changing a formula and editing ink on eligible marks are free. A successful Bind spends one matching application per inked Focus, not another application for each linked Subject or Modifier. Cancelled, stale or failed Binding spends none.
+
+Existing supported Sun, Smoke, Granite and Bloom colour scopes remain. Colour does not alter pressure, Greed, Stability, combat stats or resource chances. Unsupported colour scopes explain the limitation instead of applying a global tint. Editing a saved mixture never changes old marks, prepared vials or bound-world colours.
+
+### Personal Compounds and Seamward
+
+A personal Compound keeps one proven complete statement of **2–5 known atomic marks**, without nested Compounds or unknown words. Successful Binding proves the statement once; repeated identical worlds are unnecessary. After learning Compound Assembly, formalization costs **20 Essence and 4 Pulp**. Its actual footprint is the existing 60%-of-atomic-footprints calculation rounded up, with a minimum of one cell. The preview must show the real result, including cases where rounding saves no space.
+
+The Runebook formalizes; the Writing Desk places notation you already know. Renaming and deleting are free and refund nothing. Deleting a Runebook entry does not change a Page, Template or world that already contains its saved expansion. A found Compound does not teach every atomic word merely by being owned.
+
+**Seamward retains its current service:** built Scriptorium, Brush and Ink Mixing; one exact eligible Body or Keepsake piece with an empty inscription; one identified Seamlight, 10 Essence and one ink application. Ash is unlimited, while coloured ink consumes a matching prepared application. It inscribes the same item once. Erasing is a deliberate confirmed action for no Essence, with no refunded ingredients.
+
+Seamward wakes during collapse and guides toward a usable portal under its existing rules. It creates **no illumination**, reveals no portal marker and does not stack across party copies. The departing party's actual worn pieces determine its excursion effect. Supported same-item refits preserve it; a newly made item does not copy it.
+
+**Lantern and Light Inscription — detail still unresolved:** no verified settled recipe, radius, duration or acquisition contract is recorded. The accepted boundary remains that light begins only when rules-owned activation completes, after its preceding animation. Do not read the old speculative Lantern ingredient list as an approved recipe or borrow Seamward's behavior. This separate missing contract does not block the known writing/ink/Seamward plan.
+
+### Practical costs and preserving campaigns
+
+Before Research discounts and other facilities, recruitment or Binding:
+
+- Foundation plus Brush: **65 Essence**.
+- Foundation, Brush, purchased table and Ink Mixing: **130 Essence**. The first pure-Cyan vial adds one Copper and one Resin.
+- Foundation, Brush, table, Compound Assembly and one formalization: **160 Essence**, with six Pulp prepared from six Fibre in addition to the Brush's own materials.
+- The full purchased-tier Fountain route: **420 Essence and one Mote**, without buying Ink Mixing or Compound Assembly.
+- The four separate lens upgrades: **480 Essence**, plus their station, Survey and material requirements.
+
+These are staged choices, not a required full shopping list or an affordability playtest. The actual purchase preview retains its continuation information without a new forced currency reserve. Existing hands, tiers, capabilities, Compounds, Pages, ink applications, learned words and resolved worlds stay intact. New prices neither refund old purchases nor charge again. A failed save preserves the entire bill and result; full storage only matters for actual stored outputs, not permanent knowledge.
+
+**Next whole batch:** Distillery/Channelworks. The zero-rune lesson correction, the new writing costs and the new pigment sources are pending implementation. No additional Aimee decision is needed for this specified batch; Light's missing detailed design remains separately recorded.
 
 ## Every remaining shop and crafting system
 
@@ -657,7 +759,6 @@ The sequence below follows material dependencies. It includes services and proce
 | System | Complete scope of its batch | Main correction or dependency |
 | --- | --- | --- |
 | Peerless refinement | The later chance/guarantee journey | Ordinary refit, rebuild, legacy routing and recovery are specified above; Mote-on-miss remains open |
-| Scriptorium / Writing Desk | Ink, personal Compounds, Seamward installation/erasure, later Paper and pigments | Keep making ink, using ink, recording a Compound and inscribing an item distinct |
 | Distillery | Heat, Caustic and Light Cores | Direct attunement, recognizable catalysts and preserved potency/source; no obsolete Blank Core manufacturing step |
 | Channelworks | Current Heat Fixture and restoration; planned three attunements across three reaches | A complete nine-configuration plan; a stored fixture does not mean every planned weapon is playable |
 | Anchorage | Anchor Frame construction and world assignment | Actual structural, ballast, binding and attunement parts; creating a frame is separate from assigning it |
@@ -669,7 +770,7 @@ The Survey Post plan above replaces the old property-sample ingredient lists whi
 
 Existing direct Core attunement costs 16 Essence plus the appropriate material and catalyst. Current repeatable Channelworks work consumes a Heat Core to make a Heat Fixture; the complete Heat/Caustic/Light weapon family remains intended work. Older references to making Blank Cores are historical.
 
-Current ink makes 12 applications from the requested Cyan, Magenta, Yellow and Depth stock plus Resin. Personal Compound formalization costs 20 Essence and 4 Pulp. Seamward installation uses an identified Seamlight, 10 Essence and an ink application on eligible gear; it is a different recipe from Waystone. These services need their own ingredient review while preserving their existing effects.
+The complete Scriptorium plan above now supplies the ink/Pulp/material review and preserves the 12-application vial, 20-Essence/4-Pulp formalization and distinct Seamward service. Lantern/Light details remain separately unresolved.
 
 ## Keeping accepted decisions intact
 

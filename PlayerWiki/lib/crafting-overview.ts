@@ -62,9 +62,9 @@ export const coatingLifecycle = {
 } as const;
 
 export const starterRuneFlow = {
-  current: 'A fresh campaign currently knows 12 compound symbols and 15 source symbols and owns three starter World Pages: Open Flats, Rainwashed Shore, and Stone Hollow.',
+  current: 'The current overhaul new-game rules grant Sun and Illumination immediately, plus the 12 catalogue starter Compounds; Modifier availability also needs the intended knowledge checks. Older starting rules grant a broader set of Focuses. The three physical starter World Pages remain separate from knowing their words. The accepted zero-rune opening is not implemented yet.',
   intended: 'A new campaign begins with no known runes. Its first excursion is a broadly generated introductory world with Illumination and Sun guaranteed on a safe unavoidable path. Those discoveries survive return, defeat, interruption, and closing the game. Once both are brought home, Writing teaches Illumination as the subject and Sun as its source; the player joins them and binds the first world they shape themselves. Everything they did not write remains generated.',
-  recovery: 'Leaving before both discoveries never blocks the campaign. The same introductory world remains available, already learned rune knowledge stays learned, and the missing discovery remains safely reachable until collected. This opening journey does not depend on a voluntary return or on bringing home vulnerable cargo.',
+  recovery: 'Accepted: the same introductory world remains available, learned knowledge stays learned, and the missing discovery remains safely reachable. Design first-pass retry detail: no additional Bind fee or Page consumption after initial entry, and no regenerated loot or duplicate rewards. This does not depend on a voluntary return or vulnerable cargo. Implementation is pending.',
   legacy: 'Existing campaigns keep every known rune and owned World Page. Nothing is revoked, duplicated, or replaced during migration.',
 } as const;
 

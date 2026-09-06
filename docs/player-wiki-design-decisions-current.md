@@ -4,19 +4,19 @@ This is the current record of the changes agreed today. **Decided intended behav
 
 ## Whole-shop update · 5 September
 
-Complete first-pass plans now cover all 19 Apothecary preparations, Forge, Tannery, Bowyer, Weaponsmith and Armoury; replacement implementation remains queued. [Crafting Overhaul · Shop by Shop](crafting-shop-overhaul.html) records the complete scope, current rules, accepted destination and the complete first-pass recipes, producers and services for those six makers, now including shared ordinary equipment services and the complete Survey Post instrument plan. It supersedes isolated next-recipe assignments. The ingredient bridges below are temporary compatibility steps; they do not settle the final recipes or replace the accepted excursion-long coating lifetime.
+Complete first-pass plans now cover all 19 Apothecary preparations, Forge, Tannery, Bowyer, Weaponsmith and Armoury; replacement implementation remains queued. [Crafting Overhaul · Shop by Shop](crafting-shop-overhaul.html) records the complete scope, current rules, accepted destination and the complete first-pass recipes, producers and services for those six makers, now including shared ordinary equipment services, the complete Survey Post and Scriptorium/Writing Desk plans. It supersedes isolated next-recipe assignments. The ingredient bridges below are temporary compatibility steps; they do not settle the final recipes or replace the accepted excursion-long coating lifetime.
 
 ## Wood, Hide, Apex labels and notices · 6 September
 
-**Decided intended behavior — implementation pending:** these four changes are accepted. They are not yet claimed as available in the game.
+**Status:** all four directions are accepted. Hide grouping is delivered in build 318 and functional Apex labels in build 319; wood consistency and notice controls remain pending.
 
 **Wood comes from the world.** Trees are the main source of wood, with their actual world-derived wood colour carried into Logs, Hafts and the corresponding equipment parts. Leaves and changing light do not change the material's inherent colour. Smaller trees and fallen logs provide supporting early routes; an improved Axe must not become a circular requirement for getting its own wood.
 
 Use **Logs**, **Softwood Logs** and **Hardwood Logs** consistently. Older stock called Timber keeps its quantity, value and lawful uses as Logs. Unknown old wood does not become invented Hardwood or Softwood: it can serve a requirement for any Log where appropriate, but cannot satisfy a Hardwood-only recipe without a known type. Saved colours remain saved, and unknown historic colours remain unknown. Fallen logs are finite existing-world resources; this decision does not promise a new guaranteed supply in every world.
 
-**Equivalent Hide appears together.** Return, Storehouse and ingredient selection should show a quantity for portions with the same actual material type, quality, colour and useful physical properties, even when they came from different creatures. Genuine differences remain visible. Each portion keeps its own source history underneath; selecting two consumes exactly two. Lost and retained portions remain separate outcomes, and prices use the actual selected portions. This does not introduce a matching-only requirement for the Tannery's separate Leather panels.
+**Equivalent Hide — current in build 318:** Return, Storehouse and physical material selectors group equivalent portions by quantity, preserving their actual quality, useful properties and validated source colour. Genuine differences remain separate. Storehouse includes creature reserve stock and a quantity/source detail sheet. Individual ownership, provenance, destinations and exact recipe consumption remain intact. Engineering reports the native four-portions → process-two → two-remaining route passed and build 318 installed and launched on 6 September. The current Tannery recipe still consumes two portions; the later one-to-one Leather recipe is not claimed delivered by this display fix.
 
-**Visible Apex creatures are clearly labelled.** An **Apex** badge should accompany a creature already shown under the game's existing visibility rules, including its permitted Apex range. Standing still is not the definition of an Apex. The label does not reveal an otherwise hidden creature, unknown proper name or reward; “Apex creature” is enough when its name is unknown.
+**Apex labels — current in build 319:** actual Apex creatures are identified on the existing visible field/minimap markers, current-sight details and encounter header. Ordinary creatures that stand still do not acquire an Apex label. Existing visibility remains authoritative; this adds no hidden creature, proper name or reward reveal. Engineering reports the visible Apex → move into encounter → reopen route passed and cumulative build 319 installed and launched on 6 September. Functional labels are delivered; Asset styling remains in progress.
 
 **Optional field notices have category controls.** Monster notices and mining/gathering results can be switched separately. Muting them changes the popups, not the actual world, resource collection, map labels, Diary or inventory. A visible Apex badge remains visible.
 
@@ -58,13 +58,21 @@ The study should face north-up and east-right, with downward camera pitch rather
 
 The remembered image reveals no hidden enemies, resources, active hazard warnings or changed shadows/effects. Remembered trees do not cast current shadows or react to current lighting. Older saves without a sufficient actual tree observation keep honest remembered ground until a new sighting. Existing fading of currently visible trees is preserved. Engineering reports model/render checks and walking-away/restart checks; Design has not repeated them. This is a bounded stationary-tree correction, not approval of a full 3D migration.
 
+## Complete Scriptorium/Writing Desk first pass · 6 September
+
+**Design-authored first pass complete; implementation pending.** [The writing plan](crafting-shop-overhaul.html) covers the foundation, all seven Penmanship choices, four page-lens upgrades, Pulp, pigment sources, prepared ink, personal Compounds and Seamward. Foundation plus Brush is 65 Essence before discounts; the three practices stay independent and the separate lens still uses actual field calibration.
+
+Dyer's Root supplies a named new Magenta route, while Copper, Sulfur and Obsidian supply the other channels. The new sources are pending implementation. Just-in-time preparation still produces twelve applications, free drafting remains, and a successful Bind spends the matching ink. Old costs and world-node Ichor instructions are superseded without deleting old stock or purchases.
+
+The existing zero-rune opening decision has a confirmed implementation mismatch and is included as a paired introduction/knowledge correction. Existing campaigns lose no words or Pages. Lantern/Light's exact recipe and mechanical details remain separately unresolved; its accepted activation-before-illumination boundary stays intact. No new homework answer is needed for the known writing batch. Distillery/Channelworks follows next.
+
 ## Complete Survey Post first pass · 6 September
 
 **Design-authored first-pass plan complete; implementation pending.** The [Survey Post tables](crafting-shop-overhaul.html) now cover its foundation, eight initial instruments and all sixteen Good/Fine improvements. Named physical ingredients replace the old property-sample search. Instruments remain permanent capabilities: one Survey reads all carried subjects for one turn, and actual fieldwork calibrates the page lens.
 
 The new foundation is 20 Essence plus 6 Logs, 4 Clay and 4 Plant Fibre. Level and Hygrometer provide a route before Quartz or Ingots: foundation plus those two Crude instruments totals 55 Essence before discounts. Good and Fine retain the deliberate first-pass 20/50 Essence service fees. No animal-fluid producer, random grade, extra station tier or equipment slot is required.
 
-An improved instrument must be used on a later field Survey to improve its best calibration. Existing precision, observations, explicit packing choices and ongoing excursions remain intact. The page lens's separate 2/4/6/8 distinct-subject gates and costs remain. This batch adds no owner homework; Scriptorium/Writing Desk follows next.
+An improved instrument must be used on a later field Survey to improve its best calibration. Existing precision, observations, explicit packing choices and ongoing excursions remain intact. The page lens's separate 2/4/6/8 distinct-subject gates and costs remain. This batch adds no owner homework; the complete Scriptorium/Writing Desk plan is now also specified above.
 
 ## Shared equipment services · 6 September
 
@@ -199,7 +207,9 @@ Pin a known recipe to see relevant sources highlighted **as soon as they become 
 
 ### Learning to Write and find people
 
-The intended new campaign begins with no known runes. The introductory world safely provides Illumination and Sun, and missing either does not block a retry. Learned discoveries survive defeat, return, and reopening. At home, the player connects Illumination to Sun and sees the effect of that choice in the world they bind. Unwritten features remain generated. Existing campaigns keep their knowledge and Pages.
+**Decided intended behavior:** a new campaign begins with no known runes. The introductory world provides Illumination and Sun along its safe path, and missing either does not block retrying that same world. Learned discoveries survive defeat, Return and reopening. At Home, connect Illumination to Sun and see the effect in the world you Bind. Unwritten features remain generated; existing campaigns keep their knowledge and Pages.
+
+**Current mismatch, confirmed 6 September:** new-game rules still grant Sun/Illumination and starter Compounds immediately, while Modifier availability also needs the intended knowledge checks. The accepted empty-vocabulary opening is unfinished. Aimee's question did not create a new decision. The [whole writing plan](crafting-shop-overhaul.html) now records the paired opening/teaching correction, including preserving existing campaigns and retrying the same unfinished introduction without reminting rewards.
 
 That first lesson should make authorship visible. Traveller clues should describe recognizable world facts using vocabulary the player has had a chance to learn. They should not require guessing an invisible threshold. The first practical makers now have a decided intended discovery priority, shown below. Later people keep their relative order and existing early-access opportunities for this step; a wider campaign redesign remains separate.
 
