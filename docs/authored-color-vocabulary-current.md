@@ -1,5 +1,7 @@
 # Authored colored ink and open color resolution — current design
 
+> **6 September production authority:** The CMY+Depth, Ash=nil, free-draft/bind-spend, exact source scope and persistence rules remain accepted. The complete Scriptorium contract replaces ingredient acquisition and costs; current world-node Ichor claims and the old fresh-save Ash sentence are superseded. Fresh starts use Rough charcoal. Historical accessibility/configuration proof directions are excluded by the direct user override, not implementation prerequisites. See [Scriptorium and Writing Desk](scriptorium-writing-desk-whole-system-production-v1.md).
+
 **Status:** current implementation-ready CMY + Depth economy. Color-space coefficients and the
 12-application vial yield remain reversible playtest tuning.  
 **Owner:** Game Design owns authorship/randomness; Asset owns calibrated conversion and patterns;
@@ -138,7 +140,7 @@ The first live recipe family is:
 | Base | World resource | Reason / gate |
 |---|---|---|
 | Cyan | **1 Copper → 4 Cyan measures** | A processed blue-green copper pigment; Copper remains recognizably copper before processing |
-| Magenta | **1 Ichor → 4 Magenta measures** | Ichor is already a rare world resource with a canonical dark-magenta identity; no fabricated generic biological sample is needed |
+| Magenta | **1 Dyer's Root → 4 Magenta measures** | Complete Scriptorium first-pass source, pending implementation; old explicitly supported Ichor stock retains its legacy conversion, with no new world-node Ichor |
 | Yellow | **1 Sulfur → 4 Yellow measures** | A truthful strong mineral yellow with a deliberate world-writing route |
 | Depth | **1 Obsidian → 4 Depth measures** | A dark volcanic pigment, distinct from unlimited semantic Ash |
 
@@ -157,12 +159,7 @@ measures, source-resource shortfall, retained excess, Resin and applications bef
 The combined processing/preparation transaction is atomic; cancel, insufficient stock, interruption
 and stale confirmation consume nothing.
 
-Ichor's rarity is acceptable because deliberate color is optional and Ink Mixing arrives after the
-opening. Trading Post stock and authored Ichor-producing worlds provide independent acquisition
-routes. Do not grant a magical free Magenta stock with the upgrade. If play shows Magenta functionally
-unavailable, tune Ichor access or add a second explicitly authored magenta resource recipe; never make
-an arbitrary colorful sample qualify. Later Scriptorium nodes may improve yield or organization but
-must preserve the four base identities.
+The complete Scriptorium contract supplies a named Dyer's Root producer and new Copper/Obsidian physical routes. It keeps the four channel identities and existing measures/vials intact without making Magenta depend on unfinished creature fluids. Never grant free pigment with a Research upgrade or accept arbitrary colourful stock. The full acquisition/material policy, including exact legacy Ichor support, now belongs to that contract.
 
 ## Scope remains game-owned
 
@@ -292,7 +289,7 @@ persisted resolved facts.
    mixtures, selected ink and invalid scope without color alone.
 10. Existing pages/worlds migrate colorless without mutation; no fixed-swatch ownership or obsolete
     color-pity state is fabricated.
-11. A fresh save has Ash but no mixer; purchasing Isolde's Ink mixing node unlocks it everywhere,
+11. A fresh save has Rough charcoal and no mixer; Brush enables Ash, and purchasing Isolde's Ink Mixing node unlocks deliberate mixing,
     save/load preserves that access, and an eligible older save is migrated without paying twice.
 
 ## Open tuning

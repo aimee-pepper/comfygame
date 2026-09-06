@@ -1,5 +1,7 @@
 # Writing tools and colored-ink progression — current
 
+> **6 September production authority:** The tool identities, footprints and sibling graph below remain accepted. The complete Scriptorium contract now owns all costs and current/intended status; historical alternate-configuration acceptance clauses below are superseded by the direct fixed-target override. See [Scriptorium and Writing Desk](scriptorium-writing-desk-whole-system-production-v1.md).
+
 **Status:** settled progression; implementation-ready naming, capability and migration boundary.  
 **Owner:** Isolde's Scriptorium / Penmanship.  
 **Supersedes:** the charcoal → pencil → fountain-pen ladder and any statement that Ash ink is the

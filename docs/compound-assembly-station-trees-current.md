@@ -1,5 +1,7 @@
 # Compound assembly and station trees — current design
 
+> **6 September production authority:** Compound semantics and the sibling graph remain; the old180-Essence unlock and claim that formalization is missing are historical. The complete Scriptorium contract now specifies40 Essence plus exact materials for the unlock and retains20 Essence/4 Pulp formalization. Current/intended delivery status belongs to the public Wiki. See [Scriptorium and Writing Desk](scriptorium-writing-desk-whole-system-production-v1.md).
+
 **Status:** Implementation-ready structural design; costs remain playtest placeholders.
 **Scope:** Player-authored writing compounds and the ownership of non-combat progression.
 
@@ -9,8 +11,7 @@ Per-building research trees are not wholly unbuilt. The content model already as
 station and gates nodes by station tier; the Scriptorium and Survey Post use this architecture.
 Future station progression should extend that same system rather than introduce private upgrade UIs.
 
-Compound *placement* also exists for authored catalog compounds. What is missing is the promised
-player-facing assembly/formalization loop and its gate.
+Compound *placement* also exists for authored catalog compounds. The player-facing assembly/formalization loop now exists; its complete cost/material replacement is specified in the Scriptorium contract.
 
 ## What a player-authored compound is
 
@@ -37,7 +38,7 @@ entire world specification. Chaining remains the tool for joining distinct state
 **Compound Assembly** is a reliable midgame Penmanship node at the Scriptorium. It requires the
 Brush and Scriptorium tier 1, and sits alongside Ink Mixing and Chaining rather than behind the
 fountain pen.
-Its placeholder purchase cost is 180 essence, 6 quartz and 8 pulp.
+The new first-pass purchase is 40 Essence, 2 Pulp, 1 Quartz and 1 Resin, as specified in the complete Scriptorium contract; replacement implementation is pending.
 
 After unlocking it, the player may formalize any eligible composition they have successfully bound
 at least once. One successful world is evidence enough; requiring repeated identical worlds would

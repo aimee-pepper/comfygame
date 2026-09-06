@@ -1,5 +1,7 @@
 # Ink economy friction audit — current
 
+> **6 September production authority:** Just-in-time vial preparation remains the intended/current interaction. The complete Scriptorium contract replaces the source table with Copper/Dyer's Root/Sulfur/Obsidian and explicit preserved legacy Ichor support. Ichor is not a newly generated world resource; no broader old comparison/audit is requested. See [Scriptorium and Writing Desk](scriptorium-writing-desk-whole-system-production-v1.md).
+
 **Status:** current role/resource boundary plus reversible first-slice interaction placeholder.  
 **Authority:** `authored-color-vocabulary-current.md` remains the live recipe and resolver contract;
 this document owns the just-in-time preparation interaction pending Aimee's later feel review.
@@ -22,12 +24,12 @@ This split keeps the identities clear:
 
 ## Resource check
 
-All five first-slice ingredients already exist as independently obtainable world resources:
+The following is the intended source mapping from the whole Scriptorium contract; typed producer integration is still pending:
 
 | Use | Existing resource | Current recipe role |
 |---|---|---|
 | Cyan | Copper | 1 unit → 4 Cyan measures |
-| Magenta | Ichor | 1 unit → 4 Magenta measures |
+| Magenta | Dyer's Root | 1 unit → 4 Magenta measures; supported old Ichor stock keeps its legacy route |
 | Yellow | Sulfur | 1 unit → 4 Yellow measures |
 | Depth | Obsidian | 1 unit → 4 Depth measures |
 | Vial binder | Resin | 1 per prepared vial |
@@ -57,7 +59,7 @@ For the first native slice, collapse the separate processing verb into **one ato
 transaction with automatic just-in-time processing**:
 
 1. choose or mix the exact formula;
-2. preview the required Copper/Ichor/Sulfur/Obsidian units, Resin and 12 applications;
+2. preview the required Copper/Dyer's Root/Sulfur/Obsidian units, Resin and 12 applications;
 3. confirm once; spend existing station measures, automatically process the minimum exact world
    resources needed to cover the shortfall, retain any resulting excess measures at the Scriptorium,
    and create the vial.
@@ -77,18 +79,11 @@ persistence so the interaction can later expose explicit processing without a sa
 vial preparation the sole ordinary player-facing processing action. This is a deliberately
 reversible placeholder—not a claim that batching pigment could never become interesting.
 
-## Comparison gate
+## Current integration boundary
 
-The DEBUG mixer proof should show both interaction counts without changing color output:
+Keep the existing just-in-time vial interaction. The next implementation changes exact physical ingredient ownership and source profiles, not the number of screens. No second stored-measures comparison or new audit is requested.
 
-- **Stored measures:** process resource, then prepare vial;
-- **Just-in-time preparation:** mix, preview existing measures plus exact source-resource shortfall,
-  confirm vial once.
-
-Use just-in-time preparation by default. Revisit explicit processing only if play demonstrates that
-choosing when/how much base stock to process is enjoyable enough to justify the extra screen action.
-
-## Acceptance shared by either option
+## Retained transaction requirements
 
 1. No Scriptorium action infers pigment from a resource's artwork or name at runtime.
 2. Insufficient material and stale confirmation consume nothing.

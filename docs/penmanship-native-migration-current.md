@@ -1,5 +1,7 @@
 # Penmanship native migration — current
 
+> **6 September production authority:** Historical identity/topology reference. Native Brush naming/topology and the current45-Essence source cost already exist; the old150-Essence discussion and economy-review permission questions are superseded. Use the complete Scriptorium contract for new costs, material sources, exact currency spending and campaign preservation. Do not repeat its historical verification programme. See [Scriptorium and Writing Desk](scriptorium-writing-desk-whole-system-production-v1.md).
+
 **Status:** implementation-ready identity/topology migration; economy values remain playtest tuning  
 **Date:** 11 August 2026  
 **Authority:** `writing-tool-progression-current.md`, `authored-color-vocabulary-current.md`, and
@@ -7,8 +9,8 @@
 
 ## Why this checkpoint exists
 
-The live catalogue and model still expose `pen_pencil`, display `Hand.plain` as **Pencil**, route
-Isolde's diary rewards to the old ID, and test Penmanship as a line. The settled game instead uses
+When this historical checkpoint was authored, the catalogue and model exposed `pen_pencil`, display `Hand.plain` as **Pencil**, route
+Isolde's diary rewards to the old ID, and tested Penmanship as a line. The settled game instead uses
 Rough Charcoal → Brush → Fountain Pen, with three independent practices branching after Brush.
 Changing only visible strings would leave misleading stable IDs, stale prerequisites and no place
 for Ink Mixing or Compound Assembly.
@@ -48,31 +50,11 @@ different choices. `pen_desk` and `pen_press` are the purchased routes to effect
 they are not duplicated as hard prerequisites because keeper-earned tier uses the same effective-tier
 authority. Their completed tier grants must be idempotent.
 
-### Reversible first Brush cost — under economy review
+### Costs are owned by the complete system contract
 
-Use **150 Essence + 2 Copper + 6 Fibre + 4 Timber** as the implementation/playtest placeholder:
+The runtime now uses the later 45-Essence Brush and Brush identity. The earlier 150-Essence proposal is historical and must not be implemented from this document. The complete Scriptorium contract replaces the next implementation's full cost profile, starting with a 35-Essence Brush and named Iron/Fibre/Log inputs. It also closes Ink Mixing, Compounds, Chaining's actual Mote currency, the frame, Fountain and all lens recipes together.
 
-- Copper is now the pressure-holding ferrule described by Halloway's lead, not fictional pencil
-  lead;
-- Fibre supplies the retained bristle bundle;
-- Timber supplies the handle; and
-- the unchanged 150 Essence preserves the current intended weight of the largest early writing-
-  capacity jump while the material burden becomes substantially less luck-sensitive than the live
-  8 Copper + 10 Timber cost.
-
-All three resources have an independent Trading Post route and writable world routes by Isolde's
-phase. Phone telemetry must still prove that a player who reaches Isolde can buy the Brush without
-delaying the next authored bind; if not, reduce material counts before reducing the writing choice
-to a free grant. This cost is explicitly reversible tuning, not a reason to change the tool graph.
-
-**11 August review warning:** `penmanship-economy-runway-review-current.md` finds that 150 Essence
-plus the 60-Essence Scriptorium consumes at least 6.4 average fully explored worlds of gross income
-before continued binding. It recommends **45 Essence** for the first comparison and a coherent
-lower branch profile. Do not freeze or implement 150 as settled while that review is open.
-
-Preserve the current Fountain Pen and building costs until their economy checkpoint. The three new
-tier-1 practice costs remain separately tunable; do not copy the Brush recipe into them merely to
-fill required fields.
+Retain the actual continuation advisory, not an old full-map income assumption or a new telemetry programme. Graph/identity facts below remain useful migration constraints; old prices and historical pending approvals do not.
 
 ## Stable migration
 
