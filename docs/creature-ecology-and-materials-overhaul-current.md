@@ -31,7 +31,7 @@ persistence, placement, movement, combat rewards and migration; Asset Design own
 silhouette proofs; Aimee owns final creature and material art.
 **Updated:** 21 August 2026
 
-Machine authority and freshness gate:
+Legacy runtime evidence only; do not run these as a new-policy acceptance gate:
 `creature-habitat-authority.json`, `creature-material-projection-authority.json`,
 `python3 scripts/validate_creature_habitat.py`, and
 `python3 scripts/validate_creature_material_projection.py`.
@@ -470,155 +470,11 @@ The version transition is accepted only when a fixture covering every old `Mater
 same number of units before and after migration and all grade-dependent live consumers have zero current
 references.
 
-## Exact frozen material projection
+## Current body-to-material production authority
 
-One defeated ordinary creature produces the material families frozen on its species ecology identity.
-There is no catalogue drop roll. Teeming and multi-creature encounters aggregate the deterministic result
-once per defeated creature, then present one row per `family + qualityBand` rather than nineteen `+1` rows.
+The complete disposition of the eighteen old projection families is now in [Creature bodies and material rewards](creature-body-material-rewards-production-v1.md),6 September. Its new opt-in covers supported solid-part identity, actual source measurements/colour/Pattern, four-band quality, species quantities/Anatomy, collection/custody/trade, and exact remaining anatomy/recipe dependencies. The old projection JSON is legacy runtime evidence only for this new policy; it does not authorize generic Plate/Fin or infer Oil/Venom/Ichor from insulation/toxicity/emanation.
 
-All numeric inputs are clamped to `0...100` before comparison. Boundary comparisons below are inclusive
-unless written as `<`. The v1 constants deliberately reuse the current live meaningful-part boundaries
-where those already exist:
-
-| Constant | Exact v1 value |
-|---|---:|
-| minimum covering coverage | `15` |
-| minimum meaningful armament total | `30` |
-| minimum structural bone density | `20` |
-| minimum emanation strength | `25` |
-| soft/scaleless hardness boundary | `25` |
-| overlapping scale hardness boundary | `35` |
-| hard covering boundary | `55` |
-| plate hardness boundary | `70` |
-| long covering boundary | `45` |
-| dense covering boundary | `50` |
-| Down insulation boundary | `25` |
-| Oil insulation boundary | `45` |
-
-Derived helper values are exact:
-
-```text
-armourValue       = covering.hardness × covering.coverage / 100
-insulation        = covering.length × covering.coverage / 100
-flexibility       = clamp((100 - covering.hardness) × (0.5 + covering.length / 200))
-appendageExtent   = clamp(appendageCount / 8 × 100)
-finishLustre      = clamp(finish.shine + finish.schiller)
-toxinPotency      = isToxic
-                     ? clamp(round(0.70 × coloration.patterning + 0.30 × ornament))
-                     : 0
-sizeBand          = clamp(1 + floor(size / 25), 1, 4)
-appendageBand     = clamp(ceil(appendageCount / 2), 1, 4)
-appendageQuantity = clamp(roundHalfUp(0.5 × sizeBand + 0.5 × appendageBand), 1, 4)
-```
-
-### 1. Primary covering and appendages
-
-Resolve one primary covering family in this exact first-match order:
-
-1. `appendageType == feathered` and `appendageCount > 0` → `feather`;
-2. `(habitat == aquatic || bodyPlan == piscine)` and `covering.coverage >= 15` and
-   `covering.hardness >= 25` → `scale`;
-3. `(habitat == aquatic || bodyPlan == piscine)` and `covering.coverage >= 15` → `hide`;
-4. `bodyPlan == segmented`, `coverage >= 15`, `hardness >= 55` → `chitin`;
-5. `bodyPlan == radial`, `coverage >= 15`, `hardness >= 55` → `shell`;
-6. `coverage >= 15`, `hardness >= 55`, `length >= 45` → `quill`;
-7. `coverage >= 15`, `hardness >= 70` → `plate`;
-8. `coverage >= 15`, `hardness >= 35` → `scale`;
-9. `coverage >= 50`, `length >= 45` → `pelt`;
-10. `coverage >= 15` → `hide`;
-11. otherwise no primary covering material.
-
-Then add these non-synonymous appendage materials independently:
-
-- feathered primary + `insulation >= 25` → add `down`;
-- `appendageType == finned` and `appendageCount > 0` → add `fin`.
-
-The primary result does not also add another primary covering. A feathered hard-bodied species yields its
-characteristic Feathers rather than a second guessed Plate family; its hardness still contributes to the
-Feather quality only where the exact capability table says so.
-
-### 2. Armament
-
-When `armament.total >= 30`, add exactly one armament family:
-
-- dominant Pierce → `fang`;
-- dominant Rend → `claw`;
-- dominant Crush + `cranialFeature == horns` → `horn`;
-- other dominant Crush → `tusk`.
-
-Below `30` yields no armament material. Equal damage values use the live stable dominance order already
-owned by `CreatureTraits`: Pierce, then Crush, then Rend.
-
-### 3. Structure
-
-When `boneDensity >= 20` and `bodyPlan != amorphous`, add `bone`. Habitat does not decide whether a species
-has bones: aquatic species may yield Bone, while a truly amorphous body never does.
-
-### 4. Special materials
-
-Add every independently true special family; these are distinct tissues, not synonyms:
-
-- `isToxic == true` and `toxinPotency > 0` → `venom`;
-- `habitat == aquatic` and `insulation >= 45` → `oil`;
-- `emanation.strength >= 25` → `ichor`.
-
-This may produce more than one special family on an unusual species. Venom and Ichor are Creature
-materials, never ordinary World-resource nodes. The legacy `world.ichor` route is migration-only and never
-merges with `creature.ichor`.
-
-### 5. Exact part expression and quality input
-
-Each projected family freezes the following two capabilities. `partExpression` is their arithmetic mean,
-rounded half up. This is the missing ecology input consumed by the settled quality formula:
-
-`qualityScore = round(0.75 × partExpression + 0.25 × encounterDanger)`.
-
-Here `encounterDanger` means the bound world's frozen **source Danger band** mapped through the six values
-in the crafting authority. It is captured before party-size/level encounter scaling. God mode, DEBUG tuning,
-party growth, adaptive foe HP/slots and repeating the same anchored world cannot improve material quality.
-
-| Family | Capability A | Capability B |
-|---|---|---|
-| Hide | covering coverage | flexibility |
-| Pelt | insulation | covering coverage |
-| Down | insulation | flexibility |
-| Feather | appendage extent | finish lustre |
-| Fin | appendage extent | flexibility |
-| Bone | bone density | size |
-| Scale | covering hardness | covering coverage |
-| Quill | covering hardness | covering length |
-| Fang | armament Pierce | bone density |
-| Claw | armament Rend | bone density |
-| Oil | insulation | size |
-| Plate | covering hardness | armour value |
-| Chitin | covering hardness | finish Schiller |
-| Shell | covering hardness | armour value |
-| Tusk | armament Crush | bone density |
-| Horn | armament Crush | bone density |
-| Venom | toxin potency | coloration patterning |
-| Ichor | emanation strength | finish lustre |
-
-The six resulting bands and encounter-danger values are exactly those in
-`crafting-components-and-schematics-current.md`. No continuous bar, `max(properties)`, old rarity color or
-catalogue tier becomes a second quality authority.
-
-### 6. Exact quantity
-
-The frozen per-defeated-specimen quantities are:
-
-| Family group | Exact quantity |
-|---|---|
-| primary Hide/Pelt/Scale/Plate/Chitin/Shell/Quill | `sizeBand` (`1...4`) |
-| Feather or Fin | `appendageQuantity` (`1...4`) |
-| Down | `sizeBand` (`1...4`) |
-| Fang/Claw/Tusk/Horn | `2` when `armament.total >= 65`, otherwise `1` |
-| Bone | `clamp(1 + floor(size / 34), 1, 3)` |
-| Oil | `2` when `insulation >= 70`, otherwise `1` |
-| Venom | `2` when `toxinPotency >= 70`, otherwise `1` |
-| Ichor | `2` when `emanation.strength >= 70`, otherwise `1` |
-
-There is no `±1` loot RNG. Same saved species identity plus frozen source-Danger band produces the same family,
-band and quantity receipts across relaunch. Specimen cosmetic jitter never changes the projection.
+The old feather-first covering, dominant-damage→tooth/claw/tusk and automatic special-fluid rules are withdrawn as new-production instructions. Existing saved projections remain preserved, and the separately settled Hide/Bone rules remain their own owners. Do not layer old generic rewards behind an explicitly unavailable new family. Wider food/nesting and player experience work remains unfinished.
 
 ## Combat reward correction
 
