@@ -4,7 +4,7 @@ Updated 6 September 2026. This is the complete crafting review you requested, be
 
 ## What the review found
 
-Stone tools lead to useful raw-material equipment. Blacksmith T2 introduces Ingots, while Tannery textiles provide a parallel route into clothing and later specialist components. The later recipes still contain older rules that do not fit that sequence. The complete Apothecary recipe/source batch is delivered in phone build322, installed and ordinarily launched on6 September. The Forge now also has its complete first-pass family/tool/material plan. The Tannery also has its complete first-pass textile, Leather, clothing and carrying plan below. The Bowyer, Weaponsmith and Armoury now also have complete first-pass plans, followed by shared equipment services, the full Survey Post, Scriptorium/Writing Desk, Distillery and Channelworks plans below. Subsequent shops continue as complete batches, including gathering, item effects, prices and recycling.
+Stone tools lead to useful raw-material equipment. Blacksmith T2 introduces Ingots, while Tannery textiles provide a parallel route into clothing and later specialist components. The later recipes still contain older rules that do not fit that sequence. The complete Apothecary recipe/source batch is delivered in phone build322, installed and ordinarily launched on6 September. The complete first Forge equipment/Bone pass is delivered in324, with its tool dependencies from322. The Tannery also has its complete first-pass textile, Leather, clothing and carrying plan below. The Bowyer, Weaponsmith and Armoury now also have complete first-pass plans, followed by shared equipment services, the full Survey Post, Scriptorium/Writing Desk, Distillery and Channelworks plans below. Subsequent shops continue as complete batches, including gathering, item effects, prices and recycling.
 
 The biggest corrections are:
 
@@ -98,11 +98,11 @@ Longer-lived coatings are much stronger than single-strike bottles. Their effect
 
 ## Blacksmith — complete Forge first-pass plan
 
-**Current behavior:** the early raw-Iron blade, Pick/Axe improvements, T2 ingots and Scythe improvement have reported implementations. Older material-based Pointed Blade crafting remains a separate path. The complete new Forge batch below is not implemented or delivered; the older live Blacksmith list does not already contain all eight catalogue families.
+**Current behavior, delivered in build324:** all seven equipment families and their exact working/support bundles, tier gates, quarter Power/Protection, four-band workmanship, frozen prices and same-item refit/current-component recovery are implemented. Typed Bone now has its actual source/reward/Return/trade path and Forge consumers. The Pick remains its separate owned-tool route; smelting/T3 and all three tool progressions were delivered in322. Iron Collar remains the later Weaponsmith/Armoury-backed extension. Engineering reports16 distinct focused/native checks, including50 component combinations and two native journeys, with build324 installed and ordinarily launched.
 
 **Retained decisions:** stone opening tools, useful raw-material starter gear, ingots at T2 and a clear progression into prepared components. Material quality, workmanship, actual statistics and tool level remain different things.
 
-**Design-authored first-pass plan:** the new T3 costs, whole-family material choices, statistics, learning, prices and refit rules are now specified together. These are revisable Design choices under your whole-shop direction, not personal approvals attributed to you. Bone’s old individual approval question has been absorbed into this plan.
+**Delivered Design-authored first pass:** T3/tool costs, whole-family material choices, statistics, learning, prices and refit rules use the complete tables below. These are revisable Design choices under your whole-shop direction, not personal approvals attributed to you. Bone’s old individual approval question has been absorbed into this plan.
 
 ### Forge and tools
 
@@ -536,7 +536,7 @@ After those shops exist, an Ingot Rigid Body recipe expands to **8 Iron, 4 Coal 
 
 ## Shared equipment improvement and recovery · 6 September
 
-**First-pass Design plan complete; Tannery services delivered in build323.** The six ordinary makers share one service plan. Complete service replacement for the other makers remains pending. Older supported equipment services remain available under their existing rules while the new work is implemented.
+**First-pass Design plan complete; Tannery services delivered in323 and Forge refitting in324.** The six ordinary makers share one service plan. Complete service replacement for the other makers remains pending. Older supported equipment services remain available under their existing rules while the new work is implemented.
 
 ### Improving the piece you already own
 

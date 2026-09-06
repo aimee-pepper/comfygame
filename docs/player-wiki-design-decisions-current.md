@@ -4,7 +4,7 @@ This is the current record of the changes agreed today. **Decided intended behav
 
 ## Whole-shop update · 5 September
 
-Complete first-pass plans now cover all 19 Apothecary preparations, Forge, Tannery, Bowyer, Weaponsmith and Armoury; the complete Apothecary implementation now has Engineering-reported focused and native checks, and is delivered in phone build322. The full first Tannery pass is now delivered in build323; the other complete maker routes remain pending. [Crafting Overhaul · Shop by Shop](crafting-shop-overhaul.html) records the complete scope, current rules, accepted destination and the complete first-pass recipes, producers and services for those six makers, now including shared ordinary equipment services, the complete Survey Post, Scriptorium/Writing Desk, Distillery and nine-configuration Channelworks plans. It supersedes isolated next-recipe assignments. The ingredient bridges below are temporary compatibility steps; they do not settle the final recipes or replace the accepted excursion-long coating lifetime.
+Complete first-pass plans now cover all 19 Apothecary preparations, Forge, Tannery, Bowyer, Weaponsmith and Armoury; the complete Apothecary implementation now has Engineering-reported focused and native checks, and is delivered in phone build322. The full first Tannery pass is now delivered in build323; the first Forge equipment/Bone pass is delivered in build324; other complete maker routes remain pending. [Crafting Overhaul · Shop by Shop](crafting-shop-overhaul.html) records the complete scope, current rules, accepted destination and the complete first-pass recipes, producers and services for those six makers, now including shared ordinary equipment services, the complete Survey Post, Scriptorium/Writing Desk, Distillery and nine-configuration Channelworks plans. It supersedes isolated next-recipe assignments. The ingredient bridges below are temporary compatibility steps; they do not settle the final recipes or replace the accepted excursion-long coating lifetime.
 
 ## Apothecary implementation progress · 6 September
 
@@ -19,6 +19,16 @@ The older recipes and ingredient bridges below are historical compatibility refe
 Ordered source-colour swatches now appear in stock, crafting/refit review and equipment details. Mixed Cord strands and Cloth sections remain distinct; missing RGB is shown as unknown rather than guessed. Known Leather colour facts stay visible. Equipment comparisons preserve fractional Protection. Carry and supported paid improvements remain intact.
 
 Engineering reports47 focused checks and3 native routes passed. This completes the first Tannery batch, not the separate creature anatomy/equipment proposals or the remaining Forge and specialist makers.
+
+## Forge and Bone delivered · phone build324
+
+**Current behavior:** the complete first Forge equipment pass and typed Bone source/reward/trading route are installed and ordinarily launched on6 September. T1 offers Pointed Blade, Cutting Blade, Hand Maul and Shield; T2 adds Long Spear, Helm, Rigid Guard and refitting. These are seven equipment families. Pick remains the same owned tool progression, alongside Axe and Scythe; the smelting and T3/tool dependencies already arrived in build322.
+
+The delivered recipes use their exact Iron, Ingot, Quartz, Bone and Shield-wood working/support choices. Power and Protection retain quarter precision, workmanship stays separate, and new prices use frozen component values. Same-item refit keeps the actual piece and returns only displaced current components once. Coal remains spent process fuel, not a component, statistic or recovery reward.
+
+Eligible new Bone keeps its actual source density, size, colour/Pattern and history through victory, Return, storage and trading. It has no extra recovery roll or generic duplicate. Forge now consumes this typed Bone; unsupported older property-only services do not. No Hollow/Dense subtype or wider anatomy rollout is implied.
+
+Engineering reports16 distinct focused/native checks passed, including50 working/support combinations and two native journeys. Iron Collar remains a later Weaponsmith/Armoury-backed recipe. Bowyer and the remaining specialist batches are pending; Asset’s separate Forge presentation polish is not claimed installed.
 
 ## Wood, Hide, Apex labels and notices · 6 September
 
@@ -102,7 +112,7 @@ An improved instrument must be used on a later field Survey to improve its best 
 
 ## Shared equipment services · 6 September
 
-**Design-authored first pass complete; Tannery services delivered in build323, other full maker services pending.** [The full service plan](crafting-shop-overhaul.html) now explains component refit, Tannery remakes, Armoury rebuilds, Weaponsmith fitting, exact recovery and older paid-work preservation across the six makers. Ordinary refit/remake/rebuild costs no Essence beyond the actual replacement recipe; fitting uses the unchanged weapon parts.
+**Design-authored first pass complete; Tannery services delivered in323 and Forge refitting in324; other full maker services pending.** [The full service plan](crafting-shop-overhaul.html) now explains component refit, Tannery remakes, Armoury rebuilds, Weaponsmith fitting, exact recovery and older paid-work preservation across the six makers. Ordinary refit/remake/rebuild costs no Essence beyond the actual replacement recipe; fitting uses the unchanged weapon parts.
 
 An item's previous constructions remain its history, not extra salvage. New material equipment gains no generic old Reforge rank bonus or historical unapproved +0.5 upgrade. Older paid upgrades stay on their supported existing route until an accurate conversion can preserve them. The later Peerless guarantee remains accepted, with its Mote-on-miss outcome unresolved; ordinary services do not wait on that answer.
 
@@ -130,9 +140,9 @@ The complete [Tannery plan](crafting-shop-overhaul.html) now covers Cord, Cloth,
 
 Ordinary crafts and refit cost no Essence. New garments use the same recoverable-component pricing as the Forge. Woven Guard/Gloves/Boots remain useful before ingots or animal materials; Buckled Guard uses the existing Forge T2 Ingot. Carry stays 8→11→14→23 plus Sela's separate 2, and Home shelving still reaches 70. No extra Tannery tier, root toll or individual recipe approval is introduced. The full tables and examples are in the linked shop plan.
 
-## Whole Forge first-pass plan · 5 September
+## Whole Forge first pass · delivered in build324
 
-The complete [Forge/Blacksmith plan](crafting-shop-overhaul.html) now covers all eight catalogue families, one coherent Pick progression, T1–T3 facilities, all three level-3 tools, Bone/metal/wood component choices, statistics, prices, recovery and deterministic refit. These are **Design-authored first-pass choices; new implementation is pending**, not personal approvals attributed to you.
+The complete [Forge/Blacksmith plan](crafting-shop-overhaul.html) now covers all eight catalogue families, one coherent Pick progression, T1–T3 facilities, all three level-3 tools, Bone/metal/wood component choices, statistics, prices, recovery and deterministic refit. The seven equipment families and typed Bone route are **delivered in build324**; the tool/smelting/T3 progression was delivered in322. The first-pass numbers remain revisable Design choices, not personal recipe approvals attributed to you.
 
 T3 uses 40 Essence, 6 Ingots, 8 Clay, 6 Logs and 2 Quartz. A level-2 tool improves to 3 using 4 Ingots, 1 Log, 1 Cord and 2 Coal, with no Essence fee. Pick 2 can gather the Quartz first, so the route to Rift-glass has no circular rare-material requirement. Raw starter recipes remain before ingots and do not need matching colours.
 
@@ -144,7 +154,7 @@ The game currently contains both older rules and delivered early-overhaul paths.
 
 | System | Current behavior |
 | --- | --- |
-| Blacksmith | The early overhaul has reported raw-Iron blade/tool and T2-ingot implementations. Older material-based Pointed Blade crafting remains separate. The earlier 30-Essence foundation and quality-based crafting fee describe the legacy route, not the replacement progression. |
+| Blacksmith | Build324 delivers all seven first-pass equipment families, typed Bone choices, prices and same-item refitting. Build322 supplies smelting/T3/tool progression. Earlier30-Essence and quality-fee rules describe only the old route. |
 | Apothecary | The early overhaul has a reported 20-Essence foundation and Lesser Salve from Resin plus Plant Fibre. Briar Oil’s new material selection is reported delivered in phone build 310. Other older recipes remain; the complete19-recipe overhaul and excursion-long coatings are delivered in build322. |
 | Refinement | The complete new refinement journey is not available. This guide does not promise a paid Reforge improvement or a Mote-based Peerless attempt. |
 | First Writing | A fresh campaign currently begins with known symbols and starter World Pages. The learn-Illumination-and-Sun opening below is intended behavior. |
@@ -369,7 +379,7 @@ Existing worlds retain their creatures and movement. The completed Hide path kee
 
 ### Body-to-material rewards — 6 September first pass
 
-**Current:** existing creature traits already project generic material families, with a separately supported typed Hide path. The plain Bone and new body/habitat contracts remain intended work. The following solid-part reward plan is **new Design-authored first-pass work, not delivered**; it does not enable a broad creature rollout.
+**Current:** existing creature traits already project generic material families, with a separately supported typed Hide path. Plain Bone source/reward/trade and Forge use are delivered in build324; the wider body/habitat and solid-material changes remain pending. The following solid-part reward plan is **new Design-authored first-pass work, not delivered**; it does not enable a broad creature rollout.
 
 The creature's body will declare what it is actually made of before rewards are calculated. Body covering, appendages, horns and skeleton are separate regions. Feathers on wings do not erase a hard or furry body covering, and water habitat does not automatically mean Scales or Oil. A tissue cannot be recovered twice under different names.
 
@@ -598,7 +608,7 @@ Ice alone is not liquid habitat. This correction adds no new swimming or flying 
 
 ### Bone — first material beyond Hide
 
-**Decided intended behavior; not yet implemented.** This is partial progress on the body-to-materials design, covering Bone rewards, source history, Return and ordinary trading. It does not finish the anatomy catalogue or the new crafting route.
+**Current behavior, delivered in build324:** Bone rewards, source history, Return, ordinary trading and the complete Forge typed-Bone choices now work. This is delivered partial progress, not a completed anatomy catalogue or every specialist crafting route.
 
 Bone comes from a qualifying internal skeleton. A hard shell, horn or armoured hide does not automatically supply it, and an amorphous creature does not leave Bone. Aquatic and flying creatures may have skeletons; flight alone does not make their Bone hollow. The first material is simply **Bone**. Hollow Bone and Dense Bone are not newly promised subtypes.
 
@@ -615,7 +625,7 @@ The actual creature’s skeletal density and size determine part quality using t
 
 These are the agreed raw-material prices, not the multipliers used for equipment statistics. Colour and species do not add a hidden sale premium. This does not add shop stock. Older Bone keeps its existing value and uses.
 
-**Crafting still unfinished:** the existing Bone-compatible Pointed Blade uses the older crafting rules. The new Bone material needs a compatible crafting update before entering that recipe. No new Bone weapon cost, recipe or unlock is approved by this source design. Older Bone recipes and crafted items remain available through their existing rules.
+**Forge crafting delivered:** typed Bone now fills its specified points, grips, heads and protective components in the complete Forge recipes, with actual source statistics, workmanship, price and recovery. Bowyer/Weaponsmith/Armoury consumers remain pending. Unsupported old property-only recipes cannot take new Bone merely because its family name matches; older Bone retains its supported uses.
 
 **Now specified in the whole Forge first-pass plan:** the existing Pointed Blade can use a new Bone point and Bone grip for 0 Essence, or the other explicitly supported new-material bundles. The point uses actual skeletal density and material quality for Power; the grip adds structure, colour and its workmanship share without an invented handling bonus. A Common point at density 40 gives 2.75 Power.
 

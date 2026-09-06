@@ -1,6 +1,6 @@
 # Creature ecology and materials — current and intended behavior
 
-**Updated6 September2026. The creature rework remains unfinished.** Current trait-based material projections and older stock remain supported, with a separately implemented narrow Hide path. The existing generic family names do not prove that every intended physical part is implemented.
+**Updated6 September2026. The creature rework remains unfinished.** Current trait-based material projections and older stock remain supported, with a separately implemented narrow Hide path and phone324’s delivered typed Bone source/reward/Return/trade and Forge consumers. The existing generic family names do not prove that every intended physical part is implemented.
 
 [The current creature decisions](design-decisions-september-4.html) now record the complete first-pass disposition of the old material families. Actual Fur Pelt, Scales, Chitin/Chitin Plate, Shell, Protective Spines, Flight/Contour Feathers and useful Horns have a specified source, quantity, four-band quality, full colour/Pattern, Return and trade path. Body covering and appendages remain separate, with no duplicate tissue rewards. Implementation is pending.
 
@@ -19,3 +19,5 @@ The three goals in [Aimee's creature checklist](aimee-homework.html) stay unchec
 The new climate/observation proposal keeps cold/hot/wet/air and flora tendencies separate from actual survival, material anatomy and food evidence. A future Bestiary note may remember weather genuinely presented at a sighting, without claiming immunity or revealing hidden creatures. Dynamic wetting, migration and seasonal breeding remain unselected proposals; no climate simulation is enabled.
 
 The finite remaining-diet disposition is now recorded in the [creature decisions](design-decisions-september-4.html): the existing three supported proposed ground-feeding relationships stay bounded, while unsupported aquatic/aerial/radial/amorphous/chemical intake stays unspecified with exact missing evidence. The natural-availability plan asks concrete questions of existing ordinary source/encounter/Return/crafting observations, without choosing spawn rates, running a corpus or requiring map completion.
+
+**Bone delivery boundary:** build324 completes the plain Bone source and Forge component journey. It does not implement the other solid/anatomical materials, their optional recipes, food relations or the separate sighting/weather proposals. Natural creature/material prevalence remains unmeasured by the arranged implementation checks.
