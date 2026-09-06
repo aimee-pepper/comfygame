@@ -4,7 +4,7 @@ This is the current record of the changes agreed today. **Decided intended behav
 
 ## Whole-shop update · 5 September
 
-Complete first-pass plans now cover all 19 Apothecary preparations, Forge, Tannery, Bowyer, Weaponsmith and Armoury; replacement implementation remains queued. [Crafting Overhaul · Shop by Shop](crafting-shop-overhaul.html) records the complete scope, current rules, accepted destination and the complete first-pass recipes, producers and services for those six makers, now including shared ordinary equipment services, the complete Survey Post and Scriptorium/Writing Desk plans. It supersedes isolated next-recipe assignments. The ingredient bridges below are temporary compatibility steps; they do not settle the final recipes or replace the accepted excursion-long coating lifetime.
+Complete first-pass plans now cover all 19 Apothecary preparations, Forge, Tannery, Bowyer, Weaponsmith and Armoury; replacement implementation remains queued. [Crafting Overhaul · Shop by Shop](crafting-shop-overhaul.html) records the complete scope, current rules, accepted destination and the complete first-pass recipes, producers and services for those six makers, now including shared ordinary equipment services, the complete Survey Post, Scriptorium/Writing Desk, Distillery and nine-configuration Channelworks plans. It supersedes isolated next-recipe assignments. The ingredient bridges below are temporary compatibility steps; they do not settle the final recipes or replace the accepted excursion-long coating lifetime.
 
 ## Wood, Hide, Apex labels and notices · 6 September
 

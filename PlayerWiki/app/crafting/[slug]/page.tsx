@@ -1,3 +1,4 @@
+import { DistilleryChannelworksOverhaul } from '@/components/distillery-channelworks-overhaul';
 import { ScriptoriumOverhaul } from '@/components/scriptorium-overhaul';
 import { SurveyPostOverhaul } from '@/components/survey-post-overhaul';
 import { ArmouryOverhaul } from '@/components/armoury-overhaul';
@@ -118,6 +119,7 @@ export default async function CraftingSystemDetail({
     {system.stationID === 'bowyer' && <BowyerOverhaul />}
     {system.stationID === 'weaponsmith' && <WeaponsmithOverhaul />}
     {system.stationID === 'armoury' && <ArmouryOverhaul />}
+    {['distillery', 'channelworks'].includes(system.slug) && <DistilleryChannelworksOverhaul />}
     <SeptemberDecisions topic="crafting" />
     {system.slug === 'writing-ink' && <ScriptoriumOverhaul />}
       {guideStatus && <section className="article-section">

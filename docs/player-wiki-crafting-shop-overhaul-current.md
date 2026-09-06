@@ -4,7 +4,7 @@ Updated 6 September 2026. This is the complete crafting review you requested, be
 
 ## What the review found
 
-Stone tools lead to useful raw-material equipment. Blacksmith T2 introduces Ingots, while Tannery textiles provide a parallel route into clothing and later specialist components. The later recipes still contain older rules that do not fit that sequence. The Apothecary now has a complete first-pass recipe-and-source plan; implementation remains pending. The Forge now also has its complete first-pass family/tool/material plan. The Tannery also has its complete first-pass textile, Leather, clothing and carrying plan below. The Bowyer, Weaponsmith and Armoury now also have complete first-pass plans, followed by shared equipment services the full Survey Post plan and Scriptorium/Writing Desk plan below. Subsequent shops continue as complete batches, including gathering, item effects, prices and recycling.
+Stone tools lead to useful raw-material equipment. Blacksmith T2 introduces Ingots, while Tannery textiles provide a parallel route into clothing and later specialist components. The later recipes still contain older rules that do not fit that sequence. The Apothecary now has a complete first-pass recipe-and-source plan; implementation remains pending. The Forge now also has its complete first-pass family/tool/material plan. The Tannery also has its complete first-pass textile, Leather, clothing and carrying plan below. The Bowyer, Weaponsmith and Armoury now also have complete first-pass plans, followed by shared equipment services, the full Survey Post, Scriptorium/Writing Desk, Distillery and Channelworks plans below. Subsequent shops continue as complete batches, including gathering, item effects, prices and recycling.
 
 The biggest corrections are:
 
@@ -648,7 +648,7 @@ The foundation and all eight at Crude total **265 Essence** before discounts. Ta
 
 Older learned instruments, Good/Fine precision, observations and packed choices stay intact. A legacy Crude instrument can use the new Good bill; a legacy Good instrument can use Fine; an existing Fine instrument stays complete. No old purchase is charged again, downgraded or refunded because the price changed. Storehouse capacity does not block a permanent-capability purchase. A failed save leaves the actual materials, currency and progress unchanged.
 
-The complete Scriptorium/Writing Desk plan follows below. Distillery/Channelworks is next. The separate proposed Survey Needle is not made playable by this pressure-instrument plan. No new Aimee homework decision is needed here.
+The complete Scriptorium/Writing Desk plan follows below. The complete Distillery/Channelworks plans follow the writing plan. The separate proposed Survey Needle is not made playable by this pressure-instrument plan. No new Aimee homework decision is needed here.
 
 ## Scriptorium and Writing Desk — the complete writing plan
 
@@ -750,7 +750,91 @@ Before Research discounts and other facilities, recruitment or Binding:
 
 These are staged choices, not a required full shopping list or an affordability playtest. The actual purchase preview retains its continuation information without a new forced currency reserve. Existing hands, tiers, capabilities, Compounds, Pages, ink applications, learned words and resolved worlds stay intact. New prices neither refund old purchases nor charge again. A failed save preserves the entire bill and result; full storage only matters for actual stored outputs, not permanent knowledge.
 
-**Next whole batch:** Distillery/Channelworks. The zero-rune lesson correction, the new writing costs and the new pigment sources are pending implementation. No additional Aimee decision is needed for this specified batch; Light's missing detailed design remains separately recorded.
+**The complete Distillery/Channelworks batch now follows below.** The zero-rune lesson correction, the new writing costs and the new pigment sources are pending implementation. No additional Aimee decision is needed for this specified batch; Light's missing detailed design remains separately recorded.
+
+## Distillery — all three Cores
+
+**Current behavior:** Auber directly makes Heat, Caustic and Light Cores for16 Essence, a catalyst and a qualifying individual property sample. Potency depends on that sample. There is no Blank Core step. Existing Heat Cores can become stored Channelworks fixtures; the full combat housing system is not yet delivered.
+
+**Accepted intended behavior:** Auber makes the Core and Oda makes the housing. Recognizable ingredients replace hidden property requirements. Cores are finite items; no mana, ammunition, waste stacks or extra Essence currency is added. Ordinary refining remains a separate service.
+
+**Design-authored first pass, pending implementation:** after recruiting Auber, the foundation costs **60 Essence,4 Iron Ingots,4 Quartz and6 Clay**. Building teaches all three recipes, without three further research bills or requiring Auber to attend each craft.
+
+| One output | Actual ingredients | Essence | New potency |
+| --- | --- | ---: | --- |
+| Heat Core | 2 Sulfur +1 World Resin | 16 | 60 · clear |
+| Caustic Core | 2 Toxic Sap +1 Salt | 16 | 60 · clear |
+| Light Core | 2 Silver +1 Quartz | 16 | 60 · clear |
+
+These are complete bills: no extra sample, Blank Core, bottle, fuel or Mote. New named-material Cores have fixed starting potency60; plant colour and creature-quality labels cannot turn them into a stronger roll. Older Cores retain their real saved potency and sources, and Oda's restored starter retains its authored potency40. Faint/clear/strong/brilliant remain descriptions of actual potency, not new material grades.
+
+Ingots come from Forge T2. Quartz and Sulfur use their defined Pick2 sources. Toxic Sap comes from the explicitly sap-producing Apothecary flora profile, collected with Scythe1; not every toxic-looking plant qualifies. Salt is hand gathered. Silver requires suitable ductile ground with Substrate strength45 or more and ductile form25 or more; valuable, less dispersed ground is preferred. Its Pick2 node yields two pulls of2 Silver, within the ordinary source budget. No new guaranteed deposits or full-map harvest are assumed.
+
+Creature Oil as an alternative to Resin, and other suggested caustic substances, remain later extensions needing actual producers. They do not block the complete Resin/Toxic Sap recipes above. Older stock keeps its lawful uses instead of being renamed into a new ingredient.
+
+A Core retains the exact selected ingredients and their source colours in its history. Its own presentation remains recognizable as Heat, Caustic or Light. New nominal sale value is16 plus the consumed ingredients' recorded nominal values; buy value is twice that result. Existing values stay saved. A Core cannot be dismantled for Essence or catalysts, and a consumed Core does not remain separately owned inside its history.
+
+**Foundation plus one Heat Core:**76 Essence,4 Ingots,4 Quartz,6 Clay,2 Sulfur,1 Resin. **Foundation plus one of each:**108 Essence,4 Ingots,5 Quartz,6 Clay,2 Sulfur,1 Resin,2 Toxic Sap,1 Salt,2 Silver. Earlier buildings, recruitment and travel are separate costs. Infusion has no complete named item use yet and remains unavailable.
+
+## Channelworks — all nine housings
+
+**Current behavior:** building Oda's shop records a one-time restored Heat Fixture. A separate repeatable action consumes one valid player-made Heat Core into another stored fixture. These fixtures are not yet equippable combat housings.
+
+**Accepted intended behavior:** persistent Heat/Burn, Caustic/Poison or Light/Dazzle in the ordinary weapon slot, across Close, Mid and Far reach. Direct emanation has lower raw output, bypasses ordinary armour and meets matching Ward/resistance; explicit existing effects that extend armour to emanation still count. Light is combat light, never world illumination or a Lantern. No charges, mana, ammunition, physical damage triangle or coating slot is added.
+
+Physical weapons retain their ordinary physical damage/matchups and may carry an Apothecary coating for the **whole excursion**. Housings retain their attunement across excursions and apply only their own weaker affliction. Neither system consumes its preparation after one strike.
+
+### Oda's first weapon and unlocks
+
+**First-pass foundation:** after recruiting Oda, **70 Essence,4 Iron Ingots,2 Hardwood Hafts,2 Cord,4 Quartz and6 Clay**. Building supplies her one restored Heat Conduit, potency40, without needing Auber first or charging a second restoration bill. It goes to storage or claimable Waiting; it is not automatically equipped.
+
+The built shop opens all three basic Mid Conduits and retuning. Contact and Projection require Oda's existing **emanation housing schematic** from her diary. No additional paid shop tier, Arc rune or special writing requirement is added. Auber supplies subsequent Cores; his absence must not prevent using Oda's restored introduction.
+
+Moving, selling, losing or dismantling the original never grants another free one. Existing surviving stored fixtures become their same actual items with their saved Cores; the upgrade does not replace them with a second grant or invent paid hardware inside them. Old uncertain history remains uncertain.
+
+### Complete first-pass recipes
+
+Each row uses one matching Core, costs **0 extra Essence at Oda**, and produces one weapon. Preparing its Core at Auber costs16 Essence separately. Ingots come from Forge T2, Hafts from Fen's already defined preparation route, and Cord from Corrin. The close/mid Haft can use either known wood type; Projection needs Hardwood.
+
+| Housing | Reach | Casing | Handle/frame | Conductor | Binding | Core |
+| --- | --- | --- | --- | --- | --- | --- |
+| Heat Contact | Close | 2 Ingots | 1 Haft | 1 Quartz | 1 Cord | Heat |
+| Caustic Contact | Close | 2 Ingots | 1 Haft | 1 Quartz | 1 Cord | Caustic |
+| Light Contact | Close | 2 Ingots | 1 Haft | 1 Quartz | 1 Cord | Light |
+| Heat Conduit | Mid | 2 Ingots | 1 Haft | 2 Quartz | 1 Cord | Heat |
+| Caustic Conduit | Mid | 2 Ingots | 1 Haft | 2 Quartz | 1 Cord | Caustic |
+| Light Conduit | Mid | 2 Ingots | 1 Haft | 2 Quartz | 1 Cord | Light |
+| Heat Projection | Far | 2 Ingots | 2 Hardwood Hafts | 3 Quartz | 1 Cord | Heat |
+| Caustic Projection | Far | 2 Ingots | 2 Hardwood Hafts | 3 Quartz | 1 Cord | Caustic |
+| Light Projection | Far | 2 Ingots | 2 Hardwood Hafts | 3 Quartz | 1 Cord | Light |
+
+The chosen wood and Cord colours remain on their actual material regions, including both source-coloured Cord strands. They do not tint the whole weapon, change its attunement or add damage. These ungraded components produce ordinary Fine workmanship without a hidden extra multiplier.
+
+### Output and afflictions
+
+**First-pass tuning:** for saved Core potency P, the housing's weapon-power contribution is **1 + P ÷40**, rounded to the usual quarter point. Potency40 gives2,60 gives2.5, and80 gives3. The character then uses the existing ordinary attack calculation, with no physical kind. Each reach applies its factor to the rolled attack before the shared emanation defenses:
+
+| Family | Raw attack factor | Heat at potency60 | Caustic at potency60 | Light |
+| --- | ---: | --- | --- | --- |
+| Contact | 80% | Burn2 per boundary for2 boundaries | Poison1 for4 boundaries | Existing Dazzle for2 boundaries |
+| Conduit | 70% | Burn1 for2 boundaries | Poison1 for4 boundaries | Existing Dazzle for2 boundaries |
+| Projection | 60% | Burn1 for2 boundaries | Poison1 for4 boundaries | Existing Dazzle for2 boundaries |
+
+For other saved potency, Heat strength is P × family factor ÷30, and Caustic strength is P × family factor ÷60, rounded half-up with minimum1. Dazzle keeps its existing effect. Repeated applications follow existing prevention and stronger-effect/refresh rules, not stacks of extra damage or miss chance. A miss applies no status; actual redirection determines who receives the hit. Normal reach, rank, accuracy, retaliation and lawful action eligibility remain relevant.
+
+For an already rolled attack of10 before defenses, Contact/Conduit/Projection produce8/7/6. With the existing matching Insulation reduction of35%, the shared rounding gives5/4/3. Ordinary physical armour alone does not change those results. Small rounded attacks can tie despite different underlying factors. These are starting balance numbers, not every character's guaranteed damage.
+
+### Retuning, rebuilding and dismantling
+
+- **Retune at Home:** use one new Core, with0 additional service Essence. Keep the same housing and reach, replace the old Core and recalculate its output. The old Core is destroyed; the preview states that loss. A stronger Core of the same attunement can be used too.
+- **Rebuild or change reach:** pay the complete structural row for the chosen family, keep the existing Core once, and return old active hardware once. Explicitly reused parts are counted only once. Contact/Projection still need the schematic. This also allows a new material appearance without changing reach; an unchanged selection is a free no-op.
+- **Dismantle through Recycler:** return the actual recorded casing, Hafts, Quartz and Cord. The installed Core is lost. Prepared components do not also return their raw ore, Logs, Fibre or fuel. Oda's starter contains no recoverable foundation bill, and the older Core-only fixture does not gain invented hardware.
+
+New housing sale value is its Core's recorded value plus its active hardware values; buy value is twice that total. Old prices remain preserved until an explicitly previewed supported service changes the composition. An old destroyed Core or material history is not counted twice. Cancelled, stale or failed transactions spend nothing, and reopening cannot create another item or refund.
+
+**Both foundations plus one newly built Heat Conduit:**146 Essence,10 Ingots,2 Hardwood Hafts plus1 any-wood Haft,3 Cord,10 Quartz,12 Clay,2 Sulfur,1 Resin. This includes the separate restored starter without charging for its Core again. Earlier shops, recruitment and travel remain separate costs.
+
+Advanced infusion, containment choices and final family-special effects remain later design work without a paid service button. The ordinary three-Core/nine-housing batch needs no further Aimee recipe approval. Each combination remains labelled intended until Engineering reports its actual equipped use delivered.
 
 ## Every remaining shop and crafting system
 
@@ -759,8 +843,6 @@ The sequence below follows material dependencies. It includes services and proce
 | System | Complete scope of its batch | Main correction or dependency |
 | --- | --- | --- |
 | Peerless refinement | The later chance/guarantee journey | Ordinary refit, rebuild, legacy routing and recovery are specified above; Mote-on-miss remains open |
-| Distillery | Heat, Caustic and Light Cores | Direct attunement, recognizable catalysts and preserved potency/source; no obsolete Blank Core manufacturing step |
-| Channelworks | Current Heat Fixture and restoration; planned three attunements across three reaches | A complete nine-configuration plan; a stored fixture does not mean every planned weapon is playable |
 | Anchorage | Anchor Frame construction and world assignment | Actual structural, ballast, binding and attunement parts; creating a frame is separate from assigning it |
 | Essence Spring | Refining, Second Pass and Continuous Settling | Keep Raw Essence conversion separate from Core attunement |
 | Processing | Recycler/Rubble sorting, Planks/Hafts, Pulp/Paper/pigments, Blocks and Glass | Each new intermediate arrives with a real use and consistent prices |

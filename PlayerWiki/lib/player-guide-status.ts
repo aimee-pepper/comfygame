@@ -258,12 +258,12 @@ export const craftingFamilyStatus: CraftingFamilyStatus[] = [
     name: 'Distillery',
     status: 'Partly playable',
     current: 'Heat, Caustic, and Light Cores are made directly for 16 Essence plus their catalyst and one individual sample that meets the hidden requirements. There is no Blank Core step.',
-    accepted: 'Keep direct attunement and 16 Essence. Use named material families, and advertise a Core as a goal only when its housing is playable.',
+    accepted: 'Complete first-pass plan: a 60-Essence foundation plus materials; all three named-material recipes cost 16 Essence and produce potency 60. Older Cores retain their real potency. Promote combat use only with delivered housings.',
     changes: [
       { name: 'Blank Core', current: 'Not available.', accepted: 'Do not add a Blank Core step.' },
-      { name: 'Heat Core', current: '16 Essence, 2 Sulfur, and one qualifying reactive or insulating sample.', accepted: '16 Essence, 2 Sulfur, and 1 World Resin or Creature Oil.' },
-      { name: 'Caustic Core', current: '16 Essence, Toxin or Ichor catalyst, and one qualifying Reagent, Toxin, or Ichor sample.', accepted: '16 Essence and the recipe’s disclosed named toxic or reactive substances, such as Toxic Sap, Irritant Spore, Venom, or Ichor; Reagent and Toxin are not inventory items. Publish it as a goal when Caustic housing is playable.' },
-      { name: 'Light Core', current: '16 Essence, 2 Silver, and one qualifying lustrous and hard sample.', accepted: '16 Essence, 2 Silver, and 1 Quartz; combat use only when Light housing is playable.' },
+      { name: 'Heat Core', current: '16 Essence, 2 Sulfur, and one qualifying reactive or insulating sample.', accepted: 'First pass: 16 Essence, 2 Sulfur and 1 World Resin, potency 60. Creature Oil remains a later producer-dependent alternative.' },
+      { name: 'Caustic Core', current: '16 Essence, Toxin or Ichor catalyst, and one qualifying Reagent, Toxin, or Ichor sample.', accepted: 'First pass: 16 Essence, 2 Toxic Sap and 1 Salt, potency 60. Other proposed substances await actual producers; no generic Reagent/Toxin or extra property sample.' },
+      { name: 'Light Core', current: '16 Essence, 2 Silver, and one qualifying lustrous and hard sample.', accepted: 'First pass: 16 Essence, 2 Silver and 1 Quartz, potency 60; combat use only when Light housing is playable.' },
     ],
   },
   {
@@ -271,7 +271,7 @@ export const craftingFamilyStatus: CraftingFamilyStatus[] = [
     name: 'Channelworks',
     status: 'Partly playable',
     current: 'Heat Core can become a stored Heat Fixture. The stored Fixture is not yet an equippable combat housing.',
-    accepted: 'Heat, then Caustic, then Light become permanent Mid-reach combat Conduits. Light is combat-only and never world illumination.',
+    accepted: 'Complete first-pass plan covers Heat, Caustic and Light at Close/Mid/Far reach. A 70-Essence foundation plus materials restores Oda’s one starter; her existing schematic opens Close/Far. Retuning and rebuild services are specified. Light never illuminates the world.',
     changes: [
       { name: 'Heat Conduit', current: 'A Heat Core can become a stored Fixture; no equipped combat use yet.', accepted: 'A Mid-reach Heat weapon whose Attack can deliver Heat and Burn.' },
       { name: 'Caustic Conduit', current: 'Caustic Cores can be stored, but no fixture or combat use is available.', accepted: 'A later Mid-reach Caustic weapon whose Attack can deliver Caustic and Poison.' },
