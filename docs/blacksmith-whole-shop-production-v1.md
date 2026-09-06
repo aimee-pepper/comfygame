@@ -201,3 +201,7 @@ The [shared equipment improvement and recovery contract](equipment-improvement-r
 ## Conditional anatomy extension — separate first-pass proposal
 
 [Remaining creature anatomy/material uses](creature-anatomy-material-extensions-v1.md) defines optional actual Fang/Claw components, measured Membrane-to-Leather processing and a chemically qualified creature Venom alternative, where this shop owns the exact named role. Those producers/adapters are not implemented. The complete ordinary batch remains independent, including full-excursion coatings; no generic family sample satisfies a new typed source.
+
+## Conditional solid-material extension — later first-pass proposal
+
+[Solid creature equipment uses](creature-solid-equipment-extensions-v1.md) now defines the exact applicable Shell Shield, Horn grip/Collar, scaled/chitin/shell Armoury outer and Fur Pelt lining sockets, with complete stat/quality/colour/value/recovery rules. Its typed source producers and adapters remain unimplemented. This ordinary batch keeps its present recipes and progression; no legacy generic family automatically enters the alternatives. Spines and Feathers are intentionally raw-sale-only, not a request for another recipe.

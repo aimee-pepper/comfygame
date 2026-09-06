@@ -192,3 +192,7 @@ The [shared equipment improvement and recovery contract](equipment-improvement-r
 ## Conditional anatomy extension — separate first-pass proposal
 
 [Remaining creature anatomy/material uses](creature-anatomy-material-extensions-v1.md) now defines narrow optional uses for actual typed parts, including exact eligible sockets, measures, stats, workmanship, colour and recovery. Its new anatomy producers and adapters are not implemented. This complete ordinary batch stays independently implementable; generic legacy family names cannot satisfy the new alternatives. The extension does not make every fluid an Oil/Venom/pigment, add one-strike coatings, or replace any existing world/flora route.
+
+## Conditional solid-material extension — later first-pass proposal
+
+[Solid creature equipment uses](creature-solid-equipment-extensions-v1.md) now defines the exact applicable Shell Shield, Horn grip/Collar, scaled/chitin/shell Armoury outer and Fur Pelt lining sockets, with complete stat/quality/colour/value/recovery rules. Its typed source producers and adapters remain unimplemented. This ordinary batch keeps its present recipes and progression; no legacy generic family automatically enters the alternatives. Spines and Feathers are intentionally raw-sale-only, not a request for another recipe.
