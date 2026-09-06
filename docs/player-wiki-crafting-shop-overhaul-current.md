@@ -4,7 +4,7 @@ Updated 5 September 2026. This is the complete crafting review you requested, be
 
 ## What the review found
 
-Stone tools lead to useful raw-material equipment. Blacksmith T2 introduces Ingots, while Tannery textiles provide a parallel route into clothing and later specialist components. The later recipes still contain older rules that do not fit that sequence. The Apothecary now has a complete first-pass recipe-and-source plan; implementation remains pending. The Forge now also has its complete first-pass family/tool/material plan. The Tannery also has its complete first-pass textile, Leather, clothing and carrying plan below. The Bowyer now also has its complete three-family first-pass plan. Subsequent shops continue as complete batches, including gathering, item effects, prices and recycling.
+Stone tools lead to useful raw-material equipment. Blacksmith T2 introduces Ingots, while Tannery textiles provide a parallel route into clothing and later specialist components. The later recipes still contain older rules that do not fit that sequence. The Apothecary now has a complete first-pass recipe-and-source plan; implementation remains pending. The Forge now also has its complete first-pass family/tool/material plan. The Tannery also has its complete first-pass textile, Leather, clothing and carrying plan below. The Bowyer and Weaponsmith now also have their complete first-pass plans. Subsequent shops continue as complete batches, including gathering, item effects, prices and recycling.
 
 The biggest corrections are:
 
@@ -340,9 +340,97 @@ A **Clay Sling** needs Tannery stock, ordinary Clay and Coal, without animals or
 
 At base prices, Corrin's foundation, Fen's foundation and a Clay/Cloth Sling total **50 Essence, 12 Logs, 6 Clay, 16 Fibre, 2 Resin and 1 Coal**. A full shop/tool route to an Ingot Longbow, including Forge T1/T2 and Axe 2, totals **90 Essence, 22 Iron, 2 Coal, 23 Logs (at least 2 Hardwood), 16 Fibre, 8 Clay and 3 Resin**. These staged production totals exclude recruitment/search/Binding costs; they are not an opening shopping list or completed affordability playtest.
 
-Fen retains ownership of future Plank/Haft shaping, but this batch adds no unused processing menu. Longbow limbs are shaped in their actual craft, and Forge's early raw-Log recipes do not gain a retroactive Haft prerequisite. Weaponsmith is the next complete shop batch and will close its own useful Haft and fitting choices.
+The Weaponsmith plan below now gives Fen's Hafts actual consumers: one Softwood or Hardwood Log becomes one matching Haft, with knowledge taught on Maud's recruitment. This replaces the earlier unused-Haft hold. Planks remain withheld until needed. Longbow limbs keep their own construction, and Forge's raw-Log starters gain no retroactive Haft prerequisite.
 
 **Still needed:** implement the complete new Bowyer recipes/calculator, shared typed producer dependencies, actual combat projection, prices, refit/recovery and save/custody behavior. The three weapon families move together. Existing Mote/Peerless and broader creature-anatomy questions remain separate grouped work; this first pass adds no individual recipe approval homework.
+
+## Weaponsmith — the complete fitted-weapon first-pass plan
+
+**Current behavior:** Fitted Point, Fitted Edge, Fitted Maul and the damage-selectable Fitted Polearm have existing crafting definitions. Older routes use broad material families, six-band calculations and Essence fees; the earlier written property-threshold table also differs from those current definitions. The complete new plan below is **pending implementation**.
+
+**Retained decisions:** Maud makes physical melee weapons. Point is Pierce/Close, Edge Rend/Close, Maul Crush/Close, and Polearm is an explicitly chosen Pierce/Rend/Crush weapon with Mid reach. Fitted weapons are not bound to a particular wearer and introduce no fit score, durability, repair, ammunition or extra attack. Maud's existing recruitment timing and singular Polearm diary teaching stay intact.
+
+**New Design-authored first-pass choices:** a foundation of **40 Essence, 4 Iron Ingots, 2 Hafts and 2 Cord** includes Point, Edge, Maul, both fitting choices and ordinary refit. Ordinary processing, crafting, refit and fitting adjustment cost **0 Essence**. These are base quotes under the existing applicable staffing rules, not new personal approvals or measured balance results. The older 150-Essence foundation and extra ordinary recipe-tier tolls are replaced for future construction; existing paid progress remains recorded.
+
+### Useful Hafts and collars, with no circular unlock
+
+Maud's recruitment teaches the Haft recipes. Fen can then make them at the built Bowyer **before** the Weaponsmith foundation needs them. Building the Weaponsmith teaches the Collar recipes. Knowledge stays saved if its producer is not built yet. Existing legitimate trade can also supply prepared parts without granting a missing facility tier or inventing merchant stock.
+
+| Prepared material | Maker and access | Ingredients | Quality and sale / buy |
+| --- | --- | --- | --- |
+| Softwood Haft | Bowyer; Maud recruited | 1 Softwood Log | Ungraded; 1 / 2 Gold |
+| Hardwood Haft | Bowyer; Maud recruited | 1 Hardwood Log | Ungraded; 1 / 2 Gold |
+| Iron Collar | Blacksmith T2; Weaponsmith built | 2 Iron, 1 Coal | Ungraded; 4 / 8 Gold |
+| Bone Collar | Built Weaponsmith | 1 eligible typed Bone | Same Bone quality and actual recorded value; buy twice |
+
+A Haft is a shaped handle or shaft component; a Collar secures the fitted assembly. The Log's type and colour stay recognizable. Bone Collar preserves its exact Bone source, band and colour without applying quality twice or inventing a new skeletal subtype.
+
+Iron Collar casts directly from Iron and Coal, avoiding an extra Iron→Ingot→Collar chain. No new kiln, workshop, timer or anonymous fitting token is required. These prepared parts have real consumers below; Planks still wait for a named use. Early Forge weapons/tool upgrades keep their raw-Log recipes, and Longbow limbs keep their own Hardwood construction.
+
+### All four families and every Polearm damage choice
+
+Choose one alternative within each listed part. Every other part in that row is required. The Collar choice is always one actual prepared Iron Collar or Bone Collar.
+
+| Weapon | Working part | Handle/shaft and wrapping | Collar |
+| --- | --- | --- | --- |
+| Fitted Point — Pierce/Close | 2 Ingots **or** 2 Quartz **or** 1 Bone | 1 Softwood/Hardwood Haft; 1 Cord **or** 1 Leather | 1 Iron **or** Bone Collar |
+| Fitted Edge — Rend/Close | 2 Ingots **or** 1 Bone | Same choices | Same |
+| Fitted Maul — Crush/Close | 2 Ingots **or** 2 Bone | 1 Hardwood Haft; 1 Cord **or** 1 Leather | Same |
+| Fitted Polearm — Pierce/Mid | 2 Ingots **or** 2 Quartz **or** 1 Bone | 2 Hardwood Hafts; 2 Cord **or** 2 Leather | Same |
+| Fitted Polearm — Rend/Mid | 2 Ingots **or** 1 Bone | Same Polearm shaft/binding | Same |
+| Fitted Polearm — Crush/Mid | 2 Ingots **or** 2 Bone | Same Polearm shaft/binding | Same |
+
+Polearm additionally requires **Maud's existing fitting-pattern diary teaching**. Knowing it before building the shop stays valid; building alone does not grant that teaching. Its three damage choices are one family, not three paid patterns. Choose the damage kind before selecting its head; material overlap never silently picks the best matchup.
+
+Two Bone pieces may differ in quality, Density, colour and source; two Leather bindings may also differ. The two Hardwood Hafts form a reinforced shaft assembly and need not match colour. Prepared textiles keep their actual mixed strands and sections. No hidden numerical threshold asks for another unrelated sample to make a pictured component valid.
+
+### Two clear fittings using existing combat stats
+
+| Fitting choice | What it adds |
+| --- | --- |
+| **Balanced** | +1 Initiative |
+| **Driving** | +0.75 Power |
+
+Both use the same recipe parts and price. The choice is between these benefits, with no hidden penalty, wearer lock or new attack-speed system. Driving does not inherit a second automatic bonus from the older specialty rules.
+
+Working Power uses the same starting values as Forge: **2.5 for Ingots**, **2.25 for Quartz points**, or **4 × (0.5 + actual Bone Density ÷ 200) × the Bone quality multiplier**. Average multiple Bone pieces within the working part, add any Driving contribution, and round the final result once to the nearest quarter. Ordinary one-decimal display remains; Power is not guaranteed final HP loss.
+
+Hafts, wraps and collars supply structure, source appearance and the designated workmanship contribution. They add no unlisted combat bonus or automatic coating. Workmanship uses the accepted 70% working-part / 30% structural-support rule. Supports are three equal groups: Haft assembly, wrap/binding assembly and Collar. Ungraded parts count as Fine; Bone/Leather use their actual ranks. Raw ancestors do not vote again, and ordinary crafting never produces Peerless.
+
+For example, an all-metal Fitted Point is **2.5 Power and +1 Initiative when Balanced**, or **3.25 Power with no added Initiative when Driving**. It is Fine either way. Common Bone with Density 60 and a Common Bone Collar gives **3.25/+1 Balanced** or **4.0/0 Driving**. With Exceptional Bone at Density 80 and an Exceptional Bone Collar, those values become **5.5/+1** or **6.25/0**, with Exceptional workmanship. An expensive source or colour choice cannot imply an extra damage bonus absent from the preview.
+
+These are first-pass equipment comparisons, not completed combat balancing. Existing melee targeting, damage matchups, formation, skill and turn-order rules stay unchanged. All four physical families use the accepted **one-weapon, one-excursion coating** lifetime, with target afflictions retaining their own durations. No one-strike exception or free intrinsic status is added.
+
+### Prices, recovery and ordinary refit
+
+New weapon sale value is the sum of the actual recoverable components' recorded values; buy price is twice that, as in the other completed shops. The fitting choice itself adds no price multiplier.
+
+| Full route using Cord wrapping/binding | New sale / buy |
+| --- | --- |
+| Ingot Point, Edge or Maul with Iron Collar | 14 / 28 Gold |
+| Quartz Point with Iron Collar | 18 / 36 Gold |
+| Ingot Polearm, any kind, with Iron Collar | 16 / 32 Gold |
+| Quartz Pierce Polearm with Iron Collar | 20 / 40 Gold |
+| Single-Bone Point/Edge with same-band Bone Collar | Poor/Common/Rare/Exceptional sale 6/10/18/34; buy twice |
+| Two-Bone Maul with same-band Bone Collar | Sale 8/14/26/50; buy twice |
+| Single-Bone Pierce/Rend Polearm with same-band Bone Collar | Sale 8/12/20/36; buy twice |
+| Two-Bone Crush Polearm with same-band Bone Collar | Sale 10/16/28/52; buy twice |
+
+Different bands use their actual individual values. Replacing Cord with Leather changes the price by the real replacement value, including older Leather's frozen price; it does not reprice the entire weapon by its finished grade.
+
+Dismantling returns exact selected working materials, Hafts, wraps/bindings and Collar once. Hafts stay Hafts and Collars stay Collars; their original Logs, Iron, Bone or fuel do not also return. Other prepared stock similarly keeps its complete receipt without an extra ancestor refund. No reverse-processing service is added for loose Hafts/Collars. Owned older gear keeps its existing values and supported recovery/service rules.
+
+At Home, ordinary refit replaces a complete selected component, pays the new inputs and returns the old recoverable part once. The exact weapon, family, damage kind, reach and supported inscriptions/custody remain. Final stats and price are recalculated from its final parts; repeated refits do not stack bonuses.
+
+**Balanced↔Driving can be adjusted at Home for no Essence or new materials**, using the existing complete construction. This preserves quality, sources, price and item identity. It is not available mid-encounter. Polearm's damage kind stays fixed through refit; a different kind requires explicitly crafting that known variant. Old items without a compatible record are not given invented new components or a free modern fitting.
+
+### Progression and implementation still needed
+
+Ingots come from Forge T2, Cord/Leather from Tannery, Hafts from Fen and the new Collars from their named existing makers. All four families have an animal-free metal route. Softwood is enough for the first fitted Point/Edge; Maul and Polearm require Hardwood Hafts, with the existing Axe-2 small-Hardwood route sufficient.
+
+A full base-price production route through Forge T1/T2, Corrin, Fen, Weaponsmith and one all-metal fitted Point totals **130 Essence, 30 Iron, 7 Coal, 23 Logs, 18 Fibre, 8 Clay and 2 Resin**. After the shops exist, that Point/Edge needs expanded raw **6 Iron, 3 Coal, 1 Log and 2 Fibre**. These totals include intermediate preparation but exclude search, recruitment and Binding costs; they are staged options, not an opening checklist or affordability playtest.
+
+**Still needed:** implement the four prepared-material routes, actual event-owned knowledge, complete new recipe/fitting calculator, combat projection, trade/recovery/refit and legacy routing. No individual recipe approval is needed from Aimee for this first pass. Mote/Peerless and wider creature-anatomy work remain the existing grouped questions. **Armoury is the next complete shop batch.**
 
 ## Every remaining shop and crafting system
 
@@ -350,7 +438,6 @@ The sequence below follows material dependencies. It includes services and proce
 
 | System | Complete scope of its batch | Main correction or dependency |
 | --- | --- | --- |
-| Weaponsmith | Fitted Point, Fitted Edge, Fitted Maul, Fitted Polearm | Useful specialist fittings and explicit damage/reach choices; compare all four against Blacksmith gear |
 | Armoury | Rigid, Insulated and Balanced rebuilds across the five protective slots | Show actual Protection/ward tradeoffs and preserve the piece being rebuilt |
 | Equipment improvement and recovery | Reforge, component replacement, Peerless refinement, recycling | One explanation of identity, improvement, fees and recoverable components; no repeated bonus or material duplication |
 | Survey Post | Eight instruments, each with Good and Fine improvements | Sixteen improvements with understandable instrument components, not a generic property sample masquerading as every instrument part |

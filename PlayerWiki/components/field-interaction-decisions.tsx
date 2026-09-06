@@ -7,7 +7,7 @@ export function FieldInteractionDecisions({ study = false }: { study?: boolean }
     <p><strong>Decided resource rule:</strong> one tile, one gatherable resource node across minerals, plants and loose deposits. One node may yield several units; canopy overhang is not a second node.</p>
     <p><strong>Current uncertainty:</strong> apparent overlap may be valid adjacent mining, which remains accepted. Actual duplicate source positions are unconfirmed; no repair is claimed here.</p>
     {study && <p><strong>Requested study changes, not yet delivered:</strong> deeper example water, a north-up/east-right view with downward pitch, and a connected flat dry area for four-direction walking. Keep the tree fading. The example heights do not establish production water depths or new swimming rules.</p>}
-    {study && <p><strong>Remembered trees — verified in development, phone delivery pending:</strong> fully seen trees keep their last-observed appearance after you walk away and reopen the game. Hidden changes stay hidden; seeing a tree again refreshes its record. Current-tree fading remains. Build 316 is in the delivery pipeline.</p>}
+    {study && <p><strong>Remembered trees — current in build 316:</strong> fully seen trees keep their last-observed appearance after you walk away and reopen the game. Hidden changes stay hidden; seeing a tree again refreshes its record. Current-tree fading remains. Engineering reports build 316 installed and launched successfully.</p>}
     <p><Link href="/references/design-decisions-september-4">Read the field and terrain decisions</Link>.</p>
   </section>;
 }

@@ -24,13 +24,19 @@ The Binder going down already ends the excursion; a companion falling alone does
 
 The study should face north-up and east-right, with downward camera pitch rather than a diagonal compass rotation. You liked the tree fading. The requested flat dry connected walking area should allow all four ordinary directions; slopes, wading and swimming are separate. This feedback does not approve a full 3D migration. The scene stays labelled **Terrain and water study — example heights, not a generated expedition**.
 
-## Remembering seen trees · implementation reported 5 September
+## Remembering seen trees · delivered 5 September
 
-**Verified development behavior — phone delivery pending:** Engineering reports that fully seen trees now retain their last-observed appearance after leaving sight, including after restarting. The earlier disappearing-tree issue is corrected in the implementation. Build 316 is in the delivery pipeline; installation has not yet been reported complete.
+**Current behavior — delivered in build 316:** fully seen trees now retain their last-observed appearance after leaving sight, including after restarting. Engineering reports build 316 installed and launched successfully on Aimee’s iPhone 16 Pro on 5 September (Pacific time).
 
-**Accepted behavior, now verified in development:** remembered ground retains a tree’s last-observed shape and position. It refreshes when legitimately seen again, including a stump or observed absence. Unseen growth, removal or new trees remain unknown; an old remembered tree is not proof that it still exists now. A glimpse of canopy or previously seen ground alone does not reveal a new tree.
+**Accepted behavior, now delivered:** remembered ground retains a tree’s last-observed shape and position. It refreshes when legitimately seen again, including a stump or observed absence. Unseen growth, removal or new trees remain unknown; an old remembered tree is not proof that it still exists now. A glimpse of canopy or previously seen ground alone does not reveal a new tree.
 
 The remembered image reveals no hidden enemies, resources, active hazard warnings or changed shadows/effects. Remembered trees do not cast current shadows or react to current lighting. Older saves without a sufficient actual tree observation keep honest remembered ground until a new sighting. Existing fading of currently visible trees is preserved. Engineering reports model/render checks and walking-away/restart checks; Design has not repeated them. This is a bounded stationary-tree correction, not approval of a full 3D migration.
+
+## Whole Weaponsmith first-pass plan · 5 September
+
+The complete [Weaponsmith plan](crafting-shop-overhaul.html) now covers Fitted Point, Edge, Maul and all three Polearm damage choices, real Haft/Collar production, prices, recovery/refit and legacy services. **These are Design-authored first-pass choices, pending implementation.** The 40-Essence foundation also needs 4 Ingots, 2 Hafts and 2 Cord; ordinary crafts/refits cost no Essence. Polearm retains Maud's singular diary-teaching requirement.
+
+Choose Balanced for +1 Initiative or Driving for +0.75 Power, using existing combat stats and the same actual components. No wearer lock or extra action is added. Fen's Hafts have named consumers, and Iron Collar casts directly from Iron and Coal without a second mandatory Ingot-processing step. Early Forge recipes remain unchanged. Existing owned items and paid progress are preserved; Armoury follows next.
 
 ## Whole Bowyer first-pass plan · 5 September
 
