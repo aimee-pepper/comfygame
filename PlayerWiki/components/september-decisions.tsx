@@ -47,6 +47,6 @@ export function SeptemberDecisions({ topic }: { topic: DecisionTopic }) {
     {update.tuning && <p><strong>First-pass tuning:</strong> {update.tuning}</p>}
     {update.development && <p><strong>Tested in development:</strong> {update.development}</p>}
     {update.open && <p><strong>{topic === 'status' ? 'Verification pending' : 'Unsettled proposals and remaining work'}:</strong> {update.open}</p>}
-    <p><Link href="/references/design-decisions-september-4">Read the complete decisions and early recipe tables</Link> · <Link href="/references/aimee-homework">Aimee Homework</Link></p>
+    <p><Link href="/references/crafting-shop-overhaul">Crafting overhaul · complete shop batches</Link> · <Link href="/references/design-decisions-september-4">Read the complete decisions and early recipe tables</Link> · <Link href="/references/aimee-homework">Aimee Homework</Link></p>
   </section>;
 }

@@ -259,7 +259,7 @@ export const craftingRecipes: CraftRecipe[] = [
       r('resin', 1),
       { label: '1 flexible 25+ sample', role: 'selected sample' },
     ],
-    readiness: 'Current once the Apothecary is built; this is the immediate prepared remedy at construction.',
+    readiness: 'Older recipe shown. The reported early-overhaul route uses 1 Resin and 1 Stem or Leaf Fibre, without a separate property sample. Building teaches it; the ingredients are still required.',
   },
   {
     id: 'salve',

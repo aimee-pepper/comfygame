@@ -1,5 +1,7 @@
 # The Distillery — current design
 
+> **Historical recipe warning — 5 September:** Blank Core manufacture and its old costs below are superseded by direct 16-Essence attunement. See `player-wiki-crafting-shop-overhaul-current.md`.
+
 > **Incoming material-domain correction (21 August 2026):** Blank-core flow, attunements, catalysts,
 > provenance and atomic commit remain authoritative. The universal-grade potency term is superseded by the
 > exact Heat/Caustic/Light capability formulas in `loot-quality-hybrid-review-current.md`, if accepted. Keep

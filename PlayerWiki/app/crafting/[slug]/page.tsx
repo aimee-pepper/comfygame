@@ -1,5 +1,4 @@
-import { VenomMaterialUpdate } from '@/components/venom-material-update';
-import { BriarOilMaterialUpdate } from '@/components/briar-oil-material-update';
+import { ApothecaryOverhaul } from '@/components/apothecary-overhaul';
 import { SeptemberDecisions } from '@/components/september-decisions';
 import type { Metadata } from 'next';
 import Link from '@/components/wiki-link';
@@ -106,8 +105,7 @@ export default async function CraftingSystemDetail({
         title={system.name}
         summary={system.summary}
       />
-    {system.stationID === 'apothecary' && <VenomMaterialUpdate />}
-    {system.stationID === 'apothecary' && <BriarOilMaterialUpdate />}
+    {system.stationID === 'apothecary' && <ApothecaryOverhaul />}
     <SeptemberDecisions topic="crafting" />
       {guideStatus && <section className="article-section">
         <p className="status-pill">{guideStatus.status}</p>

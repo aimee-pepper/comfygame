@@ -30,7 +30,7 @@ The first body-and-habitat compatibility rules are decided, but still await impl
 - [ ] **Ecological coherence:** work out how world conditions produce varied, believable creatures, including relevant food, nesting and weather relationships.
 - [ ] **The complete player experience:** review whether creatures feel distinct, make sense visually and mechanically, and support enjoyable exploration and crafting. This needs playtesting of the completed features as well as design discussion.
 
-**Partial progress on Body → materials:** the first plain Bone source is now specified, including skeleton eligibility, the retained yield and Anatomy benefit, actual-source quality/colour, Return and trading. It is not implemented. A compatibility proposal for the existing Pointed Blade is now written, with the new Bone role/fee/resale choice in item 7. It is not approved or implemented. The complete anatomy catalogue and crafting update are still unfinished, so the checkbox stays open. No new Bone recipe or Hollow/Dense subtype has been approved.
+**Partial progress on Body → materials:** the first plain Bone source is now specified, including skeleton eligibility, the retained yield and Anatomy benefit, actual-source quality/colour, Return and trading. It is not implemented. A compatibility proposal for the existing Pointed Blade is now written, now folded into the whole Blacksmith batch in item 7. It is not approved or implemented. The complete anatomy catalogue and crafting update are still unfinished, so the checkbox stays open. No new Bone recipe or Hollow/Dense subtype has been approved.
 
 **Partial progress on ecological coherence:** the next naming rules are specified so movement and role descriptions agree with a creature’s actual body and habitat. A land-bound membrane does not make a flier, and weak weapons do not prove a grazing diet. This is not implemented. A further weather/body correction is now specified: the cold-water tendency toward additional appendages belongs only to supported water or amphibious creatures, not every cold-world body. It is also unimplemented; food, nesting and broader weather relationships remain open.
 
@@ -46,7 +46,7 @@ See [the current creature decisions](design-decisions-september-4.html) for what
 
 Blacksmith T2 Iron Ingots, the upgrade’s starting cost, the first useful cloth and Leather crafts, and the early maker discovery rules are now specified in **Design Decisions · 4 September**. They have bounded implementations tested in development; natural progression, final presentation and physical-phone playthrough remain pending. The wider character order, later materials, encounter and gathering balance, refinement odds, and preview behavior remain design work. You are welcome to steer these; none is a mandatory approval chore for you.
 
-**Maker work continuing without more homework:** Briar Oil’s new Fibre/Resin compatibility update has been reported delivered in development; phone availability remains separate. Venom is the next ready adapter: new Stem/Leaf Fibre, legacy Toxin and a separate reactive world resource, with its current zero Essence fee and Poison effect. Venom’s update is not implemented yet. Replacing Briar’s third ingredient or fully naming Venom’s toxic ingredients remains later design, not a new approval chore blocking these bounded updates. See [the Apothecary material updates](design-decisions-september-4.html).
+**Maker work continuing without more homework:** Design is reviewing whole shops: all 19 Apothecary recipes, then Blacksmith and Tannery, then the remaining crafting systems. Briar Oil’s new material choices are reported delivered in phone build 310; Venom’s separate update is unimplemented and is no longer an isolated next-recipe assignment. Current one-strike coatings remain temporary behavior; the agreed destination is an entire excursion. See [the complete shop-by-shop review](crafting-shop-overhaul.html).
 
 **Available to playtest:** phone build 307 offers Settings → Campaigns → New Game → Early Overhaul Playtest, alongside the separate fresh-start Simulator entry. Both begin with the ordinary opening resources and no supplied crafting stock or recruited helpers. Paid departure, gathering, Return and learning Substrate have passed in an independent ordinary campaign. Natural Nessa recruitment, the first healing craft and the full Halloway/T2 route still need playtesting. See the [fresh-start playtest instructions](design-decisions-september-4.html). This is game testing, not another approval chore.
 
@@ -68,14 +68,12 @@ You chose first full sight for a small static **Dangerous growth** marker. An ac
 
 The generic marker adds no damage numbers, duration or yield information. Dedicated 2D animation remains deferred. Engineering reports the warning implemented and tested in Simulator. Phone build 307 and the separately prepared 308 do not include it; phone delivery and visual acceptance remain pending.
 
-## 7. Decision needed: new Bone in the existing Pointed Blade
+## 7. Design-owned work: the complete Blacksmith batch
 
-**Status: proposal · later material-to-crafting work; current early-game testing continues.**
+**Status: no individual recipe approval needed.**
 
-**Approve the existing Pointed Blade using two new Bone portions, one point and one grip, with no Essence fee?** Game Design recommends this bounded option. The point's real skeletal density and quality would supply Power; both pieces would determine workmanship and retain their own colours. The grip would add no invented handling bonus.
+The previous question about a two-Bone Pointed Blade is folded into the whole Blacksmith review, following your request to design coherent shop batches. That recipe, material-role formula and resale suggestion remain proposals; withdrawing the individual homework question does not approve or implement them.
 
-The proposed finished sale value is the two portions' combined ordinary sell value, without a crafting premium: two Common portions would make a blade worth 8 Gold. Existing Recycler rates would recover one chosen portion. The Blacksmith/schematic requirement, piercing attack and close reach stay the same. Legacy Bone recipes and the starter Iron blade keep their existing rules.
+Design will work out the whole family’s material choices, stats, prices, recovery and progression together. The same applies to the Apothecary’s named ingredients and the Tannery’s later clothing choices. You do not need to price ingredients or approve each recipe. See [Crafting Overhaul · Shop by Shop](crafting-shop-overhaul.html).
 
-This approves a compatibility rule for an existing weapon, not a new weapon recipe, creature migration or immediate phone change. Bone production and the adapter still need implementation. You can approve this option or steer the Bone role, fee or resale choice; detailed conversion and source-history work remains the team's responsibility. See [the full Bone proposal](design-decisions-september-4.html).
-
-This is a reference and to-do list rather than a form. Tell Game Design or Project Manager your answer to item 1 or 7, or your thoughts on the creature goals in item 3, or share an artwork task with Asset Lead; the recorded status will then be updated here.
+This is a reference and to-do list rather than a form. Item 1 is the open crafting decision; item 3 keeps your creature-generator goals. Share optional artwork with Asset Lead. Completed decisions need no further answer.

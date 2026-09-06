@@ -1,3 +1,4 @@
+import craftingShopOverhaul from '../../docs/player-wiki-crafting-shop-overhaul-current.md?raw';
 import currentDecisions from '../../docs/player-wiki-design-decisions-current.md?raw';
 import aimeeHomework from '../../docs/aimee-homework-current.md?raw';
 import cohesivePlan from '../../docs/resource-crafting-world-ecology-cohesive-plan-v1.md?raw';
@@ -41,6 +42,13 @@ const characterLinks: DesignReferenceLink[] = [
 ];
 
 export const designReferences: DesignReference[] = [
+  {
+    slug: 'crafting-shop-overhaul',
+    title: 'Crafting Overhaul · Shop by Shop',
+    summary: 'All 19 Apothecary preparations, Blacksmith and Tannery progression, every remaining crafting system, and the corrections needed to make them coherent.',
+    source: craftingShopOverhaul,
+    systemLinks,
+  },
   {
     slug: 'design-decisions-september-4',
     title: 'Design Decisions · 4 September',

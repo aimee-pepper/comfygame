@@ -1,5 +1,4 @@
-import { VenomMaterialUpdate } from '@/components/venom-material-update';
-import { BriarOilMaterialUpdate } from '@/components/briar-oil-material-update';
+import { ApothecaryOverhaul } from '@/components/apothecary-overhaul';
 import Link from '@/components/wiki-link';
 import { DirectoryDetailsIntro, DirectoryIndex } from '@/components/directory-navigation';
 import { GuideBreadcrumbs, RelatedGuides } from '@/components/guide-navigation';
@@ -16,8 +15,7 @@ const recipeFor = (name: string) => craftingRecipes.find((recipe) => recipe.resu
 export default function ConsumablesPage() {
   const solvent = content.items.find((item) => item.id === 'solvent');
   return <SiteFrame sidebar><GuideBreadcrumbs items={[{ label: 'Home', href: '/' }, { label: 'Consumables and Field Kit' }]} /><PageIntro eyebrow="Reference" title="Consumables and Field Kit" summary="Browse every available supply, learn how to pack the Field Kit, see who or what each item can affect, and review its duration before using it." />
-    <VenomMaterialUpdate />
-    <BriarOilMaterialUpdate />
+    <ApothecaryOverhaul />
     <DirectoryIndex label="Browse consumables" entries={consumables.map((item) => ({ href: `/items/${item.slug}`, name: item.name, imageURL: item.assetURL, imageAlt: `${item.name} icon` }))} />
     <DirectoryDetailsIntro title="Compare consumables" summary="Check each item’s current effect, valid target, duration or value, and recipe before opening its full entry." />
     <p className="catalogue-guidance">Select an item image or name to open its full entry.</p>

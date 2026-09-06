@@ -2,20 +2,24 @@
 
 This is the current record of the changes agreed today. **Decided intended behavior** describes the game we are making; it does not mean that behavior is already available on your phone. **First-pass tuning** gives concrete starting numbers that can change through play. **Unsettled proposals** still need design work or a choice.
 
+## Whole-shop update · 5 September
+
+Design is now overhauling complete crafting shops, beginning with all 19 Apothecary preparations, Blacksmith and Tannery. [Crafting Overhaul · Shop by Shop](crafting-shop-overhaul.html) records the complete scope, current rules, accepted destination and proposed recipe matrix. It supersedes isolated next-recipe assignments. The ingredient bridges below are temporary compatibility steps; they do not settle the final recipes or replace the accepted excursion-long coating lifetime.
+
 ## 1. Current behavior
 
-The existing campaign, costs, recipes, and character order remain the current-game reference until their replacements are delivered. Today's decisions do not change an installed game by themselves.
+The game currently contains both older rules and delivered early-overhaul paths. The table identifies those differences; the later intended/proposed sections do not become playable merely by being written here.
 
 | System | Current behavior |
 | --- | --- |
-| Blacksmith | Halloway's foundation costs 30 Essence, 12 Iron Ore, and 6 Fibre. Pointed Blade uses a suitable point and a different suitable grip, with an Essence price based on quality. The new raw-Iron recipe and tool improvements below are intended replacements. |
-| Apothecary | Nessa's foundation costs 85 Essence, 16 Clay, 6 Quartz, and 12 Reagent. Lesser Salve uses a flexible material at 25 or better and 1 Resin. Building teaches the recipe; it does not give a free Salve. |
+| Blacksmith | The early overhaul has reported raw-Iron blade/tool and T2-ingot implementations. Older material-based Pointed Blade crafting remains separate. The earlier 30-Essence foundation and quality-based crafting fee describe the legacy route, not the replacement progression. |
+| Apothecary | The early overhaul has a reported 20-Essence foundation and Lesser Salve from Resin plus Plant Fibre. Briar Oil’s new material selection is reported delivered in phone build 310. Other older recipes remain; the whole-shop overhaul and excursion-long coatings are unfinished. |
 | Refinement | The complete new refinement journey is not available. This guide does not promise a paid Reforge improvement or a Mote-based Peerless attempt. |
 | First Writing | A fresh campaign currently begins with known symbols and starter World Pages. The learn-Illumination-and-Sun opening below is intended behavior. |
 | Scent Mask and Seamlight | Both can be prepared. Field Kit use has not yet been verified for the current phone build. Earlier descriptions disagreed about their availability; neither a working field action nor its absence is confirmed here. |
 | Recipe tracking and visual changes | Automatic ingredient highlighting, the complete material-colour treatment, and the new world palettes are intended changes; this update is not a claim they are already playable. |
 
-Ordinary consumable and physical-gear crafts now confirm success only after their result is saved. If saving fails, these crafts refuse without spending ingredients or granting the item. This correction has been delivered and checked with focused tests; an interactive crafting playthrough has not yet been completed. This does not mean every economy action or the material overhaul has changed. The Binder and human Gambits/Training presentation update has also been delivered, with clearer rule colours, capitalized labels, and the corrected earned-automation explanation. Existing unlocks, entitlements, Training rules, and Gambit rules are unchanged. Interactive phone navigation and visual acceptance remain pending. The Apothecary’s new recipe tiles, recipe details, and preparation presentation are also delivered. Its existing recipes, learned knowledge, and material choices are unchanged; the early recipes below have not arrived with this presentation update. Physical-phone visual acceptance and a campaign playthrough remain pending. The unfinished world-entry artwork is not made current by these deliveries.
+Ordinary consumable and physical-gear crafts now confirm success only after their result is saved. If saving fails, these crafts refuse without spending ingredients or granting the item. This correction has been delivered and checked with focused tests; an interactive crafting playthrough has not yet been completed. This does not mean every economy action or the material overhaul has changed. The Binder and human Gambits/Training presentation update has also been delivered, with clearer rule colours, capitalized labels, and the corrected earned-automation explanation. Existing unlocks, entitlements, Training rules, and Gambit rules are unchanged. Interactive phone navigation and visual acceptance remain pending. The Apothecary’s new recipe tiles, recipe details, and preparation presentation are also delivered. Its existing recipes, learned knowledge, and material choices are unchanged; that presentation delivery alone did not include the early recipes; their later reported implementations are recorded separately. Physical-phone visual acceptance and a campaign playthrough remain pending. The unfinished world-entry artwork is not made current by these deliveries.
 
 ## 2. Decided intended behavior
 
@@ -294,37 +298,23 @@ These are the agreed raw-material prices, not the multipliers used for equipment
 
 **Crafting still unfinished:** the existing Bone-compatible Pointed Blade uses the older crafting rules. The new Bone material needs a compatible crafting update before entering that recipe. No new Bone weapon cost, recipe or unlock is approved by this source design. Older Bone recipes and crafted items remain available through their existing rules.
 
-**New proposal — awaiting your decision:** let the existing Pointed Blade use **1 new Bone for its point + 1 new Bone for its grip, costing 0 Essence**. This keeps its existing Blacksmith/schematic requirement, close reach and piercing attack. It adds no new weapon recipe or unlock, and leaves the starter Iron blade and legacy Bone crafting unchanged. The first update would accept two new Bone portions; mixing new and legacy materials would remain unavailable.
+**Earlier proposal — now part of the whole Blacksmith batch:** let the existing Pointed Blade use **1 new Bone for its point + 1 new Bone for its grip, costing 0 Essence**. This keeps its existing Blacksmith/schematic requirement, close reach and piercing attack. It adds no new weapon recipe or unlock, and leaves the starter Iron blade and legacy Bone crafting unchanged. The first update would accept two new Bone portions; mixing new and legacy materials would remain unavailable.
 
 The proposed Bone point supplies Power from its actual skeletal density and material quality: **4 × (0.5 + density ÷ 200) × the material-quality multiplier**, rounded once to the nearest quarter point. This measures the weapon's Power contribution, not guaranteed damage on every hit. The grip keeps its existing structural and colour role without an extra handling statistic. Both materials determine workmanship, using the agreed 70% point / 30% grip quality weighting and Rough, Fine, Superior or Exceptional result names. Workmanship does not multiply Power again. For example, a Common point with density 40 gives 2.75 Power; pairing it with a Common grip produces Fine workmanship.
 
-**Proposed resale:** the finished Bone blade sells for the combined ordinary sell value of its two portions, without an extra crafting premium. Same-quality pairs would sell for 4, 8, 16 or 32 Gold. Each component keeps its own source and colour. The existing Recycler recovery rate would recover **one chosen portion**, not both, at its current service levels. Older items retain their own prices and recovery rules. This proposal grants no merchant stock, new Bone drops, creature migration, refit or Peerless path. See [Aimee Homework](aimee-homework.html) for the bounded choice.
+**Proposed resale:** the finished Bone blade sells for the combined ordinary sell value of its two portions, without an extra crafting premium. Same-quality pairs would sell for 4, 8, 16 or 32 Gold. Each component keeps its own source and colour. The existing Recycler recovery rate would recover **one chosen portion**, not both, at its current service levels. Older items retain their own prices and recovery rules. This proposal grants no merchant stock, new Bone drops, creature migration, refit or Peerless path. This is no longer an individual approval question; see [the whole Blacksmith review](crafting-shop-overhaul.html).
 
 The first creature Homework task stays unchecked. Bone production and trading are specified; the complete body-part catalogue, crafting connections and natural gathering experience still need work.
 
-### Briar Oil — next Apothecary material update
+### Apothecary — whole-shop review replaces separate recipe assignments
 
-**Current behavior:** Briar Oil is an existing one-hit Bleed coating. Its older recipe uses Fibre, Resin and a separate flexible resource. The compatibility update accepting new Stem/Leaf Fibre and Resin has now been reported delivered in development. Phone availability and natural acquisition are not established by that report.
+**Current behavior:** Briar Oil’s new Stem/Leaf Fibre and Resin selection is reported delivered in phone build 310, alongside its older recipe. It still requires a separate flexible world material at Flexibility 50 or higher. Venom’s proposed Fibre update has not been implemented. Both coatings currently retain their one-strike preparation rules.
 
-**Decided intended adapter:** at the built Apothecary, with Briar Oil known, spend **1 Stem or Leaf Fibre + 1 Resin + 1 existing flexible world resource with Flexibility 50 or higher → 1 Briar Oil**, costing **0 Essence**. The third ingredient is separate: two new Fibre portions and Resin do not yet satisfy this recipe. The new Fibre does not gain an invented Flexibility value. Existing legacy preparation choices remain available under their own rules.
+**Decided intended behavior:** all four weapon coatings last one excursion on the selected weapon, across encounters and reopening. The ingredient-only compatibility work never replaced that decision. Ordinary new preparations use recognizable material roles and cost no Essence; supernatural exceptions stay explicit.
 
-The output keeps its familiar appearance and existing Uncommon item rarity, with no material-quality band or stronger effect from the selected stock. The bottle is consumed when successfully applied to an eligible physical weapon; its prepared charge survives a miss and is spent on the next successful strike. Against a surviving target, ordinary Bleed remains 2 damage at each of three round boundaries, subject to existing prevention, refresh and cure rules. The adapter changes no combat timing, target or coating lifetime.
+**Proposed whole-shop changes:** review all 19 preparations together, removing unrelated property ingredients and giving remedies, coatings, bait and field supplies suitable physical ingredients. The proposed Briar recipe uses 2 Plant Fibre and 1 Resin; the proposed Venom recipe uses an actual eligible raw toxin and Plant Fibre. Those complete replacements are not delivered or approved by the old compatibility packets. Exact chemical and flora sources, shop balance, prices and material recovery are Design work, not individual homework questions.
 
-Briar Oil keeps its ordinary **5 Gold sell value** and **15 Gold price when legitimately stocked**; this adds no merchant stock. Preparing it sends it to Storehouse or Waiting and does not automatically pack it. Exact chosen ingredients and their source histories are retained, while old stock receives no invented origin. Cancel, stale stock or a failed save cannot spend ingredients or create a bottle.
-
-**Optional later proposal:** replace the separate flexible-resource requirement with one extra Stem/Leaf Fibre, for a fully new-material recipe of **2 Plant Fibre + 1 Resin**. This is not decided and is not part of the ready compatibility update. The existing third-resource requirement stays until an explicit recipe decision replaces it. No new homework answer is needed for Engineering to implement the settled adapter.
-
-### Venom — next existing coating compatibility update
-
-**Current behavior:** Venom is an existing physical-weapon Poison coating. Its legacy recipe and effects stay available. The new Plant Fibre compatibility update below is ready for implementation but is not delivered.
-
-**Decided intended adapter:** at the built Apothecary, with Venom known, use **1 Stem or Leaf Fibre + 1 legacy Toxin + 1 separate existing reactive world resource with Reactivity 55 or higher → 1 Venom coating**, for **0 Essence**. Each is a separate ingredient; neither Fibre nor scalar Toxin gains an invented Reactivity value. Existing legacy preparation choices keep their own rules.
-
-Legacy Toxin keeps its old identity. This update does not turn it into a named toxic sap or raw creature venom, and the finished Venom coating cannot be fed back into its own recipe. Fully naming the toxic ingredients remains later material work. No new toxic creature, gathering route or merchant stock is promised.
-
-The output keeps its existing recognizable appearance, Uncommon item rarity and ordinary **5 Gold sell value / 15 Gold price when stocked**. Ingredient quality and Reactivity above the threshold do not strengthen its Poison. Applying the bottle spends it to prepare the selected eligible physical weapon; a miss keeps the charge, and a successful strike spends it. Existing Poison duration, modifiers, prevention, cures and encounter cleanup stay unchanged.
-
-The player confirms the exact reactive resources and Fibre type. Preparing a batch saves every deduction, bottle and source-history record together, sends the output to Storehouse or Waiting, and leaves the Field Kit plan unchanged. Old Toxin receives no invented species or colour history. Cancel, stale stock or save failure spends nothing. This bounded compatibility update needs no new decision from you; replacing legacy Toxin or removing the separate reactive ingredient would need its own explicit design.
+See [the complete Apothecary recipe matrix and all-shop plan](crafting-shop-overhaul.html).
 
 ### Optional Hide-to-Leather path — decided intended behavior
 
