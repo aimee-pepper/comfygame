@@ -1,6 +1,14 @@
 # Terrain height, reachable high ground and scenery
 
-7 September 2026. **New direct Aimee decision; intended, not delivered in333.** This version changes structural generation and movement together. It supersedes the old instruction to preserve unrestricted cardinal walking in NEW worlds only. Existing saved books/worlds/opening continuations retain their own movement, water policy, sources and creatures. Read with generated-water-surfaces-and-outlets-v1.md and the modular flora/creature contracts. Engineering source review is required before enabling this structural version; independent appearance work continues.
+7 September 2026. **Accepted contract; implementation installed in338, ordinary phone launch unverified.** This version changes structural generation and movement together. It supersedes the old instruction to preserve unrestricted cardinal walking in NEW worlds only. Existing saved books/worlds/opening continuations retain their own movement, water policy, sources and creatures. Read with generated-water-surfaces-and-outlets-v1.md and the modular flora/creature contracts. Engineering completed the structural implementation and bounded verification recorded below; independent appearance work continues.
+
+## Delivery reconciliation — 7 September
+
+Engineering receipt `docs/phone-338-delivery-2026-09-07.md` in early-material-regions-v1, preserved atc8fdac3b32503aae1606cc321036d8bc5634e23e/tree206ef50398c5ac3c34f57871a4676b8d2061c6e8, records verified physical installation/readback of source5797726affdc75066dddb309798f5a054d7eb455/treebbb11af3729a8e827cfa6ba9a4af8ab63be852f4 at2026-09-07T21:38:31.258599Z. One bounded launch retry reached the phone but was refused because it was locked. Ordinary launch and phone playtest readiness are not verified. PM owns any required user engagement; Design performs no retry, native rerun or installation check.
+
+Companion `terrain-access-delivery-verification-2026-09-07.md` reports final14PASS, focused new-water2PASS and existing ordinary3D/reopen1PASS. Actual ordinary world9488023014086907682 is18×18, has levels0/1/2 and no scenery district; movement, natural encounter/Withdraw and reopening passed, without harvesting. Controlled refusal/stepped-ascent checks are distinct from rendered ordinary3D screenshots; UIKit fixture captures omitted Metal. No natural scenery frequency, complete balance or physical-phone performance claim follows. One earlier random Bind refusal lacked its seed; Engineering corrected a concrete final-entry ordering gap and subsequent production/native Bind checks passed, without claiming an exact-seed reproduction.
+
+New-policy worlds receive shared support/access, preserved wet structural height, non-filling route repair,90% high-ground/optional≤10% scenery tuning, own-height shoreline classification, source/work-route protection and final-entry reconciliation before habitat/source reservation. Existing worlds/opening continuations, ordinary2D and337 Bind correction remain. Morphology, surfaces/markings and shared3D readability remain outside338. Public Wiki delivery reconciliation is a35707a5.
 
 ## One level and one movement authority
 
