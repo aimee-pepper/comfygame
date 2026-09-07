@@ -28,7 +28,7 @@ A Subject and Focus can be recovered together as two clearly named lessons and r
 
 This guarantees an eligible lesson, **not suitable land or every material in every world**. Other lessons keep their ordinary discovery routes and protection against repeated misses.
 
-The rest of the empty-start vocabulary also needs real routes. Relief with Granite/Sand, Thermal with Ice, Vitality with Bloom and Atmosphere with Cloud follow ordinary attributable source lessons; a missing Subject accompanies the selected source lesson. Moon, Lake, Rain, Root, Herd, Sea, Snow and Wind become learnable source observations instead of automatic starter gifts. Cycle comes with an appropriate actual source. Diary-exclusive words remain with their diaries.
+The rest of the empty-start vocabulary also needs real routes. Relief with Granite/Sand, Thermal with Ice, Vitality with Bloom and Atmosphere with Cloud follow ordinary attributable source lessons; a missing Subject accompanies the selected source lesson. Moon, Lake, Rain, Root, Herd, Sea, Snow and Wind become learnable source observations instead of automatic starter gifts. Cycle comes with an appropriate actual source. Diary-exclusive words remain with their diaries. If you lawfully learn a Focus from a cache, diary or another route, its missing Subject can also be learned free from that acquired knowledge. A Focus you already know can teach its other applicable Subjects through the Library; you do not need to find the same source again. Owning a printed Page with an unknown word is still different from knowing that Focus.
 
 Faint and Moderate are the first later instruction, after your first self-authored expedition. Small/Minute and Single/Pair follow in the opening; stronger intensity, larger extent, larger counts and phase words follow the developing/later lesson bands. Each Modifier is learned separately. Ordinary unqualified writing still works before those lessons. Printed words on your three existing physical starter Pages do not become known merely because you own or use the Page; starter Compounds are not silently restored.
 
@@ -67,7 +67,7 @@ Pick2 opens Quartz and Axe2 opens small Hardwood. Neither needs those harder mat
 
 **Scope:** Essence recovery is deferred at your request. This pass keeps existing costs as references and focuses on learning and dependencies. It adds no new player-facing trial. The specifically requested 3D trials stay in Settings; the unrequested wood-colour trial entry is to be removed while normal wood-colour gameplay remains.
 
-Implementation and natural pacing still need to be established together. No new decision homework is waiting on you for this first pass.
+The empty start and its real lesson, writing and prerequisite-learning routes must be delivered together. They cannot wait behind later Scriptorium, ink or shop work. Implementation and natural pacing still need to be established together. No new decision homework is waiting on you for this first pass.
 
 
 ## Whole-shop update · 5 September
