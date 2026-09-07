@@ -12,7 +12,7 @@ This is the current record of the changes agreed today. **Decided intended behav
 
 **Appearance — current in installed build336:** stripes have softer transitions, and new woody assemblies use tapered supports and gently bowed, tapered branches. Opposite or alternating broad leaves have varied tilt. Build336 gives newly generated broad-leaved woody plants a fuller crown above a shorter bare support by adjusting support, branch-base and leaf proportions. Leaf counts, source traits, materials and the accepted profiles stay unchanged; old saved assemblies keep their shapes.
 
-These refinements have internal native specimen evidence. The earlier ordinary movement/encounter/reopen check contained fleshy flora, so no natural woody encounter, Aimee expedition or phone-performance result is claimed. Foliage still looks clustered; finished organic richness and full finish treatment remain incomplete, and dense stripe patterns can still lose contrast. The new height-route decision below is **not included in336**.
+These refinements have internal native specimen evidence. The earlier ordinary movement/encounter/reopen check contained fleshy flora, so no natural woody encounter, Aimee expedition or phone-performance result is claimed. Foliage still looks clustered; finished organic richness and full finish treatment remain incomplete, and dense stripe patterns can still lose contrast. The new height-route decision below is **not included in337**.
 
 **Creature design requirement:** all intended forms must have coherent structure rules before dependent generation is built. The existing seven body labels have23 habitat/body combinations, but that is only the starting classification. Dragon DNA’s independently varied wings and limbs, horn style/direction, spine style/height and tail shape/length are the model for the deeper modular design. The reference has now been read, and the draft replaces the restrictive single-appendage choice with independent part groups. An axial creature with three or five to eight support limbs is grouped as **Many-legged** when legitimately recorded; two and four retain their own groups. Independent structures and their source rules are enabled for newly written worlds in333; existing saved classifications remain preserved.
 
@@ -28,9 +28,34 @@ These refinements have internal native specimen evidence. The earlier ordinary m
 
 The existing3D trial remains the consumer; this adds no menu, swimming, erosion, flooding simulation or new material rewards. Large artwork does not enlarge a creature’s occupied space or a tree’s blocking base. Hidden actors and unseen water endpoints stay hidden, and remembered scenery does not reveal current movement or changes. Later shops and Essence recovery remain outside this work. No new decision homework is required from you.
 
+## Next morphology batch — designed, not delivered
+
+**Decided direction:** make generated life read as coherent, distinctive forms rather than collections of simple parts. The next implementation batch follows the Bind fix and terrain work, starts with creatures, and covers every supported family. It preserves actual anatomy, source colours, material rewards, occupied tiles and existing saved appearances.
+
+**Design-authored first-pass plan:** these are concrete starting choices for the next batch, not separate details approved by you. Exact proportions remain revisable.
+
+| Existing form | Planned shape improvement |
+| --- | --- |
+| Two-legged axial creature | A more upright, compact torso with its head and supporting limbs placed to match |
+| Four-legged and many-legged axial creature | A horizontal body with clearly spaced supporting limbs; limb count remains distinct from wings and fins |
+| Serpentine | Connected, gradually tapered sections following its saved curve |
+| Segmented | Visible sections and narrower connecting waists |
+| Radial | A regular arrangement around a central body |
+| Amorphous | Unequal, overlapping masses that stay connected and visibly differ from radial forms |
+| Fish-shaped | A broader front tapering towards the rear, with only its actual fins, tail and shore-supporting limbs |
+| Woody flora | Retain delivered taper and crown improvements, then distribute branches and leaves along their actual supports |
+| Fibrous flora | Tapered stalks with blades, leaves or fronds arranged along the support |
+| Fleshy flora | Pads or rosettes attached to the actual body surface |
+| Fungal flora | Caps, shelves or tufts arranged on their own nonwoody supports |
+| Chemosynthetic flora | Low crusts and plates, or distinct tube growth, instead of treating every form like a tree |
+
+Independent wings, fins, horns, spines and tails keep their saved presence and counts while gaining clearer shapes. Feathered wings gain overlapping contour shapes; fins and tails taper; horn styles remain distinct. More visual pieces do not mean more harvestable anatomy. Leaf sizes vary in small coordinated groups, with opposite pairs kept together and roots attached to real support.
+
+Existing size, build, tissue, stature, shape and part fields supply the variation. World conditions influence those source traits first; appearance does not secretly reroll biology or add another cold, darkness or water bonus. No new breeding, creature editor, gait system or plant lifecycle is part of this batch. The proposed limb taper has internal specimen evidence, but the batch is not implemented or delivered. Continuous patterns across part joins, complete surface finishes and final artistic richness remain separate unfinished work.
+
 ## Height routes and inaccessible scenery — newly decided
 
-**Decided intended behavior, not delivered in336:** you can move between neighbouring tiles only when their supporting ground differs by at most one elevation level. This applies going down as well as up: there is no jump or drop shortcut. To reach a higher area, find a connected route of steps each no larger than one level. Existing terrain height steps define the level; water depth or artwork size does not redefine it. Deep water still requires its existing restrictions, and flowing water does not create a walking route.
+**Decided intended behavior, not delivered in337:** you can move between neighbouring tiles only when their supporting ground differs by at most one elevation level. This applies going down as well as up: there is no jump or drop shortcut. To reach a higher area, find a connected route of steps each no larger than one level. Existing terrain height steps define the level; water depth or artwork size does not redefine it. Deep water still requires its existing restrictions, and flowing water does not create a walking route.
 
 Most high ground should have a valid route from the expedition's actual entrance. Steep cliffs may remain along its sides while a gentler approach leads around them. A few isolated elevated areas may remain scenery. They may show trees, foliage and water, but contain **no animals or resource nodes**. Decorative trees and plants there cannot be harvested and do not count towards promised resources. Real sources remain obtainable from valid work positions with the appropriate existing tools; a tree above a two-level cliff cannot be chopped from below.
 
@@ -38,9 +63,11 @@ A lake beside a reachable high shore may still support aquatic creatures, even w
 
 **Design first-pass tuning:** aim for at least90% of elevated dry terrain to be reachable. Allow at most one isolated scenic district per map, with a25% initial selection chance and no more than10% of elevated dry area; no isolated district is required. These numbers are starting production choices, not values supplied by you. Required paths and resources take priority.
 
-**Current versus intended:** Build336 retains the earlier shared-water rules introduced in333. The broader height restriction and placement rules above require a new generation version and Engineering review. Existing saved worlds keep their earlier routes, creatures and resources. New water geometry must respect the new version's height limits even when it falls back to simpler water presentation. This adds no swimming, climbing or new trial menu, and requires no new decision homework.
+**Current versus intended:** Build337 retains the earlier shared-water rules introduced in333. The broader height restriction and placement rules above require a new generation version and Engineering review. Existing saved worlds keep their earlier routes, creatures and resources. New water geometry must respect the new version's height limits even when it falls back to simpler water presentation. This adds no swimming, climbing or new trial menu, and requires no new decision homework.
 
 ## The beginning as one connected path
+
+**Bind crash correction — installed in337:** opening the Bind review no longer follows the render path that caused the reported crash. Internal native testing passed Home → Writing Desk → Bind → departure into the existing 2D world → reopening. Installation and ordinary phone launch were verified; the Bind pane was not played on your physical phone. Gameplay, campaigns and the existing 2D flow are preserved. This hotfix does not include the new terrain or morphology plans.
 
 **Current behavior — installed in build331:** new campaigns begin with no learned Subjects, Focuses, Modifiers or Compounds. The generated introduction, safe light lessons, first usable Sun writing, missing-Subject learning routes and early traveler/material/tool/maker connections are delivered together. Stone tools and the delivered Apothecary, Forge, Tannery, Bowyer and Weaponsmith remain available through their normal requirements. Existing campaigns keep their knowledge, physical Pages and progress; your phone save was not reset.
 
