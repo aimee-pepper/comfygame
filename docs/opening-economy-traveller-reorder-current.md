@@ -1,5 +1,6 @@
 # Opening economy traveller reorder — current design
 
+**Sequence superseded6 September:** use [the connected opening](game-design-early-progression-direction-2026-09-04.md) for all opening order, rune/tool/material/shop dependencies. Vance/Recycler role and narrative content below remain reference; prior ordering/validation directions are historical. Essence recovery is deferred, not an active workstream.
 **Status:** current authored-order decision; Noll/Recycler native playtest promotion is approved by
 Decision 182, while exact prose and Field Separation Kit remain independently reviewable.  
 **Updated:** 11 Aug 2026
@@ -120,25 +121,11 @@ Recycler tier 0 must be useful on ordinary eligible found gear through authored 
 crafted-receipt recovery remains equally valid when crafted gear later exists. Exact preview and
 confirmation are baseline safety, never diary-gated.
 
-## Revised authored order
+## Current opening order
 
-| Order | Traveller | Phase | Conditions |
-|---:|---|---|---:|
-| 1 | Vance | opening | 1 |
-| 2 | Noll | opening | 2 |
-| 3 | Halloway | opening | 2 |
-| 4 | Mara | opening | 1 |
-| 5 | Edren | opening | 2 |
-| 6 | Isolde | startOfMid | 2 |
-| 7 | Sela | mid | 3 |
-| 8 | Bryn | early-mid | 3 |
-| 9 | Orsa | early-mid | 3 |
-| 10–30 | Talin through Tam | retain current relative order, shifted by one | existing | existing |
+The master supplies the first-six cohort, exact blind minima, clue/causal selection and invitation rule. Old Vance→Noll→Halloway sequencing is retired. No separate cast-order table in this role reference overrides it.
 
-The full roster table in `roster-progression-current.md` is the schema authority. The roster remains
-expandable; adding Noll does not consume a final slot.
-
-## Required validation
+## Historical validation reference — no new run assigned
 
 1. Fresh-campaign selection considers matching Vance, Noll and Halloway before any later band;
    evidence may change their internal order without allowing a later story cluster to displace them.

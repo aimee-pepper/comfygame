@@ -1,6 +1,6 @@
 {
   "id": "early.progression.v1",
-  "status": "decided intended behavior; numerical values are unmeasured first-pass tuning; not runtime data",
+  "status": "Design first pass; connected opening policy pending implementation, source mechanics retain their own delivery status",
   "scope": "new-generation worlds and the first six recruitment priorities; remaining roster metadata preserves prior blind access and relative order",
   "environment": {
     "units": "normalized game pressures, not degrees Celsius",
@@ -378,21 +378,21 @@
         "id": "bryn",
         "authoredOrder": 4,
         "campaignPhase": "early-mid",
-        "storyArrivalBand": 1,
+        "storyArrivalBand": 0,
         "minimumRecruitsForBlindDiscovery": 1
       },
       {
         "id": "corrin",
         "authoredOrder": 5,
         "campaignPhase": "early-mid",
-        "storyArrivalBand": 1,
+        "storyArrivalBand": 0,
         "minimumRecruitsForBlindDiscovery": 1
       },
       {
         "id": "noll",
         "authoredOrder": 6,
         "campaignPhase": "early-mid",
-        "storyArrivalBand": 1,
+        "storyArrivalBand": 0,
         "minimumRecruitsForBlindDiscovery": 1
       },
       {
@@ -844,7 +844,8 @@
       "maximumNewTravellerPerWorld": 1,
       "arrivalChance": "min(1, .25 + .75 * causallyAuthoredConditions / totalConditions + .25 * priorSelectedNearMisses); 1 if priorSelectedNearMisses >= 2",
       "failedRoll": "no substitute traveller"
-    }
+    },
+    "openingSelectionAuthority": "game-design-early-progression-direction-2026-09-04.md section4; first six band0, existing blind minima, clue/causal score and one-person cap retained"
   },
   "teaching": {
     "intro": [
@@ -885,9 +886,10 @@
         "evidence": "early.fact.workable_iron.v1"
       }
     ],
-    "policy": "same one independent recovered-teaching opportunity per world; one reward per record; opening band; unknown prerequisite target ranks before its focus; early maker entries rank before unrelated same-age candidates until read; due candidates retain priority",
+    "policy": "Superseded by connected opening contract: four core lessons deterministic on real eligible evidence after intro; one named subject/focus pair (two separately read records) per ordinary world; collect together before target ownership, read subject first; due then oldest eligible then Substrate/Iron tie; generic other teachings keep current chance/protection.",
     "locationCluePolicy": "use ordinary diary slot and normalized traveller bucket; until both makers recruited, on alternating eligible resolved worlds starting first, reserve a missing Nessa or Halloway v2 location clue, least recovered clues then Nessa; exact existing due diary nominee wins, and postpones rather than consumes reservation; no duplicate IDs; no new extra diary slot",
-    "noObservationLeak": "clues may describe another world; teaching evidence and map highlights require actual visible-compatible facts; writing previews disclose only authored effects and known requirements"
+    "noObservationLeak": "clues may describe another world; teaching evidence and map highlights require actual visible-compatible facts; writing previews disclose only authored effects and known requirements",
+    "openingVocabularyAuthority": "game-design-early-progression-direction-2026-09-04.md section3; no automatic starter restoration; typed qualifier ownership and actual missing Subject/Focus routes required"
   },
   "acceptance": {
     "seedSet": "unsigned integer world seeds 0 through 999, generation version early.progression.v1; new campaign state fixtures at zero, one and three recruits; ordinary unwritten targets stay fully generated",
@@ -910,7 +912,7 @@
       "eligibleHostMissingReservedProducerMaximum": 0,
       "earlyMakerSelectedNearMissesBeforeGuaranteedArrival": 2
     },
-    "status": "thresholds are design acceptance targets; no seed corpus or campaign pacing run claimed"
+    "status": "Historical source-rollout evidence only. No new corpus or economy-recovery assignment; use the connected opening contract section8 for the bounded current implementation proof."
   },
   "unwrittenPressurePolicy": {
     "id": "early.unwritten_intensity.v1",
@@ -1008,7 +1010,9 @@
       "interpretation": "original25% review floor is not waived or declared passed from64; keep old and revised fact measures visible; full corpus still does not prove campaign affordability or mounted play",
       "runPolicy": "one run only; collect original process after tool timeout rather than launching duplicate; mounted Nessa work remains independent"
     },
-    "defaultGate": "remain disabled until Engineering completes connected native route/persistence/acceptance and delivery gates"
+    "defaultGate": "Delivered ordinary gameplay is enabled from phone326. Do not reinstate the historical global off gate. The connected opening has its own new-campaign policy and paired implementation boundary."
   },
-  "solidDepositInteractionContract": "early-solid-deposit-interaction-v1.json"
+  "solidDepositInteractionContract": "early-solid-deposit-interaction-v1.json",
+  "openingAuthority": "game-design-early-progression-direction-2026-09-04.md",
+  "openingPolicyIdentifier": "opening.connected.v1"
 }

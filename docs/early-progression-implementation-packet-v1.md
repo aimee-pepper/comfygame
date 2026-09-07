@@ -1,6 +1,6 @@
-# Early sources and first-maker recruitment — implementation packet V1
+# Early source facts and recruitment adapters — subordinate reference
 
-**4 September 2026 · Decided intended behavior; numbers are first-pass tuning, not measured pacing.**
+**Updated6 September: the [connected opening contract](game-design-early-progression-direction-2026-09-04.md) now owns the end-to-end sequence. This file retains source/region mechanics; its historical rollout/measurement instructions are closed evidence, not new assignments.**
 
 This closes the outstanding minimum world-category, ordinary-source and early-recruitment decisions in
 [the host/consumer contract](early-material-host-consumer-contract-v1.md). Import-ready authored rows are in
@@ -117,9 +117,9 @@ yields remain exactly as in the host contract.
 | 1 | Vance | 0 | 0 | Existing open-country condition |
 | 2 | Nessa | 0 | 0 | Fresh growing land: compatible reachable roots with resin-shrub and softwood host sites |
 | 3 | Halloway | 0 | 0 | Reachable workable Iron formation with a legal dry face |
-| 4 | Bryn | 1 | 1 | Close, bending paths: existing openness at most 40; remove hard-ground/heavy-air demands |
-| 5 | Corrin | 1 | 1 | Compatible reachable growth supporting both Stem and Leaf Fibre |
-| 6 | Noll | 1 | 1 | Existing hard-ground and concentrated-material conditions |
+| 4 | Bryn | 0 | 1 | Close, bending paths: existing openness at most 40; remove hard-ground/heavy-air demands |
+| 5 | Corrin | 0 | 1 | Compatible reachable growth supporting both Stem and Leaf Fibre |
+| 6 | Noll | 0 | 1 | Existing hard-ground and concentrated-material conditions |
 
 This is authored priority, not a forced arrival sequence. Nessa and Halloway are both eligible in a fresh
 campaign. No member of the old opening trio is required first. A known location clue can still reach ahead.
@@ -133,7 +133,7 @@ do not apply both. A tuning override may explicitly replace the authored minima 
 must never silently add a global floor in production. For missing fields in external/legacy content only,
 retain its original-version selector; do not infer a new floor from a shifted sort index.
 
-Keep single-traveller selection, earliest represented eligible story band, confidence and near-miss carry.
+Keep single-traveller selection, confidence and near-miss carry. The first six now share opening band0 under the connected opening first pass; their separate blind minima and clue/causal evidence score remain. Later bands retain their existing rules.
 The current code's score is unique recovered clues plus **twice causally authored known conditions**;
 it is not twice all authored conditions. Unread-but-recovered location clues retain their current discovery
 credit. Fully authored conditions still affect confidence even if their clue has not been found. Failure
@@ -170,19 +170,7 @@ facilities, entitlements, Pages, materials and saved tool identities are never r
 keep their frozen people, clues, resources and generation rules. Saved near-miss progress stays with the
 person across the signature revision; no reset to make the new route longer.
 
-The opening still grants no known runes before its introductory teaching. Illumination and Sun are
-permanently recoverable there. The four JSON entries close the next minimum vocabulary: Hydrology,
-River, Substrate and Iron. They use recovered teaching records, one reward each, not a second reward
-hidden on a location page. Reuse the existing River teaching identity. New IDs are reserved, not permission
-to create a duplicate of an equivalent canonical record: the integration adapter must alias if one exists.
-A prerequisite target gets priority before its source focus; collected lessons are read in the Library
-for zero Essence. No shop purchase or recruitment gate is added to learning them.
-
-Use the existing one independent teaching opportunity, evidence, 45%/45%/third-eligible-world pity and
-placement rules. The maker lessons get same-age priority while needed; existing due lessons still win.
-Iron evidence can be a real ordinary Iron formation even when the old pressure-source receipt did not
-contain the Iron word. River retains its exact-source evidence. This distinction is explicit, not a generic
-claim that any water teaches River.
+The [connected opening contract](game-design-early-progression-direction-2026-09-04.md) replaces the old introductory and practical-word sequencing in this section. Zero known words ship with the real safe Illumination/Sun introduction, ownership validation and real acquisition routes for removed starter Subjects/Focuses/Modifiers. After the introduction, the four core Hydrology/River/Substrate/Iron lessons use deterministic actual-evidence opportunities, at most one explicitly named pair/two separate records per world. Collecting both before reading is permitted; read the Subject first. A lone eligible Subject does not fabricate its Focus. No second eligible-world search or45% roll is required for the paired core lesson. Generic non-core teachings retain their existing opportunity/protection. No shop, material extraction or upgraded tool gates reading. See the master for exact selection, source proof, new missing-word routes and first-shop connections.
 
 For location clues, use the existing ordinary diary slot and normalized target buckets. Until both makers
 join, alternate eligible resolved worlds beginning with the first: reserve one missing Nessa/Halloway

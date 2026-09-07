@@ -1,252 +1,159 @@
-# Early progression design direction — 4 September 2026
+# Opening progression — one connected implementation contract
 
-**T2 closure:** [the specialist packet](early-specialist-implementation-packet-v1.md) now settles Blacksmith T2 Iron Ingots, its raw-material upgrade cost and first useful consumers; it supersedes the T2 proposal language below.
+**6 September 2026 · Operative opening direction, replacing the earlier contents of this file.** Aimee asks for the beginning to fit together across rune learning, travelers, resources, tools and shops. **Her latest correction defers Essence recovery.** Existing prices below are reference inputs; this packet adds no setback fee, recovery system, balance exercise or new trial.
 
-## 1. Authority and status
+## Authority and current boundary
 
-Aimee directly authorized this design work in Game Design task `01a06e50-9d04-72a0-a0ab-80a2b3aa7aa7`
-following the [takeover assessment](game-design-takeover-assessment-2026-09-04.md). This is the first bounded
-design packet. It records her decisions separately from the concrete proposals below. It changes no runtime
-or public Wiki, and is not a claim that the whole overhaul is ready for implementation.
+This is the single sequencing authority for the opening. The material/host, tool, shop and writing packets remain technical references for their named systems; their older opening order, automatic starter grants, learning gates and dispatch priorities yield to this contract. No later-shop or creature-extension planning precedes this work.
 
-**Host/consumer closure:** [early material contract V1](early-material-host-consumer-contract-v1.md)
-now supplies the exact eligible material sets, finite geological/flora producers, starter blade statistics,
-salve/tool outcomes and trade/recovery rules that were still open in this initial packet. Its remaining
-promotion gates distinguish specified behavior from unverified source frequency, runtime and phone proof.
+**Directly decided:** no known runes before the introductory discovery; guaranteed recoverable Illumination and Sun in a broadly generated first world; ordinary main-campaign integration; stone starting tools; revisable costs/order; intuitive usable starter recipes; exploration rather than compulsory map completion. Aimee also removes **Not now** from the invite-traveler conversation and disallows new player-facing trials unless she explicitly requests them. Remove the unrequested wood-colour trial entry; retain the specifically requested 3D trials and real wood-colour gameplay.
 
-Direct Aimee direction superseding earlier freezes:
+**Current delivered baseline through328:** ordinary New Game includes delivered overhaul rules, but still pregrants Sun/Illumination and catalogue starter Compounds. The empty-vocabulary introduction is unfinished. The source uses an opening recovered-teaching gate after one resolved expedition,45%/45%/third-eligible-world protection, source/fact evidence, and prerequisite-target ownership. Early practical makers, stone tools, raw-material starters, Apothecary322, Tannery323, Forge324, Bowyer325 and Weaponsmith328 are separate delivered pieces. This does not establish that their combined opening is complete or balanced. Invite/trial-entry corrections need their own delivery receipt.
 
-1. Recipes, upgrade costs, and order of progression are placeholders. Game Design may reorder and revise
-   them for playability, enjoyment, coherence, and intuitive understanding.
-2. Physical crafting should be intuitive where possible because other parts of Bookbinder already provide
-   deliberate arcane complexity. She agrees with an early Halloway tool-upgrade path and welcomes related
-   corrections.
-3. Starter Blacksmith gear can use raw materials. Later specialty shops may require crafted components.
-4. She likes refinement and proposes one Mote plus a maximum-level shop plus its attending shopkeeper for
-   100% Peerless success; having only one or two of those advantages should still permit a chance. This is
-   the direction to develop, with incomplete-setup odds and spending details not yet settled.
-5. Exploration should not routinely allow whole-map completion. Trees and canopy may make routes interesting;
-   a successful trip can leave substantial territory unexplored.
-6. Different materials can be desirable for statistics or colour. Appearance is a legitimate reason to gather
-   a material; it need not always win a combat comparison.
-7. Traveller/building order may be rearranged so late systems have enough useful campaign life.
-8. She agrees with the Writing/clue teaching concerns and the crafting-persistence and Wiki corrections.
-9. She authorizes the early design priority and asks that the concerns and takeover document be relayed to
-   the current Project Manager.
+**Design-authored first pass, intended but unimplemented:** the connected stages, protected four practical lessons, missing vocabulary routes and first-six selection adjustment below. These are explicit replacements under the whole-opening assignment, not claims that Aimee personally selected each tuning detail. No new personal decision is required to implement this first pass; natural pacing remains something to learn from play.
 
-During this work Aimee additionally proposed opening Ingot production at Blacksmith T2 or T3 alongside
-the player's expanding buildings. Game Design recommends **T2** for that first processed-metal milestone;
-the staged proposal is recorded below. This is a proposed tier placement, not a shipped unlock.
+## 1. The path, in player order
 
-Aimee subsequently suggested stone starting tools. Game Design adopts stone Pick/Axe/Scythe working parts
-for the existing opening kit and iron heads for the first Halloway upgrades. This is recorded in the host/
-consumer contract, with no pre-expedition crafting chore or change to tool classes and their dedicated roll.
+Stages are capabilities, not a promise of one stage per expedition. Beyond the two introductory words, worlds retain their actual ecology and encounters.
 
-These decisions do not revoke physical-material identity, ungraded geological/flora stock, explicit source
-choice when meaningful, saved-world preservation, or the AGENTS.md fixed-phone and Asset restrictions.
-Authorization to proceed with this Game Design work is not a blanket resumption of every other lead's queue.
+| Stage | What the player does and learns | What it enables | Gate and required inputs |
+| --- | --- | --- | --- |
+| Begin at Home | Own an empty draft, Rough charcoal and the stone Pick/Axe/Scythe; know zero Subjects, Focuses, Modifiers or Compounds | Enter the real introduction without needing to write first | Retain current40 Essence, party, equipment and three physical starter Pages. Use a blank first-entry request; current base quote10 Essence. No maker or ink purchase |
+| Discover light | Follow the safe introductory path, collect separate Illumination and Sun teaching records, then read them free at Home | Understand a Subject and its source before choosing a world | Two guaranteed discoveries; no combat victory, gathering tool, inventory slot, recruit or fee to read |
+| Shape one thing | Connect Illumination to Sun in Rough charcoal and Bind using the ordinary live quote | See that the chosen source matters while unwritten features remain generated | Both words learned; an unqualified source uses the existing ordinary/default intensity. This is not ownership of the Moderate Modifier |
+| Explore for a purpose | Notice water/growing land and exposed ground/Iron, collect useful lessons and starting-tool materials, follow a visible clue or traveler | Two parallel routes: plants/remedies/textiles, or Iron/tools | Exact source facts and ordinary sight/access; no need to discover every material or clear the map |
+| Learn to seek materials | Read Hydrology/River and Substrate/Iron as they are recovered | Deliberately shape water; write a reachable Iron source instead of needing a shop to learn its ingredient | The four practical lessons use the protected acquisition rule below; River is not learned from arbitrary water |
+| Bring people home | Talk to a found traveler and invite them; no decline branch | Their specific facility becomes a useful choice | Actual on-map contact and durable invitation. A clue or a matching world alone is not recruitment |
+| Make the first useful thing | Nessa: a Salve; Halloway: a raw-material weapon or a tool improvement; Corrin: Cord/Cloth and a first woven garment | Immediate reason to care about the gathered material and the person | Exact foundation and first-use bills below. These are parallel choices, not a compulsory chain through all three shops |
+| Follow a new capability | Pick2 reaches Quartz, Axe2 reaches small Hardwood, ForgeT2 makes Ingots, Corrin offers larger carrying/textile choices | Later recipes become understandable through already-used components | Choose the tool for an actually seen source or wanted recipe. No new tool tier is needed for its own ingredients |
 
-**Later closure:** [early progression implementation packet](early-progression-implementation-packet-v1.md)
-settles the first-six priority, signatures, blind gates, clue migration and ordinary source tables.
-Its exact rows supersede the proposed opening and outstanding host-frequency authoring below.
+The first useful result is not “build everything.” A recovered word, an invited person, a gathered source or one useful craft can each be a meaningful step. The game should explain the next reachable action in the player's current situation.
 
-## 2. First journey: gain a useful capability before adding another prerequisite
+## 2. Introductory knowledge and the first written world
 
-Proposed opening tendency, replacing the inherited mandatory sell → recycle → forge emphasis:
+Keep the accepted broad generated introduction with its safe unavoidable lesson path. Preserve the existing two exact teaching texts in the Scriptorium packet: Illumination describes light; Sun supplies it. The required route, lesson positions and return access must be reachable without combat, upgraded tools, harmful contact or undisclosed information. This protection belongs only to the required introductory route, not every branch or every later world.
 
-| Cohort | Proposed authored tie-break order | First useful contribution |
-|---|---|---|
-| Opening contact | 1 Vance | Exchange surplus and understand value |
-| First practical makers | 2 Nessa, 3 Halloway | Make a healing supply; make simple equipment and improve a field tool |
-| Broaden early choices | 4 Bryn, 5 Corrin, 6 Noll | Protective party play; flexible gear/packing; recover materials and sort Rubble |
+The first entry is the ordinary blank request under the introductory owner, not a new Settings/New Game mode. The three physical starter Pages remain owned, independently usable pages; their printed words do not become known. Their current14/14/16-Essence quotes and contents are not substituted for the broad introduction or a guaranteed material package.
 
-These are proposed content priorities, not six compulsory single-file arrivals. Legitimate clue-backed
-discoveries may still reach ahead. Both Nessa and Halloway should be discoverable without first recruiting
-all three members of the old opening-economy group. Noll's service is useful but need not delay healing.
+Collecting each introductory record banks it permanently; reading at Home grants exactly that one word. Existing ownership/record IDs are reused or explicitly aliased. Interrupted unfinished teaching retains the previously accepted same-world continuation and safely reachable missing discoveries, without rerolling loot or duplicating rewards. This packet leaves the previously specified retry implementation intact and does not extend it into an Essence-recovery design.
 
-Do not migrate this order by changing one JSON sort key. New signatures, story bands, earliest teachable
-vocabulary, clue links, and the selector's blind-discovery floor must be reconciled together. The current
-three-recruit floor would otherwise undermine the intended first-maker cohort. Design the needed early
-land facts first; author signatures after those facts are closed.
+After both readings, use the existing Writing Desk to show a single connected statement. Copy: **“Illumination is what you are describing. Sun is what supplies it. The rest of this world is still unwritten.”** Drafting is free; Bind uses its actual quote. Sun affects heat as well as light. Do not promise a forest, fresh water, a safe climate or a traveler merely because Sun was written.
 
-Firepit, Writing Desk, Storehouse, Party, and the other opening capabilities retain their established
-ownership. Workshop does not return. The Storehouse retains the first two pack projects; neither raw
-materials nor the three-place tool roll consume item slots.
+Use the new-campaign policy identity `opening.connected.v1`; keep world/source-generation versions independent. New-policy ownership applies to initial state, palette, new mark/connection validation, Templates, collected-page copying, startup reconciliation and teaching reads. Catalogue starter status is not a grant. A legal Modifier is not a known Modifier. Physical Page use remains separate from permission to copy/edit its unknown words. Keep Gambit starter entitlements distinct. Existing campaigns keep their words, Pages and paid progress; this is not a reset instruction.
 
-## 3. Concrete first-pass foundations and making
+## 3. The practical rune sequence and its real acquisition rules
 
-The numbers below are Game Design's working tuning proposals. They are deliberately reviewable and
-revisable; they are not measured affordability results or secretly final product requirements.
+### Four protected practical lessons — deliberate replacement
 
-| Project | Access | Proposed inputs | Immediate result |
-|---|---|---|---|
-| Apothecary foundation | Recruit Nessa | 20 Essence, 4 Clay, 4 of any Log | Know Lesser Salve and use the starting preparation service |
-| Blacksmith foundation | Recruit Halloway | 20 Essence, 8 Iron, 4 Plant Fibre, 4 of any Log | Use the starter metal Pointed Blade recipe and first tool upgrades |
-| Lesser Salve | Starting Apothecary | 1 Resin, 1 Plant Fibre; 0 Essence | 1 Lesser Salve; preserve its current base healing of 10 and existing scaling |
-| Starter metal Pointed Blade | Starting Blacksmith | 4 Iron, 1 of any Log, 2 Plant Fibre, 1 Coal; 0 Essence | 1 close-reach piercing weapon; exact stat row must be closed before promotion |
-| Pick level 1 → 2 | Starting Blacksmith | Owned Pick 1, 4 Iron, 1 of any Log, 2 Plant Fibre, 1 Coal; 0 Essence | Upgrade the same tool to Pick 2 in its tool-roll place |
-| Axe level 1 → 2 | Starting Blacksmith | Owned Axe 1, 4 Iron, 1 of any Log, 2 Plant Fibre, 1 Coal; 0 Essence | Upgrade the same tool to Axe 2; independent optional purchase |
+After the introduction, **Hydrology, River, Substrate and Iron no longer compete in the45% teaching lottery**. On a world with their real eligible evidence and a legal collection position, offer the next needed practical subject/source pair deterministically. This is a guarantee of teaching **when the evidence exists**, not a guarantee that every generated world has water, River, Iron or growing land.
 
-The salve uses the existing Resin role with a fibre applicator instead of a hidden flexibility threshold.
-It introduces no new medicinal subtype or generic Reagent. Its standardized appearance and healing result
-do not vary by raw fibre colour or source; those inputs require no source picker for this operation.
-The exact eligible Plant Fibre set must be enumerated in the registry before this recipe ships.
+Offer at most one pair/two separate records per ordinary world. Choose an already-due missing pair first, then the pair with the oldest eligible opportunity, then Substrate/Iron on a tie. A paired writing opportunity explicitly names both lessons, for example **“Ground and Iron — two lessons.”** One collection banks its two separate records atomically; it is not two overlapping world objects. Each record grants one word; no clue hides an extra reward. Both records may be collected before either is read; reading the Subject must precede reading its Focus. Remove the old requirement to own the Subject before the paired Focus can even be placed, which otherwise forces another search for the same phenomenon. A lone eligible Subject can appear without its missing Focus; do not fabricate the latter.
 
-The starter blade line is a bounded metal variant, not permission to delete existing crafted weapons or
-all later anatomical-material recipes. Iron supplies the point, Log the handle, Plant Fibre the binding,
-and Coal the forge heat. Blade/handle/binding retain the chosen material's appearance; fuel does not tint
-the weapon. No material measurement can make an unrelated ingredient eligible.
+| Record | Real evidence and placement | What the player can do afterward |
+| --- | --- | --- |
+| Hydrology | Accessible observation of actual ordinary water, using the existing safe-adjacent placement rule | Understand the water Subject; no source is granted with it |
+| River | Actual River source/manifestation in this world's saved generation evidence; reuse `teaching.focus.river` | Write River with Hydrology; later Relief use requires knowing Relief too |
+| Substrate | Accessible exposed stone/rubble or supported material face | Understand what the ground is made from |
+| Iron | Actual workable Iron formation and a legal observable Iron site, including ordinary formation evidence | Write Iron into Substrate; the existing reachable two-deposit guarantee applies |
 
-Halloway performs heating and shaping within the single craft. The player need not separately create
-an Ingot, Haft, or Cord. This preserves physically sensible work without requiring intermediate inventory.
-Later specialists can require a useful prepared component: for example, Leather plus raw binding material
-for a better garment. Ordinary projects should continue to avoid a chain of mandatory visits to several
-shops; extra processing belongs where the result earns it.
+No extraction, upgraded Pick, analysis instrument, traveler or shop is needed to collect/read a lesson. A wrong tool blocks harvesting, not learning what the visible source is. Locations use ordinary collection rules, no hidden map reveal, and no overlapping node/traveler/lesson occupancy. A missed lesson stays due at its next real eligible opportunity; found/read records never duplicate. Ordinary non-foundational recovered teachings keep their independent slot and protection. New foundational records do not consume a diary, physical World Page, ordinary writing, site or traveler opportunity.
 
-### Blacksmith tiers and settlement growth
+These exact choices supersede the four lessons' old chance/target-before-placement rules in EarlyTeachingRules and the early-production packet. They do not change generic danger/Gambit/advanced teaching protection or grant an entire vocabulary set.
 
-Use player-facing tiers to describe the progression; Engineering must explicitly map them to the registry's
-stored tier indices rather than assuming the older starting `tier: 0` means a different player stage.
+### Give every removed starter word an actual route
 
-| Player-facing stage | Blacksmith role | Relationship to other buildings |
-|---|---|---|
-| T1: working forge | Starter gear and first field-tool improvements directly from raw stock | Useful as soon as Halloway's foundation is built; no separately stored Ingot is required |
-| T2: smelting | Make exact named Ingots for recipes that need prepared metal | Arrives by the first specialist gear buildings that consume those Ingots; a new specialist recipe can point back to Halloway's upgrade |
-| T3: advanced forge | Proposed advanced forgework and high-end refinement role | Supports the later equipment journey; exact recipes and mastery benefits remain to be designed |
+The empty start must ship with these acquisition adapters, not merely empty ownership sets. Use attributable recovered records, free Library reading and the current canonical word IDs. A new teaching ID aliases an existing equivalent rather than granting the same word twice.
 
-Keep ordinary T1 recipes usable after upgrading. Early raw-stock crafting is not a permanent exemption
-from physical forging; Halloway simply performs the work inside the finished-item transaction. T2 adds
-exportable prepared stock for other recipes, rather than charging players for an extra step on the same
-starter blade they already know how to make.
+| Stage/group | Word acquisition | Boundary |
+| --- | --- | --- |
+| Introduction | Illumination, Sun | Guaranteed safe introductory records only |
+| First ordinary practical discoveries | Hydrology/River and Substrate/Iron | Protected actual-evidence pairs above |
+| Next useful terrain controls | Relief with Granite or Sand; Thermal with Ice; Vitality with Bloom; Atmosphere with Cloud | Add the missing Subject plus source teaching for the actual saved source. Use the ordinary opening45/45/due opportunity and same-visit separate prerequisite records; no source merely inferred from a colour or generic ground label |
+| Other former starter Focuses | Moon, Lake, Rain, Root, Herd, Sea, Snow, Wind | Opening ordinary source-observation teachings using their exact generated source identities. Pair a missing applicable Subject before the Focus is read. No passive starter-restoration grant |
+| Remaining Subjects | Cycle from an actual source that legally attaches to Cycle; any still-unknown Subject is paired with its first eligible legally attached source | Source's existing teaching band remains authoritative. No guessed Cycle source, automatic all-Subjects unlock or shop-priced Subject |
+| Existing non-starter Focuses | Existing ordinary world-drop and recovered-teaching routes; developing/later bands retained | Add the applicable missing Subject record to a selected Focus lesson when needed. Keep diary-exclusive words exclusively with their authored diary; do not turn them into ordinary drops |
+| First intensity instruction | Faint and Moderate, as two separate field-instruction records after the first player-authored connected Sun expedition resolves | The instruction refers to the player's own authored page and source, not a hidden world measurement. Free reading; no automatic modifier set at startup |
+| Broader Modifiers | Opening instruction after the above: Minute/Small and Single/Pair; developing instruction: Great, Large, Few/Many, Frozen/Solid/Liquid/Vaporous; later instruction: Overwhelming, Vast, Countless | One lesson record per word, current ordinary instruction opportunity/protection and band gates. Fixed teaching texts explain the existing ladder meanings; do not infer sizes/counts/phases from sprites or add material-phase physics |
+| Compounds | Existing acquired authored Compound teachings, and later personal formalization through Scriptorium/Compound Assembly | Remove all12 automatic starter Compound grants. They are not required by the opening. Their equivalent statements remain expressible when their atoms are learned; personal formalization retains its later actual Scriptorium prerequisites. Do not invent a new ordinary drop for a catalogue-only starter Compound merely to restore its old availability. Catalogue availability is not ownership. Do not copy unknown atoms out of the retained physical starter Pages or treat a random glyph as a free learned Compound |
 
-Use the existing first-pass smelting ratio as the working T2 recipe: **2 matching raw solid metal + 1 Coal
-→ 1 matching named Ingot**, with no Essence charge. Start only with named metals whose specialist consumers
-are closed. Mercury is not a solid smeltable-metal input; glass, stone, and creature parts never qualify.
+For ordinary missing-Subject pairing, the chosen source keeps its existing single teaching opportunity; its prerequisite record is attached as a distinct record at the same legal lesson placement. It does not create another lottery roll or wait for a second qualifying world. The protected practical pair takes priority over other new Subject pair additions that visit; preserve an already-due ordinary teaching rather than delete it. Maximum additional prerequisite Subject record per selected ordinary teaching is one. If a source can attach to several unknown Subjects, choose its first canonical attachesTo entry; subsequent relevant Subject teaching can use the same real source evidence without regranting the Focus.
 
-The T2 upgrade itself must be affordable with T1-accessible raw materials. Neither its foundation nor its
-first indispensable consumer may require a process available only after that same dependency. Make the
-upgrade available alongside the appropriate specialist cohort; do not invent a generic recruitment-count
-gate. Exact T2 cost and specialist placement are the next progression-table work.
+Opening/developing/later retain their current underlying progression bands for non-core lessons: after the introductory resolved excursion; level4 plus3 resolved expeditions; level8 plus8 resolved expeditions. Physical material use is never locked behind these vocabulary bands. The player can gather Iron, make a garment or invite a person without knowing every word describing that event.
 
-An Ingot prerequisite should first express a better or more demanding craft, not leave a newly built shop
-with no useful action. Check the combined expense of the specialist foundation, forge upgrade, and first
-item as one player journey. The Ingot family must have two sensible consumers or one broadly reused
-consumer family before promotion.
+**Content implementation:** add canonical `target` records for all8 Subjects, field `focus` records for the formerly starter-only sources above, and a typed `qualifier` reward/owned set for the17 existing qualifiers. Use existing definitions/names/ladder semantics as instruction authority. Basic copy: **“Faint changes how strongly a source contributes; it does not mean a small source.”** **“Small describes extent, Pair describes count. They are different choices.”** Preserve focus versus similarly named danger-rune identity. No new Coal, Clay, Resin or timber Focus is created by this opening plan.
 
-Quartz leaves the basic Apothecary foundation. It remains a sensible later optical/instrument ingredient.
-This removes the healing/tool dependency altogether while retaining the useful early Pick upgrade.
-Pick 2 opens the currently intended uncommon mineral group, including Quartz; a future harvesting-table
-revision may split that access if play evidence warrants it. Do not quietly restore the obsolete four-rank,
-party-equipped Extraction model: use the current three-tier packed-tool model.
+## 4. Travelers connect the material branches to Home
 
-Upgrading a tool preserves its exact identity, increases only its defined capability, and occupies the
-same class slot. No duplicate old tool, durability system, or mandatory upgrade of all three tools is added.
-Missing inputs, stale selection, cancelled quotes, or failed saves change neither tool nor materials.
+Retain actual habitat/location signatures and the one-new-person-per-world limit. **First-pass sequencing change:** put the first six in the same opening arrival band, while retaining the blind minima below. This removes the case where a known reachable Corrin clue keeps losing solely to an earlier band. Within that eligible cohort retain recovered-clue plus twice causally authored known-condition scoring, then the listed stable tie order. Later travelers keep their existing bands/minima/order; this is not a29-person rewrite.
 
-## 4. Producers and acquisition checks
+| Tie order | Person | Blind eligibility | Actual place to look | First useful Home connection |
+| --- | --- | --- | --- | --- |
+| 1 | Vance | From beginning | Open-country signature | Optional Trading Post10 Essence; sales/buying, never required to gather foundation stock |
+| 2 | Nessa | From beginning | Fresh, lit compatible growing land with legal Resin shrub/Softwood sources | Apothecary → Lesser Salve from Resin and Fibre |
+| 3 | Halloway | From beginning | Workable Iron, legal exposed face accessible to Pick1 | Forge → raw-material gear and independent Pick/Axe improvements |
+| 4 | Bryn | After one recruit | Existing close/bending paths, openness≤40 | Optional combat companion branch; not a foundation prerequisite |
+| 5 | Corrin | After one recruit | Compatible damp roots with Stem and Leaf Fibre sources | Tannery → Cord, Cloth, woven gear and later carrying |
+| 6 | Noll | After one recruit | Existing hard/concentrated-ground signature | Optional Recycler15 Essence; source-backed recovery, not a tool/first-craft prerequisite |
 
-| Needed stock | Intended early producer | Opening access | Useful destinations in this packet |
-|---|---|---|---|
-| Iron | Common Iron-bearing formation | Rock Pick 1; 2 units per hit | Forge foundation, blade, Pick/Axe upgrades |
-| Coal | Common fuel-bearing formation | Rock Pick 1; 2 units per hit | Blade and tool-making family |
-| Logs | Small softwood trunks | Axe 1; 2 Logs per completed trunk | Both foundations, blade and tools |
-| Plant Fibre | Compatible ordinary low/medium fibre-bearing flora | Scythe 1; saved size yield | Forge, salve, blade/tools, existing pack projects |
-| Resin | Explicit resin-producing ordinary flora | Opening-accessible harvest must be authored | Salve and existing packing/recipe consumers |
-| Clay | Explicit loose-earth placement on a compatible surface/margin | Hand gathering; 2 units per placement | Apothecary and other later vessel/construction families |
+Nessa/Corrin admission must agree with actual legal material placements, not only a global pressure or pretty green terrain. Keep their existing twelve-compatible-root/connected-host definitions and finite source budgets. If a source reservation fails, do not advertise that failed producer as the person's teaching context. Halloway uses the implemented workable-Iron predicate; no heat, Ingot or Quartz gate. A mineral's host rock never raises the deposit's own tool tier.
 
-The node/plant yields above inherit the published first-pass harvesting model. Exact host frequency,
-Resin's placed harvest interaction, and the early flora eligibility set remain content work. Do not claim
-that a material is obtainable simply because its name exists in a registry. None of these inputs may
-depend exclusively on Noll, a lucky shop roll, a rare nearby-find bonus, a creature drop, or a later Sigil.
+Keep Nessa/Halloway clue preference in the existing diary slot, old-clue aliases, actual on-map placement, confidence and near-miss receipts. An eligible selected person currently has25% base arrival without causal support,50% after one failed roll, and certainty after two failed selected-person rolls; fully causing all their required conditions is also certain. This does not mean a named person is guaranteed every third expedition. Wrong habitat, another nominee or not walking to a placed person is a different event. Record factual clues and retain progress; never replace a failed arrival with an invented person.
 
-Harvest-only arithmetic, before travel, encounters, and actual placement:
+Meeting the traveler offers the invitation directly; remove **Not now** and its decline branch. Inviting preserves the existing persistent recruitment transaction, makes the person available at Home and does not spend an ingredient or party slot merely to house them. Party assignment is separate. Close/back/app interruption is not a recorded refusal; a failed save does not mark the person recruited or remove them. Already recruited people cannot be added again. Actual keeper attendance remains separate from ordinary recipe access.
 
-- Apothecary stock is two Clay gathers and two small trees: four successful actions, plus 20 Essence.
-- Blacksmith stock is four Iron pulls, two small trees, and two to four ordinary fibre cuts: eight to ten
-  successful actions, plus 20 Essence.
-- Either tool improvement needs two Iron pulls, one small tree, one to two fibre cuts, and one Coal pull:
-  five to six successful actions, with spare stock from some yields. These are costs to source from empty
-  holdings, not minimum new actions when the player already has surplus.
+Mara/Edren remain optional early opportunities, not gates on the first three makers. Isolde remains the owner of improved hands: her later known location uses Relief/Granite/Substrate vocabulary whose acquisition is now real. Retire old pity explanations claiming everyone already owns Granite/Ice/Cloud or that Nessa needs Sulfur/toxic air. Remaining old29-person pity tables are historical until their own later coordinated pass; do not use them to override this opening.
 
-The full Halloway foundation + blade + Pick improvement needs 16 Iron, 6 Logs, 8 Plant Fibre, and 2 Coal.
-It is intentionally more work than one project and need not be completed in one trip. The player chooses
-which improvement to pursue; the game should not present the whole shopping list as the next objective.
+## 5. Materials before workshops, and tools before their harder sources
 
-Before promotion, establish each foundation's ordinary acquisition route without direct resource Writing,
-then verify the first useful craft and enough retained Essence for another legal ordinary Bind. A warning
-may explain the remaining expedition budget; a player may still knowingly spend it. Do not invent a hidden
-protected currency reserve or force a purchase order.
+Use actual saved hosts and existing finite producer yields. No introductory inventory grants or guaranteed complete shopping list.
 
-## 5. Exploration success is a worthwhile return, not complete coverage
+| Material/source | Earliest action and output | First dependency it supplies |
+| --- | --- | --- |
+| Exposed Iron seam | Pick1, adjacent manual mining;3 successful hits×2 Iron | Forge foundation and Pick/Axe2 working parts; no furnace needed to gather |
+| Coal seam in compatible sandstone | Pick1;3 hits×2 Coal | Raw-metal craft/tool fuel; no Coal word needed |
+| Clay soil/deposit | Hand gather underfoot;2 Clay | Apothecary/Tannery foundations, later ForgeT2 |
+| Stem Fibre / Leaf Fibre | Scythe1;2 Stem or1 Leaf Fibre | Raw wraps, Salve, carrying, Cord/Cloth |
+| Resin shrub | Scythe1;1 Resin | Salve, some supports and later carrying |
+| Small Softwood | Axe1;1 hit→2 Logs | All three first foundations and raw tool handles |
+| Small Hardwood | Axe2;2 hits→5 Logs on final hit | Optional better/specialist component choices after the Axe upgrade |
+| Quartz | Its actual Pick2 producer | Optional later preparations and component choices; excluded from first healing/Foundation/first tool upgrade |
+| Salt | Actual hand-gathered crust;2 Salt | Optional one-Skin+Salt Leather; no Leather needed to build Tannery or make woven gear |
 
-Working design standard: an ordinary expedition lets the player accomplish one meaningful intention and
-encounter something unexpected while leaving credible reasons to wonder about the rest of the world.
+Wrong tool/tier gives an actionable requirement without spending work. Deposits/trunks remain blocking bases; automatic movement never harvests. Underfoot sources retain their actual interaction; known adjacent manual mining remains valid. First useful routes use legal action positions before blocking trunks are placed. One tile owns one resource node across all passes. The player can choose a branch or return without clearing the world.
 
-- Spread optional opportunities into branching routes. A tree or stand of canopy should create a choice
-  between a detour, spending turns felling, and pursuing another lead.
-- Mandatory teaching and written guarantees remain start-connected. Canopy must not make them impossible,
-  erase earned minimap knowledge, or add an undisclosed dangerous contact.
-- Reserve the full written source cluster, but do not position every valuable activity on the same short
-  corridor. The guaranteed material is a dependable target, not a promise of total world completion.
-- Tune Stability against a representative goal route, harvesting and return margin. Do not automatically
-  increase it enough to clear all passable ground in a larger world.
-- Do not add completion percentages, a universal clear-map bonus, or empty travel as the pacing solution.
-  Small or unusually favourable worlds may still be thoroughly explored; there is no artificial reveal cap.
-- Assess route branches, unexplored territory on a successful return, interesting discoveries per trip,
-  and whether continuing farther creates a meaningful tradeoff. No universal percentage is fixed yet.
+Plant parts retain their actual source colours through harvest and applicable crafting components. Leaf colour is not automatically wood colour; known part overrides win. Material selection is useful for appearance as well as stats. Ordinary materials stay ungraded; exact creature parts retain their separate quality/source rules. Early animal-free routes remain complete, so an uncertain Hide drop does not gate first protection.
 
-Colour-led gathering is a valid expedition goal alongside stronger statistics. Recipe eligibility remains
-physical; optional source selection explains the actual colour/stat result. A material does not need a
-fabricated combat advantage merely to justify a desirable finish.
+## 6. First facilities, first uses and the next unlocked action
 
-## 6. Refinement and Motes: working design to develop
+Use delivered base bills; existing staffing discounts remain with their owner. All listed ordinary crafts/processes/tool improvements cost0 Essence unless the row names a facility/project fee. This is a dependency table, not a mandatory purchase order or an Essence recovery plan.
 
-Use Aimee's three advantages as the proposed Peerless route:
+| Facility/project | Required person and foundation | First useful bill | Immediate next action |
+| --- | --- | --- | --- |
+| Apothecary | Nessa;20 Essence+4 Clay+4 Logs | Lesser Salve:1 Resin+1 Fibre | Prepare healing with starting-tool flora. No Quartz, Ingot, Leather, combat drop or Study gate |
+| ForgeT1 | Halloway;20 Essence+8 Iron+4 Fibre+4 Logs | Raw Pointed Blade:4 Iron+1 Coal+1 Log+2 Fibre; alternatively choose a tool below | Useful starter weapon from gathered raw matter, without specialist components |
+| Pick2 or Axe2 | Built ForgeT1; exact owned starting tool | Each4 Iron+1 Coal+1 Log+2 Fibre | Same Pick reaches Quartz; same Axe reaches small Hardwood. Both upgrades are independent |
+| Tannery | Corrin;20 Essence+6 Logs+4 Clay+4 Fibre | Cord:2 Fibre; Cloth:4 Fibre; Woven Guard/Gloves:1 Cloth+1 Cord; Boots add1 Resin | Useful protection without Hide or Salt; coloured mixed Fibre remains visible in its components |
+| Early Storehouse pack | No recruit/new shop; sequential projects | First5 Essence+4 Fibre→11 slots; second10 Essence+6 Fibre+1 Resin→14 | Optional carrying comfort, never access permission for first harvest/craft |
+| ForgeT2 | Existing Forge;20 Essence+8 Iron+4 Clay+4 Logs | Ingot:2 Iron+1 Coal | Processing appears when useful; first recipes and tool2 never require their own Ingots |
+| Scythe2 | ForgeT2 |2 Ingots+1 Log+2 Fibre | Harder later flora; Scythe1 already supplies the opening recipes |
+| Corrin's larger pack | Built Tannery, earlier pack projects |20 Essence+2 Cloth+2 Cord+1 Resin→23 slots | Optional later carrying; preserve Sela's separate+2 |
 
-| Available advantages, after the ordinary recipe/service requirements | Intended opportunity |
-|---|---|
-| One of maximum shop, attending matching keeper, offered Mote | A small disclosed Peerless chance |
-| Any two | A larger disclosed chance |
-| All three | 100% Peerless for the eligible craft/refinement, consuming one Mote |
+First-project raw totals make the dependencies reviewable: Nessa plus one Salve =20 Essence/4 Clay/4 Logs/1 Resin/1 Fibre. Forge plus one Pick2 **or** Axe2 =20 Essence/12 Iron/6 Fibre/5 Logs/1 Coal. Tannery plus one Woven Guard =20 Essence/6 Logs/4 Clay/10 Fibre. With both pack projects add15 Essence/10 Fibre/1 Resin; do not quietly include them in every route. A full Iron node gives6, so one cannot supply Forge's8-Iron foundation; two depleted nodes provide12, enough for foundation plus one tool improvement. Three small Softwoods yield6 Logs. Existing unguaranteed remaining sources may span trips.
 
-This explicitly considers Mote-only, shop-only, keeper-only, and all two-way combinations. It does not
-quietly preserve maximum shop as an additional eligibility gate for every chance attempt. Ordinary recipe
-access and sensible input requirements still apply. Exact partial odds, zero-advantage behavior, Mote
-consumption on a missed partial attempt, and refinement costs require the next bounded reward pass.
+No hard dependency requires Vance sales, Noll salvage, a rare creature, a Mote, improved handwriting, a paid Survey instrument, unknown writing vocabulary or a future shop. Bowyer/Weaponsmith and later contracts are downstream consumers of these now-understood parts; they are not prerequisite lessons in this opening packet.
 
-Preferred direction: refine an existing piece, preserving identity and selected appearance, with a plainly
-shown current result and possible improvement. A miss never destroys or downgrades the item. This avoids
-requiring disposable copies. It does not yet authorize repeatedly spending a Mote for no improvement.
+## 7. What stays with the player, and what is deferred
 
-Before implementation, close these interactions together:
+Recovered lesson records, read words, clues and recruited people retain their existing persistent owners. Leaving without a found traveler leaves that traveler uninvited; leaving after a committed invitation does not revoke recruitment. Collected teachings survive the expedition outcome. Material haul retains its actual Return/loss rules and Home stock remains banked. A missed world opportunity is not silently converted into a free item or taught word.
 
-1. Whether partial-setup Mote spending is allowed on a miss and what lasting benefit that spend guarantees.
-2. Chance disclosure versus the older requirement to preview the exact rolled output. If the player sees
-   the completed random result before paying, ordinary cancel/requote must not become free outcome shopping.
-3. Which event advances an attempt, how cancelled/edited quotes retain randomness, and how persistence
-   failure leaves inputs, item, Mote, and attempt state unchanged.
-4. How all-ungraded metal/wood equipment participates. Do not smuggle creature quality in as a fourth
-   requirement for Aimee's three-advantage guarantee.
-5. What replaces or retains the old twenty-copy pity rule. Do not implement it alongside refinement by
-   accident or convert historical progress without an explicit mapping.
-6. Mote demand across Constellation, world-keeping/Waystone, and optional masterwork gear. The new route
-   must not require spending the same scarce Mote on both basic progression and a compulsory gear gate.
+**Essence recovery is explicitly deferred at Aimee's request.** Do not change the Spring, departure support, resource-loss compensation, ordinary Bind prices, refill policies or affordability thresholds in this pass. Existing live quotes remain truthful reference information. “Next action” here means what the player has learned to do, not an additional charge for failure. No economy audit or return-loop test is assigned.
 
-These are Game Design follow-ups. The early raw-material crafting packet can proceed independently.
+## 8. One implementation handoff and bounded proof
 
-## 7. Promotion boundary and remaining work
+Implement this as the normal new-campaign opening, preserving compatible existing progress. Reuse the existing New Game, World/collection, Library, Writing Desk, invitation and shop consumers. The source owners are BaseState/GameState factories and startup reconciliation; EarlyTeachingRules/RecoveredTeachingWorldRules/Library records; PageRules knowledge checks; EarlyTravellerRules/Library selection; existing EarlyMaker/source/harvest owners. Do not import older native code from this documentation worktree or treat it as an implementation parent.
 
-Ready as direction: reopened order/costs, raw starter crafting, proposed first-maker cohorts, removal of
-Quartz from basic healing, bounded early tool routes, exploration without routine full clearance, and a
-three-advantage guaranteed-Peerless proposal alongside refinement.
+Build the connected sequence in this order: versioned zero-ownership plus the real two-word intro; first joined Sun statement; protected core lessons and missing prerequisite ownership; source/tool guidance and six-person discovery/one-action invitation; existing first-shop routes. No isolated empty-start delivery, new playtest chooser, wood-colour trial or per-recipe dispatch. Keep explicitly requested3D trials separate. Other lead work follows Aimee/PM's priority; Design does not assign new later content.
 
-Before an affected playable slice: enumerate exact resource/recipe IDs and eligible categories; complete
-the required early host and flora entries; close the starter blade stat row and comparative balance;
-reconcile early traveller selection/signatures; validate route affordability and durable transactions; and
-publish current/intended distinctions. Existing people, buildings, tools, knowledge, and crafted items
-remain intact in saves. Changed quotes become stale rather than consuming substitute stock.
+Engineering's focused proof should establish the actual zero→collect/read→write route, one paired core lesson with target-before-read and no collection loop, a compatible material/tool→invite→first shop/craft connection, and the named ownership/refusal regressions. Reuse existing shop/source transaction coverage. Report naturally absent branches honestly; do not generate a corpus, force a complete cast, clear maps, run an economy-recovery campaign or ask Design to repeat native/phone checks. Use the actual target iPhone/default text only. A first-pass sequence is not final balance acceptance.
 
-No full 29-person reorder, creature catalogue, new art assignment, phone acceptance, or Peerless mechanic
-is claimed complete by this packet. Game Design's next work is the early host/consumer closure followed by
-the signatures that use those exact terms. The current Project Manager receives this packet and the
-assessment for coordination; Engineering's unrelated work is not interrupted.
+Before publication/handoff, reconcile the operative opening text in Scriptorium, early-source/recruitment packet and old rune-pity record. Wiki current behavior remains distinct from this intended first pass. No new Aimee homework is created merely because the team still has implementation work.
