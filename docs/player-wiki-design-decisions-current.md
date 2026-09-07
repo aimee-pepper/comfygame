@@ -2,6 +2,74 @@
 
 This is the current record of the changes agreed today. **Decided intended behavior** describes the game we are making; it does not mean that behavior is already available on your phone. **First-pass tuning** gives concrete starting numbers that can change through play. **Unsettled proposals** still need design work or a choice.
 
+## The beginning as one connected path
+
+**Current behavior:** the gameplay overhaul is the normal game, with stone starting tools and the delivered Apothecary, Forge, Tannery, Bowyer and Weaponsmith. New games still receive Sun, Illumination and starter Compounds immediately. The zero-rune introduction and the connected learning sequence below are not delivered yet.
+
+**Decided direction:** the beginning should connect what you learn, where you explore, what you can gather, who you meet and what their first shop lets you make. You start without known runes and discover Illumination and Sun on the safe path through a broadly generated introductory world. The same unfinished introduction remains available, and collected discoveries stay learned. At Home you join the two words and shape one thing about your next world. Unwritten features remain generated.
+
+**Design first pass — intended, not yet playable as a complete sequence:** the stages and teaching changes below turn that direction into a connected opening. They are revisable design choices, not a promise that each stage takes exactly one expedition.
+
+| Step | What you do | Why it matters next |
+| --- | --- | --- |
+| Start and discover light | Begin with no known Subjects, Focuses, Modifiers or Compounds; carry the stone Pick, Axe and Scythe. Collect Illumination and Sun in the introduction and read them free at Home | You learn what a Subject and source mean before being asked to compose a world |
+| Shape your first world | Join Illumination and Sun in Rough charcoal | Your choice affects the light and heat; it does not promise a forest, fresh water or a particular traveler |
+| Follow useful discoveries | Find water/growing land or exposed ground/Iron; collect lessons, clues and materials you can reach | These lead into the plant/remedy/textile and Iron/tool branches |
+| Learn to seek materials | Learn Hydrology/River and Substrate/Iron from their actual world evidence | You can shape water or ask for the existing reachable Iron deposits. You need no shop or upgraded tool to read these lessons |
+| Meet people | Invite a traveler you actually find | Nessa connects plants to remedies; Halloway connects Iron to gear and tools; Corrin connects Fibre to textiles and clothing |
+| Make something useful | Build the available maker you want and use their first recipe | A Salve, a raw-material weapon/tool improvement or a woven garment has an immediate use. You need not build all three in a fixed order |
+| Follow the next capability | Improve the Pick for Quartz or the Axe for Hardwood; later upgrade the Forge for Ingots | Harder sources and prepared components arrive after their simpler uses make sense |
+
+### Practical lessons should not send you around in circles
+
+**New first-pass teaching rule:** once the introduction is complete, a world with real suitable evidence and a reachable lesson position offers the needed Hydrology/River or Substrate/Iron lesson without another teaching-chance roll. Water alone teaches Hydrology; River requires an actual River source. Exposed ground teaches Substrate; Iron requires actual workable Iron evidence.
+
+A Subject and Focus can be recovered together as two clearly named lessons and read in order at Home. You do not have to learn the Subject, pay for another expedition and hope to find the same phenomenon again just to collect its Focus. Each lesson teaches one word, costs nothing to read and survives an expedition ending. A missed lesson stays eligible for its next suitable opportunity.
+
+This guarantees an eligible lesson, **not suitable land or every material in every world**. Other lessons keep their ordinary discovery routes and protection against repeated misses.
+
+The rest of the empty-start vocabulary also needs real routes. Relief with Granite/Sand, Thermal with Ice, Vitality with Bloom and Atmosphere with Cloud follow ordinary attributable source lessons; a missing Subject accompanies the selected source lesson. Moon, Lake, Rain, Root, Herd, Sea, Snow and Wind become learnable source observations instead of automatic starter gifts. Cycle comes with an appropriate actual source. Diary-exclusive words remain with their diaries.
+
+Faint and Moderate are the first later instruction, after your first self-authored expedition. Small/Minute and Single/Pair follow in the opening; stronger intensity, larger extent, larger counts and phase words follow the developing/later lesson bands. Each Modifier is learned separately. Ordinary unqualified writing still works before those lessons. Printed words on your three existing physical starter Pages do not become known merely because you own or use the Page; starter Compounds are not silently restored.
+
+### People and materials support the same branches
+
+**Existing early access:** Vance, Nessa and Halloway can be discovered from the beginning. Bryn, Corrin and Noll become ordinarily eligible after one recruit; known location clues can reach ahead. A world contains at most one new person, and matching conditions are not the same as having met them.
+
+**First-pass adjustment:** let those first six share the opening selection band, retaining their individual entry requirements. A relevant recovered clue can then help you pursue Corrin without losing solely because an earlier person occupies a higher-priority band. They are opportunities, not a compulsory line of six arrivals. Existing habitat checks and arrival protection remain; a person is not guaranteed on an arbitrary numbered expedition.
+
+| Person | Look for | First useful connection |
+| --- | --- | --- |
+| Nessa | Fresh, lit growing land with Resin shrubs and usable trees | Apothecary and a first Salve |
+| Halloway | Exposed Iron that a stone Pick can work | Raw-material gear and Pick/Axe improvements |
+| Corrin | Damp growing land with fibrous stems and tough leaves | Cord, Cloth and woven clothing |
+| Vance | Broad open country | Optional trading; not a prerequisite for gathering |
+| Bryn | Close, bending paths | A companion, not a required shop unlock |
+| Noll | Hard ground with concentrated useful material | Optional recovery of a crafted item's actual components |
+
+**Decided invitation change — delivery pending:** remove **Not now** from the traveler invitation. Bringing someone home should not need a decline branch. Recruiting them and choosing an active party are separate actions. A clue never automatically recruits its subject.
+
+### The first useful recipes use starting-tool materials
+
+Iron and Coal use Pick1. Clay is gathered by hand. Stem/Leaf Fibre and Resin use Scythe1. Small Softwoods use Axe1. These supply the first three maker foundations; Hardwood, Quartz, Salt and creature drops are not hidden prerequisites for all of them.
+
+| First project | Existing base foundation | First useful recipe or improvement |
+| --- | --- | --- |
+| Apothecary | Nessa;20 Essence,4 Clay,4 Logs | Salve:1 Resin+1 Fibre; no Essence fee |
+| Forge | Halloway;20 Essence,8 Iron,4 Fibre,4 Logs | Raw Pointed Blade or one Pick/Axe improvement:4 Iron+1 Coal+1 Log+2 Fibre; no Essence fee |
+| Tannery | Corrin;20 Essence,6 Logs,4 Clay,4 Fibre | Cord from2 Fibre; Cloth from4 Fibre; Woven Guard or Gloves from1 Cloth+1 Cord; no Essence fees |
+| Early carrying | Opening Storehouse; no recruit |5 Essence+4 Fibre reaches11 slots; then10 Essence+6 Fibre+1 Resin reaches14. Optional comfort, not permission to gather or craft |
+| ForgeT2 |20 Essence,8 Iron,4 Clay,4 Logs after the first Forge |2 Iron+1 Coal makes an Ingot; Ingots are useful now, rather than required before the first forge |
+
+One Iron seam yields6 Iron, so a single seam cannot pay the8-Iron Forge foundation. Two depleted seams provide enough for that foundation and one tool improvement. Logs and Fibre can come from multiple trips. The game should present the project you want, not the cost of every possible upgrade as one opening checklist.
+
+Pick2 opens Quartz and Axe2 opens small Hardwood. Neither needs those harder materials to make itself. Woven gear is useful before Hide/Salt Leather. Optional animal-free routes remain complete. Harvested flora retains its actual colours for supported crafting uses; different materials can be interesting for their appearance as well as their stats.
+
+**Scope:** Essence recovery is deferred at your request. This pass keeps existing costs as references and focuses on learning and dependencies. It adds no new player-facing trial. The specifically requested 3D trials stay in Settings; the unrequested wood-colour trial entry is to be removed while normal wood-colour gameplay remains.
+
+Implementation and natural pacing still need to be established together. No new decision homework is waiting on you for this first pass.
+
+
 ## Whole-shop update · 5 September
 
 Complete first-pass plans now cover all 19 Apothecary preparations, Forge, Tannery, Bowyer, Weaponsmith and Armoury; the complete Apothecary implementation now has Engineering-reported focused and native checks, and is delivered in phone build322. The full first Tannery pass is now delivered in build323; the first Forge equipment/Bone pass is delivered in build324; Bowyer and source-preserving Hafts are delivered in build325; Weaponsmith and both Collars are delivered in328; remaining specialist routes are pending. [Crafting Overhaul · Shop by Shop](crafting-shop-overhaul.html) records the complete scope, current rules, accepted destination and the complete first-pass recipes, producers and services for those six makers, now including shared ordinary equipment services, the complete Survey Post, Scriptorium/Writing Desk, Distillery and nine-configuration Channelworks plans. It supersedes isolated next-recipe assignments. The ingredient bridges below are temporary compatibility steps; they do not settle the final recipes or replace the accepted excursion-long coating lifetime.
@@ -132,7 +200,7 @@ The remembered image reveals no hidden enemies, resources, active hazard warning
 
 Dyer's Root supplies a named new Magenta route, while Copper, Sulfur and Obsidian supply the other channels. The new sources are pending implementation. Just-in-time preparation still produces twelve applications, free drafting remains, and a successful Bind spends the matching ink. Old costs and world-node Ichor instructions are superseded without deleting old stock or purchases.
 
-The existing zero-rune opening decision has a confirmed implementation mismatch and is included as a paired introduction/knowledge correction. Existing campaigns lose no words or Pages. Lantern/Light's exact recipe and mechanical details remain separately unresolved; its accepted activation-before-illumination boundary stays intact. No new homework answer is needed for the known writing batch. Distillery/Channelworks follows next.
+The existing zero-rune opening decision has a confirmed implementation mismatch and is included as a paired introduction/knowledge correction. Existing campaigns lose no words or Pages. Lantern/Light's exact recipe and mechanical details remain separately unresolved; its accepted activation-before-illumination boundary stays intact. No new homework answer is needed for the known writing batch. The connected opening is the current priority; later content planning is paused.
 
 ## Complete Survey Post first pass · 6 September
 
@@ -275,36 +343,9 @@ Pin a known recipe to see relevant sources highlighted **as soon as they become 
 
 ### Learning to Write and find people
 
-**Decided intended behavior:** a new campaign begins with no known runes. The introductory world provides Illumination and Sun along its safe path, and missing either does not block retrying that same world. Learned discoveries survive defeat, Return and reopening. At Home, connect Illumination to Sun and see the effect in the world you Bind. Unwritten features remain generated; existing campaigns keep their knowledge and Pages.
+The **beginning as one connected path** at the top of this reference now owns the intended sequence. The current game still starts with Sun/Illumination and starter Compounds; the zero-rune introduction remains pending. The first pass links the two safe light lessons to practical water/Iron learning, actual material sources, the first six travelers and useful starter crafts.
 
-**Current mismatch, confirmed 6 September:** new-game rules still grant Sun/Illumination and starter Compounds immediately, while Modifier availability also needs the intended knowledge checks. The accepted empty-vocabulary opening is unfinished. Aimee's question did not create a new decision. The [whole writing plan](crafting-shop-overhaul.html) now records the paired opening/teaching correction, including preserving existing campaigns and retrying the same unfinished introduction without reminting rewards.
-
-That first lesson should make authorship visible. Traveller clues should describe recognizable world facts using vocabulary the player has had a chance to learn. They should not require guessing an invisible threshold. The first practical makers now have a decided intended discovery priority, shown below. Later people keep their relative order and existing early-access opportunities for this step; a wider campaign redesign remains separate.
-
-### Earlier practical makers — decided intended behavior
-
-The intended priority is **Vance → Nessa and Halloway → Bryn, Corrin, and Noll**. These are opportunities, not six compulsory arrivals in a line. A new world still offers at most one new person, and finding a useful clue can let you reach ahead.
-
-| Person | Intended place to look | Earliest ordinary discovery |
-| --- | --- | --- |
-| Vance | Broad, open country | From the beginning |
-| Nessa | Fresh growing land with daylight, resin-bearing shrubs, and trees | From the beginning |
-| Halloway | Exposed Iron that a stone Pick can work | From the beginning |
-| Bryn | Close, bending paths with limited approaches | After one person joins |
-| Corrin | Damp growing land with fibrous stems and tough leaves | After one person joins |
-| Noll | Hard ground with concentrated useful material | After one person joins |
-
-Nessa no longer asks you to seek toxic air and reactive ground before making your first healing supply. Halloway no longer requires an unusually hot world. The old requirement to recruit three people first will not secretly delay the new early makers. These changes are intended; the character directory continues to describe the delivered game until the replacement arrives.
-
-Early location clues give Nessa and Halloway extra attention. The next useful Writing lessons explain water, River, ground, and Iron. Each lesson teaches one thing when read in the Library, without an Essence charge. Finding a clue does not itself teach all the words in it. Learning opportunities come from the world and retain their protection against repeated unlucky misses.
-
-**When early recovered lessons begin:** after your first expedition ends, newly generated worlds can offer the opening recovered lessons. Seeing water or Iron on that first expedition does not yet create a recovered lesson or count toward its repeated-miss protection. Returning does not add a lesson retrospectively to that world. The introductory Illumination and Sun teaching is separate and remains recoverable. This first-expedition gate is retained in the accepted early progression rules; whether its pacing feels good is still being playtested.
-
-**How repeated-miss protection works in development:** it applies to suitable opportunities, not every expedition. When the same traveller is selected again after two failed arrival-chance rolls, their arrival chance is certain; finding suitable land or placing that person does not automatically complete the invitation. Fully causing their required world conditions can also make the arrival chance certain. A different traveller being selected, unsuitable land, or leaving before meeting a placed traveller does not count as a failed arrival roll for Nessa.
-
-Water lessons likewise need a suitable learning opportunity: safely observable liquid water for the water target, then an actually generated River and the known target for the River lesson. Repeated eligible misses make a lesson due, while older due lessons retain priority. Ice alone does not qualify under the current rule. There is no decided promise of these lessons or Nessa within a fixed number of expeditions. Whether the opening gives enough reliable progress before healing is available remains a playtesting question.
-
-Old diaries and collected Pages remain yours. An older location clue continues to help you find its person, with an updated location hint alongside its original record. Existing people, buildings, tools, knowledge, and unlocked abilities remain. Already-created worlds keep their original contents.
+It replaces the four practical lessons’ extra chance/second-world prerequisite loop and lets the first six share a discovery band with their individual entry requirements. Broader ordinary teaching protection remains. No extra knowledge comes from merely owning a physical World Page, and no clue automatically recruits a traveler. Costs remain existing reference values; Essence recovery is deferred. The invitation loses its Not now branch; no unrequested player-facing trial is added.
 
 ### Ordinary gathering — decided intended behavior
 
@@ -973,3 +1014,11 @@ Motes also serve other ambitions, including Constellation and keeping worlds. Re
 ## 5. Where to follow up
 
 Use **Aimee Homework** for choices needing Aimee and **Asset Homework** for optional drawing. The subject guides carry the relevant current/intended summaries. The older overhaul references retain the wider system rules; today's explicit changes take precedence over an older fixed cost, fixed order, or settled Peerless claim.
+
+## Hide grouping and thumbnail borders — current feedback and decided correction
+
+**Current issue reported by you:** Common smooth Hides can still appear as two neighbouring stacks of2. Engineering is checking whether irrelevant source identity is splitting an otherwise equivalent group; no fix is claimed yet.
+
+**Decided:** Hides with the same actual crafting-relevant properties and quality share a display group, while each original piece and its provenance remain selectable underneath. Truly different properties stay distinguishable. Thumbnail borders show quality: Poor/rough white, Common/Fine green, Rare/Superior blue, Exceptional purple. Orange is reserved for genuine legendary/Peerless equipment, never an extra raw-material grade or a guess from species, source or rarity. Known ordinary ungraded materials use normal green without acquiring a quality stat; unknown quality stays explicitly unknown. Material artwork keeps its actual colours.
+
+Older Standard equipment keeps its existing label/stats and uses ordinary green; this does not add a new quality tier. The old grey Rough/white Standard convention is superseded by your latest instruction. The border and grouping corrections remain intended until delivered.

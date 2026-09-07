@@ -56,7 +56,7 @@ export const craftedQualityRules = [
 ] as const;
 
 export const coatingLifecycle = {
-  current: 'Right now, a weapon coating is used up by the next successful strike that can apply it.',
+  current: 'Since build322, a coating remains on its exact weapon for the whole excursion, including hits, misses, encounters and reopening; ending the excursion clears it.',
   intended: 'Every weapon coating lasts for exactly one world excursion. It is bound to the chosen weapon and active world, survives travel, encounters, backgrounding and cold relaunch in that same excursion, and ends only when that excursion ends. It is never consumed merely because one strike, turn, encounter, or amount of real time passed.',
   migration: 'If an older save contains an active prepared coating during an encounter, keep it on that weapon for the remainder of the same excursion. Do not create a coating from inventory and do not carry one into a later world.',
 } as const;
@@ -65,6 +65,7 @@ export const starterRuneFlow = {
   current: 'The current overhaul new-game rules grant Sun and Illumination immediately, plus the 12 catalogue starter Compounds; Modifier availability also needs the intended knowledge checks. Older starting rules grant a broader set of Focuses. The three physical starter World Pages remain separate from knowing their words. The accepted zero-rune opening is not implemented yet.',
   intended: 'A new campaign begins with no known runes. Its first excursion is a broadly generated introductory world with Illumination and Sun guaranteed on a safe unavoidable path. Those discoveries survive return, defeat, interruption, and closing the game. Once both are brought home, Writing teaches Illumination as the subject and Sun as its source; the player joins them and binds the first world they shape themselves. Everything they did not write remains generated.',
   recovery: 'Accepted: the same introductory world remains available, learned knowledge stays learned, and the missing discovery remains safely reachable. Design first-pass retry detail: no additional Bind fee or Page consumption after initial entry, and no regenerated loot or duplicate rewards. This does not depend on a voluntary return or vulnerable cargo. Implementation is pending.',
+  sequence: 'The connected opening first pass follows the two light lessons with actual-evidence water/Iron learning, starting-tool gathering, traveler invitations and useful first shops. Core Subject/Focus lessons can be collected together and read in order; removing starter grants also requires real routes for the missing Subjects, Focuses and Modifiers. Essence recovery is deferred.',
   legacy: 'Existing campaigns keep every known rune and owned World Page. Nothing is revoked, duplicated, or replaced during migration.',
 } as const;
 

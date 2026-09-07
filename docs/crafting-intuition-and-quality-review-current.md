@@ -76,8 +76,8 @@ The approved vocabulary uses the familiar loot hierarchy:
 
 | Rank | Colour | Label | Player expectation |
 |---:|---|---|---|
-| 0 | grey | Rough | vendor trash, damaged or crude output |
-| 1 | white | Standard | common ordinary loot |
+| 0 | white | Rough | vendor trash, damaged or crude output |
+| 1 | green | Standard (legacy) | common ordinary loot |
 | 2 | green | Fine | uncommon |
 | 3 | blue | Superior | rare |
 | 4 | purple | Exceptional | epic |
@@ -326,3 +326,5 @@ Engineering validates:
 The exact territory-find transaction, eligibility and presentation are now specified in
 `creature-territory-finds-current.md`. Only its recommended 3%/1.5%/0.5% frequency mix remains open through
 Homework `territory-find-frequency`; it is independent of the accepted crafting model.
+
+**6 September border override:** raw creature quality is Poor white/Common green/Rare blue/Exceptional purple. Modern workmanship is Rough white/Fine green/Superior blue/Exceptional purple; only actual legendary Peerless equipment is orange. Legacy Standard is ordinary green without a stat/label migration. This supersedes the old grey/white border convention and creates no extra raw tier. Artwork remains source-coloured; unknown quality is not inferred.

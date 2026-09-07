@@ -2,9 +2,13 @@
 
 Updated 6 September 2026. This is the complete crafting review you requested, beginning with Apothecary, Blacksmith and Tannery. **Current behavior** means existing rules or reported delivered changes. **Decided intended behavior** means the agreed destination. **Proposals** are the whole-shop recipe and balance changes still being worked out; they are not already playable.
 
+## Opening priority
+
+The [connected beginning](design-decisions-september-4.html) now owns the sequence from no runes through first lessons, resource/tool use, travelers and first shop/craft. Existing recipe tables below remain their current or proposed local rules. Later-shop/creature planning is paused. Essence recovery is deferred; no new trial or separate overhaul mode is part of this pass.
+
 ## What the review found
 
-Stone tools lead to useful raw-material equipment. Blacksmith T2 introduces Ingots, while Tannery textiles provide a parallel route into clothing and later specialist components. The later recipes still contain older rules that do not fit that sequence. The complete Apothecary recipe/source batch is delivered in phone build322, installed and ordinarily launched on6 September. The complete first Forge equipment/Bone pass is delivered in324, with its tool dependencies from322. The Tannery also has its complete first-pass textile, Leather, clothing and carrying plan below. The complete Bowyer and source-preserving Hafts are delivered in325. Weaponsmith and both Collars are delivered in328; Armoury has a complete first-pass plan, followed by shared equipment services, the full Survey Post, Scriptorium/Writing Desk, Distillery and Channelworks plans below. Subsequent shops continue as complete batches, including gathering, item effects, prices and recycling.
+Stone tools lead to useful raw-material equipment. Blacksmith T2 introduces Ingots, while Tannery textiles provide a parallel route into clothing and later specialist components. The later recipes still contain older rules that do not fit that sequence. The complete Apothecary recipe/source batch is delivered in phone build322, installed and ordinarily launched on6 September. The complete first Forge equipment/Bone pass is delivered in324, with its tool dependencies from322. The Tannery also has its complete first-pass textile, Leather, clothing and carrying plan below. The complete Bowyer and source-preserving Hafts are delivered in325. Weaponsmith and both Collars are delivered in328; Armoury has a complete first-pass plan, followed by shared equipment services, the full Survey Post, Scriptorium/Writing Desk, Distillery and Channelworks plans below. These later packets remain available as references while the connected opening takes priority.
 
 The biggest corrections are:
 

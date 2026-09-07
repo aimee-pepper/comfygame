@@ -183,8 +183,8 @@ Quality changes the surrounding inventory frame and stack label, not the physica
 
 | Band | Name | Colour convention |
 |---:|---|---|
-| 0 | Rough | grey |
-| 1 | Standard | white/neutral |
+| 0 | Rough | white |
+| 1 | Standard (legacy) | green |
 | 2 | Fine | green |
 | 3 | Superior | blue |
 | 4 | Exceptional | purple |
@@ -255,3 +255,5 @@ The checkpoint is rejected if any of these are false:
 
 Native promotion is a later Engineering checkpoint after the ecology/material schemas are live. Acceptance
 of this packet authorizes freezing Asset outputs; it does not authorize Asset to edit game code.
+
+**6 September border override:** raw creature quality is Poor white/Common green/Rare blue/Exceptional purple. Modern workmanship is Rough white/Fine green/Superior blue/Exceptional purple; only actual legendary Peerless equipment is orange. Legacy Standard is ordinary green without a stat/label migration. This supersedes the old grey/white border convention and creates no extra raw tier. Artwork remains source-coloured; unknown quality is not inferred.

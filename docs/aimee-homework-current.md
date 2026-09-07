@@ -2,6 +2,13 @@
 
 Updated 6 September 2026. One place for your decisions, design to-dos and optional creative work. You are not holding up the early crafting work by leaving a later refinement question open.
 
+
+## Current priority: the connected beginning
+
+The [opening path](design-decisions-september-4.html) now links the empty start, safe first light lessons, practical water/Iron learning, starting tools and materials, traveler invitations and the first useful Apothecary/Forge/Tannery crafts. New teaching/selection details are explicitly first-pass intended work; the current starting-vocabulary mismatch remains visible. No additional recipe or word-by-word approvals are needed from you. Later content planning is paused and **Essence recovery is deferred**, as requested.
+
+Your decisions to remove Not now from invitations and remove the unrequested wood-colour trial are recorded; requested3D trials stay. The reported split Common smooth Hide display and quality-border correction are with Engineering, not new homework for you. The existing creature questions remain reference, not the active design priority.
+
 ## 1. Decision needed: spending a Mote on a chance
 
 **Status: open · affects the later Peerless refinement rules.**
