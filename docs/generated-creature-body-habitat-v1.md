@@ -1,6 +1,6 @@
 # Generated body plans and habitat compatibility — first implementation slice
 
-> **6 September full-structure authority:** `creature-generation-structure-v1.md` incorporates the complete seven-body/23-pair matrix and supplies all attachment, dimension, variation and feasibility requirements. Aimee requires coherent full-family design before dependent generation; this older bounded packet alone is not a complete generator or assignment to implement only selected families.
+> **6 September full-structure authority:** `creature-generation-structure-v1.md` records the legacy seven-body/23-pair coverage and, after comparison with Dragon DNA, supersedes the single exclusive appendage model for the new modular policy. It supplies independent groups, structure, dimensions, variation and feasibility requirements. Aimee requires coherent full-family design before dependent generation; this older bounded packet alone is not a complete generator or assignment to implement only selected families.
 
 **Status:** decided intended behavior, 5 September 2026; Design complete for this bounded slice, native implementation not assigned or delivered. This does not complete the wider creature rework. Aimee subsequently approved the Bestiary arrangement and lifted its work hold on 5 September; see creature-role-coherence-v1.md section 8.
 
