@@ -3,7 +3,7 @@ import Link from '@/components/wiki-link';
 export function WorldViewDirection() {
   return <section className="article-section note-card">
     <h2>Three-quarter world view</h2>
-    <p><strong>Current behavior:</strong> The existing Settings3D view is available. Build333 adds modular life and measured-water rules for newly written ordinary worlds; old worlds retain their generation. Movement, sight and harvesting remain governed by their existing rules. Artwork is partial.</p>
+    <p><strong>Current behavior:</strong> The existing Settings3D view and foreground fading are available. Build333 adds modular life and measured-water rules for newly written ordinary worlds; old worlds retain their generation. Movement, sight and harvesting remain governed by their existing rules. Artwork is partial.</p>
     <p><strong>Generation — current in333:</strong> plants and creatures are assembled in game when a world is written, from its actual traits and stable saved choices. Reusable parts are allowed; finished premade species are not the system. Dragon DNA’s independent part systems inform creature variation, with equivalent relevant modularity for flora. The reviewed system covers six creature layouts and five flora construction families; the old seven creature labels are not a limit on detail. Actual connected elevated water can form a waterfall into lower water; overlapping or disconnected pools cannot. These functional rules are delivered through the existing3D trial. Natural waterfall occurrence and finished procedural richness remain unverified.</p>
     <p><strong>Decided intended behavior:</strong> Keep the square grid while showing the fronts and height of trees, rocks, characters, and cliffs.</p>
     <ul className="compact-list">
