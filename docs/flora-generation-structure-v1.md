@@ -1,5 +1,7 @@
 # Flora generation — modular structure inspired by Dragon DNA
 
+> **7 September accepted extension, implementation pending:** [Pressure-led life families v1](pressure-led-life-families-v1.md) adds a separately versioned family-selection policy. It preserves this packet's independent structure, current/legacy source authority and saved worlds. Its exact new-policy selection rules take precedence where explicitly stated; no change is delivered merely by this note.
+
 6 September2026. **Aimee directly requests a similarly granular system for flora, insofar as relevant to plants. Decided intended direction; new structural choices below are Design first-pass tuning for Engineering review, not delivered.** A two-form tree/ground-growth implementation is not the completed flora design. Reusable support, branches, leaves, caps, reproductive/display parts and surface channels compose a generated kind; finished premade plant species are not the system.
 
 Reference: Dragon DNA `dff9a9a00d3862b55829d46e6be7efc0f5861094` independent body/frame, horns/spines/tail and colour/finish systems. The adaptation is independently combining relevant plant axes with structural compatibility, not breeding genetics, animal anatomy or transferred stat bonuses. Existing `FloraTraits`, source/harvest owners and accepted flora ecology remain authoritative.
