@@ -4,7 +4,7 @@ This is the current record of the changes agreed today. **Decided intended behav
 
 ## Whole-shop update · 5 September
 
-Complete first-pass plans now cover all 19 Apothecary preparations, Forge, Tannery, Bowyer, Weaponsmith and Armoury; the complete Apothecary implementation now has Engineering-reported focused and native checks, and is delivered in phone build322. The full first Tannery pass is now delivered in build323; the first Forge equipment/Bone pass is delivered in build324; other complete maker routes remain pending. [Crafting Overhaul · Shop by Shop](crafting-shop-overhaul.html) records the complete scope, current rules, accepted destination and the complete first-pass recipes, producers and services for those six makers, now including shared ordinary equipment services, the complete Survey Post, Scriptorium/Writing Desk, Distillery and nine-configuration Channelworks plans. It supersedes isolated next-recipe assignments. The ingredient bridges below are temporary compatibility steps; they do not settle the final recipes or replace the accepted excursion-long coating lifetime.
+Complete first-pass plans now cover all 19 Apothecary preparations, Forge, Tannery, Bowyer, Weaponsmith and Armoury; the complete Apothecary implementation now has Engineering-reported focused and native checks, and is delivered in phone build322. The full first Tannery pass is now delivered in build323; the first Forge equipment/Bone pass is delivered in build324; Bowyer and source-preserving Hafts are delivered in build325; remaining complete specialist routes are pending. [Crafting Overhaul · Shop by Shop](crafting-shop-overhaul.html) records the complete scope, current rules, accepted destination and the complete first-pass recipes, producers and services for those six makers, now including shared ordinary equipment services, the complete Survey Post, Scriptorium/Writing Desk, Distillery and nine-configuration Channelworks plans. It supersedes isolated next-recipe assignments. The ingredient bridges below are temporary compatibility steps; they do not settle the final recipes or replace the accepted excursion-long coating lifetime.
 
 ## Apothecary implementation progress · 6 September
 
@@ -28,11 +28,11 @@ The delivered recipes use their exact Iron, Ingot, Quartz, Bone and Shield-wood 
 
 Eligible new Bone keeps its actual source density, size, colour/Pattern and history through victory, Return, storage and trading. It has no extra recovery roll or generic duplicate. Forge now consumes this typed Bone; unsupported older property-only services do not. No Hollow/Dense subtype or wider anatomy rollout is implied.
 
-Engineering reports16 distinct focused/native checks passed, including50 working/support combinations and two native journeys. Iron Collar remains a later Weaponsmith/Armoury-backed recipe. Bowyer and the remaining specialist batches are pending; Asset’s separate Forge presentation polish is not claimed installed.
+Engineering reports16 distinct focused/native checks passed, including50 working/support combinations and two native journeys. Iron Collar remains a later Weaponsmith/Armoury-backed recipe. Build325 subsequently delivers Bowyer and the Forge presentation update; remaining specialist batches and Iron Collar are pending.
 
 ## Wood, Hide, Apex labels and notices · 6 September
 
-**Status:** all four directions are accepted. Hide grouping is delivered in build 318, Apex labels in build 319 with their styling integrated in build 320, and notice controls in build 320. New-world wood colour through harvested Logs is delivered in build321; Mixed Cord/Cloth is delivered in build322; Tannery equipment source swatches/refit/recovery are delivered in build323; Hafts and the broader equipment journey remain pending.
+**Status:** all four directions are accepted. Hide grouping is delivered in build 318, Apex labels in build 319 with their styling integrated in build 320, and notice controls in build 320. New-world wood colour through harvested Logs is delivered in build321; Mixed Cord/Cloth is delivered in build322; Tannery equipment source swatches/refit/recovery are delivered in build323; source-preserving Hafts are delivered in build325; the broader specialist equipment journey remains pending.
 
 **Wood comes from the world.** Trees are the main source of wood, with their actual world-derived wood colour carried into Logs, Hafts and the corresponding equipment parts. Leaves and changing light do not change the material's inherent colour. Smaller trees and fallen logs provide supporting early routes; an improved Axe must not become a circular requirement for getting its own wood.
 
@@ -42,7 +42,7 @@ Use **Logs**, **Softwood Logs** and **Hardwood Logs** consistently. Older stock 
 
 The visible woody stem and its harvested Logs now share one saved base colour for new-world sources. Leaves and changing illumination keep their separate roles; wood does not take its colour from how the leaves happen to look. Remembered trees retain their observed colour, and stock colour chips show the saved material colour. Legacy Logs retain their supported any-Log uses; older unknown colour stays unknown. Engineering reports build321 installed and ordinarily launched on6 September, with the native harvest/reopen route passing.
 
-**Decided, still pending:** carry that colour through the complete Haft, visible finished-equipment, refit and recovery journey. Build322 adds ordered mixed Cord/Cloth; build323 completes the Tannery source-swatch/refit/recovery route. Hafts and other whole-shop equipment routes remain pending. Colour itself changes no wood type, stats, price or yield.
+**Colour journey — partly delivered:** actual wood colour now survives Log-to-Haft processing in build325; further specialist equipment presentation remains separate. Build322 adds ordered mixed Cord/Cloth; build323 completes the Tannery source-swatch/refit/recovery route. Bowyer construction, refit and recovery are delivered in325; remaining specialist routes are pending. Colour itself changes no wood type, stats, price or yield.
 
 **Flora colour — accepted clarification from Aimee,6 September; textile and Tannery source-swatch journey delivered, wider equipment pending:** harvested flora parts keep their actual source colour and pattern for crafting. Coloured Stem or Leaf Fibre carries that appearance into Cord strands, Cloth sections and the corresponding equipment bindings or woven panels. Choosing differently coloured ingredients preserves those separate contributions. Processing, returning home, reopening, refitting and recovering components must not silently replace their colours. This is visible material appearance, not just a source note.
 
@@ -75,6 +75,14 @@ The category defaults are Design-authored starting choices, not additional perso
 **Current behavior:** the return summary names the event that actually brought you down: for example, “Defeated by poison” for a fatal poison tick, or “Defeated by [known creature]” for its fatal attack. Burning, bleeding, toxic air and dangerous growth use their own supported causes. An undisclosed creature stays unnamed, and an unavailable older cause is honestly unknown. The following line still explains that you were carried home; this does not add permanent death or change the haul rules.
 
 The Binder going down already ends the excursion; a companion falling alone does not mean the whole party was defeated. Reopening preserves the same recorded cause without replaying damage or guessing from the enemies left nearby. This is a reporting change, not new damage or combat mechanics.
+
+## Bowyer, Hafts and Forge presentation — current in build325
+
+Build325 was installed and ordinarily launched on6 September Pacific. It delivers all three Bowyer weapon families, their exact component choices and previewed values, same-weapon refit, and current-component recovery. Maud teaches both Haft recipes: one matching Log becomes one Softwood or Hardwood Haft for no Essence, retaining actual source wood colour; sale1/buy2 Gold. Longbow limbs still use Hardwood Logs. The complete recipes are in [Crafting Overhaul](crafting-shop-overhaul.html).
+
+The Forge now presents clearly labelled part choices, individually numbered source pieces, and a review separating the finished result, returned parts and attached parts. This changes presentation without changing its prices, statistics or transactions.
+
+Engineering supplied16 distinct Bowyer/shared focused and native passing checks, plus the integrated Forge regression. These cover all17 Bowyer combinations, source colour, combat/coatings, same-item refit/reopen and save-failure recovery. Design has not repeated device checks. Build325 still uses the separate Early Overhaul Playtest choice; main-campaign integration and the Settings ordinary3D trial below remain pending. The unfinished zero-rune opening is unchanged.
 
 ## Main-campaign overhaul integration — decided intended behavior
 
@@ -144,11 +152,11 @@ The complete [Weaponsmith plan](crafting-shop-overhaul.html) now covers Fitted P
 
 Choose Balanced for +1 Initiative or Driving for +0.75 Power, using existing combat stats and the same actual components. No wearer lock or extra action is added. Fen's Hafts have named consumers, and Iron Collar casts directly from Iron and Coal without a second mandatory Ingot-processing step. Early Forge recipes remain unchanged. Existing owned items and paid progress are preserved; the complete Armoury plan is also now specified above.
 
-## Whole Bowyer first-pass plan · 5 September
+## Whole Bowyer first pass · delivered in build325
 
-The complete [Bowyer plan](crafting-shop-overhaul.html) covers Longbow/Pierce/Far, Sling/Crush/Far and Throwing Set/Rend/Far. **New Design-authored first-pass rules are pending implementation.** Fen's foundation becomes 30 Essence, 6 Logs, 2 Cord and 2 Resin, including all three families and ordinary refit; their crafts cost no Essence.
+The complete [Bowyer plan](crafting-shop-overhaul.html) covers Longbow/Pierce/Far, Sling/Crush/Far and Throwing Set/Rend/Far. **These Design-authored first-pass rules are delivered in build325.** Fen's base foundation is 30 Essence, 6 Logs, 2 Cord and 2 Resin, including all three families and ordinary refit; their crafts cost no Essence.
 
-Hardwood supplies real bow limbs, Bone is used for hard points/shot/edges, and the recipes share Tannery textiles/Leather and Forge Ingots. There is an animal-free Clay Sling route and no ammunition inventory or replenishment chore. New working Power, four-band workmanship, component prices/recovery and refit are specified together; owned legacy weapons stay unchanged. Every physical ranged family uses the accepted excursion-long coating lifetime. The subsequent Weaponsmith plan is also now specified above.
+Hardwood supplies real bow limbs, Bone is used for hard points/shot/edges, and the recipes share Tannery textiles/Leather and Forge Ingots. There is an animal-free Clay Sling route and no ammunition inventory or replenishment chore. Working Power, four-band workmanship, component prices/recovery and refit are delivered together; owned legacy weapons stay unchanged. Every physical ranged family uses the accepted excursion-long coating lifetime. The subsequent Weaponsmith plan is also now specified above.
 
 ## Whole Tannery first-pass plan · 5 September
 
@@ -641,7 +649,7 @@ The actual creature’s skeletal density and size determine part quality using t
 
 These are the agreed raw-material prices, not the multipliers used for equipment statistics. Colour and species do not add a hidden sale premium. This does not add shop stock. Older Bone keeps its existing value and uses.
 
-**Forge crafting delivered:** typed Bone now fills its specified points, grips, heads and protective components in the complete Forge recipes, with actual source statistics, workmanship, price and recovery. Bowyer/Weaponsmith/Armoury consumers remain pending. Unsupported old property-only recipes cannot take new Bone merely because its family name matches; older Bone retains its supported uses.
+**Forge crafting delivered:** typed Bone now fills its specified points, grips, heads and protective components in the complete Forge recipes, with actual source statistics, workmanship, price and recovery. Bowyer consumers are delivered in325; Weaponsmith/Armoury consumers remain pending. Unsupported old property-only recipes cannot take new Bone merely because its family name matches; older Bone retains its supported uses.
 
 **Now specified in the whole Forge first-pass plan:** the existing Pointed Blade can use a new Bone point and Bone grip for 0 Essence, or the other explicitly supported new-material bundles. The point uses actual skeletal density and material quality for Power; the grip adds structure, colour and its workmanship share without an invented handling bonus. A Common point at density 40 gives 2.75 Power.
 

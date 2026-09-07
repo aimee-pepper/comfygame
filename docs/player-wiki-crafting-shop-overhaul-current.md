@@ -4,7 +4,7 @@ Updated 6 September 2026. This is the complete crafting review you requested, be
 
 ## What the review found
 
-Stone tools lead to useful raw-material equipment. Blacksmith T2 introduces Ingots, while Tannery textiles provide a parallel route into clothing and later specialist components. The later recipes still contain older rules that do not fit that sequence. The complete Apothecary recipe/source batch is delivered in phone build322, installed and ordinarily launched on6 September. The complete first Forge equipment/Bone pass is delivered in324, with its tool dependencies from322. The Tannery also has its complete first-pass textile, Leather, clothing and carrying plan below. The Bowyer, Weaponsmith and Armoury now also have complete first-pass plans, followed by shared equipment services, the full Survey Post, Scriptorium/Writing Desk, Distillery and Channelworks plans below. Subsequent shops continue as complete batches, including gathering, item effects, prices and recycling.
+Stone tools lead to useful raw-material equipment. Blacksmith T2 introduces Ingots, while Tannery textiles provide a parallel route into clothing and later specialist components. The later recipes still contain older rules that do not fit that sequence. The complete Apothecary recipe/source batch is delivered in phone build322, installed and ordinarily launched on6 September. The complete first Forge equipment/Bone pass is delivered in324, with its tool dependencies from322. The Tannery also has its complete first-pass textile, Leather, clothing and carrying plan below. The complete Bowyer and source-preserving Hafts are delivered in325. Weaponsmith and Armoury have complete first-pass plans, followed by shared equipment services, the full Survey Post, Scriptorium/Writing Desk, Distillery and Channelworks plans below. Subsequent shops continue as complete batches, including gathering, item effects, prices and recycling.
 
 The biggest corrections are:
 
@@ -268,15 +268,15 @@ The first two pack improvements remain **15 Essence, 10 Fibre and 1 Resin**, lea
 
 Apothecary's Salve ladder and Forge's linings, bindings and tool improvements consume these same prepared textiles, with their complete source records. Their recipe counts, effects and quality rules stay as specified; mixed textiles add no new colour gate. Later specialist shops can build on these outputs without a new arbitrary facility.
 
-**Implementation still needed:** mixed-textile selection and appearance, one-to-one Leather dressing and price preservation, all seven garment variants, refit and their connected save/trade/recovery behavior. This is a complete first-pass plan, not seven new homework approvals. The broader creature catalogue and the existing Mote-on-miss decision remain separate open work.
+**Delivered in323:** mixed-textile selection and appearance, one-to-one Leather dressing and price preservation, all seven garment variants, refit and their connected save/trade/recovery behavior. This is a complete first-pass plan, not seven new homework approvals. The broader creature catalogue and the existing Mote-on-miss decision remain separate open work.
 
-## Bowyer — the complete three-family first-pass plan
+## Bowyer — complete first pass delivered in build325
 
-**Current behavior:** the Bowyer has Longbow, Sling and Throwing Set recipe definitions and an existing native crafting screen. Those routes use older broad material families, six-band crafting calculations and Essence fees. The new plan below has not yet been implemented; this is not a new playtest or delivery claim.
+**Current behavior — delivered in build325:** all three weapon families, their complete component choices, quarter-Power, four-band workmanship, prices, refit and current-component recovery below are playable at the built Bowyer. Review shows actual source parts and result before confirmation. Existing owned legacy weapons retain their supported behavior.
 
 **Retained decisions:** Longbow is **Pierce · Far**, Sling **Crush · Far**, and Throwing Set **Rend · Far**. Each occupies the ordinary weapon slot. Maintained projectiles are part of the weapon: no ammunition inventory, replenishment, retrieval roll, durability or extra attack is added.
 
-**Design-authored first-pass choices:** Fen's foundation becomes **30 Essence, 6 Logs, 2 Cord and 2 Resin** after recruitment, replacing the older 110-Essence legacy-material foundation. All three families and ordinary refit are included at the built shop. There is no extra pattern fee, Study, paid research root, attending-keeper requirement or new Bowyer tier for these recipes. Ordinary crafting and refit cost **0 Essence**, regardless of input quality. Fen's existing recruitment/story timing stays unchanged; these are base construction prices, subject to existing applicable staffing rules.
+**Delivered first-pass rules:** Fen's base foundation is **30 Essence, 6 Logs, 2 Cord and 2 Resin** after recruitment, replacing the older 110-Essence legacy-material foundation. All three families and ordinary refit are included at the built shop. There is no extra pattern fee, Study, paid research root, attending-keeper requirement or new Bowyer tier for these recipes. Ordinary crafting and refit cost **0 Essence**, regardless of input quality. Fen's existing recruitment/story timing stays unchanged; these are base construction prices, subject to existing applicable staffing rules.
 
 ### All three complete recipes
 
@@ -336,13 +336,13 @@ Ordinary refit replaces a complete selected part, pays its new inputs and return
 
 ### Progression and shared producers
 
-A **Clay Sling** needs Tannery stock, ordinary Clay and Coal, without animals or Forge upgrades. A Longbow's Hardwood comes from an appropriate Axe-2 tree; metal points come from Forge T2, Quartz from its specified Pick-2 source, and Bone from the existing planned skeleton reward. Throwing Set also has a fully animal-free Ingot route. None requires Pick 3, a new Bowyer facility or a guaranteed material placement.
+A **Clay Sling** needs Tannery stock, ordinary Clay and Coal, without animals or Forge upgrades. A Longbow's Hardwood comes from an appropriate Axe-2 tree; metal points come from Forge T2, Quartz from its specified Pick-2 source, and Bone from the skeleton reward delivered in324. Throwing Set also has a fully animal-free Ingot route. None requires Pick 3, a new Bowyer facility or a guaranteed material placement.
 
 At base prices, Corrin's foundation, Fen's foundation and a Clay/Cloth Sling total **50 Essence, 12 Logs, 6 Clay, 16 Fibre, 2 Resin and 1 Coal**. A full shop/tool route to an Ingot Longbow, including Forge T1/T2 and Axe 2, totals **90 Essence, 22 Iron, 2 Coal, 23 Logs (at least 2 Hardwood), 16 Fibre, 8 Clay and 3 Resin**. These staged production totals exclude recruitment/search/Binding costs; they are not an opening shopping list or completed affordability playtest.
 
-The Weaponsmith plan below now gives Fen's Hafts actual consumers: one Softwood or Hardwood Log becomes one matching Haft, with knowledge taught on Maud's recruitment. This replaces the earlier unused-Haft hold. Planks remain withheld until needed. Longbow limbs keep their own construction, and Forge's raw-Log starters gain no retroactive Haft prerequisite.
+Build325 delivers Fen's Hafts for the named uses in the Weaponsmith plan below: one Softwood or Hardwood Log becomes one matching Haft, with knowledge taught on Maud's recruitment. This replaces the earlier unused-Haft hold. Planks remain withheld until needed. Longbow limbs keep their own construction, and Forge's raw-Log starters gain no retroactive Haft prerequisite.
 
-**Still needed:** implement the complete new Bowyer recipes/calculator, shared typed producer dependencies, actual combat projection, prices, refit/recovery and save/custody behavior. The three weapon families move together. Existing Mote/Peerless and broader creature-anatomy questions remain separate grouped work; this first pass adds no individual recipe approval homework.
+**Delivery evidence:** Engineering reports16 distinct focused/native checks passed, including all17 component combinations, all-three crafting, actual Haft colour, combat/coatings, exact-ID Bone refit/reopen and persistence failure/recovery. Build325 was installed and ordinarily launched on6 September Pacific. Natural acquisition, pacing and balance are not established by these checks. Existing Mote/Peerless and broader creature-anatomy questions remain separate grouped work; this first pass adds no individual recipe approval homework.
 
 ## Weaponsmith — the complete fitted-weapon first-pass plan
 
@@ -353,6 +353,8 @@ The Weaponsmith plan below now gives Fen's Hafts actual consumers: one Softwood 
 **New Design-authored first-pass choices:** a foundation of **40 Essence, 4 Iron Ingots, 2 Hafts and 2 Cord** includes Point, Edge, Maul, both fitting choices and ordinary refit. Ordinary processing, crafting, refit and fitting adjustment cost **0 Essence**. These are base quotes under the existing applicable staffing rules, not new personal approvals or measured balance results. The older 150-Essence foundation and extra ordinary recipe-tier tolls are replaced for future construction; existing paid progress remains recorded.
 
 ### Useful Hafts and collars, with no circular unlock
+
+**Current boundary:** the two Haft recipes are delivered in325. The Collar producers and complete Weaponsmith replacement remain pending.
 
 Maud's recruitment teaches the Haft recipes. Fen can then make them at the built Bowyer **before** the Weaponsmith foundation needs them. Building the Weaponsmith teaches the Collar recipes; Armoury construction also teaches the same Iron Collar recipe, so Bracken does not require Maud. Knowledge stays saved if its producer is not built yet. Existing legitimate trade can also supply prepared parts without granting a missing facility tier or inventing merchant stock.
 

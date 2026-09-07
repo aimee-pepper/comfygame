@@ -199,10 +199,16 @@ export const craftingFamilyStatus: CraftingFamilyStatus[] = [
   {
     slug: 'bowyer',
     name: 'Bowyer',
-    status: 'Changing in a future update',
-    current: 'Longbow, Sling, and Throwing Set are playable through their current station and study gates.',
-    accepted: 'The same three weapons keep their recognizable parts and use player-selected physical types/subtypes. Mined and ordinary flora parts stay ungraded; creature parts retain their four-band quality choice.',
-    changes: ['Longbow', 'Sling', 'Throwing Set'].map((name) => ({ name, current: 'Playable with individually selected material samples.', accepted: 'The same parts selected from visible physical categories, with direct previewed stat contributions.' })),
+    status: 'Playable now',
+    current: 'Build325 delivers all three families and refit at Fen’s built Bowyer. Base foundation: 30 Essence, 6 Logs, 2 Cord, 2 Resin. Ordinary crafting and refit cost no Essence.',
+    accepted: 'Actual selected parts determine quarter-Power, four-band workmanship and frozen component price. All three retain physical Far reach and excursion-long coatings without ammunition.',
+    changes: [
+      { name: 'Longbow', current: '1 Ingot, 2 Quartz or 1 Bone for points; 2 Hardwood Logs, 1 Resin and 1 Cord for support.', accepted: 'Pierce/Far; actual Hardwood limbs and source-preserving points.' },
+      { name: 'Sling', current: '2 Clay plus 1 Coal, 1 Ingot or 1 Bone for shot; 2 Cord and a Cloth or Leather pouch.', accepted: 'Crush/Far; Clay offers an animal-free route without Forge upgrades.' },
+      { name: 'Throwing Set', current: 'Choose each of two edges independently from 1 Ingot or 1 Bone; Cloth or Leather carrier plus 1 Cord.', accepted: 'Rend/Far; average the two edge contributions before final Power rounding.' },
+      { name: 'Hafts', current: 'Maud teaches both recipes. At the Bowyer, 1 matching Log makes 1 Softwood or Hardwood Haft for no Essence; sale1/buy2 Gold.', accepted: 'Retain the actual source wood colour; Longbow limbs remain Logs.' },
+      { name: 'Refit and recovery', current: 'Keep the same weapon during refit and return displaced attached components once.', accepted: 'Recover only current attached parts, without fuel, raw ancestors or historical duplicate refunds.' },
+    ],
   },
   {
     slug: 'weaponsmith',
