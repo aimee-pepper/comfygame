@@ -1,5 +1,7 @@
 # Terrain and local water: approved bounded 3D study
 
+> **6 September newer direction:** Aimee now requests generated waterfalls where actual elevated water connects to lower water. `generated-water-surfaces-and-outlets-v1.md` supplies the separate new-world production proposal for Engineering review. The example study below keeps its explicitly disconnected pools and does not establish generated depths or outlet facts.
+
 5 September 2026. **Aimee approved the separate authored study with “allowed!” Decided intended demonstration; implementation pending. Production terrain and save conversion are not approved by this decision.**
 
 Purpose: unblock the shallow-bed/raised-pond portion of the agreed renderer trial without inventing facts in generated worlds. Engineering's reduced camera/depth proof can proceed independently. No early-game rules, phone campaign, renderer selection or Asset assignment changes here.

@@ -4,7 +4,7 @@
 
 ## Authority and current boundary
 
-This is the single sequencing authority for the opening. The material/host, tool, shop and writing packets remain technical references for their named systems; their older opening order, automatic starter grants, learning gates and dispatch priorities yield to this contract. No later-shop or creature-extension planning precedes this work.
+This is the single sequencing authority for the opening. The material/host, tool, shop and writing packets remain technical references for their named systems; their older opening order, automatic starter grants, learning gates and dispatch priorities yield to this contract. The connected opening was delivered in331, with the Return lesson correction in332. Aimee’s next direct priority is the coherent generated3D life/water work in `generated-3d-life-and-waterfalls-v1.md` and its full-family creature contract. Later shops and Essence recovery remain excluded.
 
 **Directly decided:** no known runes before the introductory discovery; guaranteed recoverable Illumination and Sun in a broadly generated first world; ordinary main-campaign integration; stone starting tools; revisable costs/order; intuitive usable starter recipes; exploration rather than compulsory map completion. Aimee also removes **Not now** from the invite-traveler conversation and disallows new player-facing trials unless she explicitly requests them. Remove the unrequested wood-colour trial entry; retain the specifically requested 3D trials and real wood-colour gameplay.
 

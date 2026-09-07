@@ -1,0 +1,46 @@
+# Generated local water surfaces and outlets — first policy
+
+6 September2026. **Design-authored first-pass numerical policy for Engineering review; intended, not delivered.** Aimee requests waterfalls from actual elevated water connected to lower water. This supplies the missing geometry/receiver rules for `generated-3d-life-and-waterfalls-v1.md`. It does not change water quotas, add fluids simulation or convert old saves.
+
+## Current evidence and scope
+
+Engineering is preserving generation-time standing bodies, channel source/ordered route/route endpoint/membership and special single-cell receiver evidence in WorldWaterTopology. This is raw topology, not measured geometry. General channel `outlet` currently means `routed.last`; `joinedExistingChannel` is only Boolean adjacency. Neither establishes a particular receiving body. The new policy must select and persist that receiver explicitly. Existing water-study example depths are not measurements of generated worlds.
+
+Use a separate new-world water-geometry version. Nil retains old water presentation and movement. Save geometry with the generated world before visibility projection; do not compute it from an old visible Tile.elevation. The new values below are deliberate new generation choices based on its terrain scaffold, not claims that the scaffold already measured a water surface. Engineering must review representability and route safety before enabling them.
+
+## Deterministic region and connection construction
+
+1. Begin with the final actual water/deep-water cells after terrain edits, actual liquid identity/frozen state, standing-body ownership and raw directed channel route records. Exclude frozen/nonliquid cells. Every supported wet cell has one canonical owner; merge overlapping records only where they refer to the same actual cells and compatible liquid. Never layer two water bodies at one tile or flood dry tiles below a chosen surface.
+2. A standing body is one local surface region. A flowing route is partitioned into level reaches using consecutive route cells with the same generated terrain-scaffold level. Attach its extra non-route water cells to the nearest route reach through its own connected membership, with route-order then row-major ties; do not cross a dry cell or another owner. A shared cell/junction has one canonical owner, stable source-ID tie. Persist final ownership and adjacency, not a reconstruction from screen overlap.
+3. For a channel endpoint without an explicit receiver, inspect only its actual cardinal wet neighbors in the same generated topology. Candidate receivers are a standing body or a different channel reach with compatible unfrozen liquid and an open shared edge. Exclude the route’s predecessor, its own reach and candidates that create a directed cycle. Choose a standing body before a different channel, then canonical ID/row-major tie; persist source, receiver, shared edge and selection. This is a new generation decision, not interpretation of the old Boolean as a receiver ID. A boundary outlet to outside the map may remain an outflow but has no in-map waterfall landing.
+4. A raw path that doubles back into a cyclic junction, loses its physical connection after edits or crosses an invalid/blocked cell is unsupported for measured flow in this first policy. Preserve actual categorical water and record the unsupported reason; do not reroll a world or mark it as a fall. Equal-level junction regions may be merged only with compatible liquid and an actual connected surface; disconnected pools never merge.
+5. The accepted directed graph must be acyclic. Process it in stable topological order, canonical IDs breaking ties. Multiple incoming channels share the one receiving region and its level; no source gets a private contradictory receiver height.
+
+## Numerical first-pass mapping
+
+Abstract elevation-level units, one vertical scene scale; no metres or new movement-cost thresholds. For region R:
+
+- Desired surface D(R) = minimum terrain-scaffold elevation among its member wet cells +0.75.
+- Closed-bank ceiling C(R) = minimum adjacent dry supported bank height −0.25, excluding explicitly recorded inlet/outlet edges. With no dry bank, omit this bound rather than inventing a bank height. A chasm/open edge is not a containing bank; it needs an explicit outlet, or the region is unsupported for this first contained-water policy.
+- In topological order, surface H(R) = min(D(R), C(R) when present, all incoming source surfaces when present). This ensures local containment and non-uphill connections. A higher numerical terrain scaffold does not force an uphill receiving surface. These are deterministic generation values, saved once.
+- Bed per shallow cell = H(R)−0.50; bed per deep cell = H(R)−1.25. Positive depth follows exactly from surface−bed. These depths are new first-pass drawing geometry; they do not redefine the existing categorical shallow/deep movement or habitat rules. Do not assign shallow status from this numeric depth or reveal its bed automatically.
+- A connection has drop Δ = H(source)−H(receiver). Δ≤0 is a level connection, never a waterfall. Proposed visible-fall threshold is Δ≥0.50; smaller positive transitions use a continuous short descending surface, no waterfall label/effect. Initial waterfall width0.35 tile fits its one cardinal edge; curtain spans source surface to receiver surface with no spray extending into hidden land.
+
+Closed-bank constraints apply to every non-outlet perimeter edge. The actual lip joins the source surface to an open edge toward the receiver; a disconnected low pool or a ridge at the edge fails the connection. A fall cannot run through a rock face: an exposed supported drop face is the back of the falling curtain, while the liquid route occupies the open side. The receiving water cell must exist at the bottom; a channel ending at map boundary is not a visible waterfall into invented water.
+
+## Mandatory route and disclosure safeguards
+
+For this first policy, an animated/labeled waterfall is admitted only on an **already non-walkable deep-water→deep-water edge**. It adds no party edge, habitat expansion, movement fee, damage, resource or contact opportunity. Retain all mandatory introduction routes, collection positions and source working positions. Do not lower a dry tile, clear an obstacle or remove a legal route to fit water geometry.
+
+Numeric support on any passable shallow cell must also agree with the accepted legal shoreline depiction: if its difference from an existing reachable dry neighbor would require an unsupported cliff crossing, retain that affected component’s categorical water presentation rather than drawing a new false shore. Until the shared physical edge graph is implemented, this policy does not activate interactive new steps/slopes. Engineering should evaluate this finite consistency predicate at generation, before final route validation, not recover by changing costs/passability in the renderer. A component that cannot satisfy the rules gets no measured-water/fall claim; flora/fauna integration need not wait for it.
+
+The adapter sends only known support/surface/edge facts. A waterfall needs both permitted endpoint surfaces and the intervening drop edge; otherwise use the existing neutral unknown boundary without exposing height or flow destination. Unknown bed stays unknown. Remembered presentation uses the last observed stationary geometry, not current hidden flow/contents. No new sound/splash or reflection may reveal an unseen receiver. Rendering waves/flow never advances world water amounts or gameplay RNG.
+
+## Concrete examples and acceptance
+
+- Raised source desired2.75, containing bank3, receiver desired0.75/bank1: Hsource2.75, Hreceiver0.75, drop2; if both adjacent actual endpoints are deep water and the lip/receiver are explicit, render the fall. Deep beds1.50 and−0.50 are new generated facts. Same levels with a dry ridge between them: independent pools, no fall.
+- Incoming sourceH0.75 to a receiver whose desiredH1.75: cap receiving surface at0.75 under this new policy; it is level, not an uphill fall. If resulting shallow shore depiction fails the route-consistency predicate, leave that component unsupported; never disguise the mismatch with an elevated water wall.
+- Two sources atH2.75 andH1.75 joining the same receiver cap that receiver at≤1.75. Each connection keeps its own actual drop; one may be level while the other falls.
+- Frozen endpoint, unlike liquids, missing receiver, a Boolean channel-join flag without selected edge, blocked lip, disconnected pools, self/cyclic connection or hidden receiver: no waterfall. No extra random roll is used to decide whether a physically valid admitted drop falls.
+
+Engineering readiness review must confirm canonical shared-cell ownership, region-DAG validation, generation-owned bank/lip values, and exact passable-shore consistency/refusal handling. These are the remaining implementation details to name; do not call the raw-topology foundation a completed waterfall system. Use current focused generation/geometry tests and the existing3D consumer. No new trial menu, seed search, flooding/erosion/swimming project or Design native audit.

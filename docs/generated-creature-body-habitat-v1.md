@@ -1,5 +1,7 @@
 # Generated body plans and habitat compatibility — first implementation slice
 
+> **6 September full-structure authority:** `creature-generation-structure-v1.md` incorporates the complete seven-body/23-pair matrix and supplies all attachment, dimension, variation and feasibility requirements. Aimee requires coherent full-family design before dependent generation; this older bounded packet alone is not a complete generator or assignment to implement only selected families.
+
 **Status:** decided intended behavior, 5 September 2026; Design complete for this bounded slice, native implementation not assigned or delivered. This does not complete the wider creature rework. Aimee subsequently approved the Bestiary arrangement and lifted its work hold on 5 September; see creature-role-coherence-v1.md section 8.
 
 **Authority:** Aimee's retained shallow/deep aquatic habitat and flying-over-ground-and-water decisions; PM's request to finish a concrete body-plan/habitat contract. The exact companion data is `creature-body-habitat-v1.json`. It supersedes the body/appendage and aerial-boundary portions of `creature-habitat-authority.json` and the older ecology overhaul document for newly opted-in worlds. Other creature-material families and combat balance are separate work.
