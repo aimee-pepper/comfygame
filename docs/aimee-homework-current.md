@@ -95,7 +95,7 @@ The first study shows the water from a dry, level route. Interactive slopes and 
 
 You chose first full sight for a small static **Dangerous growth** marker. An actually harmful contact/toxin patch will warn without requiring a prior injury, learning or field-guide recognition. Ordinary plants of the same species stay unmarked, as do hidden, partly seen, remembered-only, removed or stale patches. Rooted creatures retain their separate discovery rules.
 
-The generic marker adds no damage numbers, duration or yield information. Dedicated 2D animation remains deferred. Engineering reports the warning implemented and tested in Simulator. Phone build 307 and the separately prepared 308 do not include it; phone delivery and visual acceptance remain pending.
+The generic marker adds no damage numbers, duration or yield information. Dedicated 2D animation remains deferred. Engineering reports the warning implemented and tested in Simulator, and the build310 delivery receipt explicitly includes it with installation and ordinary launch confirmed. The earlier307/308 exclusion is historical; final visual acceptance remains separate. The shared3D readability plan now specifies the remaining Apex badge and selected-source action connections. Those await implementation, with no new decision needed from you.
 
 ## 7. Design-owned work: the complete Blacksmith batch
 
