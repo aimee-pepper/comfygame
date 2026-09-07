@@ -1,6 +1,14 @@
 # Generated 3D life and connected waterfalls — first vertical slice
 
-6 September 2026. **Decided intended scope, not delivered.** PM relays Aimee’s direct instruction: flora/fauna are generated in game when a world is written; finished premade species are not the system. Reusable parts, bases and sockets are allowed. Actual elevated water flowing into lower water should produce waterfalls. This contract is the bounded generation/appearance bridge, not a new ecology, loot, late-shop or fluid-simulation project.
+6 September 2026. **Original intended scope; functional delivery update below.** PM relays Aimee’s direct instruction: flora/fauna are generated in game when a world is written; finished premade species are not the system. Reusable parts, bases and sockets are allowed. Actual elevated water flowing into lower water should produce waterfalls. This contract is the bounded generation/appearance bridge, not a new ecology, loot, late-shop or fluid-simulation project.
+
+## Build333 delivery update — 7 September 2026
+
+Engineering source `50c7e2fb7a208682ad1e41145e1212cccf232f36`, tree `b52c9289e8be08c08c440ddb04333bd3fff419b7`, delivery `09b8ba32`, in `/Users/aimeepepper/Documents/comfygame-worktrees/early-material-regions-v1`. Its `docs/phone-333-delivery-2026-09-07.md` records installation at2026-09-07T18:52:39.343432Z and successful ordinary launch on Aimee's iPhone16Pro,402×874pt/1206×2622px, default text/current appearance. Design trusts that receipt; no duplicate tests or phone check.
+
+New ordinary books enable modular life and measured-water generation through both preview and authoritative preparation. Existing books/worlds/opening continuations preserve their frozen version. The functional generator and shared edges are delivered; the older planning statuses below are historical. The separate `generated-water-phone-333-verification-2026-09-07.md` records an ordinary native world with4 creature kinds/2 flora kinds, movement/encounter/Withdraw/Continue/reopen passing, and no usable harvest on that bounded route. All4 liquid components retained previous presentation because of uncontained open edges or lost/unowned final membership. There is NO natural waterfall witness. A controlled native mixed-depth fixture verifies a one-level static fall and lawful shore slopes/steps; it is not ordinary prevalence evidence.
+
+The observed save-worker stack exhaustion was corrected and the copied encounter passed async Withdraw/reopen. Four earlier migration tests have a narrow stale-fixture disposition in `reward-save-fixture-disposition-2026-09-07.md`; they were not broadly rerun or used to weaken validators. Remaining work is the assigned exact water fallback diagnosis, usable ordinary harvesting evidence, functional opacity/Schiller and literal waterfall animation, organic form refinement and artistic acceptance. No phone expedition, phone frame-budget proof or completion of Aimee's Spore-inspired richness ambition is claimed. Asset's exact appearance brief follows the implemented consumer; no new biology or Design native review is queued.
 
 ## Authority and current boundary
 
@@ -77,7 +85,7 @@ The small proof should reuse current generation/persistence/scene checks: determ
 Delivery claims require the normal exact source/receipt and installed scope. Full declared structural coverage across intended families is required before calling either generator complete. Broader feeding ecology, additional anatomical reward producers, final artwork, natural waterfall frequency and performance acceptance are separate claims. Keep the playable332 opening intact. Later shops and Essence recovery remain outside this work.
 
 
-## Remaining release dependency order — 7 September 2026
+## Pre333 release dependency order — historical planning, see delivery update
 
 This is implementation coordination against Engineering receipts, not another design expansion. Engineering `fec8ba3e` / `docs/modular-flora-runtime-slice-2026-09-07.md` and `39d41d77` / `docs/modular-creature-runtime-slice-2026-09-07.md` establish frozen five-family flora and six-layout creature generation, procedural assemblies, exact timber linkage/fallback, typed Hide/Bone isolation, observed naming/classification, save validation and sanitized disclosure. The creature receipt records20 combined focused passes and8 creature passes after the final validation change. Those decisions and proven source/mesh paths are closed; do not reassign them as missing design. Ordinary book creation still does not enable the version; phone delivery and visual acceptance are not established.
 
