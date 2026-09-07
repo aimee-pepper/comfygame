@@ -14,7 +14,7 @@ The later shared equipment-service contract owns modern gear refit/rebuild/recov
 
 ## 2. Zero-rune introduction — connected opening authority
 
-The [connected opening contract](game-design-early-progression-direction-2026-09-04.md) now owns the complete learning/traveler/material/tool/shop sequence and is the active priority. The local ownership and two introductory teaching details below remain subordinate. This is not an isolated empty-start assignment. Essence recovery is deferred by Aimee; later shop/creature planning is paused.
+The [connected opening contract](game-design-early-progression-direction-2026-09-04.md) now owns the complete learning/traveler/material/tool/shop sequence and is the active priority. The local ownership and two introductory teaching details below remain subordinate. This is not an isolated empty-start assignment. The master’s acquisition-route closure explicitly includes cache, diary and other lawful Focus rewards plus already-owned multi-Subject Focuses. These prerequisite lessons ship with the opening, not with later handwriting/ink upgrades. Essence recovery is deferred by Aimee; later shop/creature planning is paused.
 
 **Existing accepted decision, not inferred from Aimee's 6 September question:** the public Wiki's “Learning to Write and find people” and `early-progression-implementation-packet-v1.md` specify no known runes before introductory teaching; Illumination and Sun are safely recoverable there; existing campaigns retain knowledge and Pages.
 
