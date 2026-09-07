@@ -1,6 +1,16 @@
 # Procedural life form batch v2 — coherent silhouettes
 
-7 September2026. **Design-authored next implementation batch, after the Bind hotfix and terrain work. Not delivered.** Aimee's accepted direction is substantial Spore/Dragon-DNA-inspired richness within a deliberately smaller mobile game. The implementation choices and numbers below are Design first-pass tuning, not individual decisions attributed to Aimee. This batch changes presentation from already frozen biology; it does not add families, organs, statistics, rewards, breeding, an editor, growth simulation or new movement.
+7 September2026. **Implemented and installed in339; ordinary phone launch/usable entry remain unverified.** Aimee's accepted direction is substantial Spore/Dragon-DNA-inspired richness within a deliberately smaller mobile game. The implementation choices and numbers below are Design first-pass tuning, not individual decisions attributed to Aimee. This batch changes presentation from already frozen biology; it does not add families, organs, statistics, rewards, breeding, an editor, growth simulation or new movement.
+
+## Consolidated implementation and installation — 7 September
+
+Engineering `docs/phone-339-delivery-2026-09-07.md` and `docs/morphology-v2-consolidated-verification-2026-09-07.md` in procedural-life-form-v2, receipt checkpoint29e9860c, record installed source876cd39457146734c592aab4066f5eda892cac40/treed16a4ac65d5bbddb03c44604457c28c2efd885fa at2026-09-07T23:02:04.630471Z. Physical installation/readback verified; no ordinary phone launch attempted, no usable phone entry verification or playtest-readiness claim. PM owns any unlock engagement. No Design phone/native/image rerun.
+
+Appearance2 is enabled for new early-game books through shared preview/authoritative preparation; old books/frozen recipes remain unchanged. All six creature layouts/five flora families, independent regions/coexistence, corrected roots/polar heads/rosette direction and biped completed-height cap are included. Twelve consolidated tests PASS, retained exact aquatic refusal+12terrain regressions PASS, and same-level boundaries/ordinary native retry2PASS. Maximal retained creature58parts/12,768triangles; flora27parts/68instances/13,416triangles. These are actual retained fixture counts, not exhaustive all-combination maxima.
+
+Asset60da0328 and f956735e retain the bounded creature/flora visual closures described below. The ordinary native campaign seed141788567612271002 passed Bind, north movement, Return and reopen, with four species/two flora kinds and no usable harvest or granted stock. That short route is not a natural creature encounter, complete family coverage or phone-performance proof. Earlier fixture-only/no-factory statements below describe their historical checkpoints, superseded for installation by this section.
+
+Final contact admission now permits a deep-water actor in its valid contact-eligible component using a legal same-level water path to shallow contact; permitted contactEligible=false remote aquatic components remain unrestricted by that contact proof. No spawn relocation, changed terrain/source/reward or hidden detection. Trial initial state now persists before Bind and reports the actual refusal reason.337Bind/338terrain behavior retained. Pressure-led family policy is next and not in339; surfaces/markings/readability and finished richness remain unfinished. Public Wiki eaa302aa reconciles current installation and its limits.
 
 ## Concrete consumer and current deficiencies
 
