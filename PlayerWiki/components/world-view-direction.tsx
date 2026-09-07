@@ -4,6 +4,7 @@ export function WorldViewDirection() {
   return <section className="article-section note-card">
     <h2>Three-quarter world view</h2>
     <p><strong>Current behavior:</strong> The existing game remains the reference for movement, sight, and harvesting. The new view and foreground fading described here are intended changes, not a delivered visual update.</p>
+    <p><strong>Newly decided generation:</strong> plants and creatures are assembled in game when a world is written, from its actual traits and stable saved choices. Reusable parts are allowed; finished premade species are not the system. Complete structure rules for all seven creature forms must pass Engineering review before dependent generation. Actual connected elevated water can form a waterfall into lower water; overlapping or disconnected pools cannot. These generated assemblies and waterfall rules are intended, not delivered, and use the existing3D trial without adding another menu.</p>
     <p><strong>Decided intended behavior:</strong> Keep the square grid while showing the fronts and height of trees, rocks, characters, and cliffs.</p>
     <ul className="compact-list">
       <li>Water belongs to its local bed and surface height. A low river and a pond on raised land can coexist; shallow water can show its visible bed.</li>
