@@ -2,7 +2,7 @@
 
 > **Shared Iron Collar knowledge — 6 September Armoury closure:** `armoury-whole-shop-production-v1.md` extends the same Forge T2 recipe grant to either Weaponsmith or Armoury foundation. Counts,0-Essence casting, value and ownership do not change; this prevents the independent Armoury requiring Maud. Bone Collar remains Maud’s optional prepared alternative.
 
-**5 September 2026 · Complete Design-authored first-pass contract; replacement implementation pending.**
+**5 September 2026 · Complete Design-authored first-pass contract; delivered in phone328 on6 September.**
 
 Authority: Aimee's delegated whole-shop recipe/cost/order tuning and PM's complete Weaponsmith assignment. Preserve the four family identities, ordinary physical combat, Maud's singular Polearm teaching, real component identity, four-band material/workmanship rules, no soulbinding, and the completed Forge/Tannery/Bowyer/Apothecary contracts. The exact foundation, processing recipes, component bundles and two fitting choices below are Design first-pass tuning, not new personal approvals attributed to Aimee or measured balance.
 
@@ -10,7 +10,7 @@ This supersedes future Weaponsmith instructions in `weaponsmith-implementation-c
 
 ## 1. Current behavior and complete dispositions
 
-Current source defines Fitted Point, Fitted Edge, Fitted Maul and damage-selectable Fitted Polearm, using broad legacy material families and the older shared six-band calculator. The older design brief also lists numerical property thresholds that the current family allowlists no longer implement; neither is the new typed-material destination. The authored old foundation costs 150 Essence, 32 Iron Ore, 12 Copper and 4 Gold, with separate 75/150-Essence station rungs. Current source inventory is not a fresh native playtest or delivery claim.
+Historical pre-replacement source defined Fitted Point, Fitted Edge, Fitted Maul and damage-selectable Fitted Polearm, using broad legacy material families and the older shared six-band calculator. The older design brief also lists numerical property thresholds that the current family allowlists no longer implement; neither is the new typed-material destination. The authored old foundation costs 150 Essence, 32 Iron Ore, 12 Copper and 4 Gold, with separate 75/150-Essence station rungs. This is historical context; phone328 delivers the complete replacement below.
 
 | Stable family | Retained output | New route |
 | --- | --- | --- |
@@ -190,7 +190,7 @@ Freeze exact canonical input owners, quantities, source/composition, recipe/fitt
 | New profiles used in existing melee combat and shared coating route | Actual Power/Initiative reach combat, no added action/fit stat, coating persists through excursion and expires once |
 | Old owned weapons, purchased tiers, pattern and active-run snapshot | Preserved identity/knowledge/value/compatible services, no guessed modern fitting or in-run mutation |
 
-**Remaining implementation gates:** exact four producer registrations/custody and event-owned knowledge; the complete new Weaponsmith calculator/menu and combat projection; shared new-policy Bone/Leather/textile/Quartz support; legacy service routing; accepted shared coating lifetime. None is a new personal recipe approval request. Mote-on-miss/Peerless and wider anatomical work remain existing grouped homework. No new Aimee decision is required for this first pass.
+**Implementation gates closed in328:** the prepared producers/custody, event-owned knowledge, complete calculator/menu, combat projection, current source support, refit/recovery and shared coating lifetime are delivered. The earlier acceptance cases are reference, not a request to repeat the completed checks. None is a new personal recipe approval request. Mote-on-miss/Peerless and wider anatomical work remain existing grouped homework. No new Aimee decision is required for this first pass.
 
 **Next existing whole-shop batch:** Armoury — Rigid/Insulated/Balanced rebuilds across supported protective slots, actual protection/ward tradeoffs, fitting/recovery services and legacy migration, using the now-defined prepared material producers.
 
@@ -208,4 +208,12 @@ The [shared equipment improvement and recovery contract](equipment-improvement-r
 
 ## Haft dependency delivered — phone325
 
-The two Maud-taught Bowyer Haft recipes are delivered: one matching Softwood/Hardwood Log becomes one Haft for0 Essence, retaining source wood colour and sale1/buy2. This closes the Haft producer dependency only; this Weaponsmith batch and Collar producers remain pending. See the Bowyer delivery receipt.
+The two Maud-taught Bowyer Haft recipes are delivered: one matching Softwood/Hardwood Log becomes one Haft for0 Essence, retaining source wood colour and sale1/buy2. At325 this closed the Haft producer dependency only; phone328 now delivers this Weaponsmith batch and both Collar producers. See the Bowyer delivery receipt.
+
+## Delivery receipt — phone328
+
+Engineering reports source `fcdb75063cc8906ce46646fe7c9a02970fb5b257`, tree `eb5190e1947075b8a6a49562e916d53dfac16383`, delivery `99393339`, installed2026-09-07T01:51:29Z and ordinarily launched on Aimee’s iPhone16Pro. Four families/six damage-reach rows and152 bundle/fitting combinations are delivered:40E/4Ingots/2Hafts/2Cord foundation,0E crafts/refits, Balanced+1Initiative or Driving+.75Power, same-ID/current-parts recovery and exact frozen prices. Polearm still requires the actual diary pattern; included knowledge persists at construction/recruitment/compatible launch, never a render side effect.
+
+Iron Collar is available at ForgeT2 with either Weaponsmith or Armoury foundation knowledge:2Iron+Coal→1,0E,value4/buy8. Bone Collar at built Maud uses1actual typed Bone, preserves its source/colour/band/value, and returns as Collar during recovery without a duplicate raw Bone. Hafts retain the delivered source-colour owner. Eight distinct supplied focused/native checks passed, including all152 combinations, current durability/failure/recovery, six-row combat/coatings, six native crafts/refit/reopen and Bone Collar. Existing iPhone17Pro Simulator402×874pt/default text/current ordinary appearance; interaction evidence is Simulator-only. No Design native/phone recheck.
+
+Evidence: Engineering’s `docs/phone-build-328-delivery-2026-09-06.md` and `docs/weaponsmith-whole-shop-implementation-2026-09-06.md`. Armoury’s full14-choice batch remains pending; its shared Iron Collar dependency is closed. Peerless, wider creature extensions, older-version migration and zero-rune intro remain separate.

@@ -4,7 +4,7 @@
 
 > **Shared textile dependency update — 5 September:** `tannery-whole-shop-production-v1.md` now defines Cord/Cloth from mixed actual Stem/Leaf constituents. Accept complete prepared-unit receipts with their nested source appearance; prior matching-only manufacturing references are superseded. This changes no recipe count, output effect, finished quality role or nominal Cord/Cloth value in this shop. Never count or recover prepared ancestors twice.
 
-5 September 2026. **Complete first-pass Forge equipment contract delivered in phone324; tool/smelting/T3 dependencies were delivered in322. Iron Collar remains the separate later consumer-backed extension.** Covers all eight catalogue families, the entire three-level field-tool progression, Iron Ingots, facility upgrades, material statistics/workmanship, pricing, deterministic refit and recovery compatibility.
+5 September 2026. **Complete first-pass Forge equipment contract delivered in phone324; tool/smelting/T3 dependencies were delivered in322. Iron Collar is delivered in328 as the consumer-backed extension: ForgeT2, either Weaponsmith/Armoury foundation knowledge,2Iron+Coal,0E,sale4/buy8.** Covers all eight catalogue families, the entire three-level field-tool progression, Iron Ingots, facility upgrades, material statistics/workmanship, pricing, deterministic refit and recovery compatibility.
 
 ## Authority and retained decisions
 

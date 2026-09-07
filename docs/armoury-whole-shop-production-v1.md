@@ -196,3 +196,7 @@ The [shared equipment improvement and recovery contract](equipment-improvement-r
 ## Conditional solid-material extension — later first-pass proposal
 
 [Solid creature equipment uses](creature-solid-equipment-extensions-v1.md) now defines the exact applicable Shell Shield, Horn grip/Collar, scaled/chitin/shell Armoury outer and Fur Pelt lining sockets, with complete stat/quality/colour/value/recovery rules. Its typed source producers and adapters remain unimplemented. This ordinary batch keeps its present recipes and progression; no legacy generic family automatically enters the alternatives. Spines and Feathers are intentionally raw-sale-only, not a request for another recipe.
+
+## Collar dependency delivered — phone328
+
+The shared Iron Collar producer/knowledge route is delivered at ForgeT2, unlocked by either Weaponsmith or Armoury foundation. It does not require Maud. Optional Bone Collar is delivered at Maud with actual source retention. This closes those dependencies; the full14-choice Armoury replacement remains active/pending. Use Engineering’s Weaponsmith328 receipt; do not reimplement or reverify the Collar producers.
