@@ -30,8 +30,8 @@ const updates: Record<DecisionTopic, { current?: string; decided: string; tuning
   },
   people: {
     current: 'Current early rules admit Vance/Nessa/Halloway from the beginning and Bryn/Corrin/Noll after one recruit; actual habitat and on-map invitation still matter.',
-    decided: 'The connected first pass lets those six share the opening discovery band while retaining their individual entry requirements and useful clue priority. Nessa links plants to remedies, Halloway Iron to tools, Corrin Fibre to clothing. Remove Not now from the invitation; bringing someone home is separate from active-party selection.',
-    open: 'The selection-band and invitation corrections remain pending delivery. A clue is not a recruit, and no arbitrary expedition number guarantees a named person.',
+    decided: 'The connected first pass lets those six share the opening discovery band while retaining their individual entry requirements and useful clue priority. Nessa links plants to remedies, Halloway Iron to tools, Corrin Fibre to clothing. Build329 removes Not now from the invitation; bringing someone home is separate from active-party selection.',
+    open: 'The selection-band change remains pending; Invite Them without a decline control is installed in329. A clue is not a recruit, and no arbitrary expedition number guarantees a named person.',
   },
   status: {
     current: 'Ordinary consumable and physical-gear crafts now confirm success only after saving. A failed save refuses the craft without spending ingredients or granting the item. This correction is delivered and covered by focused tests; interactive crafting playthrough is still pending. The Binder and human Gambits/Training presentation update is also delivered, including clearer rule colours, capitalized labels, and the earned-automation explanation. The Apothecary recipe tiles, detail, and preparation presentation are now delivered too, with existing recipes and knowledge preserved.',

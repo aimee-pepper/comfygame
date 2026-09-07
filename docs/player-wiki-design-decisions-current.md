@@ -47,7 +47,7 @@ Faint and Moderate are the first later instruction, after your first self-author
 | Bryn | Close, bending paths | A companion, not a required shop unlock |
 | Noll | Hard ground with concentrated useful material | Optional recovery of a crafted item's actual components |
 
-**Decided invitation change — delivery pending:** remove **Not now** from the traveler invitation. Bringing someone home should not need a decline branch. Recruiting them and choosing an active party are separate actions. A clue never automatically recruits its subject.
+**Current invitation — installed in build329:** the traveler invitation offers **Invite Them** without **Not now**. Bringing someone home should not need a decline branch. Recruiting them and choosing an active party are separate actions. A clue never automatically recruits its subject.
 
 ### The first useful recipes use starting-tool materials
 
@@ -65,10 +65,16 @@ One Iron seam yields6 Iron, so a single seam cannot pay the8-Iron Forge foundati
 
 Pick2 opens Quartz and Axe2 opens small Hardwood. Neither needs those harder materials to make itself. Woven gear is useful before Hide/Salt Leather. Optional animal-free routes remain complete. Harvested flora retains its actual colours for supported crafting uses; different materials can be interesting for their appearance as well as their stats.
 
-**Scope:** Essence recovery is deferred at your request. This pass keeps existing costs as references and focuses on learning and dependencies. It adds no new player-facing trial. The specifically requested 3D trials stay in Settings; the unrequested wood-colour trial entry is to be removed while normal wood-colour gameplay remains.
+**Scope:** Essence recovery is deferred at your request. This pass keeps existing costs as references and focuses on learning and dependencies. It adds no new player-facing trial. The specifically requested 3D trials stay in Settings; the unrequested wood-colour trial entry is removed in build329, while normal wood-colour gameplay remains.
 
 The empty start and its real lesson, writing and prerequisite-learning routes must be delivered together. They cannot wait behind later Scriptorium, ink or shop work. Implementation and natural pacing still need to be established together. No new decision homework is waiting on you for this first pass.
 
+
+## Invitation and 3D corrections — installed in329
+
+Traveler invitations now offer Invite Them without the decline control. The unrequested wood-colour trial entry is removed; the specifically requested3D trials remain. This does not implement the new opening rune sequence or its first-six selection adjustment.
+
+The3D trial now uses the same displayed tile size as the2D map. Opaque trees covering the player’s body or occupied tile—including remembered trees—take part in the existing fading treatment, using only already-known geometry. Engineering supplied focused and native Simulator evidence. Expanding the3D patch to the full normal Explore viewport is still pending; this update makes no new phone-interaction or performance claim.
 
 ## Whole-shop update · 5 September
 
@@ -345,7 +351,7 @@ Pin a known recipe to see relevant sources highlighted **as soon as they become 
 
 The **beginning as one connected path** at the top of this reference now owns the intended sequence. The current game still starts with Sun/Illumination and starter Compounds; the zero-rune introduction remains pending. The first pass links the two safe light lessons to practical water/Iron learning, actual material sources, the first six travelers and useful starter crafts.
 
-It replaces the four practical lessons’ extra chance/second-world prerequisite loop and lets the first six share a discovery band with their individual entry requirements. Broader ordinary teaching protection remains. No extra knowledge comes from merely owning a physical World Page, and no clue automatically recruits a traveler. Costs remain existing reference values; Essence recovery is deferred. The invitation loses its Not now branch; no unrequested player-facing trial is added.
+It replaces the four practical lessons’ extra chance/second-world prerequisite loop and lets the first six share a discovery band with their individual entry requirements. Broader ordinary teaching protection remains. No extra knowledge comes from merely owning a physical World Page, and no clue automatically recruits a traveler. Costs remain existing reference values; Essence recovery is deferred. The invitation’s Not now branch is removed in329; no unrequested player-facing trial is added.
 
 ### Ordinary gathering — decided intended behavior
 
