@@ -1,6 +1,6 @@
 # Ordinary 3D expedition trial — approved scope and entry copy
 
-**6 September 2026 · Aimee-approved intended scope; not delivered.** PM relayed approval for an opt-in ordinary 3D expedition after Engineering safely finishes the current Bowyer checkpoint and before the remaining shops. Aimee then queried the phrase “through Return and reopening”; keep this to **one ordinary trial expedition and a quick save/reopen check**, not a campaign/progression test or a wider acceptance programme.
+**6 September 2026 · Aimee-approved scope; delivered in phone327, with bounded evidence below.** PM relayed approval for an opt-in ordinary 3D expedition after Engineering safely finishes the current Bowyer checkpoint and before the remaining shops. Aimee then queried the phrase “through Return and reopening”; keep this to **one ordinary trial expedition and a quick save/reopen check**, not a campaign/progression test or a wider acceptance programme.
 
 ## Existing Settings entry and concise wording
 
@@ -40,10 +40,20 @@ Exercise only what occurs naturally in that one expedition. If a source/creature
 
 A successful trial demonstrates that the current ordinary expedition can be operated through the 3D Field presentation for the actions actually exercised, and that the separate trial save can be resumed. It does **not** certify full 3D readiness, every terrain/creature interaction, final artwork, generated height/water physics, complete progression, global balance or cross-version save compatibility. Report the few actual actions and any specific problem/untested interaction; do not replace the trial with a broad spec or audit.
 
-Only a concrete conflict in existing command, visibility, save or world-fact ownership needs Design/Engineering resolution. Keep implementation choices with Engineering and the existing consumer owners. Publish this scope as intended now; mark current only after a delivery receipt. Ordinary2D remains available.
+Only a concrete conflict in existing command, visibility, save or world-fact ownership needs Design/Engineering resolution. Keep implementation choices with Engineering and the existing consumer owners. The phone327 delivery receipt below now establishes current availability; retain its explicit interaction limits. Ordinary2D remains available.
 
 ## Main-campaign integration delivered separately — phone326
 
 Engineering reports source `a6554bd31eeacff15f5a279e923c3c190f395006`, tree `ada7d7fa1a140822c9cbdac67750885024b8d1f1`, installed2026-09-07T00:34:30Z and ordinarily launched on Aimee’s iPhone16Pro. Normal New Game now creates Campaign N directly, with delivered overhaul rules and no mode dialog. Compatible existing names/IDs, inventory/source receipts, paid carry/research, tools, words and active worlds are retained; only missing delivered representation/knowledge is reconciled. Three supplied focused/native checks passed, including restart/Continue. Evidence: Engineering’s phone-build-326-delivery-2026-09-06.md and normal-overhaul-integration-2026-09-06.md. Design performed no native/phone recheck.
 
-This delivery does not complete the zero-rune intro or this Settings3D trial. The trial remains pending in its isolated test state, with one ordinary expedition and one quick resume check. Main-campaign integration is no longer an outstanding implementation prerequisite.
+The326 delivery did not complete the zero-rune intro or this Settings3D trial. At that checkpoint the trial remained pending; phone327 below now delivers it with isolated test state, one ordinary expedition and one quick resume check. Main-campaign integration is no longer an outstanding implementation prerequisite.
+
+## Trial delivered — phone327
+
+Engineering reports source `d05c11bbcb2b4ab10d6ebddd119bb6ca54852854`, tree `27ebc1050a774ee82f798b3025a1aa7c319f3eb3`, delivery `6f558ca3`, installed2026-09-07T01:14:26Z and ordinarily launched on Aimee’s iPhone16Pro,402×874pt /1206×2622px/default text/current ordinary configuration. Settings → Owner Tools → 3D Trials offers Start/Continue with a separate durable ordinary save. Phone trial remains fresh; no Simulator state was copied.
+
+`OrthographicTrialSession` uses the normal factory/seed/bind quote and save at Documents/3d-trials/ordinary-v1/bookbinder-save.json. The moving9×9 square-projected view follows the actor, north-up/east-right. Admitted saved facts and existing full visibility own neutral purple creature/source markers; current2D visibility and remembered-tree rules remain authoritative. No study mist/calibration or invented water-depth physics enters the ordinary trial.
+
+Three focused geometry/disclosure checks and one native Simulator expedition/resume check passed. One unscreened world: north from4,2 to4,1; south to the portal; normal Return after2 turns; full restart into that same Home. Creature markers were visible; combat contact and usable harvest were not encountered. No additional worlds/grants. The physical test runner could not launch because of iOS’s free-profile app limit, while the normal phone update succeeded. Thus interaction evidence is Simulator-only; do not infer phone performance, final art, complete harvesting/combat validation or full3D readiness. Existing iPhone17Pro Simulator402×874pt/default text/current ordinary appearance was used. No further test campaign or Design recheck is assigned.
+
+Evidence: Engineering’s `docs/phone-build-327-delivery-2026-09-06.md` and `docs/ordinary-3d-trial-implementation-2026-09-06.md` in early-material-regions-v1. Main-campaign326 integration remains current; the unfinished zero-rune intro, broader creature proposals and other specialists remain separate.
