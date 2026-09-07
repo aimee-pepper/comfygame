@@ -95,3 +95,9 @@ This is a reference and to-do list rather than a form. Item 1 is the open crafti
 Phone322 delivers the complete Apothecary and excursion-long coatings. Phone323 now delivers the first complete Tannery pass: one-part Leather, seven garment variants, exact component prices, same-item refit/remake, current-component recovery and source swatches. These are current behavior; additional creature-material uses and remaining Forge/specialist makers stay separate. During this playtest, saves between updates are not guaranteed; saving and reopening within the current version remain required. No new decision is needed from you for this delivery.
 
 **Phone324:** the first complete seven-family Forge equipment pass and typed Bone reward/Return/trade are delivered. Pick remains the existing owned-tool progression. Iron Collar, Bowyer and the remaining specialists/creature extensions remain separate work; no new decision is needed from you.
+
+## Completed decision: an ordinary 3D trial
+
+You approved one ordinarily generated 3D expedition in **Settings → Owner Tools → 3D Trials**, with isolated saved test state, the current starting setup and normal costs. Your 2D game stays available. Placeholder visuals are allowed. The small trial includes only a quick save/reopen check, not campaign/progression testing or a full-map checklist. This is approved intended work, not yet delivered; no further decision is waiting on you. The wider creature rework and unfinished zero-rune introduction are not prerequisites.
+
+**Main-campaign integration — decided, not yet delivered:** the gameplay overhaul should be the normal campaign experience, with no regular-versus-Early Overhaul Playtest choice. The 3D test stays in Settings. Neither decision completes the unfinished zero-rune opening, and neither needs another decision from you.
