@@ -32,6 +32,11 @@ The generator must satisfy actual required sources and routes before a world is 
 
 ## Scenery, vegetation and aquatic animals
 
+**7 September direct Aimee clarification:** some aquatic types may spawn in dark water beyond player reach and only approach shallow water after they notice the player. Immediate party walkability/contactability is not an aquatic spawn requirement. Darkness is a visibility condition, not automatically a depth class or an aquatic detection grant. Actual actor sensing/awareness and legal water movement determine any approach; do not force all swimmers toward the party, reveal them early, teleport them or expand their habitat.
+
+Separate three predicates: (1) lawful aquatic habitat/spawn under its actual saved liquid component and scenery mask; (2) the existing contact-eligible component/reserved-slot requirement, wherever explicitly applicable; (3) actual encounter contact at the current position. A deep/dark spawn in a contact-eligible component need not itself be player-walkable; the actor can approach a lawful shallow contact later. Existing permitted remote-only aquatic components need not acquire a universal contact route. A BFS used to certify a reserved contact component must not reject every other permitted aquatic actor. High isolated scenery exclusion and reachable harvest/work-source guarantees retain their separate meanings. This clarifies the intended admission fix; delivery awaits Engineering evidence.
+
+
 Freeze a scenery exclusion mask from final terrain/water and entry reachability BEFORE source and animal placement. Inaccessible high dry cells belong to scenery even if their surface would otherwise be passable. For a local lake/channel reach, distinguish access to its shore from party entry into deep water:
 
 - A measured local water region is shore-accessible when it borders an entry-reachable ordinary bank/shallow approach, the bank/approach is not separated by a blocking ridge, and its support is within4 quarters of that region's surface. This is a fauna placement classification only; it grants no party swimming or remote encounter.
