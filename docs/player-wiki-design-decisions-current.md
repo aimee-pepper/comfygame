@@ -82,7 +82,7 @@ Build325 was installed and ordinarily launched on6 September Pacific. It deliver
 
 The Forge now presents clearly labelled part choices, individually numbered source pieces, and a review separating the finished result, returned parts and attached parts. This changes presentation without changing its prices, statistics or transactions.
 
-Engineering supplied16 distinct Bowyer/shared focused and native passing checks, plus the integrated Forge regression. These cover all17 Bowyer combinations, source colour, combat/coatings, same-item refit/reopen and save-failure recovery. Design has not repeated device checks. Build325 retained the separate Early Overhaul Playtest choice; build326 removes it as described below. The Settings ordinary3D trial remains pending. The unfinished zero-rune opening is unchanged.
+Engineering supplied16 distinct Bowyer/shared focused and native passing checks, plus the integrated Forge regression. These cover all17 Bowyer combinations, source colour, combat/coatings, same-item refit/reopen and save-failure recovery. Design has not repeated device checks. Build325 retained the separate Early Overhaul Playtest choice; build326 removes it as described below. The Settings ordinary3D trial follows in build327 below. The unfinished zero-rune opening is unchanged.
 
 ## Main-campaign overhaul integration — current in build326
 
@@ -90,15 +90,15 @@ The delivered gameplay overhaul is now the normal campaign experience. Open **Se
 
 The 3D expedition trial stays in **Settings → Owner Tools → 3D Trials**, with isolated saved test state. It does not become a main-campaign renderer switch or another New Game mode.
 
-## Ordinary 3D expedition trial — approved, not yet delivered
+## Ordinary 3D expedition trial — current in build327
 
-You approved **one ordinary 3D trial expedition inside Settings → Owner Tools → 3D Trials**, with saved test state kept separate from your campaign. It uses the current starting setup, normal game costs and an unscreened generated world. There are no demonstration-only resource grants. Your ordinary 2D game stays available, and placeholder visuals are allowed.
+Build327 delivers **Settings → Owner Tools → 3D Trials → Start 3D trial**, with saved test state kept separate from your campaign. **Continue 3D trial** resumes that state, including Home after Return. The phone trial is fresh for you; the checked Simulator save was not copied to it. It uses the current starting setup, normal game costs and an unscreened generated world. There are no demonstration-only resource grants. Your ordinary 2D game stays available, and placeholder visuals are allowed.
 
-The trial stays in that Settings menu, with proposed buttons **Start 3D trial** or **Continue 3D trial** for an existing save. The view stays north-up/east-right with the accepted square-projected three-quarter presentation. Movement, packed tools, harvest targets, creatures/encounters, visibility, remembered terrain and foreground fading keep their existing rules.
+The trial stays in that Settings menu, using **Start 3D trial** or **Continue 3D trial** for its existing save. The view stays north-up/east-right with the accepted square-projected three-quarter presentation. Movement, packed tools, harvest targets, creatures/encounters, visibility, remembered terrain and foreground fading keep their existing rules.
 
 The trial is a small usability check of what you naturally encounter: moving, using a tool, and interacting with a creature where normal contact allows it. At the end, a quick save check means leaving normally and reopening the same trial once. It is not a campaign/progression test, a full-map task or a requirement to encounter every feature. Anything absent from that expedition is simply untested; no extra worlds or fixture grants are needed to complete a checklist.
 
-This demonstrates only the ordinary actions actually tried in3D. It does not establish full3D readiness, final artwork, new slope/water physics or complete game balance. Wider creature changes and the unfinished zero-rune introduction are not prerequisites. The earlier authored terrain/water study remains a separate example scene. This scope is approved; the ordinary 3D trial will be marked current only after delivery.
+This demonstrates only the ordinary actions actually tried in3D. It does not establish full3D readiness, final artwork, new slope/water physics or complete game balance. Wider creature changes and the unfinished zero-rune introduction are not prerequisites. The earlier authored terrain/water study remains a separate example scene. Engineering reports build327 installed and ordinarily launched on6 September Pacific. Its bounded Simulator check passed: one unscreened expedition, north then south to the portal, normal Return after two turns and one restart into the same saved Home. Neutral purple creature markers were visible and agreed with the minimap. Combat contact and usable harvesting were not encountered; no extra worlds or grants filled those gaps. Three focused geometry/disclosure checks also passed. This is Simulator interaction evidence; physical-phone gameplay and performance have not been accepted. Design has not repeated the supplied checks.
 
 ## Field and terrain feedback · 5 September
 
@@ -723,7 +723,7 @@ Begin with **Bind & Depart**, review the actual price, and explore visible oppor
 
 **Next progression to test:** naturally find and invite Nessa, build the Apothecary for 20 Essence, 4 Clay and 4 Logs, then make and use a Lesser Salve for 1 Resin and 1 Plant Fibre at no Essence cost. Check your live next-departure price and the option to refine collected raw Essence before spending. The full natural Halloway, forge and T2 acquisition path also remains unverified.
 
-The maker services and early crafting transactions are implemented and have separate controlled checks. This fresh-start build lets you test their ordinary acquisition; it does not establish that the complete opening is balanced. Later maker/material migrations, later tiers, the wider creature rework and new terrain-height/liquid behavior remain unfinished. Bestiary sorting has now passed in a separate later Simulator build; at that earlier checkpoint 3D was under consideration; the separate ordinary trial is now approved but not delivered. This original Simulator entry remains separate from the phone campaign entry below.
+The maker services and early crafting transactions are implemented and have separate controlled checks. This fresh-start build lets you test their ordinary acquisition; it does not establish that the complete opening is balanced. Later maker/material migrations, later tiers, the wider creature rework and new terrain-height/liquid behavior remain unfinished. Bestiary sorting has now passed in a separate later Simulator build; at that earlier checkpoint 3D was under consideration; the separate ordinary trial is now delivered in327, with the limited evidence described above. This original Simulator entry remains separate from the phone campaign entry below.
 
 ### Overhaul campaign entry on phone build 307
 
