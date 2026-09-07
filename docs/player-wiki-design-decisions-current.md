@@ -113,7 +113,7 @@ Some aquatic creatures can begin beyond player reach and approach shallow water 
 
 ## The beginning as one connected path
 
-**Current Bind issue — reported in339:** opening the Writing Desk’s **Bind** review can still crash in a campaign carrying gear. The earlier337 fix did not cover this case. A focused correction has passed internal checks using a separate copy of the affected campaign, including opening the review and reopening the save without changing inventory or departing. Build340 installation evidence is still pending; physical-phone navigation has not been accepted.
+**Bind navigation fix — installed in340:** build339 could crash when opening the Writing Desk’s **Bind** review in a campaign carrying gear; the earlier337 fix did not cover that case. The focused correction is now installed, device readback is verified and ordinary phone launch succeeded. Internal checks using a separate copy of the affected campaign passed opening the review and reopening the save without changing inventory or departing. Physical-phone **Bind** interaction remains unconfirmed; ordinary app launch does not establish that this navigation is fixed on the phone.
 
 A separate internal **Bind & Depart** check reached a save refusal while the app stayed open and reported that nothing was spent. That failure remains unresolved and is distinct from the navigation crash. Passing the review checks does not establish that this departure problem is fixed. Neither correction changes intended gameplay or delivers the upcoming family-generation policy.
 

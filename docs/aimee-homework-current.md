@@ -9,7 +9,7 @@ The [opening path](design-decisions-september-4.html) is delivered in build331 f
 
 **Latest appearance delivery —336:** new broad-leaved woody plants have fuller crowns and shorter bare supports, retaining the softer stripes, taper/bow and leaf-angle improvements from334/335. Counts, source traits/materials and old saved assemblies remain unchanged. The refinements have internal native specimen evidence; no natural woody encounter is claimed. Clustered foliage and finished richness remain open.
 
-**Current Bind issue —339:** a gear-carrying campaign can still crash when opening Bind. A focused correction has passed internal affected-campaign review/reopen checks, with build340 installation evidence and physical navigation acceptance pending. A separate internal Bind & Depart save refusal remains unresolved. These are implementation issues, not design homework; the [current record](design-decisions-september-4.html) keeps them distinct.
+**Bind navigation fix — installed in340:** the correction for339’s gear-campaign crash is installed, device readback is verified and ordinary phone launch succeeded. Internal affected-campaign review/reopen checks passed. Physical-phone Bind interaction remains unconfirmed, and a separate internal Bind & Depart save refusal remains unresolved. These are implementation issues, not design homework; the [current record](design-decisions-september-4.html) keeps them distinct.
 
 **Earlier hotfix —337:** the Bind review crash correction is installed. The internal native route through Bind, departure into2D and reopening passed; installation and ordinary phone launch were verified without playing your campaign. No gameplay decision changes are introduced.
 
