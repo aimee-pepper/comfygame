@@ -21,7 +21,7 @@ const updates: Record<DecisionTopic, { current?: string; decided: string; tuning
   },
   writing: {
     current: 'Sun, Illumination and starter Compounds are still granted at creation. The accepted empty-vocabulary introduction is not yet implemented. Excursion-long coatings and written Iron/Salt source guarantees retain their delivered rules.',
-    decided: 'A new campaign learns its first two words in the safe introductory world, then joins them at Home. The connected first pass gives Hydrology/River and Substrate/Iron protected actual-evidence lessons, with Subject and Focus collected together and read in order. Missing former-starter Subjects, Focuses and Modifiers need real learning routes; printed Pages do not grant their words.',
+    decided: 'A new campaign learns its first two words in the safe introductory world, then joins them at Home. The connected first pass gives Hydrology/River and Substrate/Iron protected actual-evidence lessons, with Subject and Focus collected together and read in order. Missing former-starter Subjects, Focuses and usable Modifiers need real learning routes; printed Pages do not grant their words. The four dormant phase words stay out of new lessons until they have a working writing effect.',
     open: 'These are intended acquisition changes, not guaranteed water, forests, every resource or a particular traveler in each generated world. Read the connected opening for exact stages and retained ordinary discovery rules.',
   },
   appearance: {
