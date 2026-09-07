@@ -205,3 +205,7 @@ The [shared equipment improvement and recovery contract](equipment-improvement-r
 ## Conditional solid-material extension — later first-pass proposal
 
 [Solid creature equipment uses](creature-solid-equipment-extensions-v1.md) now defines the exact applicable Shell Shield, Horn grip/Collar, scaled/chitin/shell Armoury outer and Fur Pelt lining sockets, with complete stat/quality/colour/value/recovery rules. Its typed source producers and adapters remain unimplemented. This ordinary batch keeps its present recipes and progression; no legacy generic family automatically enters the alternatives. Spines and Feathers are intentionally raw-sale-only, not a request for another recipe.
+
+## Haft dependency delivered — phone325
+
+The two Maud-taught Bowyer Haft recipes are delivered: one matching Softwood/Hardwood Log becomes one Haft for0 Essence, retaining source wood colour and sale1/buy2. This closes the Haft producer dependency only; this Weaponsmith batch and Collar producers remain pending. See the Bowyer delivery receipt.

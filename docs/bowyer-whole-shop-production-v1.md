@@ -1,6 +1,6 @@
 # Whole Bowyer production — three physical far-reaching families
 
-**5 September 2026 · Complete Design-authored first-pass contract; replacement implementation pending.**
+**5 September 2026 · Complete Design-authored first-pass contract; delivered in phone325 on 6 September.**
 
 Authority: Aimee's delegated whole-shop recipe/cost/order tuning, the retained Longbow/Sling/Throwing Set damage-and-reach identities, and the completed Apothecary, Blacksmith and Tannery contracts. Numerical values, explicit material bundles, new Longbow projectile component and construction price below are first-pass Design choices, not newly attributed personal approvals or measured combat balance.
 
@@ -8,7 +8,7 @@ This replaces future Bowyer construction, eligibility, six-band pricing/stat off
 
 ## 1. Current and intended, with every existing family accounted for
 
-Current source defines all three Bowyer recipes and a Bowyer screen, using broad legacy material families, older six-band output calculations and tier-based crafting Essence fees. The authored foundation is 110 Essence, 24 legacy Timber, 18 Fibre and 8 Resin. Longbow lists two limbs and a string; Sling lists cord, projectile and pouch; Throwing Set lists two edges and a carrier. This source inventory is not a new playtest or delivery claim.
+Historical pre-replacement source defined all three Bowyer recipes and a Bowyer screen, using broad legacy material families, older six-band output calculations and tier-based crafting Essence fees. The authored foundation is 110 Essence, 24 legacy Timber, 18 Fibre and 8 Resin. Longbow lists two limbs and a string; Sling lists cord, projectile and pouch; Throwing Set lists two edges and a carrier. This is historical context; phone325 now delivers the replacement specified below.
 
 | Existing stable family | Retained identity | Whole-shop disposition |
 | --- | --- | --- |
@@ -65,7 +65,7 @@ Retain the existing tree/tool route: small Softwood Axe1 yields2 in one hit; mat
 
 Coal and Clay use existing actual sources and custody. Ingot is the same **2 Iron + 1 Coal → 1 Ingot** producer at Forge T2, with nominal sale4/buy8. Quartz uses the already specified Pick2 actual producer, nominal6/buy12; no second mineral roll or automatic Quartz reward is added for learning Longbow.
 
-Bone is exactly the existing `creature-bone-production-v1.md` contract: supported non-amorphous skeleton, species/placed-body agreement, actual source density/size/colour, no new subtype. Species size gives `clamp(1 + floor(size/34), 1, 3)` portions; the successful ordinary Bone reward has **no new chance roll** and does not borrow Hide's70% chance. Departure-frozen strongest Anatomy once turns positive1/2/3 into2/3/4. Quality uses the source's unrounded `(boneDensity + size)/2`, 75% of that expression plus25% of the accepted Danger value, then final half-up rounding into the four bands. Retain exact units through victory, haul loss/Return, stock and trade; no second Bone balance or grant. The typed Bone source/reward/Return/trade dependency is delivered in phone324; Bowyer’s own complete typed crafting/refit adapter remains pending and must use that actual source.
+Bone is exactly the existing `creature-bone-production-v1.md` contract: supported non-amorphous skeleton, species/placed-body agreement, actual source density/size/colour, no new subtype. Species size gives `clamp(1 + floor(size/34), 1, 3)` portions; the successful ordinary Bone reward has **no new chance roll** and does not borrow Hide's70% chance. Departure-frozen strongest Anatomy once turns positive1/2/3 into2/3/4. Quality uses the source's unrounded `(boneDensity + size)/2`, 75% of that expression plus25% of the accepted Danger value, then final half-up rounding into the four bands. Retain exact units through victory, haul loss/Return, stock and trade; no second Bone balance or grant. The typed Bone source/reward/Return/trade dependency is delivered in phone324; Bowyer’s complete typed crafting/refit adapter is delivered in phone325 using that actual source.
 
 New Bone nominal sale 2/4/8/16 at Poor/Common/Rare/Exceptional remains unchanged. No world, species, colour or capability-count premium is introduced. Legacy Bone keeps its old value, quality and compatible uses; an old family name alone cannot admit it to the new typed calculator. Every new stat-bearing Bone needs actual finite Density in 0–100, not a fallback 50, inferred size, grade or current world reading.
 
@@ -159,13 +159,13 @@ These are staged production totals, not an opening shopping list, a compulsory o
 
 Apothecary supplies Quartz and the accepted shared coating lifetime; Forge supplies Ingots and Axe2; Tannery supplies exactly the already registered textiles/Leather. Use their existing quote/custody owners. This packet creates no alternative production lane, bone subtype, extra anatomical drop, tree predicate, liquid chemistry rule or merchant restock guarantee.
 
-## 10. Bounded implementation and actual remaining work
+## 10. Delivered implementation scope and retained acceptance reference
 
 One batch covers the three family offers/learning, explicit bundle selection, source presence and missing-material guidance, exact final calculations, pricing/trading, use in existing Far combat, refit/recovery, legacy preservation and normal save/return custody. Engineering may divide code commits without presenting one isolated recipe as the finished shop.
 
 Use existing material/gear quote owners. Freeze the actual units/quantities, canonical stock identity, manufacturing/source/colour, future recipe version, computed final values, returned inputs and output destination; commit them atomically with spend/history. Stale stock, invalid selection, ownership loss or save failure spends/grants nothing. Full storage uses existing Waiting; never auto-equip/discard. Retain every raw/prepared parent only once and do not invent a second generic recipe framework. Name the actual native component/weapon projection before assigning Asset any new literal artwork; this packet specifies semantic parts, not speculative final pixels.
 
-Focused cases for existing tests and one ordinary mounted shop/weapon route:
+Original acceptance cases retained for reference; use the delivery receipt below, not a new request to repeat them:
 
 | Case | Expected result |
 | --- | --- |
@@ -182,9 +182,9 @@ Focused cases for existing tests and one ordinary mounted shop/weapon route:
 | Coat each family, use across hits/encounters/relaunch, end excursion | Original exact weapon stays prepared until excursion end; per-target statuses retain their own rules; no one-strike/per-projectile consumption |
 | Legacy bow without a modern points receipt | Original item/stats/value/custody supported, no guessed inputs or automatic new recipe conversion |
 
-**Remaining implementation gates:** integrate shared typed Bone/Quartz/textile producers if not yet landed, replace the legacy Bowyer construction calculator/menu with these three complete bundles, wire exact Power/source receipts through combat, and retain the Apothecary's shared excursion-bound coating owner. No new Aimee recipe or material-role approval is needed under her delegated tuning authority. Existing Mote-on-miss/Peerless decisions and wider anatomical catalogue remain grouped open work; no new bow-limb species question blocks these explicit Hardwood construction recipes.
+**Implementation gates closed in325:** the typed producers, complete Bowyer menu/calculator, actual combat projection, refit/recovery, durable custody and shared excursion-long coating owner are delivered. Existing Mote-on-miss/Peerless decisions and wider anatomy remain separate open work. No additional Bowyer verification run or recipe approval is requested.
 
-**Next existing shop batch:** Weaponsmith — Fitted Point, Fitted Edge, Fitted Maul and Fitted Polearm, including actual Haft/fitting inputs, damage/reach choices, comparison against these Bowyer and Forge baselines, value/recovery/refit and legacy service migration.
+**Next existing shop batch after the currently prioritized main-campaign integration and Settings3D trial:** Weaponsmith — Fitted Point, Fitted Edge, Fitted Maul and Fitted Polearm, including actual Haft/fitting inputs, damage/reach choices, comparison against these Bowyer and Forge baselines, value/recovery/refit and legacy service migration.
 
 ## Shared service resolution · 6 September
 
@@ -193,3 +193,11 @@ The [shared equipment improvement and recovery contract](equipment-improvement-r
 ## Conditional anatomy extension — separate first-pass proposal
 
 [Remaining creature anatomy/material uses](creature-anatomy-material-extensions-v1.md) now defines narrow optional uses for actual typed parts, including exact eligible sockets, measures, stats, workmanship, colour and recovery. Its new anatomy producers and adapters are not implemented. This complete ordinary batch stays independently implementable; generic legacy family names cannot satisfy the new alternatives. The extension does not make every fluid an Oil/Venom/pigment, add one-strike coatings, or replace any existing world/flora route.
+
+## Delivery receipt — phone325
+
+Engineering reports complete Bowyer and sourced Hafts installed 2026-09-07T00:23:21Z (6 September Pacific) and ordinarily launched on Aimee’s iPhone16Pro. Source `0ade97a7a0ca9c229abd5a4c7fcc32af30d624c7`, tree `e247e7545015c92253eca70f9e58e07cf7029cdb`; delivery `f796519e`. Evidence: Engineering’s `docs/phone-build-325-delivery-2026-09-06.md` and `docs/bowyer-whole-shop-implementation-2026-09-06.md` in early-material-regions-v1.
+
+All three families are included at the built Bowyer: 30 Essence/6 Logs/2 Cord/2 Resin foundation, zero-Essence crafts/refits, all17 component combinations, actual quarter-Power and70/30 workmanship, frozen prices, current-component recovery and exact-ID refit/reopen. Clay shot consumes Coal only when its working bundle changes. Maud recruitment teaches both Haft recipes: one matching Log becomes one ungraded Haft, sale1/buy2, retaining actual wood source/colour. No ammunition or coating-lifetime change.
+
+Sixteen distinct focused/native checks passed, including all-three crafting, Haft review/confirmation, Bone Longbow refit/reopen, sourced colour, combat/coatings and persistence failure/recovery. Native target was iPhone17Pro Simulator402×874pt /1206×2622px/default text/current ordinary appearance; Design used supplied evidence only. Older-version compatibility remains deferred; current-version durability remains required. Normal-campaign integration and Settings-only ordinary3D trial are still pending, separate from this delivery. Broader creature alternatives and natural progression/balance remain unproven.
