@@ -1,6 +1,6 @@
 # Harmful flora: warning disclosure boundary
 
-5 September 2026. **Accepted by Aimee: “full sight, i agree,” relayed by PM from her direct decision. Implemented and tested in Simulator per Engineering report; absent from phone 307 and separately prepared 308.** Dedicated 2D flora animation remains deferred during the 3D transition.
+5 September 2026. **Accepted by Aimee: “full sight, i agree,” relayed by PM from her direct decision. Implemented and tested in Simulator per Engineering report; subsequently included in installed build310. The earlier307/308 exclusion is historical.** Dedicated 2D flora animation remains deferred during the 3D transition.
 
 ## Final disclosure rule
 
@@ -38,4 +38,4 @@ Engineering reports implementation at `687ca1612a9da3af418dd8e24a1048df58668742`
 
 Consumer `DangerousGrowthMarker.swift` is 18×18 pt. Engineering supplied a 54×54 RGBA static Asset handoff through PM; dedicated animation remains deferred. Engineering receipt: `docs/dangerous-growth-marker-implementation-2026-09-05.md` in the Engineering worktree. This is a trusted implementation report, not repeated Design verification or Aimee visual acceptance.
 
-Phone 307 remains unchanged. The separately prepared signed 308 excludes this later development. The warning is therefore Simulator-tested, with phone delivery and final visual acceptance still pending. No campaign or phone operation is requested by Design.
+Delivery reconciliation, 7 September: Engineering’s `phone-build-310-delivery-2026-09-05.md` explicitly includes the first-full-sight warning and records installation plus ordinary launch on Aimee’s iPhone16Pro. Source8754d272b2bde6ee8cf9624e26a0ac9fe7904ad9/tree8c7878b81b1abcff72f89d780901867c91d043d3. The older307/308 exclusion is historical, not a current hold. Final visual acceptance remains separate. No Design campaign or phone check was repeated. The remaining3D Apex/action connections and shared presentation are specified in `shared-3d-life-readability-v1.md`.
