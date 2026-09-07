@@ -29,3 +29,9 @@ Engineering must name the exact final native consumer, saved/runtime state and e
 Keep Engineering’s active early material/region/producer/custody/Nessa route moving toward a playable delivery. First identify the narrow compatibility requirements so a temporary renderer does not force a rewrite of saved world facts. Implement the native visual proof as a separately bounded checkpoint at a safe source boundary; do not replace the current overhaul with a sweeping renderer rewrite or block it waiting for final art.
 
 Game Design owns physical/elevation/visibility consistency and public Wiki decided-intended synchronization. Asset owns consumer-backed composition and authoring requirements, not speculative final exports. PM coordinates concrete dependencies and deliveries. References and tests do not establish final phone visual acceptance.
+
+## 6 September: ordinary3D trial approved
+
+Aimee approved the [separate ordinary3D expedition trial](ordinary-3d-expedition-trial-v1.md). It follows the current Bowyer checkpoint before remaining shops, uses current ordinary generation/start/economy, and keeps2D available. Preserve north-up/east-right square projection, current actions, disclosure/memory and fading. Placeholder visuals are allowed; the earlier example-scene requirement is not a prerequisite or substitute for this one ordinary trial. No forced full migration or broader campaign test is approved.
+
+The ordinary trial entry remains **Settings → Owner Tools → 3D Trials**, with isolated durable test state. Main-campaign gameplay overhaul integration is a separate decision; it does not move the 3D trial into New Game or add a renderer switch.
