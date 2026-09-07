@@ -4,7 +4,7 @@ Updated 6 September 2026. This is the complete crafting review you requested, be
 
 ## Opening priority
 
-The [connected beginning](design-decisions-september-4.html) now owns the sequence from no runes through first lessons, resource/tool use, travelers and first shop/craft. Existing recipe tables below remain their current or proposed local rules. Later-shop/creature planning is paused. Essence recovery is deferred; no new trial or separate overhaul mode is part of this pass.
+The [connected beginning](design-decisions-september-4.html), delivered in331 for new campaigns, now owns the sequence from no runes through first lessons, resource/tool use, travelers and first shop/craft. Existing recipe tables below remain their current or proposed local rules. Later-shop/creature planning is paused. Essence recovery is deferred; no new trial or separate overhaul mode is part of this pass.
 
 ## What the review found
 
@@ -666,11 +666,11 @@ The complete Scriptorium/Writing Desk plan follows below. The complete Distiller
 
 ### The opening already agreed
 
-The accepted new-campaign design begins with **no known runes**. The first broadly generated introductory world provides Illumination and Sun along a safe unavoidable path. Missing either does not block a retry in that same world, and learned discoveries survive defeat, Return and reopening.
+**Current in build331:** new campaigns begin with **no known runes**. The first broadly generated introductory world provides Illumination and Sun along a safe unavoidable path. Missing either does not block a retry in that same world, and learned discoveries survive defeat, Return and reopening.
 
-**Current mismatch:** the new-game rules still grant Sun/Illumination and starter Compounds immediately; Modifier availability also needs the intended knowledge checks. The connected opening will teach the13 usable intensity, extent and count Modifiers. The four phase words—Frozen, Solid, Liquid and Vaporous—remain unavailable for new writing and will receive lessons only when they have a working effect; they are not required for opening progress. This is unfinished implementation of an existing decision, not a new zero-rune instruction inferred from a question. It must be corrected together with the usable introductory lesson and startup behavior, rather than simply emptying the palette.
+**Current learning:** the opening teaches the13 usable intensity, extent and count Modifiers through separate lessons, and writing uses learned ownership. The four phase words—Frozen, Solid, Liquid and Vaporous—remain unavailable for new writing and will receive lessons only when they have a working effect; they are not required for opening progress. Missing Subject lessons accompany lawful Focus acquisition, including diary and cache routes. The connected opening is delivered independently of the later Scriptorium replacement below.
 
-**Design first-pass retry detail:** after the introductory world's first entry, retrying its unfinished lesson adds no new Bind fee or Page consumption. The same lessons and collected/depleted rewards stay recorded; it cannot generate new loot through replay. The missing lesson stays safely reachable. This is not a free reset of later worlds. Existing physical starter Pages remain distinct from knowing their words, and existing campaigns lose no vocabulary or Pages.
+**Current introductory continuation:** after the introductory world's first entry, retrying its unfinished lesson adds no new Bind fee or Page consumption. The same lessons and collected/depleted rewards stay recorded; it cannot generate new loot through replay. The missing lesson stays safely reachable on the protected learning route after Return, without another expedition outcome. If both records are already collected, read them at Home; no additional visit is needed. An interrupted active visit resumes normally. This is not a free reset of later worlds. Existing physical starter Pages remain distinct from knowing their words, and existing campaigns lose no vocabulary or Pages.
 
 After learning both words, connect Illumination to Sun in Rough charcoal. What you leave unwritten remains generated; Sun alone does not promise a safe forest or a completed map. No forced Template, automatic Binding or new improved-hand requirement is added.
 

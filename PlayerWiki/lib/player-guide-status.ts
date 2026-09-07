@@ -252,7 +252,7 @@ export const craftingFamilyStatus: CraftingFamilyStatus[] = [
     name: 'Scriptorium and prepared ink',
     status: 'Partly playable',
     current: 'Penmanship, prepared ink, Compound Assembly and Seamward exist under the older costs. Chaining lists a Mote its current purchase path cannot safely spend. The full replacement is pending.',
-    accepted: 'The complete Design first pass specifies all writing/lens costs, Pulp and pigment sources while preserving hands, exact ink, Compounds, inscriptions and old campaigns. The accepted zero-rune opening needs its paired introductory teaching and knowledge correction. Lantern/Light details remain separately unresolved.',
+    accepted: 'The complete Design first pass specifies all writing/lens costs, Pulp and pigment sources while preserving hands, exact ink, Compounds, inscriptions and old campaigns. Build331 delivers the zero-rune opening with its paired introductory teaching and knowledge correction, independently of the later shop replacement. Lantern/Light details remain separately unresolved.',
     changes: [
       { name: 'Foundation and Brush', current: 'Foundation 60 Essence with Timber/Clay; Brush 45 Essence with Copper/Fibre/Timber.', accepted: 'Foundation 30 Essence, 8 Logs, 4 Clay; Brush 35 Essence, 2 Iron, 4 Plant Fibre, 1 Log. The existing hand/footprint progression stays.' },
       { name: 'Table and independent practices', current: 'Table 70, Ink Mixing 40, Compound Assembly 55 Essence with older material bills.', accepted: 'Table 35, Ink Mixing 30 and Compound Assembly 40 Essence with complete named ingredients. Ink, Compounds and Chaining remain independent Brush-child practices.' },
