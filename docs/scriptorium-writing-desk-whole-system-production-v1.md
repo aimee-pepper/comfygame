@@ -18,7 +18,7 @@ The [connected opening contract](game-design-early-progression-direction-2026-09
 
 **Existing accepted decision, not inferred from Aimee's 6 September question:** the public Wiki's “Learning to Write and find people” and `early-progression-implementation-packet-v1.md` specify no known runes before introductory teaching; Illumination and Sun are safely recoverable there; existing campaigns retain knowledge and Pages.
 
-**Current source mismatch:** `BaseState.newGame(earlyMaterials:)` still assigns catalogue starter Compounds, then grants `earlyWritingTargets = [illumination]` and `ownedSources = [sun]`. `learnEveryStarterWord()` restores Sun/starter Compounds. `PageRules.writableQualifiers()` currently filters catalog legality rather than campaign knowledge. Merely emptying two sets would therefore leave starter or Modifier back doors. This is confirmed source behavior, not a fresh phone verification.
+**Opening delivered in phone331:** the former catalogue/startup ownership mismatch is replaced by the versioned connected opening. The new-campaign factory, learned palette/writing/Template permissions, introductory collection/free read/continuation and all-route prerequisite learning are delivered together. Existing campaigns keep their saved knowledge and Pages. The master’s phone331 receipt distinguishes native collection/read/reopen/joined-Sun quote evidence from the further rules-tested authored outcome/Modifier and maker connections. This does not deliver the later Scriptorium/ink replacement.
 
 ### Fresh-campaign implementation contract
 
@@ -43,7 +43,7 @@ After both lessons, an ordinary newly authored Illumination←Sun statement is p
 
 **Migration:** do not apply an empty opening to any already-existing campaign, even one still at Home or with no completed trip. Preserve its Subjects, Focuses, Modifiers, Compounds, Pages, Templates, ink, learned research, observations and bound worlds. Missing old ownership fields keep their supported legacy semantics. Distinguish a new-policy empty set from legacy missing data; never fill the former from the current starter catalogue. Intro replay must not become a grant of the entire former starter set. Owned physical World Pages remain consumable through their existing exact-instance rules without granting atomic vocabulary, and their paid/snapshotted histories remain unchanged.
 
-Ship this as a paired opening/teaching correction, including the Modifier knowledge check. Do not deploy only empty ownership lists and leave no usable entry/lesson route. Its implementation is an explicit dependency, not a claim that the current game already starts empty.
+Ship this as a paired opening/teaching correction, including the Modifier knowledge check. Do not deploy only empty ownership lists and leave no usable entry/lesson route. That paired correction is delivered in331 for new campaigns; it is not a dependency on the later Scriptorium replacement.
 
 ## 3. Foundation and complete Penmanship table
 
