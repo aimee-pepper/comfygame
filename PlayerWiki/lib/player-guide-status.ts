@@ -213,10 +213,16 @@ export const craftingFamilyStatus: CraftingFamilyStatus[] = [
   {
     slug: 'weaponsmith',
     name: 'Weaponsmith',
-    status: 'Changing in a future update',
-    current: 'Fitted Point, Fitted Edge, Fitted Maul, and Fitted Polearm are playable. Polearm appears after Maud’s fitting pattern is known.',
-    accepted: 'All four keep their damage choices and name the physical material categories needed for each part.',
-    changes: ['Fitted Point', 'Fitted Edge', 'Fitted Maul', 'Fitted Polearm'].map((name) => ({ name, current: 'Playable by choosing a head, support, and fitting that meet the current requirements.', accepted: 'The same form uses visible head, support, and fitting categories. Mined and ordinary flora choices have no quality; creature-material quality is chosen only where it affects the result.' })),
+    status: 'Playable now',
+    current: 'Build328 delivers four families and six damage/reach choices. Base foundation:40 Essence,4 Ingots,2 Hafts,2 Cord. Ordinary crafting and refit cost no Essence.',
+    accepted: 'Actual source parts, quarter-Power,70/30 workmanship, frozen component values and same-item recovery. Polearm retains its diary-pattern gate.',
+    changes: [
+      { name: 'Fitted Point and Edge', current: 'Point uses2 Ingots,2 Quartz or1 Bone; Edge uses2 Ingots or1 Bone. Add1 Haft, Cord or Leather wrap, and1 Iron or Bone Collar.', accepted: 'Point is Pierce/Close; Edge Rend/Close. Softwood or Hardwood Haft is valid.' },
+      { name: 'Fitted Maul', current: '2 Ingots or2 Bone,1 Hardwood Haft, Cord or Leather wrap, and1 Collar.', accepted: 'Crush/Close; actual working components determine Power.' },
+      { name: 'Fitted Polearm', current: 'Requires Maud’s actual fitting diary. Choose Pierce/Rend/Crush with its corresponding head,2 Hardwood Hafts,2 Cord or2 Leather, and1 Collar.', accepted: 'Mid reach; construction does not grant the diary pattern.' },
+      { name: 'Fitting and refit', current: 'Balanced adds1 Initiative; Driving adds0.75 Power. Home fitting changes use the same parts for no Essence.', accepted: 'Keep exact item identity; recover only current attached parts, never duplicate ancestors or fuel.' },
+      { name: 'Collars', current: 'ForgeT2:2 Iron+Coal makes Iron Collar with Weaponsmith or Armoury construction knowledge. Built Maud:1 typed Bone makes Bone Collar. Both cost0 Essence.', accepted: 'Iron sale4/buy8; Bone preserves its actual source and band/value. Recover Collars as Collars.' },
+    ],
   },
   {
     slug: 'armoury',

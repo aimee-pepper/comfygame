@@ -4,7 +4,7 @@ This is the current record of the changes agreed today. **Decided intended behav
 
 ## Whole-shop update · 5 September
 
-Complete first-pass plans now cover all 19 Apothecary preparations, Forge, Tannery, Bowyer, Weaponsmith and Armoury; the complete Apothecary implementation now has Engineering-reported focused and native checks, and is delivered in phone build322. The full first Tannery pass is now delivered in build323; the first Forge equipment/Bone pass is delivered in build324; Bowyer and source-preserving Hafts are delivered in build325; remaining complete specialist routes are pending. [Crafting Overhaul · Shop by Shop](crafting-shop-overhaul.html) records the complete scope, current rules, accepted destination and the complete first-pass recipes, producers and services for those six makers, now including shared ordinary equipment services, the complete Survey Post, Scriptorium/Writing Desk, Distillery and nine-configuration Channelworks plans. It supersedes isolated next-recipe assignments. The ingredient bridges below are temporary compatibility steps; they do not settle the final recipes or replace the accepted excursion-long coating lifetime.
+Complete first-pass plans now cover all 19 Apothecary preparations, Forge, Tannery, Bowyer, Weaponsmith and Armoury; the complete Apothecary implementation now has Engineering-reported focused and native checks, and is delivered in phone build322. The full first Tannery pass is now delivered in build323; the first Forge equipment/Bone pass is delivered in build324; Bowyer and source-preserving Hafts are delivered in build325; Weaponsmith and both Collars are delivered in328; remaining specialist routes are pending. [Crafting Overhaul · Shop by Shop](crafting-shop-overhaul.html) records the complete scope, current rules, accepted destination and the complete first-pass recipes, producers and services for those six makers, now including shared ordinary equipment services, the complete Survey Post, Scriptorium/Writing Desk, Distillery and nine-configuration Channelworks plans. It supersedes isolated next-recipe assignments. The ingredient bridges below are temporary compatibility steps; they do not settle the final recipes or replace the accepted excursion-long coating lifetime.
 
 ## Apothecary implementation progress · 6 September
 
@@ -28,7 +28,7 @@ The delivered recipes use their exact Iron, Ingot, Quartz, Bone and Shield-wood 
 
 Eligible new Bone keeps its actual source density, size, colour/Pattern and history through victory, Return, storage and trading. It has no extra recovery roll or generic duplicate. Forge now consumes this typed Bone; unsupported older property-only services do not. No Hollow/Dense subtype or wider anatomy rollout is implied.
 
-Engineering reports16 distinct focused/native checks passed, including50 working/support combinations and two native journeys. Iron Collar remains a later Weaponsmith/Armoury-backed recipe. Build325 subsequently delivers Bowyer and the Forge presentation update; remaining specialist batches and Iron Collar are pending.
+Engineering reports16 distinct focused/native checks passed, including50 working/support combinations and two native journeys. Iron Collar follows in328 through its Weaponsmith/Armoury-backed recipe. Build325 subsequently delivers Bowyer and the Forge presentation update; Weaponsmith and Iron/Bone Collars follow in328; remaining specialist batches are pending.
 
 ## Wood, Hide, Apex labels and notices · 6 September
 
@@ -75,6 +75,14 @@ The category defaults are Design-authored starting choices, not additional perso
 **Current behavior:** the return summary names the event that actually brought you down: for example, “Defeated by poison” for a fatal poison tick, or “Defeated by [known creature]” for its fatal attack. Burning, bleeding, toxic air and dangerous growth use their own supported causes. An undisclosed creature stays unnamed, and an unavailable older cause is honestly unknown. The following line still explains that you were carried home; this does not add permanent death or change the haul rules.
 
 The Binder going down already ends the excursion; a companion falling alone does not mean the whole party was defeated. Reopening preserves the same recorded cause without replaying damage or guessing from the enemies left nearby. This is a reporting change, not new damage or combat mechanics.
+
+## Weaponsmith and neutral 3D marker — current in328
+
+Build328 was installed and ordinarily launched on6 September Pacific. Maud’s complete Weaponsmith now offers Point, Edge, Maul and the diary-gated three-damage Polearm, with actual material bundles, Balanced/Driving, same-item refit and exact current-component recovery. Both Collar producers are current: Iron at ForgeT2 after either Weaponsmith or Armoury construction, Bone at built Maud. Their complete recipes and values are in [Crafting Overhaul](crafting-shop-overhaul.html).
+
+Engineering supplied8 distinct focused/native passing checks, including152 bundle/fitting combinations, current durability, six-row combat/coatings, native crafting/refit/reopen and Bone Collar. Included knowledge persists through construction and compatible launch; building never invents the Polearm diary lesson. Armoury’s full14-choice replacement remains pending.
+
+The Settings3D trial now uses rounded neutral purple creature markers. They represent neither species anatomy nor source-material colours. The marker’s isolated bounds/preview check adds no extra expedition, combat, harvesting or phone-performance evidence; the327 trial limits still apply. Design used supplied receipts without device rechecks.
 
 ## Bowyer, Hafts and Forge presentation — current in build325
 
@@ -136,7 +144,7 @@ An improved instrument must be used on a later field Survey to improve its best 
 
 ## Shared equipment services · 6 September
 
-**Design-authored first pass complete; Tannery services delivered in323 and Forge refitting in324; other full maker services pending.** [The full service plan](crafting-shop-overhaul.html) now explains component refit, Tannery remakes, Armoury rebuilds, Weaponsmith fitting, exact recovery and older paid-work preservation across the six makers. Ordinary refit/remake/rebuild costs no Essence beyond the actual replacement recipe; fitting uses the unchanged weapon parts.
+**Design-authored first pass complete; Tannery services delivered in323 and Forge refitting in324; Bowyer services delivered in325 and Weaponsmith in328; other full maker services pending.** [The full service plan](crafting-shop-overhaul.html) now explains component refit, Tannery remakes, Armoury rebuilds, Weaponsmith fitting, exact recovery and older paid-work preservation across the six makers. Ordinary refit/remake/rebuild costs no Essence beyond the actual replacement recipe; fitting uses the unchanged weapon parts.
 
 An item's previous constructions remain its history, not extra salvage. New material equipment gains no generic old Reforge rank bonus or historical unapproved +0.5 upgrade. Older paid upgrades stay on their supported existing route until an accurate conversion can preserve them. The later Peerless guarantee remains accepted, with its Mote-on-miss outcome unresolved; ordinary services do not wait on that answer.
 
@@ -146,9 +154,9 @@ The complete [Armoury plan](crafting-shop-overhaul.html) now specifies all 14 su
 
 New linings count once through Heat Ward, retaining the existing 50-point equipment cap and 60% combined heat-mitigation cap. Mixed sets can reach the ward cap while preserving Rigid pieces. Rebuilding returns old active parts once; historical versions do not become extra salvage. Bracken's foundation teaches the same Forge Iron Collar recipe so Maud is optional. Legacy gear, credits and services stay supported. The shared equipment-service plan now specifies ordinary refit/rebuild, active-component recovery and preservation of older paid work. Its implementation is pending; the later Peerless Mote-on-miss question stays in homework.
 
-## Whole Weaponsmith first-pass plan · 5 September
+## Whole Weaponsmith first pass · delivered in328
 
-The complete [Weaponsmith plan](crafting-shop-overhaul.html) now covers Fitted Point, Edge, Maul and all three Polearm damage choices, real Haft/Collar production, prices, recovery/refit and legacy services. **These are Design-authored first-pass choices, pending implementation.** The 40-Essence foundation also needs 4 Ingots, 2 Hafts and 2 Cord; ordinary crafts/refits cost no Essence. Polearm retains Maud's singular diary-teaching requirement.
+The complete [Weaponsmith plan](crafting-shop-overhaul.html) now covers Fitted Point, Edge, Maul and all three Polearm damage choices, real Haft/Collar production, prices, recovery/refit and legacy services. **These Design-authored first-pass choices are delivered in328.** The 40-Essence base foundation also needs 4 Ingots, 2 Hafts and 2 Cord; ordinary crafts/refits cost no Essence. Polearm retains Maud's singular diary-teaching requirement.
 
 Choose Balanced for +1 Initiative or Driving for +0.75 Power, using existing combat stats and the same actual components. No wearer lock or extra action is added. Fen's Hafts have named consumers, and Iron Collar casts directly from Iron and Coal without a second mandatory Ingot-processing step. Early Forge recipes remain unchanged. Existing owned items and paid progress are preserved; the complete Armoury plan is also now specified above.
 
@@ -649,7 +657,7 @@ The actual creature’s skeletal density and size determine part quality using t
 
 These are the agreed raw-material prices, not the multipliers used for equipment statistics. Colour and species do not add a hidden sale premium. This does not add shop stock. Older Bone keeps its existing value and uses.
 
-**Forge crafting delivered:** typed Bone now fills its specified points, grips, heads and protective components in the complete Forge recipes, with actual source statistics, workmanship, price and recovery. Bowyer consumers are delivered in325; Weaponsmith/Armoury consumers remain pending. Unsupported old property-only recipes cannot take new Bone merely because its family name matches; older Bone retains its supported uses.
+**Forge crafting delivered:** typed Bone now fills its specified points, grips, heads and protective components in the complete Forge recipes, with actual source statistics, workmanship, price and recovery. Bowyer consumers are delivered in325; Weaponsmith consumers and Bone Collars are delivered in328; Armoury consumers remain pending. Unsupported old property-only recipes cannot take new Bone merely because its family name matches; older Bone retains its supported uses.
 
 **Now specified in the whole Forge first-pass plan:** the existing Pointed Blade can use a new Bone point and Bone grip for 0 Essence, or the other explicitly supported new-material bundles. The point uses actual skeletal density and material quality for Power; the grip adds structure, colour and its workmanship share without an invented handling bonus. A Common point at density 40 gives 2.75 Power.
 

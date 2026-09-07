@@ -4,7 +4,7 @@ Updated 6 September 2026. This is the complete crafting review you requested, be
 
 ## What the review found
 
-Stone tools lead to useful raw-material equipment. Blacksmith T2 introduces Ingots, while Tannery textiles provide a parallel route into clothing and later specialist components. The later recipes still contain older rules that do not fit that sequence. The complete Apothecary recipe/source batch is delivered in phone build322, installed and ordinarily launched on6 September. The complete first Forge equipment/Bone pass is delivered in324, with its tool dependencies from322. The Tannery also has its complete first-pass textile, Leather, clothing and carrying plan below. The complete Bowyer and source-preserving Hafts are delivered in325. Weaponsmith and Armoury have complete first-pass plans, followed by shared equipment services, the full Survey Post, Scriptorium/Writing Desk, Distillery and Channelworks plans below. Subsequent shops continue as complete batches, including gathering, item effects, prices and recycling.
+Stone tools lead to useful raw-material equipment. Blacksmith T2 introduces Ingots, while Tannery textiles provide a parallel route into clothing and later specialist components. The later recipes still contain older rules that do not fit that sequence. The complete Apothecary recipe/source batch is delivered in phone build322, installed and ordinarily launched on6 September. The complete first Forge equipment/Bone pass is delivered in324, with its tool dependencies from322. The Tannery also has its complete first-pass textile, Leather, clothing and carrying plan below. The complete Bowyer and source-preserving Hafts are delivered in325. Weaponsmith and both Collars are delivered in328; Armoury has a complete first-pass plan, followed by shared equipment services, the full Survey Post, Scriptorium/Writing Desk, Distillery and Channelworks plans below. Subsequent shops continue as complete batches, including gathering, item effects, prices and recycling.
 
 The biggest corrections are:
 
@@ -98,7 +98,7 @@ Longer-lived coatings are much stronger than single-strike bottles. Their effect
 
 ## Blacksmith — complete Forge first-pass plan
 
-**Current behavior, delivered in build324:** all seven equipment families and their exact working/support bundles, tier gates, quarter Power/Protection, four-band workmanship, frozen prices and same-item refit/current-component recovery are implemented. Typed Bone now has its actual source/reward/Return/trade path and Forge consumers. The Pick remains its separate owned-tool route; smelting/T3 and all three tool progressions were delivered in322. Iron Collar remains the later Weaponsmith/Armoury-backed extension. Engineering reports16 distinct focused/native checks, including50 component combinations and two native journeys, with build324 installed and ordinarily launched.
+**Current behavior, delivered in build324:** all seven equipment families and their exact working/support bundles, tier gates, quarter Power/Protection, four-band workmanship, frozen prices and same-item refit/current-component recovery are implemented. Typed Bone now has its actual source/reward/Return/trade path and Forge consumers. The Pick remains its separate owned-tool route; smelting/T3 and all three tool progressions were delivered in322. Iron Collar is delivered in328 through its Weaponsmith/Armoury foundation knowledge route. Engineering reports16 distinct focused/native checks, including50 component combinations and two native journeys, with build324 installed and ordinarily launched.
 
 **Retained decisions:** stone opening tools, useful raw-material starter gear, ingots at T2 and a clear progression into prepared components. Material quality, workmanship, actual statistics and tool level remain different things.
 
@@ -344,17 +344,17 @@ Build325 delivers Fen's Hafts for the named uses in the Weaponsmith plan below: 
 
 **Delivery evidence:** Engineering reports16 distinct focused/native checks passed, including all17 component combinations, all-three crafting, actual Haft colour, combat/coatings, exact-ID Bone refit/reopen and persistence failure/recovery. Build325 was installed and ordinarily launched on6 September Pacific. Natural acquisition, pacing and balance are not established by these checks. Existing Mote/Peerless and broader creature-anatomy questions remain separate grouped work; this first pass adds no individual recipe approval homework.
 
-## Weaponsmith — the complete fitted-weapon first-pass plan
+## Weaponsmith — complete first pass delivered in328
 
-**Current behavior:** Fitted Point, Fitted Edge, Fitted Maul and the damage-selectable Fitted Polearm have existing crafting definitions. Older routes use broad material families, six-band calculations and Essence fees; the earlier written property-threshold table also differs from those current definitions. The complete new plan below is **pending implementation**.
+**Current behavior — delivered in328:** the complete four-family replacement below includes all six damage/reach choices, actual source bundles, both fittings, exact prices, same-item refit and active-component recovery. Existing supported legacy items keep their own routes.
 
 **Retained decisions:** Maud makes physical melee weapons. Point is Pierce/Close, Edge Rend/Close, Maul Crush/Close, and Polearm is an explicitly chosen Pierce/Rend/Crush weapon with Mid reach. Fitted weapons are not bound to a particular wearer and introduce no fit score, durability, repair, ammunition or extra attack. Maud's existing recruitment timing and singular Polearm diary teaching stay intact.
 
-**New Design-authored first-pass choices:** a foundation of **40 Essence, 4 Iron Ingots, 2 Hafts and 2 Cord** includes Point, Edge, Maul, both fitting choices and ordinary refit. Ordinary processing, crafting, refit and fitting adjustment cost **0 Essence**. These are base quotes under the existing applicable staffing rules, not new personal approvals or measured balance results. The older 150-Essence foundation and extra ordinary recipe-tier tolls are replaced for future construction; existing paid progress remains recorded.
+**Delivered first-pass rules:** a base foundation of **40 Essence, 4 Iron Ingots, 2 Hafts and 2 Cord** includes Point, Edge, Maul, both fitting choices and ordinary refit. Ordinary processing, crafting, refit and fitting adjustment cost **0 Essence**. These are base quotes under the existing applicable staffing rules, not new personal approvals or measured balance results. The older 150-Essence foundation and extra ordinary recipe-tier tolls are replaced for future construction; existing paid progress remains recorded.
 
 ### Useful Hafts and collars, with no circular unlock
 
-**Current boundary:** the two Haft recipes are delivered in325. The Collar producers and complete Weaponsmith replacement remain pending.
+**Current boundary:** the two Haft recipes are delivered in325. Both Collar producers and the complete Weaponsmith replacement are delivered in328. Armoury’s full replacement remains pending.
 
 Maud's recruitment teaches the Haft recipes. Fen can then make them at the built Bowyer **before** the Weaponsmith foundation needs them. Building the Weaponsmith teaches the Collar recipes; Armoury construction also teaches the same Iron Collar recipe, so Bracken does not require Maud. Knowledge stays saved if its producer is not built yet. Existing legitimate trade can also supply prepared parts without granting a missing facility tier or inventing merchant stock.
 
@@ -426,13 +426,13 @@ At Home, ordinary refit replaces a complete selected component, pays the new inp
 
 **Balanced↔Driving can be adjusted at Home for no Essence or new materials**, using the existing complete construction. This preserves quality, sources, price and item identity. It is not available mid-encounter. Polearm's damage kind stays fixed through refit; a different kind requires explicitly crafting that known variant. Old items without a compatible record are not given invented new components or a free modern fitting.
 
-### Progression and implementation still needed
+### Progression and delivery evidence
 
 Ingots come from Forge T2, Cord/Leather from Tannery, Hafts from Fen and the new Collars from their named existing makers. All four families have an animal-free metal route. Softwood is enough for the first fitted Point/Edge; Maul and Polearm require Hardwood Hafts, with the existing Axe-2 small-Hardwood route sufficient.
 
 A full base-price production route through Forge T1/T2, Corrin, Fen, Weaponsmith and one all-metal fitted Point totals **130 Essence, 30 Iron, 7 Coal, 23 Logs, 18 Fibre, 8 Clay and 2 Resin**. After the shops exist, that Point/Edge needs expanded raw **6 Iron, 3 Coal, 1 Log and 2 Fibre**. These totals include intermediate preparation but exclude search, recruitment and Binding costs; they are staged options, not an opening checklist or affordability playtest.
 
-**Still needed:** implement the four prepared-material routes, actual event-owned knowledge, complete new recipe/fitting calculator, combat projection, trade/recovery/refit and legacy routing. No individual recipe approval is needed from Aimee for this first pass. Mote/Peerless and wider creature-anatomy work remain the existing grouped questions. **Armoury is the next complete shop batch.**
+**Delivered in328:** prepared-material routes, event-owned knowledge, complete recipe/fitting calculator, combat projection and trade/recovery/refit. Engineering reports8 distinct focused/native checks passed, including152 bundle/fitting combinations, current save/failure/recovery, six-row combat/coatings, native craft/refit/reopen and Bone Collar. These are supplied Simulator checks, not a natural balance or physical-phone interaction claim. No individual recipe approval is needed from Aimee for this first pass. Mote/Peerless and wider creature-anatomy work remain the existing grouped questions. **Armoury is the next complete shop batch.**
 
 ## Armoury — the complete protective-rebuild first-pass plan
 
@@ -538,7 +538,7 @@ After those shops exist, an Ingot Rigid Body recipe expands to **8 Iron, 4 Coal 
 
 ## Shared equipment improvement and recovery · 6 September
 
-**First-pass Design plan complete; Tannery services delivered in323 and Forge refitting in324.** The six ordinary makers share one service plan. Complete service replacement for the other makers remains pending. Older supported equipment services remain available under their existing rules while the new work is implemented.
+**First-pass Design plan complete; Tannery services delivered in323, Forge refitting in324, Bowyer in325 and Weaponsmith in328.** The six ordinary makers share one service plan. Complete service replacement for the other makers remains pending. Older supported equipment services remain available under their existing rules while the new work is implemented.
 
 ### Improving the piece you already own
 
