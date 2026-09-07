@@ -3,7 +3,7 @@ import Link from '@/components/wiki-link';
 export function CarryingProgression() {
   return <section className="article-section note-card">
     <h2>Room for the next journey</h2>
-    <p><strong>Decided intended behavior:</strong> The first two pack projects belong to the opening Storehouse. Corrin makes the larger expansion once the Tannery is built. These changes are available in Early Overhaul Playtest on phone build 307; existing ordinary campaigns retain their own costs and services.</p>
+    <p><strong>Current behavior:</strong> The first two pack projects belong to the opening Storehouse. Corrin makes the larger expansion once the Tannery is built. These delivered rules are normal campaign behavior from build326. Compatible existing saves retain their purchased carry progress and credits.</p>
     <table><thead><tr><th>Pack project</th><th>Where</th><th>First-pass cost</th><th>Spaces before Sela</th></tr></thead><tbody>
       <tr><td>Opening pack</td><td>Already owned</td><td>Free</td><td>8</td></tr>
       <tr><td>Reinforced Stitching</td><td>Storehouse</td><td>5 Essence, 4 Plant Fibre</td><td>11</td></tr>

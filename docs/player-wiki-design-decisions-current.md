@@ -82,11 +82,11 @@ Build325 was installed and ordinarily launched on6 September Pacific. It deliver
 
 The Forge now presents clearly labelled part choices, individually numbered source pieces, and a review separating the finished result, returned parts and attached parts. This changes presentation without changing its prices, statistics or transactions.
 
-Engineering supplied16 distinct Bowyer/shared focused and native passing checks, plus the integrated Forge regression. These cover all17 Bowyer combinations, source colour, combat/coatings, same-item refit/reopen and save-failure recovery. Design has not repeated device checks. Build325 still uses the separate Early Overhaul Playtest choice; main-campaign integration and the Settings ordinary3D trial below remain pending. The unfinished zero-rune opening is unchanged.
+Engineering supplied16 distinct Bowyer/shared focused and native passing checks, plus the integrated Forge regression. These cover all17 Bowyer combinations, source colour, combat/coatings, same-item refit/reopen and save-failure recovery. Design has not repeated device checks. Build325 retained the separate Early Overhaul Playtest choice; build326 removes it as described below. The Settings ordinary3D trial remains pending. The unfinished zero-rune opening is unchanged.
 
-## Main-campaign overhaul integration — decided intended behavior
+## Main-campaign overhaul integration — current in build326
 
-The delivered gameplay overhaul is to become the normal main-campaign experience. New Game should no longer ask you to choose between regular play and Early Overhaul Playtest. Until that change is delivered, the existing playtest entry described below remains the current route. Compatible saves are preserved; saves between updates are not guaranteed, while saving and reopening within the current version remain required. The unfinished zero-rune introduction is still separate work.
+The delivered gameplay overhaul is now the normal campaign experience. Open **Settings → Campaigns → New Game** to create a normal campaign directly; there is no regular-versus-Early Overhaul choice. Continue and campaign selection retain compatible existing campaigns, including their names, inventory, resources, learned words, tools, paid progress and active worlds. You do not need a fresh game to activate the delivered rules in a compatible save. Compatible saves are preserved; saves between updates are not guaranteed, while saving and reopening within the current version remain required. The unfinished zero-rune introduction is still separate work; new games retain the delivered Sun/Illumination starting setup. Engineering reports build326 installed and ordinarily launched on6 September Pacific, with three focused/native checks covering direct New Game, compatible owned-state preservation and restart/Continue. Design used that supplied receipt without repeating device checks.
 
 The 3D expedition trial stays in **Settings → Owner Tools → 3D Trials**, with isolated saved test state. It does not become a main-campaign renderer switch or another New Game mode.
 
@@ -727,7 +727,7 @@ The maker services and early crafting transactions are implemented and have sepa
 
 ### Overhaul campaign entry on phone build 307
 
-**Installed and successfully launched on Aimee’s iPhone 16 Pro.** In an existing game, open **Settings → Campaigns**, then choose **New Game → Early Overhaul Playtest**. This creates a separate campaign using the ordinary overhaul opening resources. Continue and campaign selection reopen it; no special launch command is needed, and existing campaigns keep their own rules.
+**Historical build307 entry, superseded by326:** that build offered a separate Early Overhaul Playtest campaign. Current **Settings → Campaigns → New Game** creates the normal game directly with delivered overhaul rules; compatible existing campaigns also receive those rules while retaining owned progress. The observations below describe the earlier checkpoint.
 
 Creating the separate campaign and continuing it after reopening passed in the Simulator. Phone installation and ordinary launch were confirmed, but the physical phone screen and full progression route have not yet had visual/playthrough acceptance. The early maker, gathering, teaching and carrying work is included for playtesting; natural Nessa recruitment, first crafting and the full Halloway/T2 route remain unverified together.
 
@@ -751,7 +751,7 @@ The checked materials produced a Fine Leather Guard with 2.50 Protection; that n
 
 This route also checked the eligible raw-Hide selector. A repeatedly returning tutorial was corrected: **Not now** now lasts for the current app session; reopening or explicitly replaying the tutorial may show it again. It does not mark the lesson completed.
 
-**Still unproven:** finding and learning everything naturally, creature/material availability, combat and economy pacing, and affording the next expedition through ordinary play. The natural campaign remains separately preserved at Home with 29 Essence after three expeditions. No fourth search was made. The overhaul remains off for ordinary campaigns; final creature/Leather artwork, the wider creature rework and physical-phone acceptance remain unfinished.
+**Still unproven:** finding and learning everything naturally, creature/material availability, combat and economy pacing, and affording the next expedition through ordinary play. The natural campaign remains separately preserved at Home with 29 Essence after three expeditions. No fourth search was made. At that historical checkpoint the overhaul was off for ordinary campaigns; build326 now enables the delivered rules normally; final creature/Leather artwork, the wider creature rework and physical-phone acceptance remain unfinished.
 
 ### The Binder’s own Gambits
 
