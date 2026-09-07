@@ -74,7 +74,7 @@ The empty start and its real lesson, writing and prerequisite-learning routes mu
 
 Traveler invitations now offer Invite Them without the decline control. The unrequested wood-colour trial entry is removed; the specifically requested3D trials remain. This does not implement the new opening rune sequence or its first-six selection adjustment.
 
-The3D trial now uses the same displayed tile size as the2D map. Opaque trees covering the player’s body or occupied tile—including remembered trees—take part in the existing fading treatment, using only already-known geometry. Engineering supplied focused and native Simulator evidence. Expanding the3D patch to the full normal Explore viewport is still pending; this update makes no new phone-interaction or performance claim.
+The3D trial now uses the same displayed tile size as the2D map. Opaque trees covering the player’s body or occupied tile—including remembered trees—take part in the existing fading treatment, using only already-known geometry. Engineering supplied focused and native Simulator evidence. Build330 expands the3D view to the full normal Explore viewport while preserving that tile size, clipping and knowledge limits. The update is installed and ordinary launch succeeded; the supplied movement/reopen checks are Simulator evidence, not a phone-performance or visual-acceptance claim.
 
 ## Whole-shop update · 5 September
 
@@ -1021,10 +1021,10 @@ Motes also serve other ambitions, including Constellation and keeping worlds. Re
 
 Use **Aimee Homework** for choices needing Aimee and **Asset Homework** for optional drawing. The subject guides carry the relevant current/intended summaries. The older overhaul references retain the wider system rules; today's explicit changes take precedence over an older fixed cost, fixed order, or settled Peerless claim.
 
-## Hide grouping and thumbnail borders — current feedback and decided correction
+## Hide grouping and thumbnail borders — current in build330
 
-**Current issue reported by you:** Common smooth Hides can still appear as two neighbouring stacks of2. Engineering is checking whether irrelevant source identity is splitting an otherwise equivalent group; no fix is claimed yet.
+**Current behavior:** Skin/Hide with the same material, quality and useful crafting properties now share a displayed total across colour variants in return receipts and the Storehouse. The Tannery shows that total with exact colour choices underneath. The reported matching Common Smooth Skin pairs had different saved colours; those colours, individual pieces and sources remain preserved. Different useful properties still form different groups.
 
-**Decided:** Hides with the same actual crafting-relevant properties and quality share a display group, while each original piece and its provenance remain selectable underneath. Truly different properties stay distinguishable. Thumbnail borders show quality: Poor/rough white, Common/Fine green, Rare/Superior blue, Exceptional purple. Orange is reserved for genuine legendary/Peerless equipment, never an extra raw-material grade or a guess from species, source or rarity. Known ordinary ungraded materials use normal green without acquiring a quality stat; unknown quality stays explicitly unknown. Material artwork keeps its actual colours.
+**Current quality display:** Thumbnail borders show quality: Poor/rough white, Common/Fine green, Rare/Superior blue, Exceptional purple. Orange is reserved for genuine legendary/Peerless equipment, never an extra raw-material grade or a guess from species, source or rarity. Known ordinary ungraded materials use normal green without acquiring a quality stat; unknown quality stays explicitly unknown. Material artwork keeps its actual colours.
 
-Older Standard equipment keeps its existing label/stats and uses ordinary green; this does not add a new quality tier. The old grey Rough/white Standard convention is superseded by your latest instruction. The border and grouping corrections remain intended until delivered.
+Older Standard equipment keeps its existing label/stats and uses ordinary green; this does not add a new quality tier. The old grey Rough/white Standard convention is superseded by your latest instruction. Build330 delivers these corrections. Engineering supplied seven focused checks, including native movement/reopen and a return → Storehouse → Tannery case showing two preserved colour pairs as four total pieces with two exact choices. These checks used the target viewport at default text and current appearance. Installation and ordinary launch succeeded; your visual acceptance remains separate.
