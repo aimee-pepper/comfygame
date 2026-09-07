@@ -113,6 +113,11 @@ Some aquatic creatures can begin beyond player reach and approach shallow water 
 
 ## The beginning as one connected path
 
+**Current Bind issue — reported in339:** opening the Writing Desk’s **Bind** review can still crash in a campaign carrying gear. The earlier337 fix did not cover this case. A focused correction has passed internal checks using a separate copy of the affected campaign, including opening the review and reopening the save without changing inventory or departing. Build340 installation evidence is still pending; physical-phone navigation has not been accepted.
+
+A separate internal **Bind & Depart** check reached a save refusal while the app stayed open and reported that nothing was spent. That failure remains unresolved and is distinct from the navigation crash. Passing the review checks does not establish that this departure problem is fixed. Neither correction changes intended gameplay or delivers the upcoming family-generation policy.
+
+
 **Bind crash correction — installed in337:** opening the Bind review no longer follows the render path that caused the reported crash. Internal native testing passed Home → Writing Desk → Bind → departure into the existing 2D world → reopening. Installation and ordinary phone launch were verified; the Bind pane was not played on your physical phone. Gameplay, campaigns and the existing 2D flow are preserved. This hotfix does not include the new terrain or morphology plans.
 
 **Current behavior — installed in build331:** new campaigns begin with no learned Subjects, Focuses, Modifiers or Compounds. The generated introduction, safe light lessons, first usable Sun writing, missing-Subject learning routes and early traveler/material/tool/maker connections are delivered together. Stone tools and the delivered Apothecary, Forge, Tannery, Bowyer and Weaponsmith remain available through their normal requirements. Existing campaigns keep their knowledge, physical Pages and progress; your phone save was not reset.
