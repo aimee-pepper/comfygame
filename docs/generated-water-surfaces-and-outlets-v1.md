@@ -2,6 +2,8 @@
 
 6 September2026. **Design first-pass intended generation policy, reviewed for representability with Engineering; not delivered waterfalls.** Replaces every earlier interim exclusion/numerical proposal in this file. Mixed shallow/deep components are eligible. Aimee requests real connected higher→lower water without false shores, changed terrain, invented deepening or new swimming/fluids mechanics.
 
+**7 September new terrain-version override:** `terrain-height-routes-and-scenery-v1.md` now defines direct Aimee's structural≤1-level routes, sparse inaccessible scenery and source/animal exclusions. For that new version, baseline pairs below are the already height-legal structural pairs; a measured-water fallback preserves structural supports and cliff refusals, not333's unrestricted dry walking. Existing333 worlds retain their frozen policy. This amendment changes no existing waterfall surface arithmetic.
+
 ## 1. Actual source evidence and version boundary
 
 `TerrainRules.paint` uses paintCoherentElevation → paintChasms → paintWater → relaxCardinalElevation. Standing-water paint currently overwrites wet Tile.elevation with0; flowing routes retain scaffold levels. The field is categorical cover/sightline/routing data, not a measured wet bed. Capture the wet routing scaffold immediately before water paint, but compute banks from FINAL accepted dry terrain after relaxation and mandatory terrain edits. Do not use captured old dry levels as final banks. All new bed/surface values below are deliberately generated versioned facts, never invented measurements of old worlds.
