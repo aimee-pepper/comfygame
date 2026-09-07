@@ -53,6 +53,14 @@ Independent wings, fins, horns, spines and tails keep their saved presence and c
 
 Existing size, build, tissue, stature, shape and part fields supply the variation. World conditions influence those source traits first; appearance does not secretly reroll biology or add another cold, darkness or water bonus. No new breeding, creature editor, gait system or plant lifecycle is part of this batch. The proposed limb taper has internal specimen evidence, but the batch is not implemented or delivered. Continuous patterns across part joins, complete surface finishes and final artistic richness remain separate unfinished work.
 
+## Surface finishes and markings — intended next batch
+
+**Current:** generated life uses its source colour, a shine-based surface finish and soft bands applied separately to each part. Markings can restart or reverse at part joins, and dense bands can lose contrast. Full Schiller is not delivered.
+
+**Decided presentation direction:** preserve the actual colours of body regions, wood, foliage and harvested materials. Treat opacity, shine and Schiller as a finish mixture: the opacity share is matte/opaque finish, not permission to make a highly polished creature transparent. Surfaces remain opaque; existing foreground fading remains separate. Shine changes the reflected highlight. Schiller should produce a subtle, angle-dependent coloured sheen relative to the source colour, while neutral-coloured sources retain neutral sheen. This changes appearance, not materials, illumination, concealment or targeting.
+
+**Design/Asset first-pass plan, not delivered:** markings should use a shared direction and scale within each continuous material region, preserving the same pattern through connected parts, movement and reopening. Distinct wood, foliage and other regions can keep separate markings. Fine patterns may blend together at a distance rather than flicker. Actual specimen and part-specific colours must survive these effects and remain the colours used by crafting. Exact sheen strength and pattern filtering are production tuning; the required renderer support is still pending. A static rainbow tint does not count as completed Schiller.
+
 ## Height routes and inaccessible scenery — newly decided
 
 **Decided intended behavior, not delivered in337:** you can move between neighbouring tiles only when their supporting ground differs by at most one elevation level. This applies going down as well as up: there is no jump or drop shortcut. To reach a higher area, find a connected route of steps each no larger than one level. Existing terrain height steps define the level; water depth or artwork size does not redefine it. Deep water still requires its existing restrictions, and flowing water does not create a walking route.
