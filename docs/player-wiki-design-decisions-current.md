@@ -28,6 +28,20 @@ These refinements have internal native specimen evidence. The earlier ordinary m
 
 The existing3D trial remains the consumer; this adds no menu, swimming, erosion, flooding simulation or new material rewards. Large artwork does not enlarge a creature’s occupied space or a tree’s blocking base. Hidden actors and unseen water endpoints stay hidden, and remembered scenery does not reveal current movement or changes. Later shops and Essence recovery remain outside this work. No new decision homework is required from you.
 
+## Pressure-led families — accepted direction, not delivered
+
+You approved a lightweight family → species → individual hierarchy for both creatures and flora. World conditions and actual habitat support should influence which families are likely, while leaving several compatible solutions and plenty of independent variation. This develops the existing generator; it does not add all eight ranks of biological taxonomy or an ancestry/breeding simulation.
+
+**Current foundation:** creatures already choose among six body layouts according to habitat, with independent limbs, wings, fins and other parts. Flora already uses five construction families linked to metabolism and tissue. World pressures influence their source traits. The new family-selection and repetition rules below are not yet implemented or delivered.
+
+**Decided intended behavior:** broad families provide consistent structural rules, species retain their own generated anatomy and traits, and individuals keep their supported saved variation. A wet world may support multiple kinds of swimmers, shore creatures and nearby land life rather than funneling everything into one fish family. Plants use equivalent relevant structure: supported metabolism, body tissue, branches, leaves or other growth, and actual display parts. Independent counts, dimensions, colours and Pattern remain; family labels do not manufacture harvests, food, organs, abilities or Apex status.
+
+**Design first-pass tuning:** favour compatible body families using the creature's already-resolved traits, and gently reduce the chance of repeatedly selecting the same family. For flora, choose among pressure-supported families before allocating its existing tissue budget, then ensure those tissues actually match the selected family. Keep multiple choices possible wherever supported; do not force every world to contain every family or add creatures just to fill a category. A family can recur in different habitats and worlds with different species. The system reuses existing construction rules rather than requiring a finished model for every species.
+
+**What this improves:** coherent variety, recognizable differences between worlds and the amount of content supported by each added structure. It is not a promise of more simultaneous creatures, faster rendering or a larger map. First-pass weights need a bounded implementation check before broader diversity or balance claims.
+
+**Preserved:** the Bestiary stays Sky, Water, Amphibious and Land with its existing body groups. These remain browsing categories, not ancestry claims. Family membership never reveals an unseen species or guarantees a material. Existing worlds, specimens, learned records and owned source colours remain unchanged; only a separately enabled new-world generation policy may use the new choices. Current morphology corrections can finish independently. This accepted direction adds no decision homework.
+
 ## Next morphology batch — designed, not delivered
 
 **Decided direction:** make generated life read as coherent, distinctive forms rather than collections of simple parts. The next implementation batch follows the Bind fix and terrain work, starts with creatures, and covers every supported family. It preserves actual anatomy, source colours, material rewards, occupied tiles and existing saved appearances.
