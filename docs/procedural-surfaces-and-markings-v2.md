@@ -1,0 +1,53 @@
+# Procedural surface finishes and markings v2
+
+7 September2026. Design queue1, complete source specification; **intended batch, not delivered**. Aimee's accepted direction is source-faithful colour/Pattern and coherent procedural life. Numerical mappings here are Design/Asset first-pass tuning, not individually approved player choices. Coordinate with morphology v2; hotfix/terrain priorities remain independent. No new biology, materials, stats, shader production assignment to Asset, native trial or required Aimee decision.
+
+## Current consumer and exact limits
+
+RuntimeAssemblyRenderer.make currently applies sRGB8 tint with alpha1, scalar roughness and an optional32×32 RGBA8 grayscale pattern texture. Pattern alpha is255. At row-centre y, m=(sin(2pi*((y+0.5)/32*bands+phase))+1)/2; mask byte=round(255*(1−0.45*(strength/100)*m)). Zero strength bypasses the texture. Bands/phase come from saved structure. Sixteen bands across32 rows can lose contrast at particular phases. The mask is U-constant; painting around a U seam cannot fix axial phase reversal.
+
+Stock cylinder/ellipsoid V runs top→bottom; profiled cylinders run base→tip. Repetitions copy those UVs. Stock primitives do not explicitly supply normals, while profiles do. Material-slot names are not finish dispatch. ModularCreatureAppearance currently freezes scale/sRGB/roughness only, then overrides all species parts uniformly. A species-only shader change cannot preserve future specimen/region finish or colour overrides.
+
+Asset capability record94fcb6e5, docs/procedural-material-capabilities-2026-09-07.md, is the reconciled authority: the earlier unpublished translucency proposal is withdrawn. No new preview was needed.
+
+## One source-to-region appearance contract
+
+Freeze the actual source Colouration(Cyan/Magenta/Yellow/Depth/Pattern) and Finish(opacity/shine/schiller) before projection. The Finish triple is an allocation summing100, not three unrelated intensities. Validate finite0–100 values and the generation owner's normalized sum; do not silently repair malformed newly authored data in the renderer. Preserve raw values and their source identity alongside derived render values.
+
+Assign semantic region IDs: creature exterior (core/head/support limbs/tail), each actual wing, each actual fin, actual horns and separately declared surface tissue; flora wood/support, foliage/growth and explicit display. A region shares its parent's source appearance unless there is an already explicit source-region override. Region IDs do not create inventory families. Source-linked timber wood colour overrides only wood, not foliage; absent colour stays explicitly unknown on legacy stock. Do not invent part hues, scar palettes, coloured organs or material types from hardness/Schiller.
+
+Store region source binding plus full finish/Pattern in new recipe metadata and specimen appearance. Resolve inheritance versus explicit source overrides BEFORE rendering. Specimen inheritance may update its inherited regions, but cannot overwrite an explicit per-region colour/finish with one global tint/roughness. Flora memory saves the resolved observed recipe/appearance; hidden live source changes do not replace it. Existing saved receipts, material grading, quantities and source-colour crafting remain untouched.
+
+## Finish meaning and exact first-pass mapping
+
+Let O,S,I be normalized opacity,shine,schiller divided by100.
+
+- **Opacity is the matte/opaque contribution in this finish allocation. Material alpha remains1; Pattern alpha remains255.** A glossy source is not made see-through merely because allocating shine lowers O. No alpha-floor formula or new blending policy is part of v2. True material translucency would require an explicit later source rule; the older AssetLab text was a recommendation, not an accepted transmission model.
+- **Shine:** base roughness R=clamp(1−0.85S,0.15,1), retaining the existing smooth-source mapping. A declared rough flora surface uses max(0.65,R) in v2 so rough tissue still reads rough while its actual finish can vary. Current v1 instead overrides to0.95; this changed floor is explicit new tuning, not a claim about delivered behavior. Metalness stays0 and emission stays0; shiny does not mean ore/metal, illumination or danger.
+- **Schiller:** a bounded angle-dependent reflected sheen, not painted rainbow albedo. Required response uses normalized surface normal N and view direction V in the same space, mu=clamp(abs(dot(N,V)),0,1). First-pass sheen amount=0.25I*(1−mu)^2. Reflected hue offset=12degrees*I*(2mu−1) relative to the source hue; no time-based cycling. Keep source albedo unchanged except its actual Pattern. Preserve saturation/value of the source-relative sheen colour; achromatic sources (maxRGB−minRGB≤1/255) receive neutral sheen, not an arbitrary hue. At I=0 the extra response is absent. These are stylized reflected-sheen bounds, not a thin-film physics claim or new coating material.
+
+Existing foreground fade is applied once by its own owner after material appearance; it cannot grant sight, targeting or collision changes. Ordinary scene lighting modulates finish; the material adds no light. Quality borders/name styling remain interface presentation, not biological colour.
+
+Examples: O100/S0/I0 is opaque/matte; O0/S100/I0 is opaque/high-shine at roughness0.15; O0/S0/I100 has its source base colour with the bounded reflected angular sheen; default70/20/10 has roughness0.83 and at most0.025 extra sheen. No finish value classifies Chitin or activates a material reward; legacy code comments suggesting that are not the new material authority.
+
+## Marking coordinates, continuity and sampling
+
+Keep current32×32 RGBA8 texture and its exact recipe for legacy v1. V2 requires an explicitly frozen pattern coordinate frame for each continuous material region: origin, unit axis, positive extent, and source strength/bands/phase. For creature exterior use the body front→back axis; each wing/fin/horn uses its root→tip axis. Flora wood uses root→tip only where wood actually has Pattern; foliage/display use their declared growth axis. Do not add wood Pattern where the source/accepted recipe has none.
+
+For vertex p transformed through all parent sockets, axial frames and repeated poses into its region frame, v=bands*dot(p−origin,axis)/extent+phase. Identical positions in the same continuous region have identical v, regardless of primitive type or tessellation. Separate wood/foliage/tissues may deliberately use distinct frames. Scale region origin/extent with geometry so specimen scaling does not reroll markings. Camera/world movement does not affect coordinates. No global mesh fusion or world-origin texture projection.
+
+V2 analytic marking evaluation removes the32-row lookup limitation without inventing a larger texture. Let d=fwidth(v), A=1−smoothstep(0.35,0.75,d), m=0.5+0.5*A*sin(2pi*v). Preserve the saved bands/phase/strength, and compute M_sRGB=1−0.45*(strength/100)*m. Decode that neutral sRGB mask to linear before multiplying linear source albedo, matching the current colour-texture interpretation. Zero strength is exactly neutral. Derivative filtering may correctly average unresolved distant bands; it must not silently lower a saved band count. This is new shader support, not an ability of the current texture helper. No promised spots/stripes taxonomy, scars, per-pixel anatomy or extra per-tile randomness.
+
+## Required renderer work and actual capability boundary
+
+Required additions are versioned region appearance/coordinate transport through new-book preparation, species recipes, actual specimen projection and permitted memory; shared transformed-vertex/normal/frame evaluation; analytic filtered Pattern; and a reflected-colour Schiller response. Use an independent surface revision so old material reconstruction is explicit. Region metadata participates in cache identity; templates remain cloned without cross-specimen mutation. No new texture pack or semantic resource node is needed.
+
+Apple documents PBR properties and custom surface shaders, but this is not proof every desired response is a scalar setting. Inspection of installed iPhoneOS26.2 RealityKitSurfaceShader.h confirms view_direction and scalar specular/clearcoat setters; it does NOT expose a direct coloured-specular setter in that surface interface. Engineering must choose a supported reflected-colour material/shader path and verify it in the existing consumer. Do not substitute albedo hue cycling, emissive light or metalness and call it Schiller. If that exact backend is unavailable, retain current source-colour/PBR fallback with Schiller explicitly incomplete; coordinate the technical dependency through PM. Region transport and analytic Pattern remain independently implementable. This is a renderer dependency, not missing Aimee product direction.
+
+Primary API references: [PhysicallyBasedMaterial](https://developer.apple.com/documentation/realitykit/physicallybasedmaterial), [custom RealityKit materials](https://developer.apple.com/documentation/realitykit/modifying-realitykit-rendering-using-custom-materials). Asset's94fcb6e5 source review supplies current consumer facts; no unsupported shader implementation or benchmark is claimed.
+
+## Bounded acceptance and completion
+
+Reuse existing material/recipe tests for zero/full/mixed finishes, exact default roughness, rough-surface floor, achromatic Schiller, Pattern0 and high-frequency phase, normal/axis direction across ordinary/profile meshes, repeated parts and actual source-region overrides. Check same source after specimen projection/save/reopen and permitted memory; future tint handling cannot bleach explicit wood/foliage differences. Native proof at the actual iPhone/default text/current appearance uses an existing specimen only when needed to validate the changed shader and contact/visibility treatment. No configuration matrix, new world search, opaque-to-transparent comparison task or Design rerun.
+
+A full v2 finish claim requires actual reflected angular colour behavior, stable region markings and correct inherited/explicit source custody. A bounded intermediate delivery may name the parts actually implemented; it cannot label unresolved Schiller or seamless Pattern complete. Geometry budgets stay unchanged; no scene-performance claim follows from these formulas.
