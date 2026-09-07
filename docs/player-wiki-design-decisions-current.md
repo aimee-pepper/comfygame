@@ -111,6 +111,14 @@ Some aquatic creatures can begin beyond player reach and approach shallow water 
 
 **Preserved behavior:** existing saved worlds and unfinished opening expeditions keep their earlier routes, creatures and resources. New water geometry respects the height limits even when it falls back to simpler water presentation. Ordinary gameplay remains2D, with the existing Settings3D view available. The337 Bind correction is retained. This adds no swimming, climbing or new trial menu. The later morphology, finish/marking and shared readability batches remain intended, not included in338.
 
+## Deposit markers — correction pending
+
+**Current reported behavior:** some Coal, Iron and Quartz deposits appear as generic boxes in the map. Their actual material identity and required packed Pick still belong to the source; the shared picture is a presentation gap.
+
+**Decided correction:** Coal will use its selected coal artwork, Quartz its existing quartz picture, and Iron an existing ore picture as a temporary illustration. Iron will still be named **Iron** when selected or inspected. Reusing that picture does not turn Iron into a different resource, change mining requirements or claim final Iron artwork. Visibility, occupied bases, yield and depletion remain unchanged. This correction is not delivered yet.
+
+A separately reported in-world crash is under investigation. The marker correction does not establish a fix for that crash, and the earlier Bind/departure fixes below remain distinct.
+
 ## The beginning as one connected path
 
 **Bind navigation fix — retained in installed341:** build339 could crash when opening the Writing Desk’s **Bind** review in a campaign carrying gear; the earlier337 fix did not cover that case. The focused correction is now installed, device readback is verified and ordinary phone launch succeeded. Internal checks using a separate copy of the affected campaign passed opening the review and reopening the save without changing inventory or departing. Physical-phone **Bind** interaction remains unconfirmed; ordinary app launch does not establish that this navigation is fixed on the phone.
