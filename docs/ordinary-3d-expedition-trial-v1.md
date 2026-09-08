@@ -2,6 +2,10 @@
 
 **6 September 2026 · Aimee-approved scope; delivered in phone327, with bounded evidence below.** PM relayed approval for an opt-in ordinary 3D expedition after Engineering safely finishes the current Bowyer checkpoint and before the remaining shops. Aimee then queried the phrase “through Return and reopening”; keep this to **one ordinary trial expedition and a quick save/reopen check**, not a campaign/progression test or a wider acceptance programme.
 
+## Superseded main-campaign restriction —8September
+
+Aimee now authorizes normal expeditions in3D: follow [normal transition](normal-expedition-3d-transition-v1-2026-09-08.md). Earlier trial-only prohibitions and the promise of a separate2D main game below are historical. Trial save isolation remains required. Current355 ordinary2D remains until delivery.
+
 ## Existing Settings entry and concise wording
 
 - Entry stays **Settings → Owner Tools → 3D Trials**; this is not a New Game campaign choice.

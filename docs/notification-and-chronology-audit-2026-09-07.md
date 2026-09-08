@@ -30,7 +30,7 @@ Paths below are relative to Sources. Placeholder braces denote the existing runt
 | --- | --- |
 | Persistence/GameStore.swift `.harvested` | `Harvested {amount} {resource}.` Append ` Depleted.` only when exhausted. |
 | `.earlyMaterialHit` | Keep `The trunk is partly cut.` for zero yield; otherwise `Gathered {amount} {material}.` Append ` Depleted.` only when true. |
-| `.readPage` | `Diary page read.` Full exact prose remains in its existing Library diary page; do not discard event payload or learned reward. |
+| `.readPage` | `Diary page collected` Full exact prose remains in its existing Library diary page; do not discard event payload or learned reward. |
 | `.readFoundWriting` | `Field writing read.` Full record remains on its existing Library shelf. |
 | `.surveyed` | `Survey complete: {count} readings.` Exact values remain in WorldDescriptionPanel's existing **Measured** section. If any committed reading lacks that existing display, retain concise `{name}: {value}` for that reading until the existing projection is repaired; never silently lose a reading. |
 | `.metTraveller` | `{name}, {calling}.` Omit blurb from notification; existing meeting retains character text. Unknown fallback `Someone is here.` |
@@ -192,3 +192,7 @@ Presentation key: canonical material identity (including supported material subt
 ## Hostility verification closure — test-only repair
 
 Engineering checkpoint `35c30b29700ca26da71275f657060c8be3fa8de3`, receipt `docs/animal-hostility-fixture-repair-2026-09-08.md` in animal-hostility-fixture, closes the reported gap. The test removed a companion from encounter order/slots while retaining its frozen gear/participant receipts, so exact save validation correctly refused the candidate. The earlier missing-file/fresh-store explanation was incomplete. The repair builds the intended Binder-only party before production encounter construction, validates/writes/loads real state and aligns the Binder turn. Original forced-miss/ordinary exact-target hostility/trust, status-only Snuff and healing exclusions remain; attack and status results survive actual disk reopen. Focused1PASS. No companion rule/assertion relaxation, validation bypass, production change or new phone build/launch; installed354 is unchanged. PM has closure; no Design duplicate test or Aimee engagement.
+
+## Superseding diary instruction —8September
+
+Collection now requires “Diary page collected” plus exact-page “Read now” while the notification is visible. Follow [the bounded contract](diary-collected-read-now-v1-2026-09-08.md). Preserve pickup-time learning/XP, later Library ownership and actual-rendered attention semantics; no new reading prerequisite. Current355 copy remains until Engineering delivers this correction.

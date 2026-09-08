@@ -2,11 +2,15 @@
 
 8 September2026. PM relayed Aimee’s explicit direction that a paused avenue must not stop the team, and requested the wider accepted backlog be reconciled. This record supersedes the old microqueue’s active ordering. It is not a new full-tenure audit or an instruction to implement every historical proposal. Urgent evidenced player blockers still interrupt; after preserving a completed checkpoint, take the next ready outcome without waiting for phone launch or final visual approval.
 
+## New direct priorities —8September
+
+Engineering first resolves Aimee’s intermittent combat “Securing action” hang under existing durable exactly-once semantics. No skip-save, invented refund or duplicate action. Next, [normal3D transition](normal-expedition-3d-transition-v1-2026-09-08.md) supersedes the trial-only and NEW-world recording restrictions. The bounded diary collected/Read now correction proceeds alongside it. Stem correction and prepared Asset work continue independently. Discovery and the numbered rows below follow these direct fixes. No one waits for decorative iridescence or phone-launch confirmation.
+
 ## Delivery and authority baseline
 
 Installed355 delivers the connected opening from331/332, modular life/terrain, corrected material stacks and notifications, source colours/shine/Pattern, shared3D feedback, pressure families and current plant components/proportions. Trust the supplied delivery receipts; do not repeat installations or native acceptance. Aimee prefers355’s foliage and rejects generic egg stalks, so the next stem correction is explicitly authorized. Selected iridescence is accepted on appropriate some-bird/fish/reptile surfaces; its backend remains a separate dependency.
 
-The machine board Sources/Content/Data/playability-roadmap.json is dated21 August and still calls encounter-scaling the primary, font work in progress and many delivered features queued. The historical progression documents also contain old phone gates and later/recovery priorities. Those fields are not evidence to redispatch work or supersede September’s direct instructions. PM should reconcile the active board pointers to this current sequence without mechanically marking all94 historical rows done or reopening them. Shared root remains PM-owned.
+The machine board Sources/Content/Data/playability-roadmap.json is dated21 August and still calls encounter-scaling the primary, font work in progress and many delivered features queued. The historical progression documents also contain old phone gates and later/recovery priorities. Those fields are not evidence to redispatch work or supersede September’s direct instructions. PM authorized Design to reconcile active board pointers to this sequence on8September without mechanically marking all94 historical rows done or reopening them. Shared root remains PM-owned.
 
 ## Ordered ready work and independent lanes
 
@@ -25,7 +29,7 @@ Items2 and3 do not depend on item1 finishing visually or on iridescence. Asset c
 
 The opening is already delivered: zero-rune lessons, rune acquisition, starting tools, traveller invitations, early resources and first Apothecary/Forge/Tannery crafts. Do not restart that overhaul, restore starter ownership, reinstate Not now, or create a new player trial. Natural pacing and Aimee’s play feedback remain open; a missing play report is not a reason to idle or schedule another multi-expedition recovery test.
 
-The temporary ordinary2D mineral restriction remains Aimee’s accepted recording direction. It still affects Iron/Forge progression there; the existing3D route retains its own real sources. Do not silently lift that restriction, add substitute materials, promise a fully verified ordinary-phone progression route or require a phone launch before development. A later change to the recording restriction belongs to Aimee via PM.
+The temporary ordinary2D mineral restriction remains current in355 and retained policy1 books. Aimee now explicitly authorizes ending it for NEW normal3D worlds. Preserve old maps and paid book facts; do not insert substitute resources, regenerate existing worlds or create a separate progression path.
 
 Existing colours, same-subtype/quality stack grouping, safe cancellation, actual tool/source reach, one resource per tile, guaranteed written-source quote/refusal and saved campaign preservation remain cross-feature invariants for every new item. Verify the interactions actually changed once; do not recreate completed audit or stock fixtures without evidence of a regression.
 
