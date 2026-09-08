@@ -1,5 +1,10 @@
 # Accepted early-game and 3D work — current execution sequence
 
+## Immediate direct override — ONLY notifications move
+
+Aimee's exact correction supersedes all moving-navigation scope below. Follow notification-only-anchoring-correction-v1-2026-09-08.md: restore controls/carriedStrip/context to original fixed layout; only notification switches. Immediate correction, then sidewalls. Production shadows, real essence artwork, gathering-animation and occupancy corrections stay authorized. Preserve creature-disclosure checkpoint; no broad rollback or owner question. Earlier359 PASS is not scope acceptance.
+
+
 8 September2026. PM relayed Aimee’s explicit direction that a paused avenue must not stop the team, and requested the wider accepted backlog be reconciled. This record supersedes the old microqueue’s active ordering. It is not a new full-tenure audit or an instruction to implement every historical proposal. Urgent evidenced player blockers still interrupt; after preserving a completed checkpoint, take the next ready outcome without waiting for phone launch or final visual approval.
 
 ## New direct priorities —8September

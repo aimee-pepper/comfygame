@@ -2,9 +2,15 @@
 
 This is the current record of the changes agreed today. **Decided intended behavior** describes the game we are making; it does not mean that behavior is already available on your phone. **First-pass tuning** gives concrete starting numbers that can change through play. **Unsettled proposals** still need design work or a choice.
 
+## Urgent correction — only notifications should move
+
+**Decided intended behavior:** only the notification pane switches edges when your character approaches within two visible tile heights. At this place stays fixed. Movement controls, minimap, Use Tile, Look, satchel and Field Kit stay fixed at the bottom in their original layout. Notifications retain exact page links, expiry and opposite-edge hysteresis.
+
+**Current problem in361:** the earlier implementation moves the whole navigation block. That was an incorrect interpretation and is being corrected urgently. Its installation and layout review do not make it intended behavior. The rest of the delivered3D game remains intact.
+
 ## Current installed update —361
 
-Build361 corrects how falling water sits against its own shore ledge, keeps it connected to the upper water and makes its downward streaks clearer. It retains360’s stems and caps, moving navigation, normal3D exploration and **Diary page collected → Read now**. Installation is verified; this is not a completed physical-phone playtest or your visual acceptance.
+Build361 corrects how falling water sits against its own shore ledge, keeps it connected to the upper water and makes its downward streaks clearer. It retains360’s stems and caps, normal3D exploration and **Diary page collected → Read now**. Installation is verified; this is not a completed physical-phone playtest or your visual acceptance.
 
 The intermittent **Securing action** hang remains unreproduced and has not been confirmed fixed. The waterfall’s contact, exposed face and sampled downward progression passed a bounded review; real-time smoothness and flicker remain unverified. Long bare upper stems and weak distinction between needle and frond plants at ordinary scale remain visible limitations; finished whole-plant believability is not established.
 
@@ -396,7 +402,7 @@ This demonstrates only the ordinary actions actually tried in3D. It does not est
 
 ## Field and terrain feedback · 5 September
 
-**Explore navigation — installed in359:** the movement controls, minimap, Use Tile and Look buttons, together with the satchel and Field Kit strip above them, move between the bottom and top of the exploration view. When your character approaches within two visible tile heights of being covered, the block moves to the opposite edge and stays there until your character approaches that edge. Place information and notifications sit just inward from it toward the middle of the view, with expanded details opening inward. The map keeps the same size and tile scale when the controls switch. If both positions are too close, the controls stay at their current edge rather than repeatedly switching. A press held during relocation is cancelled, so releasing at the old position cannot trigger a different action; press again at the new position. Internal checks passed both anchors, expanded details and Close, held-input cancellation, and a bounded loot/tutorial case. Asset’s layout review passed. These checks and verified phone installation do not establish a completed physical-phone playtest or every possible notice combination.
+**Notification placement — urgent correction pending:** only notifications should move. At this place and its details stay fixed, as do all navigation and carried-item controls in their original bottom layout. The restored map keeps its size and tile scale during notification switches. Exact Read now identity, normal expiry and safe touches remain. If both edges are too close, the notification stays put. Builds359–361 currently move the whole navigation block; that unwanted behavior is being corrected.
 
 **Forecast wording — installed in357:** the approximate collapse countdown says **About 588 turns left**, for example, instead of using a tilde that can look like a minus sign. The estimate and collapse rules are unchanged.
 

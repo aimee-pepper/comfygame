@@ -1,5 +1,8 @@
 # Phone359 — Design reconciliation
 
+**Scope revoked:** Aimee subsequently directed “JUST THE NOTIFS NEED TO MOVE”. This is a historical installation/test receipt of the unwanted whole-block implementation, not intended behavior. Follow notification-only-anchoring-correction-v1-2026-09-08.md for restoration.
+
+
 8 September2026. Read supplied explore-navigation-anchoring/docs/phone-359-installation-2026-09-08.md and explore-navigation-implementation-2026-09-08.md; Asset supplied four-view PASS ba08bff1. No duplicate capture, tests, installation, phone launch or campaign interaction.
 
 Delivery a7b0d3e6e0d0ffe41c4760b5fb4c910b24195e6b; installed source b00a0b8d570d2a7ba5141f2f63df4a552c3c837a/tree837a724829513cb8ec94935beb421e3b2b239941. Install/readback2026-09-08T19:52:56.933438Z. ArtifactSHA256 e489aa4f0fd83e9fc7116bb1fcd19a63d43e34a57b1505eac5766662251c437f.
