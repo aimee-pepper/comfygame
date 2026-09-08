@@ -1,6 +1,6 @@
 # Aimee Homework
 
-Updated 7 September 2026. One place for your decisions, design to-dos and optional creative work. You are not holding up the early crafting work by leaving a later refinement question open.
+Updated 8 September 2026. One place for your decisions, design to-dos and optional creative work. You are not holding up the early crafting work by leaving a later refinement question open.
 
 
 ## 3D authoring direction
@@ -35,7 +35,7 @@ Build329 delivers your invitation Not now removal and the unrequested wood-colou
 
 **You approved implementation and matched before/after examples:** slimmer stems and less tightly capped leaves on unbranched fibrous plants, compact basal rosettes, and fleshy branches/foliage emerging at the outer body surface. Already-readable branched woody/fibrous forms and corrected unbranched fleshy rosettes would stay as they are.
 
-**Tradeoff:** shorter basal silhouettes and wider fleshy branch fans; existing anatomy, counts, materials, rewards and older books stay unchanged. The revision has passed internal implementation checks and review of the matched examples. Phone delivery and your final visual acceptance remain pending. The [accepted plant-silhouette revision](design-decisions-september-4.html) explains the scope.
+**Tradeoff:** shorter basal silhouettes and wider fleshy branch fans; existing anatomy, counts, materials, rewards and older books stay unchanged. The revision has passed internal implementation checks and review of the matched examples. Build355 is installed on your phone; your final visual acceptance remains pending. The [accepted plant-silhouette revision](design-decisions-september-4.html) explains the scope.
 
 ## 1. Decision needed: spending a Mote on a chance
 
