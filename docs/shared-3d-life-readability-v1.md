@@ -1,6 +1,6 @@
 # Shared 3D life readability — presentation contract v1
 
-7 September 2026. **Design queue item2: implemented and internally reviewed at de41596f; installation pending.** Consolidates accepted harmful-growth, actual Apex, occupied-base targeting and observation/fade rules. It changes no gameplay or knowledge entitlement. Layout recommendations below are Design first-pass tuning, not new Aimee decisions or delivered artwork.
+7 September 2026. **Design queue item2: implemented at de41596f and installed353; phone entry unverified.** Consolidates accepted harmful-growth, actual Apex, occupied-base targeting and observation/fade rules. It changes no gameplay or knowledge entitlement. Layout recommendations below are Design first-pass tuning, not new Aimee decisions or delivered artwork.
 
 ## Authority and baseline evidence through352
 
@@ -79,7 +79,7 @@ Use existing visibility/action/persistence tests and one existing native Setting
 
 Record actual iPhone16Pro target402×874pt/1206×2622px, default text/current ordinary appearance for native visual evidence. Asset3 becomes actionable only after Engineering supplies the named implemented consumer/events/dimensions/formats. Pending native integration and final visual acceptance are not missing Aimee design decisions. Route any failure requiring Aimee's engagement to PM with concrete evidence and requested resolution, never ask her to monitor or relay it from this task.
 
-## Internally verified shared3D candidate — installation pending
+## Internally verified shared3D candidate — subsequently installed353
 
 Engineering checkpoint `de41596fb2d9e1519f1063763f03a34da67235f4`, treec4a484f8270e1dd5579828d04b409882c5a6b245, receipt `docs/shared-3d-readability-implementation-2026-09-07.md` in shared-3d-readability, implements the named gaps on352 ancestry. `OrthographicWorldSceneAdapter` transports only actual full-sight Apex/alert; current `MapGrid.enemy` permits no limited-sight warning, so none is invented. `OrthographicSourcePresentation` uses the actual WorldView Use Tile/directional deposit command and exact source quote. Multiple sources remain unselected until a real command owns one; mesh hits do not execute work, and hidden occupancy cannot alter disclosed selection.
 
@@ -87,4 +87,10 @@ Engineering checkpoint `de41596fb2d9e1519f1063763f03a34da67235f4`, treec4a484f82
 
 Seven supplied focused checks pass across readiness, hidden occupancy, Apex/sight loss, dangerous growth withdrawal, committed partial/final work and reopen, durable legacy extraction, interaction priority and the native mounted consumer. Asset90849b87 same-view composition PASS is bounded to the supplied actual-copy/work/Apex-alert images. Actual capture device is Engineering iPhone17Pro/iOS26.2 at target-matching402×874/default/current dark. No Design native rerun. Unseen cleared glyph, every overlap, physical entry and Aimee acceptance are not visually established;329 fade evidence is reused unchanged.
 
-Phone353 installation is in progress and not yet claimed. No locked-phone launch retry absent new evidence per PM. No gameplay reach, anatomy, generation, geometry, surface/save policy or new warning entitlement is introduced. Installed352 source/Pattern work remains intact; Schiller and fibrous whole-plant readability remain separate unfinished work.
+Phone353 installation is now verified by the receipt below. No locked-phone launch retry absent new evidence per PM. No gameplay reach, anatomy, generation, geometry, surface/save policy or new warning entitlement is introduced. Installed352 source/Pattern work remains intact; Schiller and fibrous whole-plant readability remain separate unfinished work.
+
+## Phone353 installation — usable entry unverified
+
+Engineering delivery HEAD `06573c4dc41f1a8e9e3a2695fedec4a21ffb6095`, receipt `docs/phone-353-installation-2026-09-07.md` in shared-3d-readability, establishes physical installation/readback at2026-09-08T06:45:59.929406Z for source `de41596fb2d9e1519f1063763f03a34da67235f4`. The existing3D consumer now includes the actual-source readiness/command, full-sight Apex/alert and committed current-session work connections above, plus durable-before-publication legacy extraction. Existing gathering mute and independent actual state/essential cues remain authoritative. No new generation/surface revision, anatomy, source entitlement, remote warning or trial.
+
+Seven supplied focused checks and Asset90849b87 bounded same-view review apply. All352 and earlier work remains included. No phone launch retry, campaign play/reset/uninstall or progress edit occurred. Installation is verified, but usable phone entry/Aimee playtest readiness and final visual acceptance remain unverified; PM owns the locked-phone follow-up. No Design duplicate verification. Exact Schiller and fibrous whole-plant readability remain unresolved and are not closed by this delivery.
