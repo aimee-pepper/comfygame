@@ -70,3 +70,7 @@ Bounded actual stem/cap integration and approved spore contact are installed360;
 ## Installed361 supersession
 
 Waterfall receiver-face/lip/contrast correction is installed361; see phone-361-design-reconciliation-2026-09-08.md. The overlap defect has a bounded Asset contact/exposure/sampled-direction PASS, without real-time smoothness or natural occurrence proof. This correction is complete; other prepared backlog remains available under PM scheduling, without new repeat checks or phone-entry gates.
+
+## Independent plant refinement — Design contract ready
+
+PM assigned continued realistic-plant work after the bounded360 delivery. fleshy-plant-distribution-morphology-v3-2026-09-08.md consolidates leafy fleshy support/crown placement, true source-angle branches, owner-surface leaves, saved-length expression and anatomical frond faces without new organs or assets. Basal/other families/old books exact. Asset bf6e813e supplied diagnosis and source-frame sanity review; arithmetic checked, no new native work. Engineering creature-disclosure is already active independently; this packet does not interrupt it. Only the settled batch is Wiki intended; future grammar stays proposal.

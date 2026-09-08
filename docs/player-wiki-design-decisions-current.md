@@ -50,6 +50,14 @@ Internal contact, source-count and saved-world checks passed. Asset reviewed all
 
 Swollen cactus or succulent forms still require actual supporting anatomy. Fleshy tissue, thorns or needle-shaped growth alone do not establish a cactus, and current plant records have no separate swollen storage stem.
 
+## Plant crowns and leaf arrangement — decided, not yet delivered
+
+The next coordinated refinement affects leaf-bearing fleshy plants that grow upright or carry branches. Shorter, more tapered supports and branches distributed farther up the stem will bring the existing foliage into the upper silhouette. Leaves will attach to their owner's actual surface, with more of their saved length visible. Opposite leaves share a node, alternating leaves advance along their support, and whorls and rosettes remain grouped. Fronds present their existing broad faces in a consistent plant-relative orientation; needles remain narrow. No leaves or branches are added to fill gaps.
+
+Compact basal rosettes and the other plant families retain their current forms. Source colours, material properties, harvests, counts and older saved appearances remain unchanged. The refinement can improve proportions and distinction without promising that every plant will be easily distinguished or look finished at ordinary scale. This is accepted intended work, not included in361.
+
+**Unsettled future possibilities:** additional branch orders, multiple stems, storage organs, separately variable leaflet or needle-cluster counts, and more detailed flowers would need their own source structures. They are not added by this refinement, and they do not block it.
+
 ## Generated 3D life and connected waterfalls
 
 **Decided intended behavior:** plants and creatures are generated in game when you write a world. The game may combine reusable body bases, plant parts and attachments, but choosing a finished premade species is not the generation system. World conditions shape the available life; its actual traits determine structure, proportions, colour and Pattern. A saved world keeps its identities and appearance when reopened. Harvested flora and creature materials keep their actual source colours through supported crafting uses.

@@ -45,6 +45,8 @@ Build329 delivers your invitation Not now removal and the unrequested wood-colou
 
 **Tradeoff:** shorter basal silhouettes and wider fleshy branch fans; existing anatomy, counts, materials, rewards and older books stay unchanged. The revision has passed internal implementation checks and review of the matched examples. Build355 is installed. You prefer its foliage improvements and requested a further correction to ordinary egg-shaped stalks; that correction is now installed in360 for newly written worlds, together with authored fungal caps and their attachment correction. All16 matched images passed the bounded review; long bare stems and weak needle/frond distinction at ordinary scale remain. Existing books keep their saved shapes, and your final visual acceptance remains separate. No routine proportion choice is waiting on you. The [accepted plant-silhouette revision](design-decisions-september-4.html) explains the scope.
 
+**Further plant refinement — planned, no decision needed:** a coordinated adjustment to existing leafy fleshy stems, branch placement and leaf arrangement will address the remaining bare upper stems and weak needle/frond distinction. It preserves counts, materials, compact basal rosettes, other families and older books. It is not delivered yet; future new-organ ideas remain separate proposals.
+
 ## 1. Decision needed: spending a Mote on a chance
 
 **Status: open · affects the later Peerless refinement rules.**

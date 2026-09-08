@@ -95,3 +95,7 @@ Bounded Engineering cases: full sight versus fringe/crypsis/remembered/remote Ap
 ## Conditional weather-context extension
 
 [Climate relationships and observed-weather notes](creature-climate-observation-v1.md) now defines an optional extension at this same actual full-sight knowledge event: retain a small number of witnessed world-weather contexts from the valid presented receipt. No hidden creature, specimen measurement, immunity, extra XP, inventory or retrospective legacy observation follows. This proposal remains unimplemented and does not change the base disclosure contract.
+
+## 8 September durable sight integration clarification
+
+When a real action produces new sight knowledge, its action result and observation must use the existing durable candidate commit owner together. Ordinary movement currently publishes before a debounced save; it cannot optimistically publish new Seen knowledge under this contract. Failed persistence rolls back the owning action and sight together with existing admission/retry semantics. Preserve costs, full-sight/crypsis gates, cancellation and exactly-once behavior; pure Look/renderer stays read-only. This is an integration of the already accepted persistence requirement, not a new reward or gameplay decision. Engineering proceeds independently of plant refinement.

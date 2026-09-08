@@ -45,3 +45,7 @@ Stage fit: direct correction to the installed consumer. Stable dependencies: act
 ## Concurrent cap integration — narrow contact exception
 
 The separate fungal-cap-display-contact-correction-v1-2026-09-08.md authorizes only the inherited spore-display attachment-height correction on new morphology2/component6 actual caps. It does not broaden ordinary fleshy support mapping: cap owner/cohort poses, display extent/count/rotation/lateral offset and all old books stay intact. Actual evaluated cap geometry determines the existing display root height.
+
+## Planned continuation after delivered360
+
+fleshy-plant-distribution-morphology-v3-2026-09-08.md consolidates remaining leafy upright/branched fleshy silhouette correction under a NEW morphology3/component6 pair. It supersedes the old preserve-all-branch-poses rule only for that future scoped batch, with source counts/materials and old2 books exact. Existing unbranched basal rosettes, growth-absent forms and all other families remain2 geometry. No new export or organ is needed.
