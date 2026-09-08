@@ -31,6 +31,12 @@ The [opening path](design-decisions-september-4.html) is delivered in build331 f
 
 Build329 delivers your invitation Not now removal and the unrequested wood-colour trial menu removal; requested3D trials stay. Build330 delivers the agreed quality borders and full normal Explore viewport in3D;345 completes Hide subtype-and-quality totals with exact variants expanded on tap. These are no longer pending Engineering corrections or new homework for you. The existing creature questions remain reference, not the active design priority.
 
+## Proposal awaiting your review — plant support and foliage
+
+**Recommendation:** approve a limited comparison with slimmer stems and less tightly capped leaves on unbranched fibrous plants, compact basal rosettes, and fleshy branches/foliage emerging at the outer body surface. Already-readable branched woody/fibrous forms and corrected unbranched fleshy rosettes would stay as they are.
+
+**Tradeoff:** shorter basal silhouettes and wider fleshy branch fans; existing anatomy, counts, materials, rewards and older books stay unchanged. This is a proposal, not an implemented change or accepted final appearance. The [plant-silhouette proposal](design-decisions-september-4.html) explains the scope.
+
 ## 1. Decision needed: spending a Mote on a chance
 
 **Status: open · affects the later Peerless refinement rules.**
