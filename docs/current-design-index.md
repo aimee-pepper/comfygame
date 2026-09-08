@@ -18,12 +18,7 @@
 - `phase-1-phone-acceptance-card-current.md` — exact phone pass/fail sequence for the active
   playability checkpoint chain.
 
-> **Active scheduling authority:** `player-progression-implementation-roadmap-current.md` for
-> reachability order and gates, with
-> `Sources/Content/Data/playability-roadmap.json` as the actively updated operational board rendered
-> by DEBUG tools. Aimee is the sole tester for this phase; Essence continuation and early Trading
-> Post/Recycler offloading are hard blockers.
-> This index still routes system truth, but document breadth does not imply implementation priority.
+> **Current scheduling and behavior authority:** Aimee’s latest direction, the public Wiki’s current/decided sections and `game-design-early-progression-direction-2026-09-04.md` govern the cohesive opening. PM maintains the active work board. Essence recovery and later-shop implementation are paused; older roadmap gates do not reactivate them. `game-design-tenure-audit-2026-09-07.md` records reconciled contradictions and remaining work. Before handing off a behavior change, cite the accepted rule and classify the action as implementation, defect correction, permitted detail, proposal or an explicitly attributed owner change. Reconcile affected feature pages, shared summaries and homework together.
 
 | Playtest tooling | Authority | Purpose |
 |---|---|---|

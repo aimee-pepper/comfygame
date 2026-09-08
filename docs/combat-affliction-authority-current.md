@@ -87,11 +87,12 @@ One persisted round-advance receipt owns the boundary. Save/relaunch between the
 tick cannot skip or repeat it. Reapplication before a boundary may raise severity and/or remaining
 ticks through max semantics, but never grants an immediate tick.
 
-If the triggering hit passes the target out or defeats it, the hit still consumes a prepared
-one-strike coating, but no new affliction instance or Stonebark consumption is recorded on the
-non-standing target. Existing afflictions on a passed-out combatant stop producing consequences and
-clear with the encounter. This avoids status rows on actors who can no longer participate without
-refunding a coating whose successful strike already occurred.
+If the triggering hit passes the target out or defeats it, no new affliction instance or Stonebark
+consumption is recorded on the non-standing target. Existing afflictions on a passed-out combatant
+stop producing consequences and clear with the encounter. The weapon coating remains active for
+the rest of its world excursion, including later encounters and reopening. Applying the preparation
+spends it once; a hit does not consume it. This lifecycle supersedes the former one-strike rule,
+as delivered in322; see `apothecary-coating-identity-current.md`.
 
 ## Cure semantics
 
