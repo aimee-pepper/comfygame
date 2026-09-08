@@ -2,6 +2,14 @@
 
 This is the current record of the changes agreed today. **Decided intended behavior** describes the game we are making; it does not mean that behavior is already available on your phone. **First-pass tuning** gives concrete starting numbers that can change through play. **Unsettled proposals** still need design work or a choice.
 
+## Normal expeditions move to3D — decided, not yet delivered
+
+You approved the fixed three-quarter, top-down3D view for normal expeditions. Bind, Enter and Continue will use the same campaign and rules; Home, crafting, combat and Return keep their current screens. There will be no new mode choice or separate progression path.
+
+Newly written ordinary worlds will use the normal3D resource rules, including suitable mineral deposits previously omitted for2D recordings. Existing books and active expeditions keep their actual terrain, resources, progress and saved appearances; switching the view does not regenerate them. Settings trials retain their separate saves.
+
+**Current:** build355 still uses2D for ordinary expeditions, with3D available through Settings trials. The transition is not yet delivered. Plant-stem corrections continue alongside it; decorative iridescence is not required for the transition.
+
 ## 3D authoring direction
 
 **Decided intended production:** Blender-authored reusable parts will be assembled and varied in game. The six resource-node replacements are delivered in build348’s existing3D view; their earlier code-authored meshes are historical interim artwork. Stable assets such as Coal do not need placeholder authoring; an exception needs a concrete unsettled-design reason. The procedural flora and creature direction remains intact. Quality, coherence and playability govern this work.
@@ -143,9 +151,11 @@ Some aquatic creatures can begin beyond player reach and approach shallow water 
 
 ## Recording, notifications and finding lessons
 
+**Diary notification — decided, not yet delivered:** collecting a diary page will say **Diary page collected**, with **Read now** available before the notice fades. It opens that exact page; closing returns to the expedition. If you let the notice fade, the page stays in your Library. Collection and opening the prose are separate; current learning rewards keep their existing timing and are never granted twice. Build355 still uses the earlier “Diary page read” wording.
+
 **Current recording update — installed in344:** newly generated ordinary2D worlds omit unfinished box deposits for **Iron, Coal, Quartz, Sulfur, Mercury and Rift Glass**, including equivalent unfinished deposit sources. Trees, Clay, Salt Crust, plant/root gathers and ordinary rubble remain. Existing saved worlds and earned stock stay unchanged. A world's contents do not appear or disappear when its view changes; worlds created through the3D route keep their normal resource sources. Installation and ordinary phone launch are verified, with new-world movement and reopening checked internally. No physical-phone recording journey is claimed.
 
-**Temporary progression consequence — accepted:** these missing deposits may block Iron-learning, Forge, Ingots, metal tools and affected specialist crafts. This update supports recording the pre3D appearance, so no substitute materials or alternate progression route is added. Ordinary worlds can still generate; explicit Iron writing explains its temporary unavailability before spending. Salt writing and retained gathers keep their rules. This is a temporary generation restriction, not a new trial. Further2D node artwork and the interim Iron-picture substitution are superseded.
+**Current temporary progression consequence — superseded for future normal3D worlds:** these missing deposits may block Iron-learning, Forge, Ingots, metal tools and affected specialist crafts. This update supports recording the pre3D appearance, so no substitute materials or alternate progression route is added. Ordinary worlds can still generate; explicit Iron writing explains its temporary unavailability before spending. Salt writing and retained gathers keep their rules. The accepted normal3D transition ends this restriction for newly written ordinary worlds when delivered. Existing books retain their saved contents. Further2D node artwork and the interim Iron-picture substitution remain superseded.
 
 **Encounter crash — fixed on your phone in343, retained in344:** you confirmed the further correction resolves the encounter crash reported on342. Your campaign was preserved.
 
