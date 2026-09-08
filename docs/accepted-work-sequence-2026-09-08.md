@@ -6,6 +6,10 @@
 
 Engineering’s bounded combat investigation is installed356; the intermittent “Securing action” hang is NOT reproduced or confirmed fixed. Main3D resumes under PM direction; a real recurrence remains an interrupt under existing durable exactly-once semantics. No skip-save, invented refund or duplicate action. Next, [normal3D transition](normal-expedition-3d-transition-v1-2026-09-08.md) supersedes the trial-only and NEW-world recording restrictions. The bounded diary collected/Read now correction proceeds alongside it. Stem correction and prepared Asset work continue independently. Discovery and the numbered rows below follow these direct fixes. No one waits for decorative iridescence or phone-launch confirmation.
 
+## Navigation follow-up — PM scope resolved
+
+After the verified normal3D checkpoint and diary collected/Read now, implement [the complete navigation anchoring contract](explore-feedback-pane-anchoring-v1-2026-09-08.md). The moving set is carriedStrip + controls(run), with separate inward feedback inside one constant expanded Explore viewport. The unpublished feedback-only interpretation is superseded. Use actual projected actor and measured control bounds, preserve held-input safety, and retain the anchor deterministically when both approach zones overlap. No phone-launch dependency; other independent work continues.
+
 ## Delivery and authority baseline
 
 Installed355 delivers the connected opening from331/332, modular life/terrain, corrected material stacks and notifications, source colours/shine/Pattern, shared3D feedback, pressure families and current plant components/proportions. Trust the supplied delivery receipts; do not repeat installations or native acceptance. Aimee prefers355’s foliage and rejects generic egg stalks, so the next stem correction is explicitly authorized. Selected iridescence is accepted on appropriate some-bird/fish/reptile surfaces; its backend remains a separate dependency.
@@ -46,3 +50,7 @@ See phone-356-design-reconciliation-2026-09-08.md. Initial waterfall motion is i
 ## Solid-material preparation complete
 
 creature-solid-materials-implementation-v1-2026-09-08.md replaces the old source-binding assumptions with delivered bodySurface/wingCount/horn and a distinct typed manifest/award path preserving current Hide/Bone projection. It consolidates exact quality/quantity/region colour, inventory grouping, trade/buyback and the already specified optional Forge Shell/Horn alternatives. No native work or automatic runtime rollout performed; later shops/fluids/new organs remain excluded. Ready for the scheduled coherent implementation after active priorities.
+
+## Installed357 supersession
+
+Normal3D, its new-book resource policy, gear/health separation and About … turns left wording are installed357; see phone-357-design-reconciliation-2026-09-08.md. The main3D checkpoint above is complete. Next is diary, then the finalized navigation-block contract. Hang remains unreproduced and waterfall appearance non-PASS; stems/iridescence/solids are not included. No duplicate tests or physical entry gate.
