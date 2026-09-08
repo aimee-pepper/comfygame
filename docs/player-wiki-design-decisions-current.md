@@ -87,6 +87,8 @@ Pressure-led family generation is installed351 for newly bound books, with phone
 
 ## Surface finishes and markings — installed in352, Schiller unfinished
 
+**Accepted scope:** Dragon DNA is an inspiration for useful detail, and features are adapted to Bookbinder’s own needs. Schiller has an accepted purpose as a visual finish for plants and animals. Its exact appearance remains tunable; this does not adopt Dragon DNA’s other features or systems wholesale.
+
 **Current for newly bound books:** the existing3D view preserves each creature’s or plant’s actual colours and finish, including distinct body regions, wood, foliage and supported individual differences. Surfaces stay opaque; shine affects the highlight while rough surfaces retain their softer appearance. Markings share a direction and scale through connected parts of the same region, and fine bands soften at a distance. Distinct regions can keep separate patterns. Colours used in harvesting and crafting remain tied to the actual source.
 
 **Older books:** existing books retain their earlier appearance, including the older markings that can restart at part joins. Reopening a saved world does not apply the new finish automatically. Future Schiller improvements must likewise preserve already-saved appearances.
