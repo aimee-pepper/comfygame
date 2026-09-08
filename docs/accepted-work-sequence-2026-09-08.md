@@ -4,7 +4,7 @@
 
 ## New direct priorities —8September
 
-Engineering first resolves Aimee’s intermittent combat “Securing action” hang under existing durable exactly-once semantics. No skip-save, invented refund or duplicate action. Next, [normal3D transition](normal-expedition-3d-transition-v1-2026-09-08.md) supersedes the trial-only and NEW-world recording restrictions. The bounded diary collected/Read now correction proceeds alongside it. Stem correction and prepared Asset work continue independently. Discovery and the numbered rows below follow these direct fixes. No one waits for decorative iridescence or phone-launch confirmation.
+Engineering’s bounded combat investigation is installed356; the intermittent “Securing action” hang is NOT reproduced or confirmed fixed. Main3D resumes under PM direction; a real recurrence remains an interrupt under existing durable exactly-once semantics. No skip-save, invented refund or duplicate action. Next, [normal3D transition](normal-expedition-3d-transition-v1-2026-09-08.md) supersedes the trial-only and NEW-world recording restrictions. The bounded diary collected/Read now correction proceeds alongside it. Stem correction and prepared Asset work continue independently. Discovery and the numbered rows below follow these direct fixes. No one waits for decorative iridescence or phone-launch confirmation.
 
 ## Delivery and authority baseline
 
@@ -38,3 +38,7 @@ Stay paused: Essence recovery/continuation retuning, later shops, Peerless proba
 ## Real unresolved decisions routed to PM
 
 No Aimee choice is needed for the routine stem ratios, cap component contract, discovery integration or accepted waterfall presentation. The named technical dependencies above belong to Engineering/Asset. A future cactus/storage-stem source or broader plant/shell/chitin iridescence needs its own source/design authority; neither blocks this work. The existing Mote miss-outcome question stays in Homework under the later refinement pause. PM owns presenting any actual new owner decision rather than having leads solicit an intermittent chat.
+
+## Installed356 update
+
+See phone-356-design-reconciliation-2026-09-08.md. Initial waterfall motion is installed but Asset visual non-PASS; its next work is that bounded appearance correction, not rebuilding the already implemented consumer. Main3D/diary/stems remain pending. No duplicate diagnostic or native loop is authorized merely because the intermittent hang remains unconfirmed.

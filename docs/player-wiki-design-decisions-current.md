@@ -2,13 +2,19 @@
 
 This is the current record of the changes agreed today. **Decided intended behavior** describes the game we are making; it does not mean that behavior is already available on your phone. **First-pass tuning** gives concrete starting numbers that can change through play. **Unsettled proposals** still need design work or a choice.
 
+## Current installed update —356
+
+Build356 is installed with a limited improvement to combat saving. The intermittent **Securing action** hang has not been reproduced or confirmed fixed; it remains open. Installation was verified, but ordinary phone entry has not been checked.
+
+This build retains355’s plant changes and adds an initial waterfall-motion update. The waterfall’s visible motion has not passed its appearance review, so that work remains unfinished. Normal3D expeditions, **Diary page collected → Read now**, and the newer stem correction are not included yet.
+
 ## Normal expeditions move to3D — decided, not yet delivered
 
 You approved the fixed three-quarter, top-down3D view for normal expeditions. Bind, Enter and Continue will use the same campaign and rules; Home, crafting, combat and Return keep their current screens. There will be no new mode choice or separate progression path.
 
 Newly written ordinary worlds will use the normal3D resource rules, including suitable mineral deposits previously omitted for2D recordings. Existing books and active expeditions keep their actual terrain, resources, progress and saved appearances; switching the view does not regenerate them. Settings trials retain their separate saves.
 
-**Current:** build355 still uses2D for ordinary expeditions, with3D available through Settings trials. The transition is not yet delivered. Plant-stem corrections continue alongside it; decorative iridescence is not required for the transition.
+**Current:** build356 still uses2D for ordinary expeditions, with3D available through Settings trials. The transition is not yet delivered. Plant-stem corrections continue alongside it; decorative iridescence is not required for the transition.
 
 ## 3D authoring direction
 
@@ -28,7 +34,7 @@ Already-readable branched woody and fibrous plants, bare forms and corrected unb
 
 You prefer build355’s clearer foliage, but its egg-shaped supports do not suit ordinary plants. The next correction keeps those foliage improvements and gives ordinary fleshy plants believable, gently tapered stems. Upright plants keep an upright support; unbranched basal rosettes use a compact central support. Branches and leaves remain attached to the real stem surface.
 
-Swollen cactus or succulent forms require actual supporting anatomy. Fleshy tissue, thorns or needle-shaped growth alone will not turn a plant into a cactus. Current plant records do not yet establish a separate swollen storage stem. Existing books keep their saved shapes, and the correction changes no materials, harvest counts or crafting values. Build355 remains the installed behavior while this correction is made.
+Swollen cactus or succulent forms require actual supporting anatomy. Fleshy tissue, thorns or needle-shaped growth alone will not turn a plant into a cactus. Current plant records do not yet establish a separate swollen storage stem. Existing books keep their saved shapes, and the correction changes no materials, harvest counts or crafting values. Build356 retains355’s plant behavior while this correction is made.
 
 ## Generated 3D life and connected waterfalls
 
@@ -151,7 +157,7 @@ Some aquatic creatures can begin beyond player reach and approach shallow water 
 
 ## Recording, notifications and finding lessons
 
-**Diary notification — decided, not yet delivered:** collecting a diary page will say **Diary page collected**, with **Read now** available before the notice fades. It opens that exact page; closing returns to the expedition. If you let the notice fade, the page stays in your Library. Collection and opening the prose are separate; current learning rewards keep their existing timing and are never granted twice. Build355 still uses the earlier “Diary page read” wording.
+**Diary notification — decided, not yet delivered:** collecting a diary page will say **Diary page collected**, with **Read now** available before the notice fades. It opens that exact page; closing returns to the expedition. If you let the notice fade, the page stays in your Library. Collection and opening the prose are separate; current learning rewards keep their existing timing and are never granted twice. Build356 still uses the earlier “Diary page read” wording.
 
 **Current recording update — installed in344:** newly generated ordinary2D worlds omit unfinished box deposits for **Iron, Coal, Quartz, Sulfur, Mercury and Rift Glass**, including equivalent unfinished deposit sources. Trees, Clay, Salt Crust, plant/root gathers and ordinary rubble remain. Existing saved worlds and earned stock stay unchanged. A world's contents do not appear or disappear when its view changes; worlds created through the3D route keep their normal resource sources. Installation and ordinary phone launch are verified, with new-world movement and reopening checked internally. No physical-phone recording journey is claimed.
 
