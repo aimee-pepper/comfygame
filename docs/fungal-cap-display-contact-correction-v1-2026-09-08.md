@@ -1,5 +1,8 @@
 # Fungal cap display contact — bounded correction
 
+**Delivery update — installed360:** this bounded correction is implemented and installed for newly written books; see phone-360-design-reconciliation-2026-09-08.md for exact supplied checks and remaining appearance limits. Pending labels in the original contract below are historical. Existing books keep their saved shapes.
+
+
 8 September2026. Accepted Design implementation correction within Aimee's believable-organic-form direction, not a new Aimee decision. Engineering41aafe1b identified inherited floating attachment while integrating actual Blender cap. Implementation pending; no phone/visual completion claim.
 
 ## Narrow supersession

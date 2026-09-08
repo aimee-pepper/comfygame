@@ -1,5 +1,8 @@
 # Believable plant supports — implementation contract
 
+**Delivery update — installed360:** this bounded correction is implemented and installed for newly written books; see phone-360-design-reconciliation-2026-09-08.md for exact supplied checks and remaining appearance limits. Pending labels in the original contract below are historical. Existing books keep their saved shapes.
+
+
 8 September2026. **ACCEPTED INTENDED, not delivered.** PM relayed Aimee: “The plants need to look more real than they are. no plant has an egg shaped stalk like that except cacti. But I do prefer the latter versions other than that.” This is a targeted correction to installed355. The ratios below are routine Design/Asset tuning within her direction, not additional choices requiring her approval.
 
 ## Cause and scope

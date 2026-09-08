@@ -62,3 +62,7 @@ Diary collected/Read now is installed358; see phone-358-design-reconciliation-20
 ## Installed359 supersession
 
 Navigation anchoring is installed359; see phone-359-design-reconciliation-2026-09-08.md. Both-anchor/details/held-input and bounded loot/tutorial checks pass with Asset four-view PASS. Next Engineering work is already-running stem/cap integration; navigation is no longer queued. No phone-entry gate or duplicate tests.
+
+## Installed360 supersession
+
+Bounded actual stem/cap integration and approved spore contact are installed360; see phone-360-design-reconciliation-2026-09-08.md. Asset16-view review passes for this scope, with long bare stems/weak ordinary needle-frond distinction retained as limitations. Engineering continues the requested existing-geometry waterfall diagnosis; no automatic contrast sweep or new anatomy work. No duplicate tests or phone-entry gate.

@@ -1,0 +1,13 @@
+# Phone360 — Design reconciliation
+
+8 September2026. Read supplied plant-believable-supports/docs/phone-360-installation-2026-09-08.md and believable-stem-cap-implementation-2026-09-08.md. Asset39b51c6c reviews all16 supplied matched images. No repeated tests, capture, installation, physical entry or campaign interaction.
+
+Delivery18635fd4b677beb646c273fbbcd4b525adf23b30; installed sourceebc6e5a38a118b2a84595468e24ff59dd34de2db/tree70bfac7f20411eec2f19bb052da9aa6893a9b8f5. Install/readback2026-09-08T20:11:44.798893Z. ArtifactSHA256 0a0722119916b4c8bab8a232fed0cb15b7fb94ffcd564a6b18fd931332fd5765.
+
+New books freeze morphology2/component6 with unchanged actual Blender b80a084e stem/cap exports. Fleshy supports straight2r tapered1→.70; basal leafy unbranched rosettes .20h/.10supportHeight roots; other fleshy height h. Actual branch/thorn/root contacts preserve source counts, proportions, colour/Pattern and budgets. Dense nonwoody branching remains invalid. Cap poses/cohorts/dimensions unchanged; approved spore socket localY correction uses actual offset surface with .001h overlap, no lateral slide/fallback. Old nil/1/5 books, observations and unfinished worlds retain shapes; creature form2/family1/surface2 unchanged.
+
+Final focused3/3 PASS covers actual contacts/counts/old morphology,16 matched native views and nil/1/2 book/observed-memory persistence. Retained preparation→Bind→entry→mounted movement→cold reopen2/6 passed before socket-only correction; affected recipe persistence/native cap rendering rerun afterward. Earlier mixed batch is not an overall PASS. No native-harvest/economy claim.
+
+Actual iPhone17Pro Simulator/iOS26.2,402×874pt/default dark,1206×2622PNG; close uses same pair union bounds, ordinary established402×453pt stage centered in402×874. Asset bounded PASS for egg replacement and authored cap integration, no further correction required for that scope. Long bare upper stems and weak ordinary needle/frond differentiation remain. Basal compact radial cluster; caps preserve stacked repetitions. Spore contact not separately visually legible and relies on focused geometry tests. No final whole-plant realism or Aimee visual acceptance claim.
+
+Installation/readback verified, no phone launch/play/reset/progress mutation or entry gate. Retains359 navigation,358 diary and357 normal3D. Waterfall contrast correction is separate/not included, current visual non-PASS9a27170a. Hang remains unreproduced. Wiki current summary, stem/cap and world-view feature text, decision summary and Homework reconciled. Complete bounded stem/cap active pointer; do not treat remaining appearance critique as automatic new anatomy or a new mandatory rendering sweep.
