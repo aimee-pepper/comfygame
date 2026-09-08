@@ -76,3 +76,5 @@ Engineering confirmed integer-quarter pair-preservation and atomic component adm
 ## 8 September bounded presentation amendment
 
 waterfall-receiver-face-contact-v1-2026-09-08.md authorizes the falling sheet on its own matched shore-step receiver face, with exact surface heights/width and normal occlusion preserved. Current .03step/.025sheet needs .030tile downstream center offset for .0025clearance, plus narrow static source-height lip contact. No logical source/receiver, elevation, crossing, disclosure or saved-world change. This is pending presentation correction, not current readability acceptance.
+
+**361 delivery supersedes the amendment’s pending status:** the matched receiver-face/lip correction is installed with geometry/disclosure tests and bounded sequential-frame contact/exposure/direction PASS. See phone-361-design-reconciliation-2026-09-08.md; no real-time smoothness, natural occurrence or physical acceptance claim.

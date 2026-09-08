@@ -66,3 +66,7 @@ Navigation anchoring is installed359; see phone-359-design-reconciliation-2026-0
 ## Installed360 supersession
 
 Bounded actual stem/cap integration and approved spore contact are installed360; see phone-360-design-reconciliation-2026-09-08.md. Asset16-view review passes for this scope, with long bare stems/weak ordinary needle-frond distinction retained as limitations. Engineering continues the requested existing-geometry waterfall diagnosis; no automatic contrast sweep or new anatomy work. No duplicate tests or phone-entry gate.
+
+## Installed361 supersession
+
+Waterfall receiver-face/lip/contrast correction is installed361; see phone-361-design-reconciliation-2026-09-08.md. The overlap defect has a bounded Asset contact/exposure/sampled-direction PASS, without real-time smoothness or natural occurrence proof. This correction is complete; other prepared backlog remains available under PM scheduling, without new repeat checks or phone-entry gates.

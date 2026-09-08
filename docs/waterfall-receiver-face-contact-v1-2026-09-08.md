@@ -1,5 +1,8 @@
 # Waterfall on the receiving side of its shore step
 
+**Delivery update — installed361:** this bounded placement/lip/material correction is current. See phone-361-design-reconciliation-2026-09-08.md for exact supplied checks and sequential-frame acceptance limits. Pending labels and overlap-related NON-PASS below are historical; real-time smoothness and wider acceptance remain unverified.
+
+
 8 September2026. Accepted bounded Design/Asset presentation correction, implementation pending. PM requested resolution from Engineering ded9889d's existing source/fixture/projection diagnosis. This explicitly supersedes the earlier geometry-unchanged restriction only for the matched shore-step overlap and narrow lip contact described here. It changes no water generation, source connectivity, logical elevation, movement, save facts or disclosure. Installed360 remains the current delivery.
 
 ## Evidence and exact relationship
