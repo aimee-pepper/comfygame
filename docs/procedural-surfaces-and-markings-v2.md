@@ -1,8 +1,8 @@
 # Procedural surface finishes and markings v2
 
-7 September2026. Design queue1, complete source specification; **intended batch, not delivered**. Aimee's accepted direction is source-faithful colour/Pattern and coherent procedural life. Numerical mappings here are Design/Asset first-pass tuning, not individually approved player choices. Coordinate with morphology v2; hotfix/terrain priorities remain independent. No new biology, materials, stats, shader production assignment to Asset, native trial or required Aimee decision.
+7 September2026. Design queue1, complete source specification; **partial implementation/static review; rollout pending, full Schiller incomplete**. Aimee's accepted direction is source-faithful colour/Pattern and coherent procedural life. Numerical mappings here are Design/Asset first-pass tuning, not individually approved player choices. Coordinate with morphology v2; hotfix/terrain priorities remain independent. No new biology, materials, stats, shader production assignment to Asset, native trial or required Aimee decision.
 
-## Current consumer and exact limits
+## Installed351 baseline consumer and exact limits
 
 RuntimeAssemblyRenderer.make currently applies sRGB8 tint with alpha1, scalar roughness and an optional32×32 RGBA8 grayscale pattern texture. Pattern alpha is255. At row-centre y, m=(sin(2pi*((y+0.5)/32*bands+phase))+1)/2; mask byte=round(255*(1−0.45*(strength/100)*m)). Zero strength bypasses the texture. Bands/phase come from saved structure. Sixteen bands across32 rows can lose contrast at particular phases. The mask is U-constant; painting around a U seam cannot fix axial phase reversal.
 
@@ -51,3 +51,11 @@ Primary API references: [PhysicallyBasedMaterial](https://developer.apple.com/do
 Reuse existing material/recipe tests for zero/full/mixed finishes, exact default roughness, rough-surface floor, achromatic Schiller, Pattern0 and high-frequency phase, normal/axis direction across ordinary/profile meshes, repeated parts and actual source-region overrides. Check same source after specimen projection/save/reopen and permitted memory; future tint handling cannot bleach explicit wood/foliage differences. Native proof at the actual iPhone/default text/current appearance uses an existing specimen only when needed to validate the changed shader and contact/visibility treatment. No configuration matrix, new world search, opaque-to-transparent comparison task or Design rerun.
 
 A full v2 finish claim requires actual reflected angular colour behavior, stable region markings and correct inherited/explicit source custody. A bounded intermediate delivery may name the parts actually implemented; it cannot label unresolved Schiller or seamless Pattern complete. Geometry budgets stay unchanged; no scene-performance claim follows from these formulas.
+
+## Bounded static markings review — rollout pending
+
+Asset receipt `docs/procedural-markings-asset-review-2026-09-07.md` in woody-components-blender-v1 records a static-view PASS for `RuntimeAssemblyRenderer.make`, recipe `surfaceRevision2`, `RuntimeSurfacePattern.metal` and shared region coordinates. It reviewed only the supplied high-frequency close/ordinary-scale PNGs. Retained woody ID7/seed42 uses internal Pattern100/bands16/phase0.25 stress inputs, not a new flora grammar. Actual capture device was Engineering iPhone17Pro Simulator at402×874pt/1206×2622PNG/default/current dark, matching the target viewport.
+
+Visible foliage bands resolve close up along leaf orientation, wood remains unbanded, and ordinary-scale bands soften without an obvious coarse interference pattern in that frame. Silhouettes/visible joins remain readable. No marking-specific art correction or duplicate capture/native run is requested. Static evidence does not establish temporal shimmer suppression, hidden-surface or creature continuity, physical roughness/alpha/emission/metalness correctness, or full Finish acceptance. Those retain Engineering’s separate implementation/check ownership.
+
+New-book activation is still nil and installed351 is unchanged at this review. Remaining bounded Engineering verification and a separately identified intermediate rollout may proceed. Schiller’s source-relative angular reflected colour remains incomplete: the inspected scalar-only CustomMaterial surface interface and a static PBR sheen tint do not establish the required per-fragment response. No albedo, emission or metalness substitute is approved. No new Aimee decision, complete-finish claim or phone/Aimee acceptance follows from this Asset PASS.
