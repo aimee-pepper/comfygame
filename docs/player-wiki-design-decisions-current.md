@@ -2,11 +2,11 @@
 
 This is the current record of the changes agreed today. **Decided intended behavior** describes the game we are making; it does not mean that behavior is already available on your phone. **First-pass tuning** gives concrete starting numbers that can change through play. **Unsettled proposals** still need design work or a choice.
 
-## Current installed update —357
+## Current installed update —358
 
-Build357 is installed with the normal campaign's three-quarter, top-down3D exploration view. The Settings button and party health no longer overlap, and the collapse estimate now says **About … turns left**. Installation was verified; this is not a completed physical-phone playtest.
+Build358 adds **Diary page collected** with **Read now**, opening that exact page and returning to the same expedition without an extra turn or reward. It retains357’s normal3D exploration, clear Settings and party-health layout, and **About … turns left** estimate. Installation was verified; this is not a completed physical-phone playtest.
 
-The intermittent **Securing action** hang remains unreproduced and has not been confirmed fixed. The waterfall's visible motion has not passed its appearance review. **Diary page collected → Read now**, moving navigation controls and the newer plant-stem correction remain pending.
+The intermittent **Securing action** hang remains unreproduced and has not been confirmed fixed. The waterfall's visible motion has not passed its appearance review. Moving navigation controls and the newer plant-stem correction remain pending.
 
 ## Normal expeditions in3D — installed in357
 
@@ -157,7 +157,7 @@ Some aquatic creatures can begin beyond player reach and approach shallow water 
 
 ## Recording, notifications and finding lessons
 
-**Diary notification — decided, not yet delivered:** collecting a diary page will say **Diary page collected**, with **Read now** available before the notice fades. It opens that exact page; closing returns to the expedition. If you let the notice fade, the page stays in your Library. Collection and opening the prose are separate; current learning rewards keep their existing timing and are never granted twice. Build357 still uses the earlier “Diary page read” wording.
+**Diary notification — installed in358:** collecting a diary page says **Diary page collected**, with **Read now** available before the notice fades. It opens that exact page; closing returns to the same expedition without spending another turn. The open reader stays available even after the notice expires. If you ignore the notice, the page remains in your Library. Collection keeps its learning and reward timing; opening the prose never grants them twice. Internal pickup, exact-page, expiry and return checks passed, and phone installation is verified. This is not a physical-phone play acceptance claim.
 
 **Earlier recording restriction — retained in existing books:** build344 omitted unfinished box deposits for **Iron, Coal, Quartz, Sulfur, Mercury and Rift Glass**, including equivalent unfinished deposit sources. Trees, Clay, Salt Crust, plant/root gathers and ordinary rubble remain. Existing saved worlds and earned stock stay unchanged. A world's contents do not appear or disappear when its view changes; worlds created through the3D route keep their normal resource sources. Installation and ordinary phone launch are verified, with new-world movement and reopening checked internally. No physical-phone recording journey is claimed.
 

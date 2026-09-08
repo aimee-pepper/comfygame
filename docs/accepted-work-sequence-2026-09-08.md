@@ -54,3 +54,7 @@ creature-solid-materials-implementation-v1-2026-09-08.md replaces the old source
 ## Installed357 supersession
 
 Normal3D, its new-book resource policy, gear/health separation and About … turns left wording are installed357; see phone-357-design-reconciliation-2026-09-08.md. The main3D checkpoint above is complete. Next is diary, then the finalized navigation-block contract. Hang remains unreproduced and waterfall appearance non-PASS; stems/iridescence/solids are not included. No duplicate tests or physical entry gate.
+
+## Installed358 supersession
+
+Diary collected/Read now is installed358; see phone-358-design-reconciliation-2026-09-08.md. Navigation anchoring is now the next Engineering task. Stem/cap admission continues independently. No duplicate native or phone-entry checks.
