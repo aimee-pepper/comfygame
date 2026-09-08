@@ -1,6 +1,8 @@
 # Resource deposit marker correction
 
-7 September2026. Design resolution of Engineering's exact341 report. **Correction specified, not delivered.** In-world crash investigation is separate urgent Engineering work; this artwork mapping does not fix or explain the crash.
+> **New direct Aimee instruction supersedes every future2D mapping authorization below.** Use [Temporary2D deposit filter](temporary-2d-deposit-filter-v1.md): new ordinary2D worlds exclude unfinished box deposits; existing worlds/stock remain. The temporary ore→Iron mapping is withdrawn and never counts as finished art approval.3D node graphics take priority. The remainder is historical decision context, not an active assignment.
+
+7 September2026. Design resolution of Engineering's exact341 report. **SUPERSEDED before delivery: no further2D asset work.** In-world crash investigation is separate urgent Engineering work; this artwork mapping does not fix or explain the crash.
 
 Current source: `Sources/Screens/WorldView.swift` TileView renders early blocking deposits through generic `PhysicalMaterialID.icon`/cube.fill. Actual reported sources include Coal, Iron and Quartz. Existing packed Pick/tier requirements still come from the real source definition. Counts, private campaign identifiers and crash diagnostics stay in Engineering records, not player explanations.
 
