@@ -13,7 +13,7 @@ Updated 8 September 2026. One place for your decisions, design to-dos and option
 
 **Fixed controls and supporting faces — corrected in362:** only notifications move; context and controls stay fixed. Raised land now shows its known supporting faces, and current objects have broader shadow coverage. Internal checks and the supplied image review passed; final visual acceptance remains separate.
 
-**Terrain colours — installed in363:** terrain and exposed banks now use the saved world colours, including last-observed colours outside sight. Snow and ash layers remain unfinished. Gathering animation, shared physical-source occupancy, remembered non-enemy discoveries and wider material grouping have implementation contracts and remain team work. The24 missing material icons are prepared, pending integration and review. No new decision or test is waiting on you.
+**Terrain colours — installed in363:** terrain and exposed banks now use the saved world colours, including last-observed colours outside sight. Snow and ash layers remain unfinished. Gathering animation, shared physical-source occupancy, remembered non-enemy discoveries and wider material grouping have implementation contracts and remain team work. The24 missing material icons are being completed to match the existing in-game pixel art; the first new set needs style revision, integration and review. No new decision or test is waiting on you.
 
 **Diary Read now — installed in358:** collected pages offer an immediate shortcut to their exact prose. Closing returns to the same expedition without another turn or reward; ignored notices leave the page in your Library. Internal checks and phone installation are verified. No decision is waiting on you.
 
