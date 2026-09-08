@@ -12,6 +12,7 @@ export interface CraftingSystem {
 
 export interface CraftIngredient {
   resourceID?: string;
+  resourceIDs?: string[];
   label: string;
   amount?: number;
   role?: string;
@@ -33,13 +34,13 @@ export const craftingSystems: CraftingSystem[] = [
     station: 'The Apothecary',
     stationID: 'apothecary',
     summary:
-      'Make remedies, coatings and field supplies from named resources and property-matched natural samples.',
+      'Make remedies, coatings and field supplies from the named physical ingredients in each recipe.',
     access: ['Build the Apothecary.', 'Use a recipe that is currently known.'],
-    materialChoice: 'When a preparation needs a natural sample, the recipe shows which of your qualifying samples it will use, beginning with the weakest suitable one. Scent Mask has its own creature-material choice.',
+    materialChoice: 'Select actual ingredient portions. Standardized preparations do not require an extra hidden-property sample; source details remain recorded.',
     commitResult: 'The named resources, Essence or Mote cost, and chosen material are spent together after the result has somewhere to go. You then receive the listed item.',
     howItWorks: [
       'Learn or infer the preparation.',
-      'Choose any required natural sample that meets the shown property floor.',
+      'Choose the actual named ingredients shown by the recipe.',
       'Supply the named resources, Essence or Mote cost, then prepare one item.',
     ],
   },
@@ -49,14 +50,14 @@ export const craftingSystems: CraftingSystem[] = [
     station: 'Blacksmith',
     stationID: 'blacksmith',
     summary:
-      'Construct a Pointed Blade from one suitable point and one suitable grip; their material and quality shape the finished weapon.',
-    access: ['Build the Blacksmith.', 'Learn the Pointed Blade schematic.'],
-    materialChoice: 'Choose one point and one different grip from the families allowed by the recipe. Their material and quality shape the weapon’s combat form.',
-    commitResult: 'Making the weapon spends the chosen point, grip, and displayed Essence cost together, then stores one Pointed Blade.',
+      'Construct seven Forge equipment families from actual working and support bundles; T1 opens four families and T2 opens the rest.',
+    access: ['Build the Blacksmith.', 'Meet the selected recipe’s tier and knowledge requirements.'],
+    materialChoice: 'Choose complete working and support bundles allowed by the equipment recipe. Exact parts determine statistics and separate workmanship.',
+    commitResult: 'Making the selected Forge item spends its complete chosen component bundles together for no Essence.',
     howItWorks: [
-      'Select one eligible point and one eligible grip.',
-      'Review the resulting quality, combat shape and Essence cost.',
-      'Constructing consumes both chosen materials and creates one weapon.',
+      'Select a known equipment recipe and its complete working and support bundles.',
+      'Review the resulting workmanship, combat statistics and complete ingredient cost.',
+      'Constructing consumes the chosen components and fuel once, then creates the selected equipment.',
     ],
   },
   {
@@ -65,14 +66,14 @@ export const craftingSystems: CraftingSystem[] = [
     station: 'The Tannery',
     stationID: 'tannery',
     summary:
-      'Turn flexible, living and structural samples into coats, gloves and boots.',
+      'Prepare Cord, Cloth and Leather, then craft the seven woven or Leather garment variants.',
     access: ['Build the Tannery.', 'Learn the required wear Research or reach the tier shown by the chosen pattern.'],
-    materialChoice: 'Every named outer layer, lining, palm, binding, upper, and sole accepts only the material choices shown for that part; the main selected pieces contribute most strongly to the result.',
-    commitResult: 'Making the item spends all chosen materials and the displayed Essence cost together, then stores the selected coat, gloves, or boots.',
+    materialChoice: 'Choose the Cord, Cloth, Leather panels and other named parts in the selected garment recipe. Exact source colours and independent Leather properties stay preserved.',
+    commitResult: 'Making the garment spends its chosen components together for no Essence, then stores the selected Guard, Gloves or Boots.',
     howItWorks: [
-      'Choose a distinct sample for every named part.',
-      'Higher-quality primary pieces contribute most strongly to the result.',
-      'The selected stock and shown Essence cost are consumed together.',
+      'Choose the actual Cloth, Leather, Cord and other components in the selected variant.',
+      'Woven gear is Fine; Leather panels determine the Leather garment’s workmanship.',
+      'Ordinary garment crafting and refit cost no Essence; selected components are consumed together.',
     ],
   },
   {
@@ -233,337 +234,81 @@ const e = (
   resourceIDs.map((resourceID) => ({ resourceID, label, role }));
 
 export const craftingRecipes: CraftRecipe[] = [
-  {
-    id: 'seamlight',
-    name: 'Seamlight',
-    system: 'apothecary',
-    result: 'Seamlight',
-    ingredients: [r('quartz', 1), r('resin', 1), r('fiber', 1)],
-  },
-  {
-    id: 'scent-mask',
-    name: 'Scent Mask',
-    system: 'apothecary',
-    result: 'Scent Mask',
-    ingredients: [
-      r('reagent', 1),
-      { label: '1 creature Hide, Pelt, Down or Oil', role: 'selected sample' },
-    ],
-  },
-  {
-    id: 'lesser-salve',
-    name: 'Lesser Salve',
-    system: 'apothecary',
-    result: 'Lesser Salve',
-    ingredients: [
-      r('resin', 1),
-      { label: '1 flexible 25+ sample', role: 'selected sample' },
-    ],
-    readiness: 'Older recipe shown. The reported early-overhaul route uses 1 Resin and 1 Stem or Leaf Fibre, without a separate property sample. Building teaches it; the ingredients are still required.',
-  },
-  {
-    id: 'salve',
-    name: 'Salve',
-    system: 'apothecary',
-    result: 'Salve',
-    ingredients: [
-      r('pulp', 2),
-      r('spore', 1),
-      r('resin', 1),
-      { label: '1 insulating 40+ sample', role: 'selected sample' },
-    ],
-  },
-  {
-    id: 'greater-salve',
-    name: 'Greater Salve',
-    system: 'apothecary',
-    result: 'Greater Salve',
-    ingredients: [
-      r('ichor', 1),
-      r('spore', 2),
-      r('resin', 2),
-      { label: '1 reactive 60+ sample', role: 'selected sample' },
-    ],
-  },
-  {
-    id: 'clearing-draught',
-    name: 'Clearing Draught',
-    system: 'apothecary',
-    result: 'Clearing Draught',
-    ingredients: [
-      r('pulp', 1),
-      r('salt', 1),
-      { label: '1 reactive 35+ sample', role: 'selected sample' },
-    ],
-  },
-  {
-    id: 'quenching-draught',
-    name: 'Quenching Draught',
-    system: 'apothecary',
-    result: 'Quenching Draught',
-    ingredients: [
-      r('reagent', 1),
-      r('resin', 1),
-      { label: '1 insulating 45+ sample', role: 'selected sample' },
-    ],
-  },
-  {
-    id: 'broad-antidote',
-    name: 'Broad Antidote',
-    system: 'apothecary',
-    result: 'Broad Antidote',
-    ingredients: [
-      r('ichor', 1),
-      r('reagent', 1),
-      r('spore', 1),
-      { label: '1 reactive 65+ sample', role: 'selected sample' },
-    ],
-  },
-  {
-    id: 'stonebark-tonic',
-    name: 'Stonebark Tonic',
-    system: 'apothecary',
-    result: 'Stonebark Tonic',
-    ingredients: [
-      r('timber', 1),
-      r('resin', 1),
-      { label: '1 hard 45+ sample', role: 'selected sample' },
-    ],
-  },
-  {
-    id: 'venom',
-    name: 'Venom',
-    system: 'apothecary',
-    result: 'Venom',
-    ingredients: [
-      r('toxin', 1),
-      r('fiber', 1),
-      { label: '1 reactive 55+ sample', role: 'selected sample' },
-    ],
-  },
-  {
-    id: 'firebrand',
-    name: 'Firebrand',
-    system: 'apothecary',
-    result: 'Firebrand',
-    ingredients: [
-      r('reagent', 1),
-      r('sulfur', 1),
-      { label: '1 reactive 60+ sample', role: 'selected sample' },
-    ],
-  },
-  {
-    id: 'briar-oil',
-    name: 'Briar Oil',
-    system: 'apothecary',
-    result: 'Briar Oil',
-    ingredients: [
-      r('fiber', 1),
-      r('resin', 1),
-      { label: '1 flexible 50+ sample', role: 'selected sample' },
-    ],
-  },
-  {
-    id: 'flashsalt',
-    name: 'Flashsalt',
-    system: 'apothecary',
-    result: 'Flashsalt',
-    ingredients: [
-      r('reagent', 1),
-      r('mercury', 1),
-      { label: '1 lustrous 55+ sample', role: 'selected sample' },
-    ],
-  },
-  {
-    id: 'solvent',
-    name: 'Solvent',
-    system: 'apothecary',
-    result: 'Solvent',
-    ingredients: [
-      r('reagent', 1),
-      r('salt', 1),
-      { label: '1 reactive 40+ sample', role: 'selected sample' },
-    ],
-  },
-  {
-    id: 'lure',
-    name: 'Lure',
-    system: 'apothecary',
-    result: 'Lure',
-    ingredients: [
-      r('toxin', 1),
-      r('pulp', 1),
-      { label: '1 reactive 50+ sample', role: 'selected sample' },
-    ],
-  },
-  {
-    id: 'stillwater',
-    name: 'Stillwater',
-    system: 'apothecary',
-    result: 'Stillwater',
-    ingredients: [
-      r('rift_glass', 1),
-      r('mercury', 1),
-      { label: '1 lustrous 60+ sample', role: 'selected sample' },
-      { label: '6 Essence', role: 'currency' },
-    ],
-  },
-  {
-    id: 'waystone',
-    name: 'Waystone',
-    system: 'apothecary',
-    result: 'Waystone',
-    ingredients: [
-      r('rift_glass', 1),
-      { label: '1 hard 70+ sample', role: 'selected sample' },
-      { label: '1 Mote', role: 'currency' },
-      { label: '12 Essence', role: 'currency' },
-    ],
-  },
-  {
-    id: 'torch',
-    name: 'Torch',
-    system: 'apothecary',
-    result: 'Torch',
-    ingredients: [
-      r('resin', 1),
-      r('timber', 2),
-      { label: '1 reactive 30+ sample', role: 'selected sample' },
-    ],
-  },
-  {
-    id: 'farsight',
-    name: 'Farsight Draught',
-    system: 'apothecary',
-    result: 'Farsight Draught',
-    ingredients: [
-      r('quartz', 1),
-      r('ichor', 1),
-      { label: '1 lustrous 50+ sample', role: 'selected sample' },
-    ],
-  },
-  {
-    id: 'pointed-blade',
-    name: 'Pointed Blade',
-    system: 'blacksmith',
-    result: 'Pointed Blade',
-    ingredients: [
-      ...e('Point', ['ore', 'adamant', 'obsidian', 'quartz']),
-      ...e('Grip', ['fiber', 'timber', 'copper', 'silver', 'gold']),
-    ],
-    notes:
-      'Creature Fang, Quill, Bone, Tusk, Horn, Hide, Pelt and Fin can also fill compatible recipe parts.',
-  },
-  {
-    id: 'supple-coat',
-    name: 'Supple Coat',
-    system: 'tannery',
-    result: 'Supple Coat',
-    ingredients: [...e('Outer', ['fiber']), ...e('Lining', ['fiber'])],
-    notes:
-      'Creature Hide, Pelt, Fin, Scale, Down and Feather can also qualify.',
-  },
-  {
-    id: 'working-gloves',
-    name: 'Working Gloves',
-    system: 'tannery',
-    result: 'Working Gloves',
-    ingredients: [...e('Hand', ['fiber']), ...e('Facing', [])],
-    notes:
-      'Uses creature and world materials chosen for the parts shown in the recipe.',
-  },
-  {
-    id: 'working-boots',
-    name: 'Working Boots',
-    system: 'tannery',
-    result: 'Working Boots',
-    ingredients: [
-      ...e('Upper', ['fiber']),
-      ...e('Sole', ['timber']),
-      ...e('Binding', ['fiber', 'resin', 'copper', 'silver', 'gold']),
-    ],
-  },
-  {
-    id: 'longbow',
-    name: 'Longbow',
-    system: 'bowyer',
-    result: 'Longbow',
-    ingredients: [...e('Limbs', ['timber']), ...e('String', ['fiber'])],
-    notes:
-      'Horn, Quill, Bone, Hide and Fin can substitute for compatible recipe parts.',
-    readiness: 'Current Tier 0 Bowyer recipe once the Bowyer is built.',
-  },
-  {
-    id: 'sling',
-    name: 'Sling',
-    system: 'bowyer',
-    result: 'Sling',
-    ingredients: [
-      ...e('Cord', ['fiber']),
-      ...e('Projectile', ['rubble', 'clay', 'ore', 'copper', 'adamant']),
-      ...e('Pouch', ['fiber']),
-    ],
-    readiness: 'Current Tier 1 Bowyer recipe after the named Broaden capability is available.',
-  },
-  {
-    id: 'throwing-set',
-    name: 'Throwing Set',
-    system: 'bowyer',
-    result: 'Throwing Set',
-    ingredients: [
-      ...e('Edges', ['ore', 'adamant', 'obsidian']),
-      ...e('Carrier', ['fiber']),
-    ],
-    readiness: 'Current Tier 1 Bowyer recipe after the named Broaden capability is available.',
-  },
-  {
-    id: 'fitted-point',
-    name: 'Fitted Point',
-    system: 'weaponsmith',
-    result: 'Fitted Point',
-    ingredients: [
-      ...e('Point', ['ore', 'adamant', 'obsidian', 'quartz']),
-      ...e('Grip', ['fiber', 'timber', 'copper', 'silver', 'gold']),
-      ...e('Fitting', ['copper', 'silver', 'gold', 'quartz', 'adamant']),
-    ],
-    readiness: 'Current Tier 0 Weaponsmith recipe once the Weaponsmith is built.',
-  },
-  {
-    id: 'fitted-edge',
-    name: 'Fitted Edge',
-    system: 'weaponsmith',
-    result: 'Fitted Edge',
-    ingredients: [
-      ...e('Edge', ['ore', 'adamant', 'obsidian']),
-      ...e('Grip', ['fiber', 'timber', 'copper', 'silver', 'gold']),
-      ...e('Fitting', ['copper', 'silver', 'gold', 'quartz', 'adamant']),
-    ],
-    readiness: 'Current Tier 1 Weaponsmith recipe after the named Broaden capability is available.',
-  },
-  {
-    id: 'fitted-maul',
-    name: 'Fitted Maul',
-    system: 'weaponsmith',
-    result: 'Fitted Maul',
-    ingredients: [
-      ...e('Head', ['rubble', 'ore', 'copper', 'adamant']),
-      ...e('Brace', ['timber', 'ore', 'adamant']),
-      ...e('Grip', ['fiber', 'timber', 'copper', 'silver', 'gold']),
-    ],
-    readiness: 'Current Tier 1 Weaponsmith recipe after the named Broaden capability is available.',
-  },
-  {
-    id: 'fitted-polearm',
-    name: 'Fitted Polearm',
-    system: 'weaponsmith',
-    result: 'Fitted Polearm',
-    ingredients: [
-      ...e('Point', ['ore', 'adamant', 'obsidian', 'quartz']),
-      ...e('Haft', ['timber', 'ore', 'adamant']),
-      ...e('Fitting', ['copper', 'silver', 'gold', 'quartz', 'adamant']),
-    ],
-    readiness: 'Current Weaponsmith recipe after Maud’s fitting pattern is known.',
-  },
+  {"id": "seamlight", "name": "Seamlight", "system": "apothecary", "result": "Seamlight", "ingredients": [{"label": "1 Quartz", "role": "component or cost", "resourceIDs": ["quartz"]}, {"label": "1 Resin", "role": "component or cost", "resourceIDs": ["resin"]}, {"label": "1 Plant Fibre", "role": "component or cost", "resourceIDs": ["fiber"]}], "notes": "Current actual-ingredient recipe, delivered322. Supported older stock has a separately labelled legacy route."},
+  {"id": "scent-mask", "name": "Scent Mask", "system": "apothecary", "result": "Scent Mask", "ingredients": [{"label": "2 Aromatic Leaf", "role": "component or cost"}, {"label": "1 Resin", "role": "component or cost", "resourceIDs": ["resin"]}], "notes": "Current actual-ingredient recipe, delivered322. Supported older stock has a separately labelled legacy route."},
+  {"id": "lesser-salve", "name": "Lesser Salve", "system": "apothecary", "result": "Lesser Salve", "ingredients": [{"label": "1 Resin", "role": "component or cost", "resourceIDs": ["resin"]}, {"label": "1 Plant Fibre", "role": "component or cost", "resourceIDs": ["fiber"]}], "notes": "Current actual-ingredient recipe, delivered322. Supported older stock has a separately labelled legacy route."},
+  {"id": "salve", "name": "Salve", "system": "apothecary", "result": "Salve", "ingredients": [{"label": "1 Cloth", "role": "component or cost"}, {"label": "2 Soothing Leaf", "role": "component or cost"}, {"label": "1 Resin", "role": "component or cost", "resourceIDs": ["resin"]}], "notes": "Current actual-ingredient recipe, delivered322. Supported older stock has a separately labelled legacy route."},
+  {"id": "greater-salve", "name": "Greater Salve", "system": "apothecary", "result": "Greater Salve", "ingredients": [{"label": "1 Cloth", "role": "component or cost"}, {"label": "2 Soothing Leaf", "role": "component or cost"}, {"label": "2 Restorative Spore", "role": "component or cost"}, {"label": "2 Resin", "role": "component or cost", "resourceIDs": ["resin"]}], "notes": "Current actual-ingredient recipe, delivered322. Supported older stock has a separately labelled legacy route."},
+  {"id": "clearing-draught", "name": "Clearing Draught", "system": "apothecary", "result": "Clearing Draught", "ingredients": [{"label": "1 Bitter Root", "role": "component or cost"}, {"label": "1 Salt", "role": "component or cost", "resourceIDs": ["salt"]}], "notes": "Current actual-ingredient recipe, delivered322. Supported older stock has a separately labelled legacy route."},
+  {"id": "quenching-draught", "name": "Quenching Draught", "system": "apothecary", "result": "Quenching Draught", "ingredients": [{"label": "2 Soothing Leaf", "role": "component or cost"}, {"label": "1 Salt", "role": "component or cost", "resourceIDs": ["salt"]}], "notes": "Current actual-ingredient recipe, delivered322. Supported older stock has a separately labelled legacy route."},
+  {"id": "broad-antidote", "name": "Broad Antidote", "system": "apothecary", "result": "Broad Antidote", "ingredients": [{"label": "1 Bitter Root", "role": "component or cost"}, {"label": "1 Restorative Spore", "role": "component or cost"}, {"label": "1 Salt", "role": "component or cost", "resourceIDs": ["salt"]}], "notes": "Current actual-ingredient recipe, delivered322. Supported older stock has a separately labelled legacy route."},
+  {"id": "stonebark-tonic", "name": "Stonebark Tonic", "system": "apothecary", "result": "Stonebark Tonic", "ingredients": [{"label": "1 Tough Bark", "role": "component or cost"}, {"label": "1 Resin", "role": "component or cost", "resourceIDs": ["resin"]}], "notes": "Current actual-ingredient recipe, delivered322. Supported older stock has a separately labelled legacy route."},
+  {"id": "venom", "name": "Venom", "system": "apothecary", "result": "Venom", "ingredients": [{"label": "1 Toxic Sap", "role": "component or cost"}, {"label": "1 Plant Fibre", "role": "component or cost", "resourceIDs": ["fiber"]}], "notes": "Current actual-ingredient recipe, delivered322. Supported older stock has a separately labelled legacy route."},
+  {"id": "firebrand", "name": "Firebrand", "system": "apothecary", "result": "Firebrand", "ingredients": [{"label": "1 Sulfur", "role": "component or cost", "resourceIDs": ["sulfur"]}, {"label": "1 Resin", "role": "component or cost", "resourceIDs": ["resin"]}], "notes": "Current actual-ingredient recipe, delivered322. Supported older stock has a separately labelled legacy route."},
+  {"id": "briar-oil", "name": "Briar Oil", "system": "apothecary", "result": "Briar Oil", "ingredients": [{"label": "2 Plant Fibre", "role": "component or cost", "resourceIDs": ["fiber"]}, {"label": "1 Resin", "role": "component or cost", "resourceIDs": ["resin"]}], "notes": "Current actual-ingredient recipe, delivered322. Supported older stock has a separately labelled legacy route."},
+  {"id": "flashsalt", "name": "Flashsalt", "system": "apothecary", "result": "Flashsalt", "ingredients": [{"label": "1 Quartz", "role": "component or cost", "resourceIDs": ["quartz"]}, {"label": "1 Sulfur", "role": "component or cost", "resourceIDs": ["sulfur"]}, {"label": "1 Salt", "role": "component or cost", "resourceIDs": ["salt"]}], "notes": "Current actual-ingredient recipe, delivered322. Supported older stock has a separately labelled legacy route."},
+  {"id": "solvent", "name": "Solvent", "system": "apothecary", "result": "Solvent", "ingredients": [{"label": "1 Bitter Root", "role": "component or cost"}, {"label": "1 Sulfur", "role": "component or cost", "resourceIDs": ["sulfur"]}], "notes": "Current actual-ingredient recipe, delivered322. Supported older stock has a separately labelled legacy route."},
+  {"id": "lure", "name": "Lure", "system": "apothecary", "result": "Lure", "ingredients": [{"label": "1 Aromatic Leaf", "role": "component or cost"}, {"label": "1 Plant Fibre", "role": "component or cost", "resourceIDs": ["fiber"]}], "notes": "Current actual-ingredient recipe, delivered322. Supported older stock has a separately labelled legacy route."},
+  {"id": "stillwater", "name": "Stillwater", "system": "apothecary", "result": "Stillwater", "ingredients": [{"label": "1 Rift-glass", "role": "component or cost", "resourceIDs": ["rift_glass"]}, {"label": "1 Mercury", "role": "component or cost", "resourceIDs": ["mercury"]}, {"label": "6 Essence", "role": "component or cost"}], "notes": "Current actual-ingredient recipe, delivered322. Supported older stock has a separately labelled legacy route."},
+  {"id": "waystone", "name": "Waystone", "system": "apothecary", "result": "Waystone", "ingredients": [{"label": "1 Rift-glass", "role": "component or cost", "resourceIDs": ["rift_glass"]}, {"label": "1 Quartz", "role": "component or cost", "resourceIDs": ["quartz"]}, {"label": "12 Essence", "role": "component or cost"}, {"label": "1 Mote", "role": "component or cost", "resourceIDs": ["mote"]}], "notes": "Current actual-ingredient recipe, delivered322. Supported older stock has a separately labelled legacy route."},
+  {"id": "torch", "name": "Torch", "system": "apothecary", "result": "Torch", "ingredients": [{"label": "1 Resin", "role": "component or cost", "resourceIDs": ["resin"]}, {"label": "1 Log", "role": "component or cost", "resourceIDs": ["timber"]}, {"label": "1 Plant Fibre", "role": "component or cost", "resourceIDs": ["fiber"]}], "notes": "Current actual-ingredient recipe, delivered322. Supported older stock has a separately labelled legacy route."},
+  {"id": "farsight", "name": "Farsight Draught", "system": "apothecary", "result": "Farsight Draught", "ingredients": [{"label": "1 Quartz", "role": "component or cost", "resourceIDs": ["quartz"]}, {"label": "1 Restorative Spore", "role": "component or cost"}], "notes": "Current actual-ingredient recipe, delivered322. Supported older stock has a separately labelled legacy route."},
+  {"id": "pointed-blade", "name": "Pointed Blade", "system": "blacksmith", "result": "Pointed Blade", "ingredients": [{"label": "4 Iron + 1 Coal; or 2 Ingots; or 2 Quartz; or 1 Bone", "role": "component or cost", "resourceIDs": ["ore", "quartz"]}, {"label": "1 Log + 2 Fibre; or 1 Bone grip", "role": "component or cost", "resourceIDs": ["fiber", "timber"]}, {"label": "0 Essence", "role": "component or cost"}], "notes": "T1; Ingots require T2. Close, Pierce. Choose complete separate working/support bundles; source parts determine statistics."},
+  {"id": "cutting-blade", "name": "Cutting Blade", "system": "blacksmith", "result": "Cutting Blade", "ingredients": [{"label": "4 Iron + 1 Coal; or 2 Ingots; or 1 Bone", "role": "component or cost", "resourceIDs": ["ore"]}, {"label": "1 Log + 2 Fibre; or 1 Bone grip", "role": "component or cost", "resourceIDs": ["fiber", "timber"]}, {"label": "0 Essence", "role": "component or cost"}], "notes": "T1; Ingots require T2. Close, Rend. Choose complete separate working/support bundles; source parts determine statistics."},
+  {"id": "hand-maul", "name": "Hand Maul", "system": "blacksmith", "result": "Hand Maul", "ingredients": [{"label": "4 Iron + 1 Coal; or 2 Ingots; or 2 Bone", "role": "component or cost", "resourceIDs": ["ore"]}, {"label": "1 Log + 2 Fibre; or 2 Bone + 2 Fibre", "role": "component or cost", "resourceIDs": ["fiber", "timber"]}, {"label": "0 Essence", "role": "component or cost"}], "notes": "T1; Ingots require T2. Close, Crush. Choose complete separate working/support bundles; source parts determine statistics."},
+  {"id": "long-spear", "name": "Long Spear", "system": "blacksmith", "result": "Long Spear", "ingredients": [{"label": "4 Iron + 1 Coal; or 2 Ingots; or 2 Quartz; or 1 Bone", "role": "component or cost", "resourceIDs": ["ore", "quartz"]}, {"label": "2 Logs + 4 Fibre; or 3 Bone + 4 Fibre", "role": "component or cost", "resourceIDs": ["fiber", "timber"]}, {"label": "0 Essence", "role": "component or cost"}], "notes": "T2; Ingots require T2. Mid, Pierce. Choose complete separate working/support bundles; source parts determine statistics."},
+  {"id": "shield", "name": "Shield", "system": "blacksmith", "result": "Shield", "ingredients": [{"label": "4 Iron + 1 Coal; or 2 Ingots; or 2 Softwood Logs; or 2 Hardwood Logs; or 2 Bone", "role": "component or cost", "resourceIDs": ["ore", "timber"]}, {"label": "1 Log + 2 Fibre; or 1 Bone + 2 Fibre", "role": "component or cost", "resourceIDs": ["fiber", "timber"]}, {"label": "0 Essence", "role": "component or cost"}], "notes": "T1; Ingots require T2. Offhand protection. Choose complete separate working/support bundles; source parts determine statistics."},
+  {"id": "helm", "name": "Helm", "system": "blacksmith", "result": "Helm", "ingredients": [{"label": "4 Iron + 1 Coal; or 2 Ingots; or 2 Bone", "role": "component or cost", "resourceIDs": ["ore"]}, {"label": "4 Fibre; or 1 Cloth lining", "role": "component or cost", "resourceIDs": ["fiber"]}, {"label": "0 Essence", "role": "component or cost"}], "notes": "T2; Ingots require T2. Head protection. Choose complete separate working/support bundles; source parts determine statistics."},
+  {"id": "rigid-guard", "name": "Rigid Guard", "system": "blacksmith", "result": "Rigid Guard", "ingredients": [{"label": "8 Iron + 2 Coal; or 4 Ingots; or 4 Bone", "role": "component or cost", "resourceIDs": ["ore"]}, {"label": "Lining: 4 Fibre or 1 Cloth; binding: 2 Fibre or 1 Cord", "role": "component or cost", "resourceIDs": ["fiber"]}, {"label": "0 Essence", "role": "component or cost"}], "notes": "T2; Ingots require T2. Body protection. Choose complete separate working/support bundles; source parts determine statistics."},
+  {"id": "woven-guard", "name": "Woven Guard", "system": "tannery", "result": "Woven Guard", "ingredients": [{"label": "1 Cloth, 1 Cord", "role": "component or cost"}, {"label": "0 Essence", "role": "component or cost"}], "notes": "Current garment variant, delivered323. Preserve actual textile constituents and independent Leather panels."},
+  {"id": "buckled-woven-guard", "name": "Buckled Woven Guard", "system": "tannery", "result": "Buckled Woven Guard", "ingredients": [{"label": "2 Cloth, 1 Cord, 1 Iron Ingot", "role": "component or cost"}, {"label": "0 Essence", "role": "component or cost"}], "notes": "Current garment variant, delivered323. Preserve actual textile constituents and independent Leather panels."},
+  {"id": "leather-guard", "name": "Leather Guard", "system": "tannery", "result": "Leather Guard", "ingredients": [{"label": "2 separately chosen Leather panels, 1 Cord", "role": "component or cost"}, {"label": "0 Essence", "role": "component or cost"}], "notes": "Current garment variant, delivered323. Preserve actual textile constituents and independent Leather panels."},
+  {"id": "woven-gloves", "name": "Woven Gloves", "system": "tannery", "result": "Woven Gloves", "ingredients": [{"label": "1 Cloth, 1 Cord", "role": "component or cost"}, {"label": "0 Essence", "role": "component or cost"}], "notes": "Current garment variant, delivered323. Preserve actual textile constituents and independent Leather panels."},
+  {"id": "leather-gloves", "name": "Leather Gloves", "system": "tannery", "result": "Leather Gloves", "ingredients": [{"label": "1 Leather, 1 Cord", "role": "component or cost"}, {"label": "0 Essence", "role": "component or cost"}], "notes": "Current garment variant, delivered323. Preserve actual textile constituents and independent Leather panels."},
+  {"id": "woven-boots", "name": "Woven Boots", "system": "tannery", "result": "Woven Boots", "ingredients": [{"label": "1 Cloth, 1 Cord, 1 Resin", "role": "component or cost", "resourceIDs": ["resin"]}, {"label": "0 Essence", "role": "component or cost"}], "notes": "Current garment variant, delivered323. Preserve actual textile constituents and independent Leather panels."},
+  {"id": "leather-boots", "name": "Leather Boots", "system": "tannery", "result": "Leather Boots", "ingredients": [{"label": "1 Leather, 1 Cord, 1 Resin", "role": "component or cost", "resourceIDs": ["resin"]}, {"label": "0 Essence", "role": "component or cost"}], "notes": "Current garment variant, delivered323. Preserve actual textile constituents and independent Leather panels."},
+  {"id": "plant-cord", "name": "Plant Cord", "system": "tannery", "result": "Plant Cord", "ingredients": [{"label": "2 Stem and/or Leaf Fibre", "role": "component or cost", "resourceIDs": ["fiber"]}, {"label": "0 Essence", "role": "component or cost"}], "notes": "Preserve actual source portions and colours."},
+  {"id": "plant-cloth", "name": "Plant Cloth", "system": "tannery", "result": "Plant Cloth", "ingredients": [{"label": "4 Stem and/or Leaf Fibre", "role": "component or cost", "resourceIDs": ["fiber"]}, {"label": "0 Essence", "role": "component or cost"}], "notes": "Preserve actual source portions and colours."},
+  {"id": "leather", "name": "Leather", "system": "tannery", "result": "Leather", "ingredients": [{"label": "1 eligible Skin/Hide and 1 Salt", "role": "component or cost", "resourceIDs": ["salt"]}, {"label": "0 Essence", "role": "component or cost"}], "notes": "Preserve actual source portions and colours."},
+  {"id": "longbow", "name": "Longbow", "system": "bowyer", "result": "Longbow", "ingredients": [{"label": "Maintained points: 1 Iron Ingot or 2 Quartz or 1 Bone", "role": "component or cost", "resourceIDs": ["quartz"]}, {"label": "2 Hardwood Logs, 1 Resin, 1 Cord", "role": "component or cost", "resourceIDs": ["resin", "timber"]}, {"label": "0 Essence", "role": "component or cost"}], "notes": "Current Far weapon; no separate ammunition inventory. Exact chosen components and same-item refit retain their source."},
+  {"id": "sling", "name": "Sling", "system": "bowyer", "result": "Sling", "ingredients": [{"label": "Shot: 2 Clay + 1 Coal or 1 Iron Ingot or 1 Bone", "role": "component or cost", "resourceIDs": ["clay"]}, {"label": "2 Cord; pouch of 1 Cloth or 1 Leather", "role": "component or cost"}, {"label": "0 Essence", "role": "component or cost"}], "notes": "Current Far weapon; no separate ammunition inventory. Exact chosen components and same-item refit retain their source."},
+  {"id": "throwing-set", "name": "Throwing Set", "system": "bowyer", "result": "Throwing Set", "ingredients": [{"label": "Two edges, each independently 1 Iron Ingot or 1 Bone", "role": "component or cost"}, {"label": "Carrier of 1 Cloth or 1 Leather, plus 1 Cord", "role": "component or cost"}, {"label": "0 Essence", "role": "component or cost"}], "notes": "Current Far weapon; no separate ammunition inventory. Exact chosen components and same-item refit retain their source."},
+  {"id": "fitted-point", "name": "Fitted Point (Pierce/Close)", "system": "weaponsmith", "result": "Fitted Point", "ingredients": [{"label": "2 Ingots or 2 Quartz or 1 Bone", "role": "component or cost", "resourceIDs": ["quartz"]}, {"label": "1 Softwood/Hardwood Haft; 1 Cord or 1 Leather", "role": "component or cost"}, {"label": "1 Iron or Bone Collar", "role": "component or cost", "resourceIDs": ["ore"]}, {"label": "0 Essence", "role": "component or cost"}], "notes": "Polearm requires the actual fitting diary. Balanced and Driving retain their current effects."},
+  {"id": "fitted-edge", "name": "Fitted Edge (Rend/Close)", "system": "weaponsmith", "result": "Fitted Edge", "ingredients": [{"label": "2 Ingots or 1 Bone", "role": "component or cost"}, {"label": "1 Softwood/Hardwood Haft; 1 Cord or 1 Leather", "role": "component or cost"}, {"label": "1 Iron or Bone Collar", "role": "component or cost", "resourceIDs": ["ore"]}, {"label": "0 Essence", "role": "component or cost"}], "notes": "Polearm requires the actual fitting diary. Balanced and Driving retain their current effects."},
+  {"id": "fitted-maul", "name": "Fitted Maul (Crush/Close)", "system": "weaponsmith", "result": "Fitted Maul", "ingredients": [{"label": "2 Ingots or 2 Bone", "role": "component or cost"}, {"label": "1 Hardwood Haft; 1 Cord or 1 Leather", "role": "component or cost"}, {"label": "1 Iron or Bone Collar", "role": "component or cost", "resourceIDs": ["ore"]}, {"label": "0 Essence", "role": "component or cost"}], "notes": "Polearm requires the actual fitting diary. Balanced and Driving retain their current effects."},
+  {"id": "fitted-polearm", "name": "Fitted Polearm (Pierce/Mid)", "system": "weaponsmith", "result": "Fitted Polearm", "ingredients": [{"label": "2 Ingots or 2 Quartz or 1 Bone", "role": "component or cost", "resourceIDs": ["quartz"]}, {"label": "2 Hardwood Hafts; 2 Cord or 2 Leather", "role": "component or cost"}, {"label": "1 Iron or Bone Collar", "role": "component or cost", "resourceIDs": ["ore"]}, {"label": "0 Essence", "role": "component or cost"}], "notes": "Polearm requires the actual fitting diary. Balanced and Driving retain their current effects."},
+  {"id": "fitted-polearm-rend-mid", "name": "Fitted Polearm (Rend/Mid)", "system": "weaponsmith", "result": "Fitted Polearm", "ingredients": [{"label": "2 Ingots or 1 Bone", "role": "component or cost"}, {"label": "2 Hardwood Hafts; 2 Cord or 2 Leather", "role": "component or cost"}, {"label": "1 Iron or Bone Collar", "role": "component or cost", "resourceIDs": ["ore"]}, {"label": "0 Essence", "role": "component or cost"}], "notes": "Polearm requires the actual fitting diary. Balanced and Driving retain their current effects."},
+  {"id": "fitted-polearm-crush-mid", "name": "Fitted Polearm (Crush/Mid)", "system": "weaponsmith", "result": "Fitted Polearm", "ingredients": [{"label": "2 Ingots or 2 Bone", "role": "component or cost"}, {"label": "2 Hardwood Hafts; 2 Cord or 2 Leather", "role": "component or cost"}, {"label": "1 Iron or Bone Collar", "role": "component or cost", "resourceIDs": ["ore"]}, {"label": "0 Essence", "role": "component or cost"}], "notes": "Polearm requires the actual fitting diary. Balanced and Driving retain their current effects."},
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
   {
     id: 'rigid-shell',
     name: 'Rigid shell rebuild',
@@ -726,7 +471,7 @@ export const craftingRecipes: CraftRecipe[] = [
 export function recipesUsingResource(resourceID: string) {
   return craftingRecipes.filter((recipe) =>
     recipe.ingredients.some(
-      (ingredient) => ingredient.resourceID === resourceID,
+      (ingredient) => ingredient.resourceID === resourceID || ingredient.resourceIDs?.includes(resourceID),
     ),
   );
 }

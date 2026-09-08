@@ -1,5 +1,8 @@
 # Essence continuation economy — current design
 
+> **Scheduling supersession — 7 September 2026:** Aimee has deferred Essence recovery and prioritizes the cohesive opening and current player fixes. The historical budgets, run plans and gates below are reference, not an active assignment or a requirement to start another trial. Follow `game-design-early-progression-direction-2026-09-04.md` and the current player Wiki. Existing recovery behavior remains supported; this pause changes no reward or fee.
+
+
 **Status:** Current invariant; temporary playtest values pending run data  
 **Updated:** 9 Aug 2026
 

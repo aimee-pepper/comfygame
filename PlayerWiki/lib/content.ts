@@ -333,7 +333,16 @@ export function itemProperties(item: Item) {
     .map(([key, value]) => `${humanize(key)}: ${humanize(value)}`);
 }
 
+const deliveredFoundationCosts: Record<string, string> = {
+  blacksmith: '20 Essence · 8 Iron · 4 Plant Fibre · 4 Logs',
+  apothecary: '20 Essence · 4 Clay · 4 Logs',
+  tannery: '20 Essence · 6 Logs · 4 Clay · 4 Plant Fibre',
+  bowyer: '30 Essence · 6 Logs · 2 Cord · 2 Resin',
+  weaponsmith: '40 Essence · 4 Iron Ingots · 2 Hafts · 2 Cord',
+};
+
 export function buildCost(station: Station) {
+  if (deliveredFoundationCosts[station.id]) return deliveredFoundationCosts[station.id];
   if (!station.buildCost?.length)
     return station.unlockedAtStart
       ? 'Available at the start'

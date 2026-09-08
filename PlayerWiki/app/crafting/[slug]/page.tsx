@@ -1,3 +1,4 @@
+import { buildCost } from '@/lib/content';
 import { DistilleryChannelworksOverhaul } from '@/components/distillery-channelworks-overhaul';
 import { ScriptoriumOverhaul } from '@/components/scriptorium-overhaul';
 import { SurveyPostOverhaul } from '@/components/survey-post-overhaul';
@@ -75,15 +76,7 @@ function resultLink(item: NonNullable<ReturnType<typeof resultItem>>) {
 }
 
 function constructionCost(station: (typeof content.stations)[number]) {
-  if (station.unlockedAtStart) return 'Available at the start of a campaign.';
-  if (!station.buildCost.length) return 'A construction cost is not available yet.';
-  return <>{station.buildCost.map((cost, index) => {
-    const id = cost.id ?? cost.resource ?? cost.resourceID;
-    const resource = id ? content.resources.find((entry) => entry.id === id) : null;
-    const quantity = cost.quantity ?? cost.amount ?? '?';
-    const label = resource?.name ?? humanize(id);
-    return <span key={`${station.id}-${id}-${index}`}>{index ? ', ' : ''}{quantity} {resource ? <Link href={`/resources/${resource.slug}`}>{label}</Link> : label}</span>;
-  })}</>;
+  return buildCost(station);
 }
 
 export default async function CraftingSystemDetail({
@@ -144,9 +137,9 @@ export default async function CraftingSystemDetail({
           ))}
         </ol>
       </section>
-      {system.slug === 'apothecary' && <section className="article-section"><h2>Lesser Salve is the first known preparation</h2><div className="definition-grid"><div><h3>What construction gives you</h3><p>The completed Apothecary teaches the Lesser Salve recipe only. It does not give a Salve, spend a flexible material, or consume Resin.</p><p><Link href="/buildings/apothecary">Read the complete Apothecary entry</Link></p></div><div><h3>What preparation needs</h3><p>{apothecaryFirstUse.firstRecipe}</p><p>A flexible material means one eligible material stored at Home, not a generic amount or an unrelated named object.</p></div></div><h3>If ingredients are missing</h3><ul className="compact-list">{apothecaryFirstUse.shortfalls.map((line) => <li key={line}>{line}</li>)}</ul><p>{apothecaryFirstUse.inference}</p></section>}
-      {system.slug === 'blacksmith' && <section className="article-section"><h2>Pointed Blade is the first available weapon form</h2><p>Completing Halloway’s foundation teaches this Schematic but does not give you finished gear. The recipe uses one chosen point and one different chosen grip. The preview shows the final Essence price before you confirm.</p><ul className="compact-list">{blacksmithFirstUse.pointedBlade.map((line) => <li key={line}>{line}</li>)}</ul><p>{blacksmithFirstUse.stockBoundary}</p><p><Link href="/buildings/blacksmith">Read Halloway’s complete Blacksmith entry</Link></p></section>}
-      {system.slug === 'blacksmith' && <section className="article-section note-card"><h2>Reforge changes one chosen item</h2><ul className="compact-list">{blacksmithFirstUse.reforgeBoundary.map((line) => <li key={line}>{line}</li>)}</ul></section>}
+      {system.slug === 'apothecary' && <section className="article-section"><h2>Lesser Salve is the first known preparation</h2><div className="definition-grid"><div><h3>What construction gives you</h3><p>The completed Apothecary teaches the Lesser Salve recipe only. It does not give a Salve, spend Plant Fibre, or consume Resin.</p><p><Link href="/buildings/apothecary">Read the complete Apothecary entry</Link></p></div><div><h3>What preparation needs</h3><p>{apothecaryFirstUse.firstRecipe}</p><p>Plant Fibre can use the allowed Stem or Leaf Fibre portions stored at Home. There is no hidden Flexibility threshold or separate sample.</p></div></div><h3>If ingredients are missing</h3><ul className="compact-list">{apothecaryFirstUse.shortfalls.map((line) => <li key={line}>{line}</li>)}</ul><p>{apothecaryFirstUse.inference}</p></section>}
+      {system.slug === 'blacksmith' && <section className="article-section"><h2>Pointed Blade is one of four T1 equipment choices</h2><p>Completing Halloway’s foundation opens the T1 equipment recipes without granting finished gear. Pointed Blade uses a chosen point bundle and separate grip. Ordinary crafting costs no Essence.</p><ul className="compact-list">{blacksmithFirstUse.pointedBlade.map((line) => <li key={line}>{line}</li>)}</ul><p>{blacksmithFirstUse.stockBoundary}</p><p><Link href="/buildings/blacksmith">Read Halloway’s complete Blacksmith entry</Link></p></section>}
+      {system.slug === 'blacksmith' && <section className="article-section note-card"><h2>Refit changes one chosen item</h2><ul className="compact-list">{blacksmithFirstUse.reforgeBoundary.map((line) => <li key={line}>{line}</li>)}</ul></section>}
       {system.slug === 'anchorage' && <section className="article-section"><h2>Using an Anchor Frame in the field</h2><p>Build the Anchorage after <Link href="/people/tovin">Tovin</Link> joins the Village, then meet every requirement for one Frame:</p><ul className="compact-list">{anchorageFirstAnchor.frameRequirements.map((line) => <li key={line}>{line}</li>)}</ul><p>One material cannot fill two positions. The completed Frame goes to the Storehouse, or Waiting if storage is full, and can be packed later through the Field Kit. It works on valid clear ground. A discovered <Link href="/sites/atlas-seam">Atlas Seam</Link> can anchor a world without a Frame.</p><p><Link href="/buildings/anchorage">Read the complete first-anchor journey</Link></p></section>}
       {system.slug === 'instruments' && <SurveyPostOverhaul />}
       {system.slug === 'instruments' && <section className="article-section"><h2>Study a permanent field skill</h2><p>After <Link href="/people/mara">Mara</Link> joins the Village and the <Link href="/buildings/survey-post">Survey Post</Link> is built, each Field Instruments Research entry teaches one named subject at Crude precision. It is a permanent skill rather than a physical item.</p><div className="table-wrap"><table><thead><tr><th>Instrument</th><th>Subject</th><th>Cost before discounts</th></tr></thead><tbody>{surveyPostFirstUse.instruments.map(([id, name, subject, cost]) => <tr key={id}><td>{name}</td><td>{subject}</td><td>{cost}</td></tr>)}</tbody></table></div><p>Check the Research preview before studying; it includes any staffing discount from Mara. A full Storehouse or Waiting area cannot block this purchase because it does not create an item.</p></section>}

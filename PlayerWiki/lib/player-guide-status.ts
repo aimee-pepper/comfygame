@@ -171,7 +171,7 @@ export const craftingFamilyStatus: CraftingFamilyStatus[] = [
     name: 'Blacksmith',
     status: 'Playable now',
     current: 'Build324 delivers seven equipment families with exact world/Bone components, tier gates, quarter statistics, frozen prices and same-item refitting. Pick/Axe/Scythe, smelting and T3 retain their delivered tool progression.',
-    accepted: 'Raw-material starter equipment, Ingots at T2, actual material identity, separate workmanship/statistics and current-component recovery. The first Forge pass now implements these decisions; Iron Collar and Peerless remain separate later work.',
+    accepted: 'Raw-material starter equipment, Ingots at T2, actual material identity, separate workmanship/statistics and current-component recovery. The first Forge pass implements these decisions. Build328 adds Iron Collar at T2 after Weaponsmith or Armoury construction; Peerless refinement remains unfinished.',
     changes: [
       { name: 'Pointed Blade', current: 'T1: choose a working point and separate short grip. Raw Iron uses 4 Iron +1 Coal, with 1 Log +2 Fibre grip; 0 Essence, Power2.0.', accepted: 'Exact Bone, Quartz and T2 Ingot alternatives follow the complete current recipe table.' },
       { name: 'Cutting Blade', current: 'T1: one complete cutting-edge bundle and separate short grip.', accepted: 'The working edge alone supplies Power; support quality can affect workmanship.' },

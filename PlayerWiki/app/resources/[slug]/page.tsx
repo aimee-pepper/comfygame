@@ -108,7 +108,7 @@ export default async function ResourceDetail({
       <section className="article-section">
         <h2>Material role in current recipes</h2>
         <p>Counted stock pays only the fixed costs shown below. When a recipe asks for a particular physical or creature material, it names that choice clearly; an ordinary resource count never replaces it.</p>
-        {craftUses.length ? <ul className="compact-list">{craftUses.map((recipe) => { const ingredient = recipe.ingredients.find((entry) => entry.resourceID === resource.id)!; const system = systemFor(recipe.system); return <li key={`${recipe.id}-role`}><Link href={`/crafting/${recipe.system}`}>{recipe.name}</Link> · {ingredient.role ?? 'ingredient'}{ingredient.amount ? ` · ${ingredient.amount} required` : ''}{system ? ` at ${system.name}` : ''}</li>; })}</ul> : <p>No current recipe lists this resource as a counted ingredient.</p>}
+        {craftUses.length ? <ul className="compact-list">{craftUses.map((recipe) => { const ingredient = recipe.ingredients.find((entry) => entry.resourceID === resource.id || entry.resourceIDs?.includes(resource.id))!; const system = systemFor(recipe.system); return <li key={`${recipe.id}-role`}><Link href={`/crafting/${recipe.system}`}>{recipe.name}</Link> · {ingredient.role ?? 'ingredient'}{ingredient.amount ? ` · ${ingredient.amount} required` : ''}{system ? ` at ${system.name}` : ''}</li>; })}</ul> : <p>No current recipe lists this resource as a counted ingredient.</p>}
       </section>
       <section className="article-section">
         <h2>Craft recipes</h2>
@@ -126,7 +126,7 @@ export default async function ResourceDetail({
               <tbody>
                 {craftUses.map((recipe) => {
                   const ingredient = recipe.ingredients.find(
-                    (entry) => entry.resourceID === resource.id,
+                    (entry) => entry.resourceID === resource.id || entry.resourceIDs?.includes(resource.id),
                   )!;
                   const system = systemFor(recipe.system);
                   const result = content.items.find((item) => item.name === recipe.result);
@@ -142,7 +142,7 @@ export default async function ResourceDetail({
                       <td>
                         {ingredient.amount
                           ? `${ingredient.amount} required`
-                          : humanize(ingredient.role ?? 'eligible component')}
+                          : humanize(ingredient.label)}
                         {ingredient.role && ingredient.amount
                           ? ` · ${ingredient.role}`
                           : ''}

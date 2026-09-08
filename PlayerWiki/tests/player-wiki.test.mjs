@@ -288,13 +288,13 @@ test('Apothecary first-use journey keeps Nessa, construction, Lesser Salve, infe
     'salve_lesser',
   ])
     assert.match(journey, new RegExp(stableID));
-  assert.match(journey, /85 Essence · 16 Clay · 6 Quartz · 12 Reagent/);
-  assert.match(journey, /1 flexible material at 25\+ · 1 Resin · 0 Essence/);
+  assert.match(journey, /20 Essence · 4 Clay · 4 Logs/);
+  assert.match(journey, /1 Plant Fibre · 1 Resin · 0 Essence/);
   assert.match(
     journey,
     /Construction teaches Lesser Salve but spends no recipe material and creates no item/,
   );
-  assert.match(journey, /Needs 1 flexible material at 25\+ and 1 Resin/);
+  assert.match(journey, /Needs 1 Plant Fibre and 1 Resin/);
   assert.match(journey, /does not reveal Scent Mask, Stillwater, Waystone/);
   assert.match(
     journey,
@@ -756,22 +756,22 @@ test('Blacksmith first use keeps Halloway, exact foundation, Pointed Blade custo
   assert.match(journey, /travellerID: 'halloway'/);
   assert.match(journey, /stationID: 'blacksmith'/);
   assert.match(journey, /schematicID: 'pointed_blade'/);
-  assert.match(journey, /30 Essence · 12 Iron Ore · 6 Fibre/);
+  assert.match(journey, /20 Essence · 8 Iron · 4 Plant Fibre · 4 Logs/);
   assert.match(
     journey,
     /Iron enough for the work, fibre enough to bind the frame/,
   );
   assert.doesNotMatch(journey, /stone and iron/i);
   assert.match(journey, /World or Creature Material/);
-  assert.match(journey, /two materials with the required 30\+ property, 8 Essence/);
+  assert.match(journey, /ordinary refit costs 0 Essence/);
   assert.match(journey, /does not promise a paid Reforge success/);
   assert.match(journey, /never substitutes another item with the same name/);
   for (const source of [service, building, place, crafting])
     assert.match(source, /blacksmithFirstUse/);
-  assert.match(service, /Third opening find: Halloway to Pointed Blade/);
+  assert.match(service, /Halloway and the first Forge recipes/);
   assert.match(building, /Build the Blacksmith with Halloway/);
   assert.match(place, /Build it with Halloway/);
-  assert.match(crafting, /Pointed Blade is the first available weapon form/);
+  assert.match(crafting, /Pointed Blade is one of four T1 equipment choices/);
   for (const source of [building, place])
     assert.doesNotMatch(source, /stone and the iron/);
 });
@@ -1078,7 +1078,7 @@ test('crafting has a linked system index and complete resource cross-reference s
   assert.match(crafting, /stationID/);
   assert.match(crafting, /definedButNotLiveCrafting/);
   assert.match(crafting, /Fitted Polearm/);
-  assert.match(crafting, /id: 'fitted-polearm'/);
+  assert.match(crafting, /["']?id["']?: ["']fitted-polearm["']/);
   assert.match(crafting, /id: 'caustic-core'/);
   assert.match(crafting, /id: 'light-core'/);
   assert.match(crafting, /name: 'Heat Conduit Fixture'/);

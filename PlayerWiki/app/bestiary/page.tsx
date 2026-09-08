@@ -61,10 +61,10 @@ export default function BestiaryPage() {
       </section>
       <section className="article-section"><h2>Intended physical material families</h2><p>Generated species can still leave species-specific items, colours, values, and histories. Those units sit inside recognizable physical families and subtypes so recipes can ask for Scales, Fish Scales, or Armoured Fish Scales without requiring one named species.</p><div className="table-wrap"><table><thead><tr><th>Family</th><th>Physical meaning</th></tr></thead><tbody>{creatureMaterialFamilies.map(([family, meaning]) => <tr key={family}><td><strong>{family}</strong></td><td>{meaning}</td></tr>)}</tbody></table></div></section>
       <section className="article-section note-card">
-        <h2>Decided intended behavior: the first Leather path</h2>
+        <h2>Current first Leather path</h2>
         <p>Animals whose actual covering qualifies can provide Smooth Skin, Supple Hide, or Tough Hide. A feathered, scaled, shelled, or furry animal does not become a Hide source simply because a recipe needs it. These parts retain their source colour and four-band quality.</p>
         <p>First-pass tuning gives a qualified covering a 70% drop chance after defeat, with 1–4 parts according to body size. Recipe tracking can mark a relevant normally visible creature without prior inspection; it means a possible drop, not a guarantee. Population, combat, and full gathering journeys still need playtesting.</p>
-        <p>Corrin can turn matching parts and Salt into Leather for a Leather Guard. The earlier woven garments need no animal parts or Salt. These are intended additions; the current encounter profiles above remain the delivered-game reference.</p>
+        <p>Corrin can turn matching parts and Salt into Leather for a Leather Guard. The earlier woven garments need no animal parts or Salt. The one-part Leather recipe and garments are delivered in323. Each Leather uses one eligible Skin/Hide and one Salt. Exact source portions remain preserved inside the agreed subtype-and-quality stack; build345 corrects the property-based visible split in Return and Storehouse.</p>
         <p><Link href="/references/design-decisions-september-4">Read the complete Leather recipes, quality rules, and early gathering plan</Link></p>
       </section>
       <section className="article-section">
