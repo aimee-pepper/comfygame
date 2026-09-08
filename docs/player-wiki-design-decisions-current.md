@@ -83,15 +83,17 @@ Existing size, build, tissue, stature, shape and part fields supply the variatio
 
 **Aquatic admission correction — included in339:** a deep-water creature in a habitat with valid shallow-water contact no longer causes world preparation to fail merely because its starting tile is not player-walkable. Allowed remote-only aquatic habitats still do not require a contact route. No creature or source is relocated. This preserves dark-water starts beyond your reach and existing awareness, movement and sight rules.
 
-Pressure-led family generation is next and remains unimplemented. Surface finishes/continuous markings and shared3D readability also remain separate unfinished work. Existing campaigns and owned source colours are preserved.
+Pressure-led family generation is installed351 for newly bound books, with phone entry still unverified. Surface finishes/continuous markings and shared3D readability also remain separate unfinished work. Existing campaigns and owned source colours are preserved.
 
-## Surface finishes and markings — intended next batch
+## Surface finishes and markings — improvements planned
 
 **Current:** generated life uses its source colour, a shine-based surface finish and soft bands applied separately to each part. Markings can restart or reverse at part joins, and dense bands can lose contrast. Full Schiller is not delivered.
 
 **Decided presentation direction:** preserve the actual colours of body regions, wood, foliage and harvested materials. Treat opacity, shine and Schiller as a finish mixture: the opacity share is matte/opaque finish, not permission to make a highly polished creature transparent. Surfaces remain opaque; existing foreground fading remains separate. Shine changes the reflected highlight. Schiller should produce a subtle, angle-dependent coloured sheen relative to the source colour, while neutral-coloured sources retain neutral sheen. This changes appearance, not materials, illumination, concealment or targeting.
 
-**Design/Asset first-pass plan, not delivered:** markings should use a shared direction and scale within each continuous material region, preserving the same pattern through connected parts, movement and reopening. Distinct wood, foliage and other regions can keep separate markings. Fine patterns may blend together at a distance rather than flicker. Actual specimen and part-specific colours must survive these effects and remain the colours used by crafting. Exact sheen strength and pattern filtering are production tuning; the required renderer support is still pending. A static rainbow tint does not count as completed Schiller.
+**Design/Asset first-pass plan, not delivered:** markings should use a shared direction and scale within each continuous material region, preserving the same pattern through connected parts, movement and reopening. Distinct wood, foliage and other regions can keep separate markings. Fine patterns may blend together at a distance rather than flicker. Actual specimen and part-specific colours must survive these effects and remain the colours used by crafting. Exact sheen strength and pattern filtering are production tuning; the remaining effects and visual checks are still unfinished. A static rainbow tint does not count as completed Schiller.
+
+**Progress on the planned appearance:** early visual checks show clearer leaf bands up close and softer markings at a distance, with the tree’s outline preserved. Wood keeps its own colour without leaf bands. These improvements are not available in your installed game yet. Their appearance during movement and across connected creature parts still needs checking. Schiller and the complete finished appearance remain unfinished.
 
 ## Reading plants, creatures and targets in 3D
 
