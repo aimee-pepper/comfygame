@@ -1,6 +1,6 @@
 # Creature generation — modular structure and coverage contract
 
-> **7 September accepted extension, implementation pending:** [Pressure-led life families v1](pressure-led-life-families-v1.md) adds a separately versioned family-selection policy. It preserves this packet's independent structure, current/legacy source authority and saved worlds. Its exact new-policy selection rules take precedence where explicitly stated; no change is delivered merely by this note.
+> **7 September accepted extension, internally verified; installation pending:** [Pressure-led life families v1](pressure-led-life-families-v1.md) adds a separately versioned family-selection policy. It preserves this packet's independent structure, current/legacy source authority and saved worlds. Its exact new-policy selection rules take precedence where explicitly stated; no change is delivered merely by this note.
 
 6 September2026. **Intended structural draft; Dragon DNA reference reconciliation complete, Engineering representation and source-choice review passed. Not a completed generator or delivered runtime/final artwork.** Aimee requires coherent design for every intended family before dependent generation is implemented. This supersedes the proposed quadruped/serpentine-only fauna slice in `generated-3d-life-and-waterfalls-v1.md`. Generic interfaces and independent flora/water work may proceed; family/morphology generation waits for the feasibility review described below.
 
