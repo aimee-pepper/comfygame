@@ -2,11 +2,11 @@
 
 This is the current record of the changes agreed today. **Decided intended behavior** describes the game we are making; it does not mean that behavior is already available on your phone. **First-pass tuning** gives concrete starting numbers that can change through play. **Unsettled proposals** still need design work or a choice.
 
-## Current installed update —359
+## Current installed update —360
 
-Build359 adds moving exploration controls: the carried-item strip and navigation block move together between the bottom and top of the map as your character approaches. Details open inward, and the map keeps its tile scale and framing. It retains normal3D exploration, **Diary page collected → Read now**, and the **About … turns left** estimate. Installation was verified; this is not a completed physical-phone playtest.
+Build360 gives newly written worlds tapered fleshy stems, compact basal rosettes and authored fungal caps with corrected attachment of their existing spore-bearing feature. It retains moving navigation, normal3D exploration and **Diary page collected → Read now**. Existing books keep their saved shapes. Internal checks and Asset’s review passed for this bounded correction; installation is verified, without a completed physical-phone playtest or your visual acceptance claim.
 
-The intermittent **Securing action** hang remains unreproduced and has not been confirmed fixed. The waterfall's visible motion has not passed its appearance review. The newer plant-stem and cap corrections remain pending.
+The intermittent **Securing action** hang remains unreproduced and has not been confirmed fixed. The waterfall's visible motion has not passed its appearance review. Long bare upper stems and weak distinction between needle and frond plants at ordinary scale remain visible limitations; finished whole-plant believability is not established.
 
 ## Normal expeditions in3D — installed in357
 
@@ -14,7 +14,7 @@ The intermittent **Securing action** hang remains unreproduced and has not been 
 
 Newly written ordinary worlds use the normal3D resource rules, including suitable mineral deposits previously omitted for2D recordings. Existing books and active expeditions keep their actual terrain, resources, progress and saved appearances; switching the view does not regenerate them. Settings trials retain their separate saves.
 
-Internal checks passed binding, entering, movement and controls, reopening through Continue, and returning Home. Installation on your phone is verified; these checks do not establish physical-phone play acceptance or finished artwork. Plant-stem corrections and selective iridescence remain separate unfinished work.
+Internal checks passed binding, entering, movement and controls, reopening through Continue, and returning Home. Installation on your phone is verified; these checks do not establish physical-phone play acceptance or finished artwork. Build360 subsequently delivers the bounded stem/cap correction; selective iridescence and further plant refinement remain unfinished.
 
 ## 3D authoring direction
 
@@ -30,21 +30,25 @@ Already-readable branched woody and fibrous plants, bare forms and corrected unb
 
 **Tradeoff:** basal rosettes look shorter, and fleshy branch fans occupy more visible space around their unchanged central body. Some rear foliage can still be hidden. You approved this revision and asked to see matched before/after examples of the same plants. The completed comparisons show clearer upright leaves, compact basal clusters and fleshy branch fans emerging outside the body. Internal checks also preserved source counts, materials and older saved plants. Your final visual acceptance remains pending. Build355 is installed on your phone. Existing books keep their saved plant shapes. Ordinary phone entry has not been checked.
 
-## Fungal cap contact — decided, not yet delivered
+## Fungal caps and contact — installed in360
 
-When the new fungal-cap artwork is introduced, an existing spore-bearing feature will sit against its actual cap surface instead of floating above it. This corrects an inherited attachment gap without adding parts or changing their sizes, source colours, harvests or material values. Existing books keep their saved appearances. The correction is pending; it is not included in359.
+Newly written worlds use authored fungal caps in place of the earlier rounded placeholder shape. Existing cap sizes and repeated groups remain intact. An existing spore-bearing feature now sits against the actual cap surface instead of floating above it. This adds no parts or changes to source colours, harvests or material values. Existing books keep their saved appearances.
 
-## More believable plant supports — decided, not yet delivered
+Asset's matched review passed for this cap replacement. The small attachment is not separately legible in the images; its contact is established by Engineering's geometry checks, not by visual inference. Repeated caps can still look stacked; this is not final whole-plant realism.
 
-You prefer build355’s clearer foliage, but its egg-shaped supports do not suit ordinary plants. The next correction keeps those foliage improvements and gives ordinary fleshy plants believable, gently tapered stems. Upright plants keep an upright support; unbranched basal rosettes use a compact central support. Branches and leaves remain attached to the real stem surface.
+## Tapered plant supports — installed in360
 
-Swollen cactus or succulent forms require actual supporting anatomy. Fleshy tissue, thorns or needle-shaped growth alone will not turn a plant into a cactus. Current plant records do not yet establish a separate swollen storage stem. Existing books keep their saved shapes, and the correction changes no materials, harvest counts or crafting values. Build357 retains355’s plant behavior while this correction is made.
+Newly written worlds keep355's foliage improvements while replacing ordinary fleshy egg-shaped supports with straight, gently tapered stems. Upright forms keep their height; unbranched basal rosettes use a short central support and read as compact radial clusters. Branches, leaves and thorns attach to the actual stem surface. Anatomy, counts, source colours, harvests, material values and older saved shapes stay intact.
+
+Internal contact, source-count and saved-world checks passed. Asset reviewed all16 matched before/after images and accepted the bounded stem and cap replacement. Upright needle and frond forms still have long bare upper stems and can be difficult to distinguish at ordinary scale. This does not establish final plant believability or your visual acceptance.
+
+Swollen cactus or succulent forms still require actual supporting anatomy. Fleshy tissue, thorns or needle-shaped growth alone do not establish a cactus, and current plant records have no separate swollen storage stem.
 
 ## Generated 3D life and connected waterfalls
 
 **Decided intended behavior:** plants and creatures are generated in game when you write a world. The game may combine reusable body bases, plant parts and attachments, but choosing a finished premade species is not the generation system. World conditions shape the available life; its actual traits determine structure, proportions, colour and Pattern. A saved world keeps its identities and appearance when reopened. Harvested flora and creature materials keep their actual source colours through supported crafting uses.
 
-**Current behavior — installed in build333:** newly written ordinary worlds now generate modular plants and creatures and use the measured-water rules. See their current 3D presentation through Settings → Owner Tools → 3D Trials → Ordinary expedition. Existing books, saved worlds and unfinished opening expeditions retain their frozen generation; reopening them does not reroll their life or terrain. Artwork remains partial.
+**Current behavior — installed in build333:** newly written ordinary worlds now generate modular plants and creatures and use the measured-water rules. Build357 subsequently brings their3D presentation into normal expeditions; the Settings trials remain separate. Existing books, saved worlds and unfinished opening expeditions retain their frozen generation; reopening them does not reroll their life or terrain. Artwork remains partial.
 
 **What has been verified:** an internal native ordinary expedition contained four creature kinds and two flora kinds. Movement, a creature encounter, Withdraw, Continue and reopening that same expedition passed. The short route reached no usable harvest. All four water areas kept their earlier presentation because the new geometry could not be admitted; **no naturally generated waterfall was witnessed**. A separate controlled native example verified a connected one-level waterfall and legal shore slopes/steps. Build333 launched normally at its delivery, but Aimee's expedition was not played and phone performance was not established. See the latest installation status above for the current build.
 
