@@ -2,11 +2,11 @@
 
 This is the current record of the changes agreed today. **Decided intended behavior** describes the game we are making; it does not mean that behavior is already available on your phone. **First-pass tuning** gives concrete starting numbers that can change through play. **Unsettled proposals** still need design work or a choice.
 
-## Current installed update —358
+## Current installed update —359
 
-Build358 adds **Diary page collected** with **Read now**, opening that exact page and returning to the same expedition without an extra turn or reward. It retains357’s normal3D exploration, clear Settings and party-health layout, and **About … turns left** estimate. Installation was verified; this is not a completed physical-phone playtest.
+Build359 adds moving exploration controls: the carried-item strip and navigation block move together between the bottom and top of the map as your character approaches. Details open inward, and the map keeps its tile scale and framing. It retains normal3D exploration, **Diary page collected → Read now**, and the **About … turns left** estimate. Installation was verified; this is not a completed physical-phone playtest.
 
-The intermittent **Securing action** hang remains unreproduced and has not been confirmed fixed. The waterfall's visible motion has not passed its appearance review. Moving navigation controls and the newer plant-stem correction remain pending.
+The intermittent **Securing action** hang remains unreproduced and has not been confirmed fixed. The waterfall's visible motion has not passed its appearance review. The newer plant-stem and cap corrections remain pending.
 
 ## Normal expeditions in3D — installed in357
 
@@ -374,7 +374,7 @@ This demonstrates only the ordinary actions actually tried in3D. It does not est
 
 ## Field and terrain feedback · 5 September
 
-**Explore navigation — decided, not yet delivered:** the movement controls, minimap, Use Tile and Look buttons, together with the satchel and Field Kit strip above them, will move between the bottom and top of the exploration view. When your character approaches within two visible tile heights of being covered, the block moves to the opposite edge and stays there until your character approaches that edge. Place information and notifications sit just inward from it toward the middle of the view, with expanded details opening inward. The map keeps the same size and tile scale when the controls switch. If both positions are too close, the controls stay at their current edge rather than repeatedly switching. Currently, navigation remains below the map and the place and notification panes sit at its bottom; the moving layout is not delivered yet.
+**Explore navigation — installed in359:** the movement controls, minimap, Use Tile and Look buttons, together with the satchel and Field Kit strip above them, move between the bottom and top of the exploration view. When your character approaches within two visible tile heights of being covered, the block moves to the opposite edge and stays there until your character approaches that edge. Place information and notifications sit just inward from it toward the middle of the view, with expanded details opening inward. The map keeps the same size and tile scale when the controls switch. If both positions are too close, the controls stay at their current edge rather than repeatedly switching. A press held during relocation is cancelled, so releasing at the old position cannot trigger a different action; press again at the new position. Internal checks passed both anchors, expanded details and Close, held-input cancellation, and a bounded loot/tutorial case. Asset’s layout review passed. These checks and verified phone installation do not establish a completed physical-phone playtest or every possible notice combination.
 
 **Forecast wording — installed in357:** the approximate collapse countdown says **About 588 turns left**, for example, instead of using a tilde that can look like a minus sign. The estimate and collapse rules are unchanged.
 
