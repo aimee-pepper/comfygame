@@ -6,6 +6,8 @@ This is the current record of the changes agreed today. **Decided intended behav
 
 **Decided intended production:** Blender-authored reusable parts will be assembled and varied in game. Existing code-authored resource meshes are interim artwork, with Blender replacements planned. Stable assets such as Coal do not need placeholder authoring; an exception needs a concrete unsettled-design reason. The procedural flora and creature direction remains intact. Quality, coherence and playability govern this work.
 
+**Next reusable flora artwork — intended, importer pending:** individual broad leaves and branches will be authored in Blender and assembled using each plant’s existing size, arrangement, source colour and saved structure. The first pair improves woody plants; it adds no new species type, organ, harvest or growth rule. Leaf/branch import still needs implementation before the artwork can be used in game. Existing saved plants keep their recorded appearance.
+
 ## Generated 3D life and connected waterfalls
 
 **Decided intended behavior:** plants and creatures are generated in game when you write a world. The game may combine reusable body bases, plant parts and attachments, but choosing a finished premade species is not the generation system. World conditions shape the available life; its actual traits determine structure, proportions, colour and Pattern. A saved world keeps its identities and appearance when reopened. Harvested flora and creature materials keep their actual source colours through supported crafting uses.

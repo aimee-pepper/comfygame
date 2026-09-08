@@ -2,6 +2,8 @@
 
 ## Current execution and acceptance
 
+- `blender-flora-components-v1.md` — first authored woody leaf/branch roles, exact frame/material/profile contract, required shared importer and sequential existing flora components. Final Asset production depends on the named Engineering seam.
+
 - `cross-lead-delivery-contract-current.md` — required delivery receipts, mockup behavior fence and
   exact Campaign/Home/Writing/World ambiguity resolutions for Design, Asset and Engineering.
 - `asset-production-output-contract-current.md` — task-specific lossless pixel sprite/scene/modular output,

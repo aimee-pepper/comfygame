@@ -1,6 +1,8 @@
 # Procedural life form batch v2 — coherent silhouettes
 
-7 September2026. **Implemented and installed in339; ordinary phone launch/usable entry remain unverified.** Aimee's accepted direction is substantial Spore/Dragon-DNA-inspired richness within a deliberately smaller mobile game. The implementation choices and numbers below are Design first-pass tuning, not individual decisions attributed to Aimee. This batch changes presentation from already frozen biology; it does not add families, organs, statistics, rewards, breeding, an editor, growth simulation or new movement.
+7 September2026. **Morphology delivered in339 and retained by later346; later ordinary phone launch verified, physical feature acceptance remains separate.** Aimee's accepted direction is substantial Spore/Dragon-DNA-inspired richness within a deliberately smaller mobile game. The implementation choices and numbers below are Design first-pass tuning, not individual decisions attributed to Aimee. This batch changes presentation from already frozen biology; it does not add families, organs, statistics, rewards, breeding, an editor, growth simulation or new movement.
+
+**Blender component extension:** `blender-flora-components-v1.md` implements the newer accepted authoring workflow for the first woody leaf/branch pair. Its optional frozen imported-mesh seam is not yet implemented. The old primitive-only restriction below describes the completed v2 batch; it does not forbid this bounded component extension. Source biology, old recipes, root/contact rules and budgets remain unchanged.
 
 ## Consolidated implementation and installation — 7 September
 
