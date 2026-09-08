@@ -4,7 +4,12 @@
 
 Read with [body/habitat](generated-creature-body-habitat-v1.md), [role coherence](creature-role-coherence-v1.md), [cold-water appendages](creature-cold-water-appendages-v1.md), [Bone](creature-bone-production-v1.md), [Bestiary knowledge](bestiary-knowledge-and-grouping-v1.md), and the four-band material hierarchy. Aimee's Sky/Water/Amphibious/Land arrangement and its seven body groups remain settled. No renewed Bestiary hold or new homework approval is introduced.
 
-## 1. Current gap and retained boundaries
+
+## Superseding implementation consolidation —8September
+
+Follow [the consolidated solid-material packet](creature-solid-materials-implementation-v1-2026-09-08.md) for current source bindings and implementation. Delivered modular anatomy already declares bodySurface, independent wingCount and horn; existing modular rewards deliberately remain Hide/Bone-only. The older threshold list below describes generation history, not a reward-time classifier. Its cranialFeature Horn predicate and generic appendageCount binding are superseded. New source/quality/custody/trade and optional Forge alternatives are one system bundle; later shops and missing organs remain excluded. The preserved historical equations/intent below cannot override the newer packet.
+
+## 1. Historical gap and retained boundaries
 
 Current `CreatureMaterialProjectionRules` has eighteen families, inferred from a species trait vector; `CreatureMaterialRewardRules` grants exact projection quantities using the older generic quality model, with a separate supported narrow typed Hide branch. Bone's new actual-source/four-band producer is already specified separately. The new whole-shop contracts name real input families; an old enum name is not permission to feed an old property calculator.
 

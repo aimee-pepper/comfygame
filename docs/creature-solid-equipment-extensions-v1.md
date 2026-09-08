@@ -126,3 +126,7 @@ Eventual implementation should extend its existing focused source/recipe/service
 ## Follow-on feeding and prevalence disposition
 
 The [finite feeding-support contract](creature-feeding-support-disposition-v1.md) now classifies the remaining bodies/modes against exact positive and missing evidence; it does not invent additional diets. The [natural-prevalence plan](creature-natural-prevalence-acceptance-v1.md) supplies the concrete ordinary-route acceptance questions for step6 above. Actual frequencies and unsupported intake mechanisms remain unresolved; no new run or runtime rollout follows.
+
+## 8 September consolidation boundary
+
+The new [solid-material implementation packet](creature-solid-materials-implementation-v1-2026-09-08.md) carries forward only the already-described Forge Shell face and Horn short grip alongside its source/stock/trade system. Armoury, Horn Collar and Weaponsmith breadth remain paused. Source anatomy now binds to actual modular bodySurface/wingCount/horn; old field guesses are superseded. No new source delivery or natural availability is claimed.
