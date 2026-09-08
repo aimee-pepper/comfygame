@@ -2,25 +2,25 @@
 
 This is the current record of the changes agreed today. **Decided intended behavior** describes the game we are making; it does not mean that behavior is already available on your phone. **First-pass tuning** gives concrete starting numbers that can change through play. **Unsettled proposals** still need design work or a choice.
 
-## Current installed update —356
+## Current installed update —357
 
-Build356 is installed with a limited improvement to combat saving. The intermittent **Securing action** hang has not been reproduced or confirmed fixed; it remains open. Installation was verified, but ordinary phone entry has not been checked.
+Build357 is installed with the normal campaign's three-quarter, top-down3D exploration view. The Settings button and party health no longer overlap, and the collapse estimate now says **About … turns left**. Installation was verified; this is not a completed physical-phone playtest.
 
-This build retains355’s plant changes and adds an initial waterfall-motion update. The waterfall’s visible motion has not passed its appearance review, so that work remains unfinished. Normal3D expeditions, **Diary page collected → Read now**, and the newer stem correction are not included yet.
+The intermittent **Securing action** hang remains unreproduced and has not been confirmed fixed. The waterfall's visible motion has not passed its appearance review. **Diary page collected → Read now**, moving navigation controls and the newer plant-stem correction remain pending.
 
-## Normal expeditions move to3D — decided, not yet delivered
+## Normal expeditions in3D — installed in357
 
-You approved the fixed three-quarter, top-down3D view for normal expeditions. Bind, Enter and Continue will use the same campaign and rules; Home, crafting, combat and Return keep their current screens. There will be no new mode choice or separate progression path.
+**Current:** Bind, Enter and Continue use the3D exploration view in the same campaign, without a new mode choice or separate progression path. Home, crafting, combat and Return keep their current screens. Tile selection, movement, Look and Use Tile retain their ordinary rules.
 
-Newly written ordinary worlds will use the normal3D resource rules, including suitable mineral deposits previously omitted for2D recordings. Existing books and active expeditions keep their actual terrain, resources, progress and saved appearances; switching the view does not regenerate them. Settings trials retain their separate saves.
+Newly written ordinary worlds use the normal3D resource rules, including suitable mineral deposits previously omitted for2D recordings. Existing books and active expeditions keep their actual terrain, resources, progress and saved appearances; switching the view does not regenerate them. Settings trials retain their separate saves.
 
-**Current:** build356 still uses2D for ordinary expeditions, with3D available through Settings trials. The transition is not yet delivered. Plant-stem corrections continue alongside it; decorative iridescence is not required for the transition.
+Internal checks passed binding, entering, movement and controls, reopening through Continue, and returning Home. Installation on your phone is verified; these checks do not establish physical-phone play acceptance or finished artwork. Plant-stem corrections and selective iridescence remain separate unfinished work.
 
 ## 3D authoring direction
 
 **Decided intended production:** Blender-authored reusable parts will be assembled and varied in game. The six resource-node replacements are delivered in build348’s existing3D view; their earlier code-authored meshes are historical interim artwork. Stable assets such as Coal do not need placeholder authoring; an exception needs a concrete unsettled-design reason. The procedural flora and creature direction remains intact. Quality, coherence and playability govern this work.
 
-**Reusable flora artwork — retained in installed355:** newly bound books use reviewed Blender trunks, branches, broad leaves, fibrous blades, needles and fronds in the existing3D view. Parts retain each plant’s source colour and saved structure. Existing books keep their recorded artwork; the normal2D view is unchanged. These replacements add no new species type, organ or harvest. Earlier versions left some fibrous stems too dominant and some fleshy foliage buried; the revision below addresses those shapes. Your final review of the overall plant appearance remains open.
+**Reusable flora artwork — retained in installed355:** newly bound books use reviewed Blender trunks, branches, broad leaves, fibrous blades, needles and fronds in the existing3D view. Parts retain each plant’s source colour and saved structure. Existing books keep their recorded artwork. Build357 now uses the3D view for normal expeditions as well. These replacements add no new species type, organ or harvest. Earlier versions left some fibrous stems too dominant and some fleshy foliage buried; the revision below addresses those shapes. Your final review of the overall plant appearance remains open.
 
 ## Clearer plant silhouettes — installed in355
 
@@ -34,7 +34,7 @@ Already-readable branched woody and fibrous plants, bare forms and corrected unb
 
 You prefer build355’s clearer foliage, but its egg-shaped supports do not suit ordinary plants. The next correction keeps those foliage improvements and gives ordinary fleshy plants believable, gently tapered stems. Upright plants keep an upright support; unbranched basal rosettes use a compact central support. Branches and leaves remain attached to the real stem surface.
 
-Swollen cactus or succulent forms require actual supporting anatomy. Fleshy tissue, thorns or needle-shaped growth alone will not turn a plant into a cactus. Current plant records do not yet establish a separate swollen storage stem. Existing books keep their saved shapes, and the correction changes no materials, harvest counts or crafting values. Build356 retains355’s plant behavior while this correction is made.
+Swollen cactus or succulent forms require actual supporting anatomy. Fleshy tissue, thorns or needle-shaped growth alone will not turn a plant into a cactus. Current plant records do not yet establish a separate swollen storage stem. Existing books keep their saved shapes, and the correction changes no materials, harvest counts or crafting values. Build357 retains355’s plant behavior while this correction is made.
 
 ## Generated 3D life and connected waterfalls
 
@@ -157,11 +157,11 @@ Some aquatic creatures can begin beyond player reach and approach shallow water 
 
 ## Recording, notifications and finding lessons
 
-**Diary notification — decided, not yet delivered:** collecting a diary page will say **Diary page collected**, with **Read now** available before the notice fades. It opens that exact page; closing returns to the expedition. If you let the notice fade, the page stays in your Library. Collection and opening the prose are separate; current learning rewards keep their existing timing and are never granted twice. Build356 still uses the earlier “Diary page read” wording.
+**Diary notification — decided, not yet delivered:** collecting a diary page will say **Diary page collected**, with **Read now** available before the notice fades. It opens that exact page; closing returns to the expedition. If you let the notice fade, the page stays in your Library. Collection and opening the prose are separate; current learning rewards keep their existing timing and are never granted twice. Build357 still uses the earlier “Diary page read” wording.
 
-**Current recording update — installed in344:** newly generated ordinary2D worlds omit unfinished box deposits for **Iron, Coal, Quartz, Sulfur, Mercury and Rift Glass**, including equivalent unfinished deposit sources. Trees, Clay, Salt Crust, plant/root gathers and ordinary rubble remain. Existing saved worlds and earned stock stay unchanged. A world's contents do not appear or disappear when its view changes; worlds created through the3D route keep their normal resource sources. Installation and ordinary phone launch are verified, with new-world movement and reopening checked internally. No physical-phone recording journey is claimed.
+**Earlier recording restriction — retained in existing books:** build344 omitted unfinished box deposits for **Iron, Coal, Quartz, Sulfur, Mercury and Rift Glass**, including equivalent unfinished deposit sources. Trees, Clay, Salt Crust, plant/root gathers and ordinary rubble remain. Existing saved worlds and earned stock stay unchanged. A world's contents do not appear or disappear when its view changes; worlds created through the3D route keep their normal resource sources. Installation and ordinary phone launch are verified, with new-world movement and reopening checked internally. No physical-phone recording journey is claimed.
 
-**Current temporary progression consequence — superseded for future normal3D worlds:** these missing deposits may block Iron-learning, Forge, Ingots, metal tools and affected specialist crafts. This update supports recording the pre3D appearance, so no substitute materials or alternate progression route is added. Ordinary worlds can still generate; explicit Iron writing explains its temporary unavailability before spending. Salt writing and retained gathers keep their rules. The accepted normal3D transition ends this restriction for newly written ordinary worlds when delivered. Existing books retain their saved contents. Further2D node artwork and the interim Iron-picture substitution remain superseded.
+**Existing restricted books — new books use normal3D resources from357:** these missing deposits may block Iron-learning, Forge, Ingots, metal tools and affected specialist crafts. That earlier restriction supported recording the pre3D appearance, with no substitute materials or alternate progression route. At that checkpoint, ordinary worlds could still generate and explicit Iron writing explained its unavailability before spending. Salt writing and retained gathers keep their rules. Build357 ends this restriction for newly written ordinary worlds; suitable deposits follow normal generation rules rather than being guaranteed everywhere. Existing books retain their saved contents. Further2D node artwork and the interim Iron-picture substitution remain superseded.
 
 **Encounter crash — fixed on your phone in343, retained in344:** you confirmed the further correction resolves the encounter crash reported on342. Your campaign was preserved.
 
@@ -177,7 +177,7 @@ Some aquatic creatures can begin beyond player reach and approach shallow water 
 
 **Material stacks — current Hide correction in345:** the same material subtype and source quality share one visible Hide total in Return and Storehouse. For example, eight and two Common Supple Hide appear as **Common Supple Hide ×10**, even with different measurements or colours. Tap the stack to see exact variants and their quantities, swatches and rounded useful properties. Exact underlying pieces and values stay stored for crafting; display grouping does not blend them into a new material. Player details no longer expose source IDs, raw colour numbers or unfinished-rendering messages. The same subtype/quality grouping remains the intended rule for other quality-bearing materials; ordinary flora remains ungraded.
 
-**3D deposits — current in348:** Coal, Iron, Quartz, Sulfur, Mercury and Rift Glass now use their Blender-authored artwork in the existing Settings3D view. Engineering reports physical-phone installation and ordinary launch; your visual acceptance remains separate. The earlier code-authored meshes are historical interim artwork. Their recognizable direction is retained: Mercury as a solid mineral-bearing host with silver exposed faces, Sulfur as a low yellow crust, and Rift Glass as broad opaque shards. This changes no mining reward or liquid interaction and does not remove the temporary2D restriction.
+**3D deposits — current in348:** Coal, Iron, Quartz, Sulfur, Mercury and Rift Glass now use their Blender-authored artwork in the existing Settings3D view. Engineering reports physical-phone installation and ordinary launch; your visual acceptance remains separate. The earlier code-authored meshes are historical interim artwork. Their recognizable direction is retained: Mercury as a solid mineral-bearing host with silver exposed faces, Sulfur as a low yellow crust, and Rift Glass as broad opaque shards. This artwork changes no mining reward or liquid interaction. Build357 subsequently brings it into normal3D expeditions and removes the temporary mineral restriction for newly written books; existing book contents stay intact.
 
 ## The beginning as one connected path
 
@@ -364,7 +364,7 @@ The 3D expedition trial stays in **Settings → Owner Tools → 3D Trials**, wit
 
 ## Ordinary 3D expedition trial — current in build327
 
-Build327 delivers **Settings → Owner Tools → 3D Trials → Start 3D trial**, with saved test state kept separate from your campaign. **Continue 3D trial** resumes that state, including Home after Return. The phone trial is fresh for you; the checked Simulator save was not copied to it. It uses the current starting setup, normal game costs and an unscreened generated world. There are no demonstration-only resource grants. Your ordinary 2D game stays available, and placeholder visuals are allowed.
+Build327 delivers **Settings → Owner Tools → 3D Trials → Start 3D trial**, with saved test state kept separate from your campaign. **Continue 3D trial** resumes that state, including Home after Return. The phone trial is fresh for you; the checked Simulator save was not copied to it. It uses the current starting setup, normal game costs and an unscreened generated world. There are no demonstration-only resource grants. At that delivery, the ordinary campaign remained2D. Build357 subsequently moves normal expeditions to3D while preserving the separate trial saves; placeholder visuals remain allowed.
 
 The trial stays in that Settings menu, using **Start 3D trial** or **Continue 3D trial** for its existing save. The view stays north-up/east-right with the accepted square-projected three-quarter presentation. Movement, packed tools, harvest targets, creatures/encounters, visibility, remembered terrain and foreground fading keep their existing rules.
 
@@ -374,7 +374,9 @@ This demonstrates only the ordinary actions actually tried in3D. It does not est
 
 ## Field and terrain feedback · 5 September
 
-**Forecast wording — intended correction:** the approximate collapse countdown will say **About 588 turns left**, for example, instead of using a tilde that can look like a minus sign. The current estimate and collapse rules are unchanged; this wording correction is not yet delivered.
+**Explore navigation — decided, not yet delivered:** the movement controls, minimap, Use Tile and Look buttons, together with the satchel and Field Kit strip above them, will move between the bottom and top of the exploration view. When your character approaches within two visible tile heights of being covered, the block moves to the opposite edge and stays there until your character approaches that edge. Place information and notifications sit just inward from it toward the middle of the view, with expanded details opening inward. The map keeps the same size and tile scale when the controls switch. If both positions are too close, the controls stay at their current edge rather than repeatedly switching. Currently, navigation remains below the map and the place and notification panes sit at its bottom; the moving layout is not delivered yet.
+
+**Forecast wording — installed in357:** the approximate collapse countdown says **About 588 turns left**, for example, instead of using a tilde that can look like a minus sign. The estimate and collapse rules are unchanged.
 
 **Tool gesture — current behavior, delivered in build 315:** hold **Interact for 0.40 seconds**, keep the same finger down while sliding onto a packed tool, then release to select it. No second tap is needed. Release outside a choice or cancel to retain the previous valid tool. A completed hold never turns into an accidental Interact tap; choosing a tool does not harvest or spend a turn. A later Interact tap or direction toward a blocking node performs the ordinary eligible action. The movement-centre hold remains the separate quick-item menu. Hovering over a tool does not commit the choice; releasing over it does. The exact chosen tool remains your preference after reopening and on the next visit. The existing tap-to-open tool menu also remains available. Engineering reported delivery and four focused passing checks, including the continuous gesture, on 5 September (Pacific time); Design has not repeated the phone checks.
 
