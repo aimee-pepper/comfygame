@@ -1,5 +1,7 @@
 # Authored Text Audit — Current
 
+**7 September chronology correction:** the historical Good disposition for Halloway below did not check the roughly-one-month post-cataclysm timeline. Her live nine-years reply is corrected in344. Use [the consolidated notification/chronology audit](notification-and-chronology-audit-2026-09-07.md) for current runtime coverage and the resolved29-meeting corpus; older counts/review dispositions below are historical.
+
 **Status:** first complete manual corpus pass; production-first playtest policy is current. Reviewed
 content may enter the live catalogue without waiting for advance Atlas approval so Aimee can judge it
 in ordinary play. Every promotion retains stable IDs and preserves the prior text in the decision

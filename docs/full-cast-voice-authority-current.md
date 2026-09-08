@@ -1,5 +1,7 @@
 # Full-cast human voice authority — current
 
+**7 September correction:** Halloway retains her voice except the incompatible nine-years fire claim, now “Since everything broke.” Delivered344; the roughly-one-month cataclysm chronology and runtime-source audit are in [the current consolidated audit](notification-and-chronology-audit-2026-09-07.md).
+
 **Status:** personality and conversational voice are settled for all twenty-nine travellers; the
 existing clue and dialogue corpus still requires a separate rewrite against this authority
 **Date:** 3 September 2026

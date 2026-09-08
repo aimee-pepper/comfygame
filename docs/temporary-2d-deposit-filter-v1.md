@@ -1,6 +1,6 @@
 # Temporary2D deposit filter — recording scope
 
-7 September2026. **Direct Aimee direction, settled through PM; implementation pending.** Aimee wants footage of the game before its3D transition and explicitly accepts missing progression. No further approval, progression balancing or alternate-resource design is needed. Encounter crash and shared text wrapping remain Engineering's urgent priorities;3D node graphics replace further2D resource-art work.
+7 September2026. **Direct Aimee direction, delivered344; new-world behavior internally verified.** Aimee wants footage of the game before its3D transition and explicitly accepts missing progression. No further approval, progression balancing or alternate-resource design is needed. Encounter crash and shared text wrapping remain Engineering's urgent priorities;3D node graphics replace further2D resource-art work.
 
 ## Exact eligibility and exclusions
 
@@ -78,3 +78,8 @@ PM relayed Aimee's direct confirmation that343 fixes the physical encounter cras
 - Successful quotes harvest as before. No source-name preamble, routine tutorial, new mechanic or turn/tool change. Preserve wrapping capability. No broad copy audit.
 
 Engineering has this exact contract for the recording-policy delivery.343 still carries the verbose copy; concise copy is decided, not yet delivered.
+
+
+###344 current delivery supersedes pending filter/mining status above
+
+Engineering sourceefeab33303eff0a2bd1a2d1994ca1ae9548aa404/treeeced7872c5ad8310a41ae35748c1eb9388c61b92 is installed/read back2026-09-08T00:58:43.838086Z; ordinary launch87955 survived. Receipt `docs/phone-344-delivery-2026-09-07.md` in recording-2d-node-policy records6/6 cumulative internal checks and actual native north movement/reopen. New ordinary2D six-deposit exclusion/private3D exception, pre-spend Iron refusal, preserved Salt/old worlds/stock and concise mining are delivered. Halloway chronology correction also included. No phone campaign play/new-world acceptance claimed.343 physical encounter success remains closed.3D artwork is still separate. [Current full copy audit](notification-and-chronology-audit-2026-09-07.md) supersedes the earlier narrow-copy scope and documents Mercury's preexisting liquid-in-seam diary without changing the approved solid host depiction.

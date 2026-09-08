@@ -1,5 +1,7 @@
 # Recovered teachings — current authority
 
+**7 September direct Aimee navigation decision:** dedicated **Unread Findings** section with unread count and actual prerequisites; Return **Read findings** opens it directly. Opening keeps free atomic learning; learned records remain in Field Notes, with no duplicate unread tiles there. This supersedes the generic “appropriate shelf” presentation below. See [current route/state contract](notification-and-chronology-audit-2026-09-07.md); implementation pending. This inherited document alone does not prove explicit Aimee approval of the original collect/read separation.
+
 **Status:** Game Design implementation authority for replacing the Workshop's Instruction, Hand, Lexicon
 and Bargain knowledge purchases. The catalogue below is complete; the six-star Constellation decision and
 capacity-upgrade compression remain separate decisions.
