@@ -62,3 +62,9 @@ These continue the already-declared morphology. Begin each only when its concret
 4. Needle growth, then frond growth as separate components: use the existing narrow axial needle and frond `[0.35L,L,0.018]` roles/dimensions and declared family allowlists. Neither may replace an absent growth state or turn one frond into extra source members. The needle requires its actual cylinder budget≤48 triangles; frond retains≤192.
 
 Fleshy pads, fungal caps/shelves and chemical plates are subsequent existing roles, but their centred-pivot/surface-contact consumer details must be confirmed before assigning their literal final output. This list supplies continuity without bypassing those real dependencies or reopening settled flora design.
+
+## Source checkpoint — 7 September 2026
+
+Asset reports the editable Blender pair and agreed JSON exports preserved at `ac74af0fcd36a0a0fc089735de9d7f99d48a2a4f`, branch `codex/woody-components-blender-v1`. Receipt: `docs/woody-components-blender-source-2026-09-07.md` in that worktree. Leaf:60 triangles/180 vertices; branch:216 triangles/648 vertices. Asset's schema1, frame, UV, unit-normal, CCW, nondegenerate, closed-manifold and all-indexed checks pass; source/export hashes are preserved in the pack audit. These are authoring/export results, not native acceptance.
+
+Use the retained `ModularFloraFormV2Tests.specimen(.woody)` ID7/seed42 from the flora-form-v2-visual-review worktree, with its `docs/test-artifacts/flora-form-v2-review/recipe-woody-v2.json` and `flora-woody-v2.png`. Keep the receipt's original framing. Engineering must validate these real exports through the shared importer and supply the implemented consumer checkpoint to Asset for the same-view inspection. Native ordinary-scale acceptance and phone integration remain pending. The next flora role waits until this first pair closes.
