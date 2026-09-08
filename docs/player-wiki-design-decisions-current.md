@@ -10,6 +10,14 @@ This is the current record of the changes agreed today. **Decided intended behav
 
 **Needle and frond artwork — installed in354, phone entry unverified:** narrow needles and lobed fronds have passed their limited replacement reviews and new-book rollout checks. Newly bound books now use the reviewed artwork for their existing needle and frond growth; older books keep their saved appearance. Installation is verified, but ordinary phone entry and playtest readiness remain unverified. Visible woody and fibrous growth remains seated and recognizable. The reviewed fleshy examples hide much of their foliage behind a large support. That whole-plant readability concern remains open; no changes to growth size or attachment positions have been decided.
 
+## Proposal for review — clearer plant silhouettes
+
+**Recommended, not yet approved or implemented:** give leaf-bearing, unbranched fibrous plants slimmer stems and let more of their existing leaf length show. Upright plants keep their height; basal rosettes get a shorter central support so the low leaf cluster defines their shape. Let fleshy branches start at the body’s actual outside and carry their existing foliage beyond it. Unbranched fleshy growth that is currently buried would also attach at the surface.
+
+Already-readable branched woody and fibrous plants, bare forms and corrected unbranched fleshy rosettes would keep their current shapes. This changes how existing parts are arranged and proportioned, while preserving anatomy, leaf/branch counts, materials, rewards and older books.
+
+**Tradeoff:** basal rosettes would look shorter, and fleshy branch fans would occupy more visible space around their unchanged central body. Some rear foliage could still be hidden. The recommendation is to approve a limited implementation and comparison using the same plants before accepting the final appearance. Current build354 remains unchanged while this is a proposal.
+
 ## Generated 3D life and connected waterfalls
 
 **Decided intended behavior:** plants and creatures are generated in game when you write a world. The game may combine reusable body bases, plant parts and attachments, but choosing a finished premade species is not the generation system. World conditions shape the available life; its actual traits determine structure, proportions, colour and Pattern. A saved world keeps its identities and appearance when reopened. Harvested flora and creature materials keep their actual source colours through supported crafting uses.
@@ -97,7 +105,7 @@ Pressure-led family generation is installed351 for newly bound books, with phone
 
 **Decided intended behavior, still unfinished:** Schiller should add a subtle, angle-dependent reflected colour relative to the source colour, with neutral sheen on neutral-coloured sources. That visible effect is not implemented yet. Painted rainbow colours, emitted light or a metallic replacement do not count as Schiller. Markings and shine improvements do not establish the complete finished appearance or resolve the fibrous plants’ proportions.
 
-**Verification limits:** close and ordinary-scale views showed readable leaf bands that soften with distance while preserving the tree outline. Checks also covered connected creature markings, saved source colours and reopening. These results do not establish flicker-free motion or your visual acceptance. Build352 is installed, but ordinary phone entry and playtest readiness remain unverified following the earlier locked-phone launch refusal.
+**Verification limits:** close and ordinary-scale views showed readable leaf bands that soften with distance while preserving the tree outline. Checks also covered connected creature markings, saved source colours and reopening. A later short, controlled camera-movement check found no obvious pattern jumps or large brightness pulses in the sampled views. This does not establish flicker-free behavior at every speed or distance, or your visual acceptance. These improvements remain included in installed build354, but ordinary phone entry and playtest readiness remain unverified following the earlier locked-phone launch refusal.
 
 ## Reading plants, creatures and targets in 3D — installed in353, phone entry unverified
 
