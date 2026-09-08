@@ -1,6 +1,6 @@
 # Procedural surface finishes and markings v2
 
-7 September2026. Design queue1, complete source specification; **bounded colour/shine/markings installed352; phone entry unverified, full Schiller incomplete**. Aimee's accepted direction is source-faithful colour/Pattern and coherent procedural life. Numerical mappings here are Design/Asset first-pass tuning, not individually approved player choices. Coordinate with morphology v2; hotfix/terrain priorities remain independent. No new biology, materials, stats, shader production assignment to Asset, native trial or required Aimee decision.
+7 September2026. Design queue1, source specification with Schiller applicability under reconsideration; **bounded colour/shine/markings installed352; phone entry unverified, full Schiller incomplete**. Aimee's accepted direction is source-faithful colour/Pattern and coherent procedural life. Numerical mappings here are Design/Asset first-pass tuning, not individually approved player choices. Coordinate with morphology v2; hotfix/terrain priorities remain independent. No new biology, materials, stats, shader production assignment to Asset, native trial or required Aimee decision.
 
 ## Installed351 baseline consumer and exact limits
 
@@ -18,7 +18,7 @@ Assign semantic region IDs: creature exterior (core/head/support limbs/tail), ea
 
 Store region source binding plus full finish/Pattern in new recipe metadata and specimen appearance. Resolve inheritance versus explicit source overrides BEFORE rendering. Specimen inheritance may update its inherited regions, but cannot overwrite an explicit per-region colour/finish with one global tint/roughness. Flora memory saves the resolved observed recipe/appearance; hidden live source changes do not replace it. Existing saved receipts, material grading, quantities and source-colour crafting remain untouched.
 
-## Finish meaning and exact first-pass mapping
+## Earlier finish mapping — universal Schiller applicability under reconsideration
 
 Let O,S,I be normalized opacity,shine,schiller divided by100.
 
@@ -28,7 +28,7 @@ Let O,S,I be normalized opacity,shine,schiller divided by100.
 
 Existing foreground fade is applied once by its own owner after material appearance; it cannot grant sight, targeting or collision changes. Ordinary scene lighting modulates finish; the material adds no light. Quality borders/name styling remain interface presentation, not biological colour.
 
-Examples: O100/S0/I0 is opaque/matte; O0/S100/I0 is opaque/high-shine at roughness0.15; O0/S0/I100 has its source base colour with the bounded reflected angular sheen; default70/20/10 has roughness0.83 and at most0.025 extra sheen. No finish value classifies Chitin or activates a material reward; legacy code comments suggesting that are not the new material authority.
+Examples: O100/S0/I0 is opaque/matte; O0/S100/I0 is opaque/high-shine at roughness0.15; O0/S0/I100 has its source base colour with the bounded reflected angular sheen; default70/20/10 has roughness0.83 and at most0.025 extra sheen. Actual body structure determines Chitin eligibility in the newer material authority. Schiller still contributes to its capability pair and to derived Lustre elsewhere; legacy Butchery classification also consumes it. The renderer must not change those values or reinterpret those legacy paths as new source eligibility.
 
 ## Marking coordinates, continuity and sampling
 
@@ -40,9 +40,9 @@ V2 analytic marking evaluation removes the32-row lookup limitation without inven
 
 ## Required renderer work and actual capability boundary
 
-Required additions are versioned region appearance/coordinate transport through new-book preparation, species recipes, actual specimen projection and permitted memory; shared transformed-vertex/normal/frame evaluation; analytic filtered Pattern; and a reflected-colour Schiller response. Use an independent surface revision so old material reconstruction is explicit. Region metadata participates in cache identity; templates remain cloned without cross-specimen mutation. No new texture pack or semantic resource node is needed.
+Versioned region/specimen transport, shared transformed coordinates and analytic Pattern are delivered in the bounded surface2 scope. A full universal reflected-colour Schiller response is no longer an active mandate: Aimee has requested reconsideration of applicability and possible plant structural alternatives. Preserve the existing implementation and raw material/source data during that design review. Use an independent surface revision so old material reconstruction is explicit. Region metadata participates in cache identity; templates remain cloned without cross-specimen mutation. No new texture pack or semantic resource node is needed.
 
-Apple documents PBR properties and custom surface shaders, but this is not proof every desired response is a scalar setting. Inspection of installed iPhoneOS26.2 RealityKitSurfaceShader.h confirms view_direction and scalar specular/clearcoat setters; it does NOT expose a direct coloured-specular setter in that surface interface. Engineering must choose a supported reflected-colour material/shader path and verify it in the existing consumer. Do not substitute albedo hue cycling, emissive light or metalness and call it Schiller. If that exact backend is unavailable, retain current source-colour/PBR fallback with Schiller explicitly incomplete; coordinate the technical dependency through PM. Region transport and analytic Pattern remain independently implementable. This is a renderer dependency, not missing Aimee product direction.
+Apple documents PBR properties and custom surface shaders, but this is not proof every desired response is a scalar setting. Inspection of installed iPhoneOS26.2 RealityKitSurfaceShader.h confirms view_direction and scalar specular/clearcoat setters; it does NOT expose a direct coloured-specular setter in that surface interface. If selective Schiller is approved for implementation, Engineering must choose a supported reflected-colour material/shader path and verify it in the existing consumer. Do not substitute albedo hue cycling, emissive light or metalness and call it Schiller. If that exact backend is unavailable, retain current source-colour/PBR fallback with Schiller explicitly incomplete; coordinate the technical dependency through PM. Region transport and analytic Pattern remain independently implementable. The tested backend limitation and the newer scope reconsideration are separate dependencies; neither blocks the accepted plant-proportion revision.
 
 Primary API references: [PhysicallyBasedMaterial](https://developer.apple.com/documentation/realitykit/physicallybasedmaterial), [custom RealityKit materials](https://developer.apple.com/documentation/realitykit/modifying-realitykit-rendering-using-custom-materials). Asset's94fcb6e5 source review supplies current consumer facts; no unsupported shader implementation or benchmark is claimed.
 
@@ -82,4 +82,12 @@ This rules out that tested node/runtime combination only. It does not prove all 
 
 Engineering checkpoint `9807bc293a9068a8b1ef1b30c4dd7e855f5819ed`, receipt `docs/pattern-motion-verification-2026-09-08.md` in pattern-motion-verification, adds one retained woody7/seed42 Pattern100/bands16/phase0.25/component3/surface2 ordinary scene check.49 ordered native samples over7.021s follow slow camera translation out/back at fixed ordinary lens/orientation,402×453pt stage within402×874/default/current dark. Engineering inspected the ordered crops: no obvious coarse interference, phase jump or large brightness pulse; visible markings remained leaf-associated and minified bands softened. One focused test passed after a test-only sorted-JSON encoding correction; no shader/production defect or change was identified.
 
-This is bounded sampled temporal evidence, not every display frame, speed, distance, full Finish/Schiller or whole-plant acceptance. Phone354 is unchanged, with no launch/install or duplicate Design/Asset capture required. Lossless animation and ordered samples remain in that worktree’s docs/test-artifacts/pattern-motion. The pending morphology proposal retains priority.
+This is bounded sampled temporal evidence, not every display frame, speed, distance, full Finish/Schiller or whole-plant acceptance. Phone354 is unchanged, with no launch/install or duplicate Design/Asset capture required. Lossless animation and ordered samples remain in that worktree’s docs/test-artifacts/pattern-motion. The accepted morphology revision proceeds independently.
+
+## New direct Aimee scope — 8 September, reconsideration active
+
+PM relayed Aimee questioning Schiller as an across-the-board flora/fauna trait and suggesting numerousness (single/many flower heads, stems or leaves) as a possible alternative. This supersedes any interpretation of the earlier acceptance as a universal implementation mandate. Selective finish eligibility and existing count/budget/economy dependencies are being reviewed; no trait swap or new count formula is approved. Retain installed354/current saved Finish and material properties; do not zero or repurpose Schiller. Phone launch confirmation is never a production dependency. The separately approved plant support/foliage revision proceeds independently.
+
+## Selective-finish recommendation — proposal, not implementation authority
+
+See [Schiller and plant-count recommendation](schiller-selective-finish-and-plant-counts-proposal-2026-09-08.md). It recommends explicitly eligible source regions, preserving saved Finish and economy while reusing independent plant counts. No universal trait replacement, new harvest formula or new source anatomy is accepted.

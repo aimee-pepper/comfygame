@@ -25,17 +25,17 @@ The [opening path](design-decisions-september-4.html) is delivered in build331 f
 
 **Taxonomy direction — decision complete, not delivered:** you approved a lightweight family → species → individual structure. World pressures favour several compatible families, with independent anatomy/plant variation preserved. The [current design reference](design-decisions-september-4.html) records the intended generation change; the existing Bestiary navigation stays. This does not add eight biological ranks, breeding, new population promises or a question you need to answer. Exact initial weights and implementation are team work.
 
-**Surface finishes and markings — specified, not delivered:** the [design reference](design-decisions-september-4.html) now separates opaque/matte finish, shine and subtle Schiller sheen, plus stable markings across connected material regions. Exact source colours remain authoritative. Renderer work is still needed; there is no new decision homework for you.
+**Surface finishes and markings — partly delivered, scope being reviewed:** colour, shine and connected markings are installed in352 and retained in354. Angle-dependent Schiller is unfinished, and your concern about making it universal is under design review. The recommendation is selective iridescence plus independent plant structure counts, with no direct trait swap. Stored Schiller also contributes to material Lustre, so changing it needs an explicit crafting plan. The [design reference](design-decisions-september-4.html) separates current behavior from that proposal.
 
 **Terrain implementation — installed in338:** newly bound worlds now use entrance-connected high-ground routes with steps of at most one level in either direction. Sparse unreachable high scenery may show water and decorative vegetation, but no animals or resource nodes. Existing worlds and unfinished opening expeditions retain their earlier rules. Internal native binding, terrain and reopening checks passed. Installation is verified; ordinary phone launch was blocked by the device lock and remains unverified, so phone playtest readiness is not claimed. The [current height-route record](design-decisions-september-4.html) separates implementation from first-pass tuning and its limited ordinary-world evidence. This adds no design decision homework.
 
 Build329 delivers your invitation Not now removal and the unrequested wood-colour trial menu removal; requested3D trials stay. Build330 delivers the agreed quality borders and full normal Explore viewport in3D;345 completes Hide subtype-and-quality totals with exact variants expanded on tap. These are no longer pending Engineering corrections or new homework for you. The existing creature questions remain reference, not the active design priority.
 
-## Proposal awaiting your review — plant support and foliage
+## Accepted — plant support and foliage comparison
 
-**Recommendation:** approve a limited comparison with slimmer stems and less tightly capped leaves on unbranched fibrous plants, compact basal rosettes, and fleshy branches/foliage emerging at the outer body surface. Already-readable branched woody/fibrous forms and corrected unbranched fleshy rosettes would stay as they are.
+**You approved implementation and matched before/after examples:** slimmer stems and less tightly capped leaves on unbranched fibrous plants, compact basal rosettes, and fleshy branches/foliage emerging at the outer body surface. Already-readable branched woody/fibrous forms and corrected unbranched fleshy rosettes would stay as they are.
 
-**Tradeoff:** shorter basal silhouettes and wider fleshy branch fans; existing anatomy, counts, materials, rewards and older books stay unchanged. This is a proposal, not an implemented change or accepted final appearance. The [plant-silhouette proposal](design-decisions-september-4.html) explains the scope.
+**Tradeoff:** shorter basal silhouettes and wider fleshy branch fans; existing anatomy, counts, materials, rewards and older books stay unchanged. The exact revision is accepted for implementation; delivery and final visual acceptance remain pending. The [accepted plant-silhouette revision](design-decisions-september-4.html) explains the scope.
 
 ## 1. Decision needed: spending a Mote on a chance
 
