@@ -18,6 +18,12 @@ Keep existing recipe choices and selection rules. Expanding the group allows the
 
 Use one shared presentation grouping contract across normal material stock consumers (field/carried, Return, Storehouse/Waiting and material selection where these show stock), with adapters for CraftMaterialUnitV1 and physical lots. Keep recipe compatibility/equivalence distinct from display equivalence: broadening the former merely to collapse rows would change crafting. Unique gear does not become a material stack.
 
+## Latest artwork direction and status
+
+Asset relays a newer direct Aimee instruction to review current in-game pixel art and make matching artwork. Source review finds v2's16 new images too finely textured; hold their final acceptance. Asset b92a1740 has initial ingot/leather replacements using actual shipped originals as image references, with broader visible pixel clusters and sparse shading. These are still source-only: generated RGB checkerboard backgrounds have not supplied usable transparency. Asset has reported the exact failure to PM/Engineering; no duplicate user question or silent checkerboard acceptance.
+
+Match the existing artwork's visible pixel clusters, shapes and shading, not an assumed32×32 file resolution: Asset confirms approved reference originals include1254/1536px sources. Preserve the existing originals and native32pt consumer. The earlier package inventory below is historical availability, not final approval of the16 new images. Use revised exact manifest mappings as Asset publishes usable matching candidates; do not integrate a known rejected style as finished art. Grouping remains independently implementable.
+
 ## Existing gap and artwork handoff
 
 Delivered362 MaterialDisplayGrouping.swift distinguishes displayEquivalent from equivalent but generalizes only the existing covering path. EarlyFieldMaterialsView.swift/EarlyMaterialStockView display separate typed lot and crafting-family groups. Engineering must audit these consumers as one presentation batch, not declare compliance by fixing Hide again or deleting exact variants.
