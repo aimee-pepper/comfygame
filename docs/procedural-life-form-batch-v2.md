@@ -131,3 +131,7 @@ This batch materially extends visible shape variation while retaining the accept
 ## Fibrous whole-plant readability — unresolved design concern
 
 Asset7dfa2185 found support-dominated fibrous silhouettes in the retained opposed/rosette ordinary-scale blade views. The exact preserved support/growth dimensions above remain the current contract; this is an unresolved whole-plant design limitation, not evidence that the component violated them. See `blender-flora-components-v1.md` for the source-linked disposition. Any support/foliage proportion change remains a proposed consolidated morphology revision. Component integration PASS and its revision3 rollout do not establish full-plant readability. No silent mesh enlargement or new anatomy is authorized.
+
+## Fleshy needle occlusion — unresolved retained morphology observation
+
+Engineeringf4262f97 reports that the maximal repeated-branch fleshy specimen obscures most needles behind its large support, despite unchanged source32members and non-reference frames/dimensions. See blender-flora-components-v1.md for exact evidence and review status. This extends the consolidated whole-plant readability concern; it does not settle larger needles, relocated roots or a new support ratio. Source correctness and visible whole-plant readability remain distinct. No new needle-component defect or numerical rule violation is established by this observation alone. Asset same-view review is pending; no additional native run requested.
