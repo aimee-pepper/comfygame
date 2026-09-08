@@ -49,7 +49,7 @@ In the wiki-design-decisions-september-4 worktree:
 - `docs/player-wiki-design-decisions-current.md`: current opening, stack defect/correction, legacy Wildfire eligibility, historical rather than active Essence-runway work, delivered T3, interim code-authored meshes.
 - `docs/aimee-homework-current.md`: delivered study/Bestiary/warning, later-shop pause, no duplicated homework for settled decisions, Blender direction.
 
-Mirror maintained player-reference documents in the early-progression-implementation-v1 Design worktree and correct its notification contract. Update345 current behavior from Engineering's supplied receipt. Keep exact variants, legacy learning and pending notification remainder intact.
+Maintained player-reference documents are mirrored in Design, and the notification contract preserves exact variants and legacy learning. The supplied345–347 receipts establish current delivery of the complete notification wording batch.
 
 ## Retained approved direction
 
@@ -81,7 +81,7 @@ The frozen audit scope inventory records revisions and paths without private cha
 
 ### Continuing production, not reopened decisions
 
-Engineering already delivered the coating, mode-removal, aquatic, chronology, stacking and Library corrections described above. Engineering subsequently delivered field/Schematic/auto-path notification copy in346; action/shop/refusal/combat copy remains its separate active batch. Asset completed all six Blender replacements at658edadf, with native imports, exact asset bytes and five focused checks verified; Engineering integration/phone delivery remains pending. The previous code-authored meshes are historical interim work. Those existing owner-specific deliveries remain tracked by PM. This audit does not claim their artwork or remaining notification copy is delivered, and does not hold the accepted wiki corrections for them.
+Engineering already delivered the coating, mode-removal, aquatic, chronology, stacking and Library corrections described above. Engineering delivered field/Schematic/auto-path notification copy in346 and the consolidated action/shop/refusal/combat remainder in347, with nine distinct focused checks and installation/ordinary-launch evidence. Actual capped healing amounts are truthful; generic untyped failures use the approved concise fallback. Asset completed all six Blender replacements at658edadf, with native imports, exact asset bytes and five focused checks verified; Engineering integration/phone delivery remains pending. The previous code-authored meshes are historical interim work. Those existing owner-specific deliveries remain tracked by PM. The complete notification copy is delivered; Blender artwork phone integration remains separate. Neither receipt is a claim of Aimee visual acceptance of each surface.
 
 ## Validation and publication boundary
 
