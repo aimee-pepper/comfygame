@@ -1,6 +1,6 @@
 # Plant support and foliage proportions — accepted intended revision
 
-8 September 2026. **ACCEPTED INTENDED — implementation and matched before/after examples requested by Aimee; not yet delivered.** PM explicitly relayed her instruction to implement this plant revision and show the comparisons. The exact listed ratios, scope and preservation boundaries are accepted for bounded implementation. Ratios were authored by Design, not measured from screenshots; final appearance still requires review. This acceptance is separate from the unresolved universal-Schiller/plant-numerousness reconsideration.
+8 September 2026. **ACCEPTED INTENDED — implemented and internally verified with matched examples; phone delivery pending.** PM explicitly relayed her instruction to implement this plant revision and show the comparisons. The exact listed ratios, scope and preservation boundaries are accepted for bounded implementation. Ratios were authored by Design, not measured from screenshots; final appearance still requires review. This acceptance is separate from the unresolved universal-Schiller/plant-numerousness reconsideration.
 
 ## Accepted direction and tradeoff
 
@@ -63,4 +63,10 @@ Validate this as one coherent revision using the retained opposed/basal blade an
 
 Aimee explicitly instructed: “implement the plant generation revision you mentioned and show me the examples when comparing them.” PM relayed that approval after reading the full contract and assigned Engineering the exact scope. The original proposal-only status is superseded. Implement the listed revision and show matched same-source before/after close and ordinary-scale examples; preserve the actual target/default/current appearance and source facts. Do not replace those examples with a source-count-only receipt. No duplicate Design native run is requested.
 
-Approval authorizes this bounded implementation, not materially different ratios, additional families or accepted final visuals. Installed354 remains the current behavior until a verified implementation/delivery receipt follows. Phone-launch confirmation is never a production dependency. The universal-Schiller/numerousness recommendation remains a separate unsettled design task.
+Approval authorizes this bounded implementation, not materially different ratios, additional families or accepted final visuals. Installed354 remains the last confirmed phone version; candidate implementation and internal verification are complete as recorded below. Phone-launch confirmation is never a production dependency. The universal-Schiller/numerousness recommendation remains a separate unsettled design task.
+
+## Implementation receipt — phone355 installation in progress
+
+Engineering candidate3f386c725d40332875af1dc777f2791ff4fdcce8/tree f1a8f1113b55e24e3f0f6cfac8212a2e128294c2, plant-foliage-generation worktree, records the exact revision in `docs/plant-foliage-generation-implementation-2026-09-08.md`. Five focused checks pass, including actual Bind/Enter/native movement/cold reopen, old/new source preservation, observed changed-plant memory, scoped contact/exclusions and matched captures. Independent floraMorphologyVersion1 freezes new-book geometry; nil old geometry, creature form2/component5/surface2 remain unchanged.
+
+Asset13b5fdd5 reviewed the same eight comparisons: clearer upright foliage, compact basal clusters and external fleshy fans with seated visible joins; rear occlusion and fine map-scale limits remain. Actual capture device is Engineering iPhone17Pro Simulator/iOS26.2 at402×874pt/default/current dark, matching target viewport; no duplicate Design capture. PM has all eight BEFORE LEFT / AFTER RIGHT images for Aimee. This is internal verification, not her final visual acceptance. Phone355 installation receipt follows separately; no launch dependency.
