@@ -1,5 +1,10 @@
 # Field tools and one resource per tile
 
+## Latest authority · 8 September 2026
+
+The current occupancy scope and exact saved-conflict repair/failure policy are consolidated in [Shared growth, mineral and loot occupancy](shared-growth-resource-occupancy-v1-2026-09-08.md). This supersedes the earlier resource-only scope and unspecified old-save repair below; adjacent mining and chooser rules remain intact.
+
+
 5 September 2026. Two bounded corrections explicitly requested by Aimee through PM. Design contract only; implementation/delivery pending. No damage, yield, turn-cost, movement or world-generation redesign.
 
 ## Hold, slide, release to choose a tool

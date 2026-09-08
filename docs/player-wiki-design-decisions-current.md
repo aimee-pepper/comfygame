@@ -2,17 +2,37 @@
 
 This is the current record of the changes agreed today. **Decided intended behavior** describes the game we are making; it does not mean that behavior is already available on your phone. **First-pass tuning** gives concrete starting numbers that can change through play. **Unsettled proposals** still need design work or a choice.
 
-## Urgent correction — only notifications should move
+## Current installed update —363
 
-**Decided intended behavior:** only the notification pane switches edges when your character approaches within two visible tile heights. At this place stays fixed. Movement controls, minimap, Use Tile, Look, satchel and Field Kit stay fixed at the bottom in their original layout. Notifications retain exact page links, expiry and opposite-edge hysteresis.
+Build363 connects terrain tops, water and exposed banks to the world's saved terrain colours. Colours remembered outside current sight stay as you last observed them. Build362 restored fixed controls and context, added the missing supporting faces beneath raised land, and expanded shadows from currently visible objects. The earlier plant, Diary and waterfall corrections remain intact. Installation is verified; this is not a completed physical-phone playtest or your visual acceptance.
 
-**Current problem in361:** the earlier implementation moves the whole navigation block. That was an incorrect interpretation and is being corrected urgently. Its installation and layout review do not make it intended behavior. The rest of the delivered3D game remains intact.
+The intermittent **Securing action** hang remains unreproduced and has not been confirmed fixed. Long bare upper stems and weak needle/frond distinction remain appearance limitations. The waterfall's contact and sampled downward movement passed a bounded review; real-time smoothness, flicker and natural occurrence remain unverified.
 
-## Current installed update —361
+## Only notifications move — corrected in362
 
-Build361 corrects how falling water sits against its own shore ledge, keeps it connected to the upper water and makes its downward streaks clearer. It retains360’s stems and caps, normal3D exploration and **Diary page collected → Read now**. Installation is verified; this is not a completed physical-phone playtest or your visual acceptance.
+Only the notification pane switches edges as your character approaches. At this place, movement controls, minimap, Use Tile, Look, satchel and Field Kit stay fixed in their original bottom layout. Notification movement does not resize or reframe the map. Exact Diary page links and notice expiry remain intact. This corrects the unintended whole-navigation movement in359–361. Internal layout and input checks passed; no further decision is waiting on you.
 
-The intermittent **Securing action** hang remains unreproduced and has not been confirmed fixed. The waterfall’s contact, exposed face and sampled downward progression passed a bounded review; real-time smoothness and flicker remain unverified. Long bare upper stems and weak distinction between needle and frond plants at ordinary scale remain visible limitations; finished whole-plant believability is not established.
+## Raised land and shadows — installed in362
+
+Raised terrain now has exposed supporting faces wherever the relevant heights are known. A visible bank can end at the known water surface without revealing an unknown riverbed. Unseen edges do not disclose hidden heights. Existing shore crossings, slopes and waterfall connections keep their rules; this does not regenerate your world or change movement.
+
+Currently visible terrain, plants, mineral nodes and creatures can cast shadows alongside your character. Remembered or hidden objects do not cast live shadows. Supporting faces fade where necessary to keep the character readable. The bounded internal review passed; this is not final lighting or artwork acceptance.
+
+## World terrain colours — installed in363
+
+Terrain tops, water and exposed banks use the saved colours of their world. Looking away retains the terrain colours you actually observed, without revealing unseen changes. Older observations missing a saved colour keep their previous appearance until seen again. Flora and resource colours keep their own identities. Internal palette and memory checks and the supplied image review passed.
+
+**Still unfinished:** snow and ash surface layers are not yet drawn in normal3D. The colour correction does not establish complete terrain-layer or artwork coverage.
+
+## Reported field and inventory corrections — decided, not yet delivered
+
+**Gathering feedback:** successful gathering should visibly rise from the actual source after the reward is saved. The short local motion takes less than half a second and never delays your next action or spends another turn. A work hit without a reward must not show a collected item. Optional gathering feedback continues to follow your notice setting. The reported missing animation remains open.
+
+**Growth, minerals and loose finds:** a physical plant base, mineral node or loose find must not share a tile with a separate physical source. Leaves may overhang neighbouring tiles, and one plant may provide its own several materials. Placement after world creation follows the same rule. Corrections to an existing overlap must preserve actual sources, work and earned stock; a known source must not silently move into unexplored terrain. An overlap that cannot be repaired without loss remains an explicit team issue, not a reason to erase your progress. Adjacent mining stays valid.
+
+**Remembered discoveries:** discovered plants, resource nodes, loose finds and places remain at their last-known positions outside current sight; only enemy mobs disappear. Their images reflect what you last saw, not secret changes elsewhere. Collecting or knowingly removing something updates that memory, so it cannot reappear as uncollected when you reopen. Remembered presence does not grant remote interaction or confirm it is still there. Existing tree memory is not yet complete support for every non-enemy discovery; older saves cannot reconstruct details they never recorded.
+
+**Material stacks:** the same real material, subtype and existing quality share one visible total. Colour, precise properties, composition and origin stay in exact variants that expand on tap. Ordinary flora remains ungraded. This rule applies to new raw and processed materials as well as the delivered Hide correction. It does not blend stock, change crafting selection or merge different qualities. Wider reported grouping issues remain open. Artwork for24 missing material icons is prepared but still awaits integration and in-game readability review; preparing icons does not fix stacking.
 
 ## Waterfall ledge contact and motion — installed in361
 
@@ -30,7 +50,7 @@ Internal checks passed binding, entering, movement and controls, reopening throu
 
 ## 3D authoring direction
 
-**Decided intended production:** Blender-authored reusable parts will be assembled and varied in game. The six resource-node replacements are delivered in build348’s existing3D view; their earlier code-authored meshes are historical interim artwork. Stable assets such as Coal do not need placeholder authoring; an exception needs a concrete unsettled-design reason. The procedural flora and creature direction remains intact. Quality, coherence and playability govern this work.
+**Decided intended production:** beautiful conventional Blender-authored3D parts will be assembled and varied in game. Their geometry should not be made of modeled pixels or deliberately crude blocks. A later pixel-art treatment belongs to the rendered game image and remains unfinished; inventory pixel-art icons are a separate kind of artwork. Essence is blue. The earlier purple crystal candidate is withdrawn; its blue replacement still awaits in-game integration and review. The six resource-node replacements are delivered in build348’s existing3D view; their earlier code-authored meshes are historical interim artwork. Stable assets such as Coal do not need placeholder authoring; an exception needs a concrete unsettled-design reason. The procedural flora and creature direction remains intact. Quality, coherence and playability govern this work.
 
 **Reusable flora artwork — retained in installed355:** newly bound books use reviewed Blender trunks, branches, broad leaves, fibrous blades, needles and fronds in the existing3D view. Parts retain each plant’s source colour and saved structure. Existing books keep their recorded artwork. Build357 now uses the3D view for normal expeditions as well. These replacements add no new species type, organ or harvest. Earlier versions left some fibrous stems too dominant and some fleshy foliage buried; the revision below addresses those shapes. Your final review of the overall plant appearance remains open.
 
@@ -404,13 +424,13 @@ This demonstrates only the ordinary actions actually tried in3D. It does not est
 
 ## Field and terrain feedback · 5 September
 
-**Notification placement — urgent correction pending:** only notifications should move. At this place and its details stay fixed, as do all navigation and carried-item controls in their original bottom layout. The restored map keeps its size and tile scale during notification switches. Exact Read now identity, normal expiry and safe touches remain. If both edges are too close, the notification stays put. Builds359–361 currently move the whole navigation block; that unwanted behavior is being corrected.
+**Notification placement — corrected in362:** only notifications move. At this place and its details stay fixed, as do all navigation and carried-item controls in their original bottom layout. The map keeps its size and tile scale during notification switches. Exact Read now identity, normal expiry and safe touches remain. If both edges are too close, the notification stays put. This replaces the unintended whole-navigation movement in359–361.
 
 **Forecast wording — installed in357:** the approximate collapse countdown says **About 588 turns left**, for example, instead of using a tilde that can look like a minus sign. The estimate and collapse rules are unchanged.
 
 **Tool gesture — current behavior, delivered in build 315:** hold **Interact for 0.40 seconds**, keep the same finger down while sliding onto a packed tool, then release to select it. No second tap is needed. Release outside a choice or cancel to retain the previous valid tool. A completed hold never turns into an accidental Interact tap; choosing a tool does not harvest or spend a turn. A later Interact tap or direction toward a blocking node performs the ordinary eligible action. The movement-centre hold remains the separate quick-item menu. Hovering over a tool does not commit the choice; releasing over it does. The exact chosen tool remains your preference after reopening and on the next visit. The existing tap-to-open tool menu also remains available. Engineering reported delivery and four focused passing checks, including the continuous gesture, on 5 September (Pacific time); Design has not repeated the phone checks.
 
-**One tile, one resource node — decided:** mineral, plant and loose-resource placement must share this rule, including guaranteed resources. One node may yield several units, and canopy artwork may extend over neighbouring tiles; neither means that two underlying gatherable resources may share a tile. **Actual duplicate placement remains unconfirmed:** you clarified that what looked like stacking may be the accepted ability to mine an adjacent node. Adjacent mining stays valid; source positions determine whether a conflict exists. No fix is claimed before Engineering's investigation and delivery.
+**One tile, one resource node — decided:** mineral, plant and loose-resource placement must share this rule, including guaranteed resources. One node may yield several units, and canopy artwork may extend over neighbouring tiles; neither means that two underlying gatherable resources may share a tile. **Latest clarification:** actual growth bases, mineral nodes and loose finds share the same occupancy rule, including later placement. The reported overlap correction is still pending; source coordinates determine actual conflicts, and adjacent mining remains valid. Existing-world repairs must preserve sources, progress and known locations, as described above.
 
 **Authored water study — requested illustrative tuning, pending implementation:** you found the example too shallow. The revised example makes both bodies five times deeper: lower channel bed −0.50 / surface 0.75 beside bank 1; raised pond bed 1.50 / surface 2.75 inside bank 3. Both depths are 1.25 abstract height levels, with their own independent contained surfaces and explicitly known beds. These are illustration values, not a production depth scale or new swimming rule.
 

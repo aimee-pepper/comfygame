@@ -1,6 +1,6 @@
 # Only notifications move — direct Aimee correction
 
-8 September2026. **Urgent accepted correction; not delivered.** Aimee's exact instruction relayed by PM is **“JUST THE NOTIFS NEED TO MOVE”.** It supersedes PM's moving-navigation interpretation AND the intermediate information/notification-pane scope. No new question or interpretation expansion.
+8 September2026. **Accepted correction; delivered in362.** Aimee's exact instruction relayed by PM is **“JUST THE NOTIFS NEED TO MOVE”.** It supersedes PM's moving-navigation interpretation AND the intermediate information/notification-pane scope. No new question or interpretation expansion.
 
 ## Sole moving owner
 
@@ -27,3 +27,7 @@ The one-time layout restoration cancels old touches/timers whose frames move. Su
 Restore urgently, before sidewalls. Preserve361 water,360 plants,358 diary,357 normal3D and all campaigns. Sidewall/shadow/real-art/gathering-restoration work stays authorized; preserve the creature-disclosure checkpoint.
 
 Reuse current tests and one affected actual-target/default/current native route: notification at both edges while context and ALL fixed-control frames stay unchanged, restored map reservation/tile scale, exact Read now/expiry and safe old release/map touch. Asset reviews the same evidence; no Design capture, new trial or phone-launch gate. Earlier359 whole-block visual/technical PASS is historical evidence of rejected scope, not acceptance. Wiki must state current regression and intended correction separately until delivery.
+
+## Delivery
+
+Build362 installed/readback verified; see phone-362-design-reconciliation-2026-09-08.md for supplied native/Asset evidence and limits. No repeated tests or phone entry check. Earlier priority and acceptance instructions above describe implementation requirements, now satisfied within that bounded receipt.

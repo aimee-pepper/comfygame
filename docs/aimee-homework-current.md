@@ -5,13 +5,15 @@ Updated 8 September 2026. One place for your decisions, design to-dos and option
 
 ## 3D authoring direction
 
-**Decided intended production:** Blender-authored reusable parts will be assembled and varied in game. The six resource-node replacements are delivered in build348’s existing3D view; their earlier code-authored meshes are historical interim artwork. Stable assets such as Coal do not need placeholder authoring; an exception needs a concrete unsettled-design reason. The procedural flora and creature direction remains intact. Quality, coherence and playability govern this work.
+**Decided intended production:** beautiful conventional Blender-authored3D parts will be assembled and varied in game. Any later pixel-art treatment applies to the rendered game image, not modeled pixels or crude geometry. Essence stays blue; a blue crystal candidate is prepared but not yet accepted in game. Inventory pixel-art icons remain a separate consumer. The six resource-node replacements are delivered in build348’s existing3D view; their earlier code-authored meshes are historical interim artwork. Stable assets such as Coal do not need placeholder authoring; an exception needs a concrete unsettled-design reason. The procedural flora and creature direction remains intact. Quality, coherence and playability govern this work.
 
 ## Current priority: coherent generated 3D life
 
 **Waterfall contact and motion — installed in361:** falling water sits beyond its own ledge and stays connected to the upper water. Internal checks and a sequential-frame review passed for contact, exposure and sampled downward movement. Real-time smoothness, natural occurrence and your visual acceptance remain separate; no decision is waiting on you.
 
-**Only notifications move — urgent correction, no decision needed:** you clarified that only notifications move. At this place and all movement, minimap, action and carried-item controls stay fixed in their original positions. Whole-block movement in359–361 was an incorrect interpretation and is being removed. This is team correction work, not homework for you.
+**Fixed controls and supporting faces — corrected in362:** only notifications move; context and controls stay fixed. Raised land now shows its known supporting faces, and current objects have broader shadow coverage. Internal checks and the supplied image review passed; final visual acceptance remains separate.
+
+**Terrain colours — installed in363:** terrain and exposed banks now use the saved world colours, including last-observed colours outside sight. Snow and ash layers remain unfinished. Gathering animation, shared physical-source occupancy, remembered non-enemy discoveries and wider material grouping have implementation contracts and remain team work. The24 missing material icons are prepared, pending integration and review. No new decision or test is waiting on you.
 
 **Diary Read now — installed in358:** collected pages offer an immediate shortcut to their exact prose. Closing returns to the same expedition without another turn or reward; ignored notices leave the page in your Library. Internal checks and phone installation are verified. No decision is waiting on you.
 

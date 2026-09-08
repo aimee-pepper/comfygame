@@ -1,0 +1,31 @@
+# Shared material stock groups and inventory icons
+
+8 September 2026. **Previously settled grouping; reported wider correction pending.** Aimee's same Common Supple Hide example remains authority. This consolidates new raw and processed typed materials without changing recipes, qualities, prices, exact consumption or stored values. The Hide correction delivered345 is not proof that all typed resources currently comply.
+
+## One visible group, exact underlying stock
+
+Within one actual custody/destination, group by real material identity, its actual gameplay subtype and its existing physical/source quality band where defined. Eight plus two Common Supple Hide of the same quality show Common Supple Hide ×10 despite different colours or precise properties. Identity is a typed material key, not its translated label, artwork, provider path or broad category such as all wood. Different real materials/subtypes/qualities remain separate. A legacy unknown type/quality remains explicitly unknown unless an existing verified migration resolves it; never infer grade from rarity, price, colour or numerical proximity.
+
+Ordinary flora is currently ungraded. Use its actual material/subtype without inventing a quality band for grouping. Raw material and its processed output are different types. Existing mixed Cord/Cloth retain their true material identity and stored compositions; constituent colours and mixing proportions are variants within the relevant stock group, not automatically new outer stacks. Genuine semantic subtype differences already established by the crafting owner remain distinct; do not promote a source/specimen/receipt ID into a subtype.
+
+Sum lot quantities plus individual units according to their real storage representation, counting each owned unit once. The outer group stores references to existing lots/units; it is not a merged economic record or newly blended material. Group identity/order remains stable as individual lots are consumed. Do not pick a new outer stack ID solely from whichever first lot survives. Preserve satchel/Storehouse/Waiting and other real custody boundaries; showing a total must never imply inaccessible stock is packed or selectable.
+
+Collapsed rows show material/subtype, existing quality where applicable, quantity and its legitimate icon. Source colours, precise properties, origins, composition, acquisition history and per-lot values remain stored and available after tapping that group. If variants differ, indicate variation without claiming the first lot's colour/property/value describes all stock. Exact entries retain quantities and permitted swatches/details. Do not add raw internal IDs or precision dumps to ordinary player-facing rows.
+
+## Exact selection and transactions
+
+Keep existing recipe choices and selection rules. Expanding the group allows the existing exact eligible lot/variant selection wherever its colour/properties affect results. Grouping does not silently substitute another source, choose a quality, average properties, blend colours, change a source-price override or ignore protected stock. For existing outcome-neutral automatic consumption retain PhysicalMaterialQuantitySelection's authorized ordering; this correction does not rewrite it. Quotes and sales compute actual selected lots and amounts, never an invented uniform stack price. Partial sale/use decrements the exact selected parts and leaves all others intact. Refit/recycling outputs retain their existing source receipts.
+
+Use one shared presentation grouping contract across normal material stock consumers (field/carried, Return, Storehouse/Waiting and material selection where these show stock), with adapters for CraftMaterialUnitV1 and physical lots. Keep recipe compatibility/equivalence distinct from display equivalence: broadening the former merely to collapse rows would change crafting. Unique gear does not become a material stack.
+
+## Existing gap and artwork handoff
+
+Delivered362 MaterialDisplayGrouping.swift distinguishes displayEquivalent from equivalent but generalizes only the existing covering path. EarlyFieldMaterialsView.swift/EarlyMaterialStockView display separate typed lot and crafting-family groups. Engineering must audit these consumers as one presentation batch, not declare compliance by fixing Hide again or deleting exact variants.
+
+Asset36a0ad14 supplies AssetLab/integration/typed-material-inventory-v2 in woody-components-blender-v1. Exact mappings cover24 requested missing IDs:8 unchanged32×32 sources and16 new transparent1254×1254 source PNGs. Four previously approved originals are explicitly excluded/preserved. The package is SOURCE CANDIDATE, not native acceptance or matched logical pixel density. Do not claim original-image inspection proves clarity at32pt.
+
+Named existing consumer: PhysicalMaterialInventoryArtwork.approvedImageNames → PhysicalMaterialInventoryThumbnail in EarlyFieldMaterialsView.swift, original-colour nearest-neighbour scaledToFit32pt; quality border belongs to UI. Integrate the manifest's exact IDs/assets, preserve the four originals and verify no missing-key fallback. This is pixel-art inventory work, separate from conventional Blender3D models and later game-image pixel filtering. Asset reviews supplied actual-size native evidence for readability and coherence; if detailed source art fails there, return the exact affected IDs to Asset through PM rather than substitute unrelated icons or call placeholders final. No arbitrary batch resize or new trial.
+
+## Bounded verification and status
+
+Use representative same-type/subtype/quality mixed-colour/properties stock, different actual quality/type, ungraded flora, mixed processed textiles and legacy unknowns. Check totals, expansion, exact selection/partial consumption/price/custody and save/reopen against existing transaction tests. Assert all24 manifest keys resolve and the four approved originals remain unchanged. Reuse one native inventory view/contact sheet at actual target/default/current appearance for group clarity and artwork; no configuration matrix or Design rerun. Report grouping, image integration, native review and installation separately. Both reported inventory issues remain open until their corresponding evidence arrives.

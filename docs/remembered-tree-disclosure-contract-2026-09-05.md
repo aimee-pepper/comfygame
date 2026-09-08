@@ -1,5 +1,10 @@
 # Remembered trees — last observed appearance
 
+## Latest authority · 8 September 2026
+
+The latest direct instruction extends memory to discovered non-enemy objects and POIs; only enemies vanish. [Remembered discoveries](remembered-discoveries-v1-2026-09-08.md) supersedes this document’s tree-only scope while preserving its last-observed/no-hidden-refresh rules.
+
+
 5 September 2026. Bounded Design contract for Aimee’s report that fully seen trees disappear outside current sight in the 3D trial. **Requested correction, not delivered or verified.** No full 3D migration approval is inferred. Engineering owns the implementation; Design resumes the whole Blacksmith batch after this handoff.
 
 ## Intended behavior

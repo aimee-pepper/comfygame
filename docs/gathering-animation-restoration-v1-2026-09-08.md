@@ -1,0 +1,25 @@
+# Gathering animation restoration
+
+8 September 2026. **Accepted correction, implementation pending.** Aimee reports lost gathering animation after tool mining. Restore the existing field-feedback design; add no delay, turn, trial or new gathering mechanic. This document consolidates field-feedback-and-loot-presentation-current.md, shared-3d-life-readability-v1.md and field-tool-gesture-and-resource-occupancy-2026-09-05.md. The local-rise specification is established design authority; it is not evidence that that exact motion previously shipped.
+
+## Exact event and presentation contract
+
+Ownership, work, source depletion and quantities change through the actual durable action commit. Optional animation follows that commit and never owns or delays it. Project the committed source identity, source tile, actual awarded presentation identity/quantity and event identity from the existing result owner. Do not infer success from a button press, selected tool, notification prose, scene disappearance or a quote.
+
+For a successful direct pickup/harvest that actually awards one presentation identity, show that exact legitimate icon at the projected SOURCE tile centre. Rise screen-up by 1.5 projected tile heights over450ms; full opacity for180ms then fade over270ms. Optional scale is0.90→1.05→0.95. No rotation, bounce, particle burst, line to the HUD or long flight. Aggregate same-identity units into one icon, with ×N only above one. Update the real carried total at commit; its matching counter can pulse once without moving the fixed controls. If a source disappears, place its collected icon in that same displayed result frame. Clamp the rise to the remaining visible map; never reverse downward or cover fixed HUD. Maintain the committed world-space source anchor if the camera reframes; never retarget to the player's new tile.
+
+A partial work hit with NO yield may retain its existing committed impact/work cue at the exact source, but must not show a collected-material icon or invented quantity. A yield-bearing intermediate hit may use the rise for that actual yield. Final depletion uses the real final result, not a second pickup. Any existing tool-swing motion must keep its actual existing timing; this contract introduces no speculative swing duration. The delivered static hammer/check marker is not evidence that the pickup-rise path is restored.
+
+The current bounded grammar supports one legitimate presentation identity per direct pickup/harvest transaction. Creature victory, site multi-loot, Home crafting and trading retain their own result presentation. No multi-kind burst or borrowed icon is introduced. If an existing multi-yield source cannot supply one honest aggregate identity, keep all rewards and its existing result breakdown, omit only the unsupported optional rise, and report the exact source/event mismatch to PM; do not suppress rewards or invent a representative item. An unidentified source uses only its legitimately disclosed silhouette. Missing known artwork is an exact Asset gap, not permission to show an unrelated material.
+
+## Lifetime, preferences and persistence
+
+Use the existing committed batch/event identity with its run/world and source identity; deduplicate within the active presentation session. One result means one cue even when several views observe it. The animation is nonblocking and may be cancelled by departure, reader ownership, scene teardown or world change without modifying receipt, quantity, turn or work. No replay on reopening, selection change or reconstruction. Refused, failed-save, stale, cancelled and duplicate attempts show no successful work/yield/depletion cue. Tool chooser release selects only; it does not swing or gather.
+
+Mining and gathering results retains its existing default Off and explicit saved choice. Optional hit/progress/yield/depletion cues follow that preference. Actual stock, work and source changes, readiness, essential refusal/save-failure explanations and harm remain independent. Preserve the separate established category rules for loose pages/items. No accessibility/configuration variants are authorized by this correction; historical alternate-motion instructions are superseded by AGENTS.md.
+
+## Existing seam and bounded completion
+
+In delivered362, Sources/VisualRuntime/OrthographicSourcePresentation.swift admits committed current-world unexpired gathering work; Sources/Screens/OrthographicReadabilityOverlay.swift renders static hammer/check cues. Engineering traces the existing moving pickup consumer and connects the typed and legacy successful action paths to it. Reuse rather than create a second reward or event system.
+
+Focused checks: partial/no-yield versus actual-yield/final-depletion; exact source/quantity and450ms timeline; mute; wrong tool/cancel/failure/duplicate; move/reopen without replay. One supplied ordinary native gathering example at the actual target/default/current appearance can establish visible motion after implementation. No new player trial, Design rerun or physical-phone campaign play. Report restoration, any unsupported specific path and delivery separately.

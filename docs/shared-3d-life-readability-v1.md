@@ -1,5 +1,10 @@
 # Shared 3D life readability — presentation contract v1
 
+## Latest authority · 8 September 2026
+
+Latest corrections: [remembered non-enemy discoveries](remembered-discoveries-v1-2026-09-08.md) supersedes generic all-creature/current-only language for non-enemies; enemies still vanish. [Gathering restoration](gathering-animation-restoration-v1-2026-09-08.md) preserves existing static work semantics and restores actual-yield motion. Neither correction is delivered by the historical353 receipt.
+
+
 7 September 2026. **Design queue item2: implemented at de41596f and installed353; phone entry unverified.** Consolidates accepted harmful-growth, actual Apex, occupied-base targeting and observation/fade rules. It changes no gameplay or knowledge entitlement. Layout recommendations below are Design first-pass tuning, not new Aimee decisions or delivered artwork.
 
 ## Authority and baseline evidence through352
