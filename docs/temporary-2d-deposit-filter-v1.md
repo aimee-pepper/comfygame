@@ -64,3 +64,17 @@ Engineering owns integration and subsequent delivery evidence. All six are inter
 ### Subsequent343 crash-correction delivery
 
 Engineering receipt `docs/phone-343-delivery-2026-09-07.md` in world-crash-and-notifications supersedes the urgent investigation status above: source91b853f8a83d663b5bd1cb4dd91193f69b59dcf1/tree1001cd3176fbe6e2cbb298b749983abfbdca9188 installed/read back2026-09-08T00:44:29.505163Z, ordinary launch PID87862 survived. Actual342 saved-state movement→encounter→Techniques→cold-reopen passed internally, including a1MiB main-stack executable. Campaign preserved, no phone gameplay; physical encounter resolution remains unclaimed.343 includes neither the recording policy nor Asset artwork. Engineering resumes the settled policy from preserved WIP5cf0d9f4 on343 ancestry; family work remains paused. Design relies on this receipt without repeating delivery checks.
+
+
+###343 physical closure and concise mining copy
+
+PM relayed Aimee's direct confirmation that343 fixes the physical encounter crash. This supersedes the unconfirmed physical result above; no reruns requested. Aimee also rejects paragraph-length routine mining prompts. Decided copy for the next useful Engineering delivery:
+
+- Preserve actual quote refusal and existing gate order; the current `try?` failure must not imply every failure needs a tool change.
+- Disclosed `wrongTool` with an owned qualifying tool: `Select your {tool.displayName}.` Choose a deterministic existing qualifying tool, preferably lowest adequate tier. Examples: `Select your Stone Pick.` / `Select your Iron Pick.`
+- No owned qualifying tool: `Requires {Tool} Lv {minimumTier}+.` Example `Requires Pick Lv 2+.` Keep existing class/Lv naming; do not suggest selecting unavailable gear.
+- Hidden/missing/stale/exhausted fallback: `Cannot mine here.` No hidden material/tool/tier disclosure.
+- Actual priority interaction: `Finish this interaction first.` Actual out-of-reach: `Cannot reach this deposit.` Keep the existing encounter guard.
+- Successful quotes harvest as before. No source-name preamble, routine tutorial, new mechanic or turn/tool change. Preserve wrapping capability. No broad copy audit.
+
+Engineering has this exact contract for the recording-policy delivery.343 still carries the verbose copy; concise copy is decided, not yet delivered.
