@@ -58,3 +58,7 @@ Normal3D, its new-book resource policy, gear/health separation and About … tur
 ## Installed358 supersession
 
 Diary collected/Read now is installed358; see phone-358-design-reconciliation-2026-09-08.md. Navigation anchoring is now the next Engineering task. Stem/cap admission continues independently. No duplicate native or phone-entry checks.
+
+## Installed359 supersession
+
+Navigation anchoring is installed359; see phone-359-design-reconciliation-2026-09-08.md. Both-anchor/details/held-input and bounded loot/tutorial checks pass with Asset four-view PASS. Next Engineering work is already-running stem/cap integration; navigation is no longer queued. No phone-entry gate or duplicate tests.

@@ -9,6 +9,8 @@ Updated 8 September 2026. One place for your decisions, design to-dos and option
 
 ## Current priority: coherent generated 3D life
 
+**Moving exploration controls — installed in359:** navigation and the carried-item strip move together to the opposite edge as your character approaches, with details opening inward and stable map framing. Internal interaction checks and Asset’s layout review passed; phone installation is verified. No new preference or decision is waiting on you.
+
 **Diary Read now — installed in358:** collected pages offer an immediate shortcut to their exact prose. Closing returns to the same expedition without another turn or reward; ignored notices leave the page in your Library. Internal checks and phone installation are verified. No decision is waiting on you.
 
 **Normal expeditions in3D — installed in357:** the same campaign now uses3D and normal resource generation for newly written worlds. Existing books and saved progress remain intact. Internal binding, entry, controls, reopening and Return checks passed; phone installation is verified, without a completed physical-phone playtest claim. No new mode or approval choice is waiting on you.

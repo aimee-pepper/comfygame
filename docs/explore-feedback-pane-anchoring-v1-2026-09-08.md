@@ -1,5 +1,8 @@
 # Explore navigation block — stateful top/bottom anchoring
 
+**Delivery update — installed359:** supplied implementation/native/Asset receipts establish this moving navigation layout. See phone-359-design-reconciliation-2026-09-08.md for current behavior and bounded limits. The original accepted contract below remains design history; its pending labels and order are superseded by this delivery. Current direction buttons act on release without a repeat timer; cancel existing held input and chooser timers, do not add a repeat mechanic.
+
+
 8 September 2026. **Accepted intended behavior; implementation pending.** Aimee directs the bottom navigation panes to move to the top of the viewframe when the character approaches within two tiles of being underneath them, then stay there until the character approaches the top panes within two tiles. PM resolved the exact native scope below under delegated authority. Including the utility strip and expanding the constant map rectangle are PM's implementation interpretation, not additional quotations or personal decisions attributed to Aimee.
 
 This finalized contract replaces the unpublished feedback-only draft at this same path. Its filename is retained for existing handoff links; its authority is the navigation block described here. No new preference, trial, Home redesign or camera mode.
