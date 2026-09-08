@@ -111,13 +111,15 @@ Some aquatic creatures can begin beyond player reach and approach shallow water 
 
 **Preserved behavior:** existing saved worlds and unfinished opening expeditions keep their earlier routes, creatures and resources. New water geometry respects the height limits even when it falls back to simpler water presentation. Ordinary gameplay remains2D, with the existing Settings3D view available. The337 Bind correction is retained. This adds no swimming, climbing or new trial menu. The later morphology, finish/marking and shared readability batches remain intended, not included in338.
 
-## Deposit markers — correction pending
+## Temporary 2D deposit restriction and 3D node art — accepted, not delivered
 
-**Current reported behavior:** some Coal, Iron and Quartz deposits appear as generic boxes in the map. Their actual material identity and required packed Pick still belong to the source; the shared picture is a presentation gap.
+For the upcoming recording playthroughs, newly generated ordinary2D worlds should stop placing resource nodes that lack finished map graphics. Work on new2D resource art stops;3D node graphics take priority. The temporary plan to use an ore picture for Iron is superseded and does not count as finished artwork. Inventory pictures alone do not establish finished map-node graphics.
 
-**Decided correction:** Coal will use its selected coal artwork, Quartz its existing quartz picture, and Iron an existing ore picture as a temporary illustration. Iron will still be named **Iron** when selected or inspected. Reusing that picture does not turn Iron into a different resource, change mining requirements or claim final Iron artwork. Visibility, occupied bases, yield and depletion remain unchanged. This correction is not delivered yet.
+Existing saved worlds and earned stock stay unchanged. A world's contents will not appear or disappear when its renderer changes. Worlds generated under the3D policy keep their resource-node capability. This is a temporary generation restriction, not a new trial or player mode.
 
-A separately reported in-world crash is under investigation. The marker correction does not establish a fix for that crash, and the earlier Bind/departure fixes below remain distinct.
+**Temporary progression consequence:** unavailable Iron deposits mean the corresponding Iron-learning, Forge and tool progression cannot be completed through those new2D worlds. The restriction will remove conflicting deposit guarantees and reservations together, with the temporary absence made clear before binding; it will not invent substitute materials or silently charge for a promised deposit it cannot place. Existing owned materials remain usable. Exact excluded source categories and finished-map-art eligibility are being finalized from the existing evidence; this restriction is not yet delivered.
+
+A separately reported in-world crash is under investigation. The temporary node restriction does not establish a fix for that crash, and the earlier Bind/departure fixes below remain distinct.
 
 ## The beginning as one connected path
 
