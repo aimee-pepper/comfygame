@@ -30,6 +30,10 @@ Already-readable branched woody and fibrous plants, bare forms and corrected unb
 
 **Tradeoff:** basal rosettes look shorter, and fleshy branch fans occupy more visible space around their unchanged central body. Some rear foliage can still be hidden. You approved this revision and asked to see matched before/after examples of the same plants. The completed comparisons show clearer upright leaves, compact basal clusters and fleshy branch fans emerging outside the body. Internal checks also preserved source counts, materials and older saved plants. Your final visual acceptance remains pending. Build355 is installed on your phone. Existing books keep their saved plant shapes. Ordinary phone entry has not been checked.
 
+## Fungal cap contact — decided, not yet delivered
+
+When the new fungal-cap artwork is introduced, an existing spore-bearing feature will sit against its actual cap surface instead of floating above it. This corrects an inherited attachment gap without adding parts or changing their sizes, source colours, harvests or material values. Existing books keep their saved appearances. The correction is pending; it is not included in359.
+
 ## More believable plant supports — decided, not yet delivered
 
 You prefer build355’s clearer foliage, but its egg-shaped supports do not suit ordinary plants. The next correction keeps those foliage improvements and gives ordinary fleshy plants believable, gently tapered stems. Upright plants keep an upright support; unbranched basal rosettes use a compact central support. Branches and leaves remain attached to the real stem surface.
