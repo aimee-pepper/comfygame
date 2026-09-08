@@ -196,3 +196,9 @@ Engineering checkpoint `35c30b29700ca26da71275f657060c8be3fa8de3`, receipt `docs
 ## Superseding diary instruction —8September
 
 Collection now requires “Diary page collected” plus exact-page “Read now” while the notification is visible. Follow [the bounded contract](diary-collected-read-now-v1-2026-09-08.md). Preserve pickup-time learning/XP, later Library ownership and actual-rendered attention semantics; no new reading prerequisite. Current355 copy remains until Engineering delivers this correction.
+
+## Forecast approximation wording —8September
+
+PM inspected the existing main-campaign3D native-entry image and WorldView forecast producer: `~\(Int(projectedTurns)) turns until collapse` can look like a negative number in the pixel font. This repeats the previously resolved tilde/negative misreading; no numerical bug is established.
+
+**Intended literal:** `About \(Int(projectedTurns)) turns left`. Example: **About 588 turns left**. Preserve projectedTurns, Int conversion, availability/threshold branches and the existing fixed-target header. Do not add abs/clamp, change collapse rules, investigate forecast arithmetic or reopen the prior audit. Engineering has this small correction for sensible current integration; main3D gear/delivery priorities remain. Use its existing ordinary-target receipt rather than a separate Design/native run. Current tilde wording remains until delivered.
