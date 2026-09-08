@@ -4,7 +4,7 @@
 
 ## Superseding direct decision
 
-Aimee subsequently accepted selective iridescence for suitable some-bird/fish/reptile surfaces. The broader plant/chitin/shell candidates below are not implementation authority. Follow [the narrowed accepted contract](selective-iridescence-contract-v1-2026-09-08.md); no numerousness swap or economy change is approved. The original comparison below remains proposal history.
+Aimee subsequently accepted selective iridescence for suitable some-bird/fish/reptile surfaces, then clarified directly that it can have a purpose for both plants and animals and Dragon DNA need not be copied wholesale. Selective flora use is accepted direction; exact flora-region eligibility still needs Design specification. The broader candidate list below is not blanket implementation authority. Follow [the accepted contract and latest clarification](selective-iridescence-contract-v1-2026-09-08.md); no numerousness swap or economy change is approved. The original comparison below remains proposal history.
 
 ## Recommendation
 

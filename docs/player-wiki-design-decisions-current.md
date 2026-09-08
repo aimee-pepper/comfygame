@@ -143,7 +143,7 @@ Pressure-led family generation is installed351 for newly bound books, with phone
 
 ## Surface finishes and markings — installed in352, Schiller unfinished
 
-**Decided intended scope:** iridescence may appear on suitable surfaces of some birds, fish and reptiles. It is selective, not a universal flora/fauna trait. This does not approve every surface suggested earlier: plants, shells and chitin have not been added to this implementation scope. Existing source colours and material calculations stay intact; Schiller is not being turned into an organ count.
+**Decided intended scope:** iridescence can have a place on suitable plants and animals. Dragon DNA is inspiration for useful detail, rather than a blueprint to copy wholesale. Some feathered or scaled animals are the first specified examples; suitable plant surfaces may also use the finish. This is selective: it does not make every species or surface iridescent. The exact plant surfaces still need design specification, and the visible effect remains unfinished. Existing source colours and material calculations stay intact; Schiller is not being turned into an organ count.
 
 **Current for newly bound books:** the existing3D view preserves each creature’s or plant’s actual colours and finish, including distinct body regions, wood, foliage and supported individual differences. Surfaces stay opaque; shine affects the highlight while rough surfaces retain their softer appearance. Markings share a direction and scale through connected parts of the same region, and fine bands soften at a distance. Distinct regions can keep separate patterns. Colours used in harvesting and crafting remain tied to the actual source.
 
