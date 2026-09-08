@@ -8,6 +8,12 @@ Build360 gives newly written worlds tapered fleshy stems, compact basal rosettes
 
 The intermittent **Securing action** hang remains unreproduced and has not been confirmed fixed. The waterfall's visible motion has not passed its appearance review. Long bare upper stems and weak distinction between needle and frond plants at ordinary scale remain visible limitations; finished whole-plant believability is not established.
 
+## Waterfall ledge contact — decided, not yet delivered
+
+A shore-step face currently hides part of the falling water in the reviewed example. The correction places the falling sheet just beyond the receiving side of that ledge and keeps it connected to the upper water. Its actual drop, width, landing height and crossing rules stay the same. Terrain can still naturally obscure a fall seen from behind; this does not make water visible through hidden ground. Nearby pools and shore surfaces are not being given waterfall animation.
+
+This is a placement correction, not another brightness adjustment. It is not included in360, and readable downward flow remains unaccepted until the corrected view is reviewed.
+
 ## Normal expeditions in3D — installed in357
 
 **Current:** Bind, Enter and Continue use the3D exploration view in the same campaign, without a new mode choice or separate progression path. Home, crafting, combat and Return keep their current screens. Tile selection, movement, Look and Use Tile retain their ordinary rules.
