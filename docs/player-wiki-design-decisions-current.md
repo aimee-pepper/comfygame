@@ -85,15 +85,15 @@ Existing size, build, tissue, stature, shape and part fields supply the variatio
 
 Pressure-led family generation is installed351 for newly bound books, with phone entry still unverified. Surface finishes/continuous markings and shared3D readability also remain separate unfinished work. Existing campaigns and owned source colours are preserved.
 
-## Surface finishes and markings — partial internal review, rollout pending
+## Surface finishes and markings — improvements planned
 
 **Current:** generated life uses its source colour, a shine-based surface finish and soft bands applied separately to each part. Markings can restart or reverse at part joins, and dense bands can lose contrast. Full Schiller is not delivered.
 
 **Decided presentation direction:** preserve the actual colours of body regions, wood, foliage and harvested materials. Treat opacity, shine and Schiller as a finish mixture: the opacity share is matte/opaque finish, not permission to make a highly polished creature transparent. Surfaces remain opaque; existing foreground fading remains separate. Shine changes the reflected highlight. Schiller should produce a subtle, angle-dependent coloured sheen relative to the source colour, while neutral-coloured sources retain neutral sheen. This changes appearance, not materials, illumination, concealment or targeting.
 
-**Design/Asset first-pass plan, not delivered:** markings should use a shared direction and scale within each continuous material region, preserving the same pattern through connected parts, movement and reopening. Distinct wood, foliage and other regions can keep separate markings. Fine patterns may blend together at a distance rather than flicker. Actual specimen and part-specific colours must survive these effects and remain the colours used by crafting. Exact sheen strength and pattern filtering are production tuning; the complete renderer support and remaining verification are still pending. A static rainbow tint does not count as completed Schiller.
+**Design/Asset first-pass plan, not delivered:** markings should use a shared direction and scale within each continuous material region, preserving the same pattern through connected parts, movement and reopening. Distinct wood, foliage and other regions can keep separate markings. Fine patterns may blend together at a distance rather than flicker. Actual specimen and part-specific colours must survive these effects and remain the colours used by crafting. Exact sheen strength and pattern filtering are production tuning; the remaining effects and visual checks are still unfinished. A static rainbow tint does not count as completed Schiller.
 
-**Partial internal markings review:** in two retained views, visible leaf bands follow the leaves, wood stays unbanded, and distant bands soften toward the surface colour while preserving the canopy outline. This is a static review of the markings component, not proof that patterns remain stable during motion or continuous across every creature surface. The change is not enabled for newly bound books or installed on the phone yet. Full Schiller remains unfinished, and these views do not establish complete surface-finish or whole-plant appearance acceptance.
+**Progress on the planned appearance:** early visual checks show clearer leaf bands up close and softer markings at a distance, with the tree’s outline preserved. Wood keeps its own colour without leaf bands. These improvements are not available in your installed game yet. Their appearance during movement and across connected creature parts still needs checking. Schiller and the complete finished appearance remain unfinished.
 
 ## Reading plants, creatures and targets in 3D
 
