@@ -123,3 +123,7 @@ No ordinary launch retry was made following350’s locked-phone refusal, per PM 
 **Accepted intended revision:** [Plant support and foliage proportions](plant-support-foliage-proposal-2026-09-08.md) is now explicitly approved by Aimee for the exact scoped implementation and matched before/after examples. It supersedes the listed fibrous/fleshy dimension/root rules only in the separately versioned new-book path once implemented; installed354 and old books remain unchanged pending delivery. This does not approve a Schiller or numerousness replacement.
 
 Plant revision candidate3f386c72 now passes the five focused implementation checks and Asset13b5fdd5 matched-example review. See the accepted plant-support/foliage contract for receipt and preservation scope. Phone355 is now installed/read back; see the contract’s installation receipt. This is not final Aimee visual acceptance, and no phone-entry check was added.
+
+## New direct correction — believable supports
+
+Aimee prefers355 foliage but rejects generic egg stalks. [Believable supports v2](plant-believable-supports-v2-2026-09-08.md) is the accepted next mapping; old355 geometry remains for old books. The prior unchanged-fleshy-body boundary is superseded only for this new version. [Current execution sequence](accepted-work-sequence-2026-09-08.md) keeps independent accepted work moving.

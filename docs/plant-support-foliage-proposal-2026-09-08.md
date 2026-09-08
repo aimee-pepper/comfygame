@@ -74,3 +74,7 @@ Asset13b5fdd5 reviewed the same eight comparisons: clearer upright foliage, comp
 ### Phone355 installation complete
 
 Engineering delivery77d3ccc904fddd6ffabddbb79b04d0b133d0b99b, receipt `docs/phone-355-installation-2026-09-08.md` in plant-foliage-generation: installed/read back2026-09-08T14:07:39.637060Z on Aimee’s physical iPhone16Pro. ArtifactSHA e041d69be247e37a9a5de0bc18dc2bcc2a1510ed18cb26e5fdb83a855fe91695. No launch attempted, campaign interaction or reset; usable entry remains unverified and is not a production dependency. New books receive the scoped revision, nil old books remain exact. Final Aimee visual acceptance and Schiller/count proposals remain separate.
+
+## New direct correction — believable supports
+
+Aimee prefers355 foliage but rejects generic egg stalks. [Believable supports v2](plant-believable-supports-v2-2026-09-08.md) is the accepted next mapping; old355 geometry remains for old books. The prior unchanged-fleshy-body boundary is superseded only for this new version. [Current execution sequence](accepted-work-sequence-2026-09-08.md) keeps independent accepted work moving.

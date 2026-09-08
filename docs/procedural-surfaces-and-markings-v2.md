@@ -1,6 +1,6 @@
 # Procedural surface finishes and markings v2
 
-7 September2026. Design queue1, source specification with Schiller applicability under reconsideration; **bounded colour/shine/markings installed352; phone entry unverified, full Schiller incomplete**. Aimee's accepted direction is source-faithful colour/Pattern and coherent procedural life. Numerical mappings here are Design/Asset first-pass tuning, not individually approved player choices. Coordinate with morphology v2; hotfix/terrain priorities remain independent. No new biology, materials, stats, shader production assignment to Asset, native trial or required Aimee decision.
+7 September2026. Design queue1, source specification with selective Schiller scope settled in the linked September8 contract; **bounded colour/shine/markings installed352; phone entry unverified, full Schiller incomplete**. Aimee's accepted direction is source-faithful colour/Pattern and coherent procedural life. Numerical mappings here are Design/Asset first-pass tuning, not individually approved player choices. Coordinate with morphology v2; hotfix/terrain priorities remain independent. No new biology, materials, stats, shader production assignment to Asset, native trial or required Aimee decision.
 
 ## Installed351 baseline consumer and exact limits
 
@@ -91,3 +91,7 @@ PM relayed Aimee questioning Schiller as an across-the-board flora/fauna trait a
 ## Selective-finish recommendation — proposal, not implementation authority
 
 See [Schiller and plant-count recommendation](schiller-selective-finish-and-plant-counts-proposal-2026-09-08.md). It recommends explicitly eligible source regions, preserving saved Finish and economy while reusing independent plant counts. No universal trait replacement, new harvest formula or new source anatomy is accepted.
+
+## Narrowed iridescence scope — accepted intended
+
+PM relayed Aimee accepting suitable some-bird/fish/reptile surfaces. [Selective iridescence contract](selective-iridescence-contract-v1-2026-09-08.md) supersedes the reconsideration and broader candidate lists above. Only eligible actual feather-wing/scale regions enter the new selected effect; no plants/chitin/shell grant or Finish/economy swap. The backend remains a local technical dependency; follow [the wider current work sequence](accepted-work-sequence-2026-09-08.md) independently.

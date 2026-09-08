@@ -2,6 +2,10 @@
 
 8 September 2026. **PROPOSAL — not a settled trait replacement or implementation assignment.** PM relayed Aimee questioning universal Schiller and suggesting plant numerousness. Universal Schiller is no longer a ready implementation mandate. The separately accepted plant support/foliage revision proceeds unchanged, including matched examples. Phone-launch confirmation is never a production dependency.
 
+## Superseding direct decision
+
+Aimee subsequently accepted selective iridescence for suitable some-bird/fish/reptile surfaces. The broader plant/chitin/shell candidates below are not implementation authority. Follow [the narrowed accepted contract](selective-iridescence-contract-v1-2026-09-08.md); no numerousness swap or economy change is approved. The original comparison below remains proposal history.
+
 ## Recommendation
 
 Use **selective, explicitly source-owned iridescence** for suitable surfaces. Keep the existing independent plant structure choices and describe their actual counts. Do not replace Schiller with a universal numerousness scalar. Preserve saved Finish and all existing crafting calculations during this bounded visual-scope change; removing their compatibility dependence would require a separately reviewed economy revision.

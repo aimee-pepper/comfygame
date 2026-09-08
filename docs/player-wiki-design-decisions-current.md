@@ -16,6 +16,12 @@ Already-readable branched woody and fibrous plants, bare forms and corrected unb
 
 **Tradeoff:** basal rosettes look shorter, and fleshy branch fans occupy more visible space around their unchanged central body. Some rear foliage can still be hidden. You approved this revision and asked to see matched before/after examples of the same plants. The completed comparisons show clearer upright leaves, compact basal clusters and fleshy branch fans emerging outside the body. Internal checks also preserved source counts, materials and older saved plants. Your final visual acceptance remains pending. Build355 is installed on your phone. Existing books keep their saved plant shapes. Ordinary phone entry has not been checked.
 
+## More believable plant supports — decided, not yet delivered
+
+You prefer build355’s clearer foliage, but its egg-shaped supports do not suit ordinary plants. The next correction keeps those foliage improvements and gives ordinary fleshy plants believable, gently tapered stems. Upright plants keep an upright support; unbranched basal rosettes use a compact central support. Branches and leaves remain attached to the real stem surface.
+
+Swollen cactus or succulent forms require actual supporting anatomy. Fleshy tissue, thorns or needle-shaped growth alone will not turn a plant into a cactus. Current plant records do not yet establish a separate swollen storage stem. Existing books keep their saved shapes, and the correction changes no materials, harvest counts or crafting values. Build355 remains the installed behavior while this correction is made.
+
 ## Generated 3D life and connected waterfalls
 
 **Decided intended behavior:** plants and creatures are generated in game when you write a world. The game may combine reusable body bases, plant parts and attachments, but choosing a finished premade species is not the generation system. World conditions shape the available life; its actual traits determine structure, proportions, colour and Pattern. A saved world keeps its identities and appearance when reopened. Harvested flora and creature materials keep their actual source colours through supported crafting uses.
@@ -95,17 +101,17 @@ Pressure-led family generation is installed351 for newly bound books, with phone
 
 ## Surface finishes and markings — installed in352, Schiller unfinished
 
-**Scope under reconsideration:** Dragon DNA remains an inspiration for useful detail. You have questioned Schiller as a universal trait and suggested plant numerousness as a possible alternative. Selective iridescence and reuse of existing plant counts are being evaluated; no replacement trait or formula is settled. Full universal Schiller is no longer an implementation mandate.
+**Decided intended scope:** iridescence may appear on suitable surfaces of some birds, fish and reptiles. It is selective, not a universal flora/fauna trait. This does not approve every surface suggested earlier: plants, shells and chitin have not been added to this implementation scope. Existing source colours and material calculations stay intact; Schiller is not being turned into an organ count.
 
 **Current for newly bound books:** the existing3D view preserves each creature’s or plant’s actual colours and finish, including distinct body regions, wood, foliage and supported individual differences. Surfaces stay opaque; shine affects the highlight while rough surfaces retain their softer appearance. Markings share a direction and scale through connected parts of the same region, and fine bands soften at a distance. Distinct regions can keep separate patterns. Colours used in harvesting and crafting remain tied to the actual source.
 
 **Current crafting connection:** stored Schiller contributes to material Lustre and some material capability calculations. The missing angle-dependent visual effect does not make that stored value unused. Replacing it with a plant count would therefore require a separate crafting decision.
 
-**Proposal, not settled:** make iridescence an optional property of appropriate, explicitly described surfaces, including selected plant foliage or displays. Keep branch count, leaf repetition and arrangement independent. Existing plant variation does not yet provide true multiple stems or multiple flower heads; the pieces used to draw one blossom are not separate flowers. Do not substitute one universal “numerousness” value or make extra visible parts yield extra harvest units.
+**Plant structure remains independent:** branching, leaf repetition and arrangement keep their own variation. True multiple stems or flower heads are separate missing capabilities, not a settled replacement trait. Visible parts do not automatically yield extra harvest units.
 
 **Older books:** existing books retain their earlier appearance, including the older markings that can restart at part joins. Reopening a saved world does not apply the new finish automatically. Future Schiller improvements must likewise preserve already-saved appearances.
 
-**Earlier finish direction, applicability now under review:** Schiller was intended to add a subtle, angle-dependent reflected colour relative to the source colour, with neutral sheen on neutral-coloured sources. That visible effect is not implemented yet. Painted rainbow colours, emitted light or a metallic replacement do not count as Schiller. Markings and shine improvements do not establish the complete finished appearance or resolve the fibrous plants’ proportions.
+**Decided intended appearance, not yet delivered:** selective iridescence adds a subtle, angle-dependent reflected colour relative to the source colour, with neutral sheen on neutral-coloured sources. That visible effect is not implemented yet. Painted rainbow colours, emitted light or a metallic replacement do not count as Schiller. Markings and shine improvements do not establish the complete finished appearance or resolve the fibrous plants’ proportions.
 
 **Verification limits:** close and ordinary-scale views showed readable leaf bands that soften with distance while preserving the tree outline. Checks also covered connected creature markings, saved source colours and reopening. A later short, controlled camera-movement check found no obvious pattern jumps or large brightness pulses in the sampled views. This does not establish flicker-free behavior at every speed or distance, or your visual acceptance. These improvements remain included in installed build354, but ordinary phone entry and playtest readiness remain unverified following the earlier locked-phone launch refusal.
 
@@ -837,7 +843,7 @@ Empty collections and searches explain that no recorded creatures match; empty c
 
 ### Creature descriptions that match their lives
 
-**Decided intended behavior; not yet implemented.** New creature names and role descriptions should reflect their actual supported bodies and behavior. A flying creature can be described as a flier; a land-bound membrane creature cannot. Fins and body proportions alone do not establish an eel identity, and low bone density does not establish hollow bones.
+**Current for the modular creatures introduced in333 and retained in355:** new creature names and role descriptions follow their actual supported bodies and behavior. A flying creature can be described as a flier; a land-bound membrane creature cannot. Fins and body proportions alone do not establish an eel identity, and low bone density does not establish hollow bones.
 
 An Ambusher needs the existing concealed close-range striking traits. Pursuers can still fight and chase without a separate natural weapon. Swarmer describes an existing multi-strike or area attack profile, not a promise of a colony; Sentinel does not promise nest guarding. Ordinary creatures must not gain the separate Apex identity just because they are large and well-armed.
 
@@ -849,7 +855,7 @@ A grazing diet is not yet defined, so new descriptions will not call a creature 
 
 **Current generation rules:** cold tends to favour larger bodies and more covering. The wetter cold response favours bulk with less extra covering length than the drier response; heat tends toward smaller, less-covered bodies. These are tendencies that leave room for different creatures, not promises that every animal has fur, fat or protection from the weather. These relationships have not yet had a complete creature-experience playtest.
 
-**Decided intended correction; not implemented:** the existing cold-water tendency toward additional appendages will apply only to creatures with a supported water or amphibious habitat containing actual liquid water. It currently applies too broadly to cold-world creatures. A land creature or flier will keep ordinary body variation, but will not receive that particular water-related tendency just because its world is cold or wet. Amphibious creatures can still qualify while on their bank; their supported water-and-land habitat is what matters.
+**Current for modular creatures in newly written worlds:** the cold-water tendency toward additional appendages applies only to supported water or amphibious creatures. Older worlds preserve their existing bodies. A land creature or flier will keep ordinary body variation, but will not receive that particular water-related tendency just because its world is cold or wet. Amphibious creatures can still qualify while on their bank; their supported water-and-land habitat is what matters.
 
 Ice alone is not liquid habitat. This correction adds no new swimming or flying ability, weather immunity, material reward or food simulation. A creature’s body stays fixed after generation, and existing worlds keep their creatures. Cold land can still produce many-legged creatures through ordinary variation.
 
