@@ -11,7 +11,7 @@ Updated 8 September 2026. One place for your decisions, design to-dos and option
 
 **Waterfall contact and motion — installed in361:** falling water sits beyond its own ledge and stays connected to the upper water. Internal checks and a sequential-frame review passed for contact, exposure and sampled downward movement. Real-time smoothness, natural occurrence and your visual acceptance remain separate; no decision is waiting on you.
 
-**Moving exploration controls — installed in359:** navigation and the carried-item strip move together to the opposite edge as your character approaches, with details opening inward and stable map framing. Internal interaction checks and Asset’s layout review passed; phone installation is verified. No new preference or decision is waiting on you.
+**Only notifications move — urgent correction, no decision needed:** you clarified that only notifications move. At this place and all movement, minimap, action and carried-item controls stay fixed in their original positions. Whole-block movement in359–361 was an incorrect interpretation and is being removed. This is team correction work, not homework for you.
 
 **Diary Read now — installed in358:** collected pages offer an immediate shortcut to their exact prose. Closing returns to the same expedition without another turn or reward; ignored notices leave the page in your Library. Internal checks and phone installation are verified. No decision is waiting on you.
 
