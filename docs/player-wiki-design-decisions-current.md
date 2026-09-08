@@ -123,7 +123,7 @@ Trees, Clay, Salt Crust, plant and root gathers, and ordinary rubble ground rema
 
 **Message corrections — delivered in342:** shared event messages expand to show their wrapped text rather than stopping at two lines, and already-disclosed deposits explain their actual required tool and tier. Message timing, hidden information and harvest requirements remain unchanged. Installation, device readback and ordinary phone launch are verified. These delivered message changes do not imply the encounter crash is resolved.
 
-**3D node art — production consumer ready, artwork pending:** the installed3D view now passes the actual visible material and remaining work to its node renderer. It still draws unfinished grey boxes. Distinct3D node artwork can now be made for that consumer; this does not make the placeholder finished art or deliver the temporary2D spawning restriction. Build342 retains the earlier Bind/departure corrections below.
+**3D deposits — current appearance and artwork progress:** build342 still shows unfinished grey boxes for these deposits in the3D view. Distinct models for **Coal, Iron, Quartz, Sulfur, Mercury and Rift Glass** are now complete and internally reviewed at ordinary map scale, but are not yet confirmed delivered to your phone. Mercury appears as solid rock with silver exposed faces; Sulfur forms a low yellow crust, while Rift Glass has broad opaque shards. These appearances keep the existing mining requirements and rewards. The temporary2D spawning restriction remains pending and is not changed by finished3D artwork. Build342 retains the earlier Bind/departure corrections below.
 
 ## The beginning as one connected path
 
