@@ -3,13 +3,13 @@
 Updated 9 September 2026. One place for your decisions, design to-dos and optional creative work. You are not holding up the early crafting work by leaving a later refinement question open.
 
 
-## First departure preparation — known issue, correction pending
+## First departure preparation — corrected in366
 
-**Current behavior:** A current internal playthrough found that an otherwise valid first blank request can fail world preparation before departure. The refused request kept its Essence and campaign progress, and issued no world. The opening is therefore not yet reliable for every new campaign; a correction is pending.
+**Current behavior — installed in366:** newly prepared ordinary worlds can try another layout before payment when the original layout cannot fit its required sources. Preparation keeps the same world identity, written properties, source colours and original required resources. It accepts the first valid layout; it does not choose a world for better rewards. If preparation cannot succeed, it refuses without spending or issuing a world. Existing saved worlds are not regenerated.
 
-**Decided intended correction, not delivered:** Before payment, preparation will find a valid layout while preserving the same written world properties, source colours and required resources. An alternate layout cannot qualify by dropping required resources or the safe introductory lessons. Its plant coverage and appearance will reflect the plants actually placed. If preparation cannot succeed, it will refuse without spending or issuing a world. Existing saved worlds stay unchanged.
+**Verified scope:** seven focused internal checks passed, including recovery of the first blank request that had previously refused preparation. Its required sources and safe introductory route were retained. Installation and ordinary app launch are verified; the ongoing natural acquisition journey is still incomplete, and no physical-phone playthrough is claimed. The original refusal remains part of the earlier test record.
 
-This is team correction work; no new decision or retry is needed from you.
+**Decided behavior retained:** an alternate layout cannot qualify by dropping required resources or introductory lessons. Plant coverage and appearance reflect the plants actually placed. Reopening or continuing an existing world preserves that world.
 
 ## Tutorials switch — installed in364
 

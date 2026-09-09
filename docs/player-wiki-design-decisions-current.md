@@ -2,13 +2,13 @@
 
 Updated 9 September 2026. This reference keeps the accepted decisions and subsequent deliveries together. **Decided intended behavior** describes the game we are making; it does not mean that behavior is already available on your phone. **First-pass tuning** gives concrete starting numbers that can change through play. **Unsettled proposals** still need design work or a choice.
 
-## First departure preparation — known issue, correction pending
+## First departure preparation — corrected in366
 
-**Current behavior:** A current internal playthrough found that an otherwise valid first blank request can fail world preparation before departure. The refused request kept its Essence and campaign progress, and issued no world. The opening is therefore not yet reliable for every new campaign; a correction is pending.
+**Current behavior — installed in366:** newly prepared ordinary worlds can try another layout before payment when the original layout cannot fit its required sources. Preparation keeps the same world identity, written properties, source colours and original required resources. It accepts the first valid layout; it does not choose a world for better rewards. If preparation cannot succeed, it refuses without spending or issuing a world. Existing saved worlds are not regenerated.
 
-**Decided intended correction, not delivered:** Before payment, preparation will find a valid layout while preserving the same written world properties, source colours and required resources. An alternate layout cannot qualify by dropping required resources or the safe introductory lessons. Its plant coverage and appearance will reflect the plants actually placed. If preparation cannot succeed, it will refuse without spending or issuing a world. Existing saved worlds stay unchanged.
+**Verified scope:** seven focused internal checks passed, including recovery of the first blank request that had previously refused preparation. Its required sources and safe introductory route were retained. Installation and ordinary app launch are verified; the ongoing natural acquisition journey is still incomplete, and no physical-phone playthrough is claimed. The original refusal remains part of the earlier test record.
 
-This is team correction work; no new decision or retry is needed from you.
+**Decided behavior retained:** an alternate layout cannot qualify by dropping required resources or introductory lessons. Plant coverage and appearance reflect the plants actually placed. Reopening or continuing an existing world preserves that world.
 
 ## Tutorials toggle — installed in364
 
@@ -22,7 +22,9 @@ Settings → Field Notes remains readable. **Replay on its screen** requests one
 
 **Decided intended correction:** Got it remembers that you have acknowledged the guidance for this campaign and stops its automatic reminders. It does not count as performing the action being taught. Not now postpones guidance until a relevant later opportunity; Replay on its screen remains available when you want a reminder, without resetting progress.
 
-## Current installed update —365
+## Current installed update —366
+
+Build366 adds the pre-payment world preparation correction described above. The natural early-progression journey remains under review. The Got it tutorial-repeat correction is still pending and is not included in this update.
 
 Build365 adds snow and settled-ash patches to normal3D terrain. The patches keep the ground visible, follow its existing height and preserve the colours and cover you last observed. Separate shore ramps and crossings keep their previous appearance. Existing worlds and gameplay rules are unchanged; the build364 improvements below remain included.
 
