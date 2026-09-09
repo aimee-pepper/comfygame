@@ -56,6 +56,14 @@ Outside current sight, cover keeps only its last-observed pattern and colours. O
 
 **Unsettled proposals, not implemented:** deeper snowdrifts, melting, weather-driven accumulation, and coating plants or whole cliff faces. None follows automatically from the delivered surface patches.
 
+## Clay in the world — appearance correction planned
+
+**Current behavior:** Clay remains a low, walkable source gathered by hand: one gathering action yields two Clay. Its current 3D world marker is a generic yellow block; the inventory icon is separate.
+
+**Decided intended appearance:** Replace that marker with a shallow, irregular exposure of soft clay, with folded clumps and a thin broken edge against the ground. It should look gatherable by hand and remain easy to walk across. Gathering, source quantities and routes stay unchanged. Discovered Clay keeps only its last-observed appearance outside sight, and an observed successful gather removes the depleted source. The dedicated world artwork is not delivered yet.
+
+This is team artwork and integration work; no new decision is waiting on you.
+
 ## Field and inventory corrections — installed in364
 
 **Current gathering feedback:** supported collected materials rise briefly from their actual source after the reward is saved. The short local motion takes less than half a second and never delays your next action or spends another turn. A work hit without a reward shows no collected item. The effect follows your Mining and gathering results setting, which is Off by default. A result involving several kinds or sources keeps its normal breakdown without this extra motion. Materials awaiting suitable artwork may also keep their ordinary result display; your reward is unchanged.

@@ -68,6 +68,7 @@ export default async function ResourceDetail({
       <section className="article-section">
         <h2>How it works now and how it will change</h2>
         <TruthPair current={`${resource.name} currently follows the acquisition, storage, trade, and recipe rules described on this page.`} accepted={futureResourceCopy(resource.name)} />
+        {resource.id === "clay" && <><h3>Clay in the world</h3><TruthPair current="Clay remains a low, walkable source gathered by hand: one gathering action yields two Clay. Its current 3D world marker is a generic yellow block; the inventory icon is separate." accepted="Replace that marker with a shallow, irregular exposure of soft clay, with folded clumps and a thin broken edge against the ground. It should look gatherable by hand and remain easy to walk across. Gathering, source quantities and routes stay unchanged. Discovered Clay keeps only its last-observed appearance outside sight, and an observed successful gather removes the depleted source. The dedicated world artwork is not delivered yet." acceptedLabel="Decided appearance, not yet delivered" /></>}
       </section>
       <section className="article-section">
         <h2>How to obtain it</h2>

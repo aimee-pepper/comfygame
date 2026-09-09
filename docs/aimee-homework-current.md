@@ -19,6 +19,14 @@ Settings → Tutorials now turns automatic guidance off while keeping ordinary i
 
 **Decided intended correction:** Got it remembers that you have acknowledged the guidance for this campaign and stops its automatic reminders. It does not count as performing the action being taught. Not now postpones guidance until a relevant later opportunity; Replay on its screen remains available when you want a reminder, without resetting progress.
 
+## Clay in the world — appearance correction planned
+
+**Current behavior:** Clay remains a low, walkable source gathered by hand: one gathering action yields two Clay. Its current 3D world marker is a generic yellow block; the inventory icon is separate.
+
+**Decided intended appearance:** Replace that marker with a shallow, irregular exposure of soft clay, with folded clumps and a thin broken edge against the ground. It should look gatherable by hand and remain easy to walk across. Gathering, source quantities and routes stay unchanged. Discovered Clay keeps only its last-observed appearance outside sight, and an observed successful gather removes the depleted source. The dedicated world artwork is not delivered yet.
+
+This is team artwork and integration work; no new decision is waiting on you.
+
 ## 3D authoring direction
 
 **Decided intended production:** beautiful conventional Blender-authored3D parts will be assembled and varied in game. Any later pixel-art treatment applies to the rendered game image, not modeled pixels or crude geometry. Essence stays blue; a blue crystal candidate is prepared but not yet accepted in game. Inventory pixel-art icons remain a separate consumer. The six resource-node replacements are delivered in build348’s existing3D view; their earlier code-authored meshes are historical interim artwork. Stable assets such as Coal do not need placeholder authoring; an exception needs a concrete unsettled-design reason. The procedural flora and creature direction remains intact. Quality, coherence and playability govern this work.
