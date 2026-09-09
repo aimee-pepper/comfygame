@@ -2,6 +2,14 @@
 
 This is the current record of the changes agreed today. **Decided intended behavior** describes the game we are making; it does not mean that behavior is already available on your phone. **First-pass tuning** gives concrete starting numbers that can change through play. **Unsettled proposals** still need design work or a choice.
 
+## Tutorials toggle — decided, not yet delivered
+
+**Current behavior:** automatic tutorial cards and first-return guidance can appear in their relevant screens. Settings → Field Notes lets you read lessons and request a replay. Dismissing a prompt is not a permanent global switch; the requested Tutorials toggle is not delivered yet.
+
+**Decided intended behavior:** Settings will include **Tutorials**, On by default. Turning it Off immediately stops automatic tips, guided prompts and tutorial-only suggestions across writing, exploration, Return, Village, Library and World History. Your choice stays saved across app restarts and campaigns. Warnings, real results, necessary choices and ordinary help remain available.
+
+You can still read Field Notes or deliberately replay one lesson while Tutorials is Off. That does not turn other tutorials back on or reset completed lessons. Turning Tutorials back On resumes relevant teaching without a backlog of popups. Disabling teaching does not complete lessons, grant runes, change recipes or skip gameplay; progress earned through your normal actions is preserved. This is team implementation work, with no further decision waiting on you.
+
 ## Current installed update —363
 
 Build363 connects terrain tops, water and exposed banks to the world's saved terrain colours. Colours remembered outside current sight stay as you last observed them. Build362 restored fixed controls and context, added the missing supporting faces beneath raised land, and expanded shadows from currently visible objects. The earlier plant, Diary and waterfall corrections remain intact. Installation is verified; this is not a completed physical-phone playtest or your visual acceptance.

@@ -3,6 +3,10 @@
 Updated 8 September 2026. One place for your decisions, design to-dos and optional creative work. You are not holding up the early crafting work by leaving a later refinement question open.
 
 
+## Tutorials switch — accepted, implementation pending
+
+You requested a Settings toggle to turn tutorials off. It will stop automatic guidance while preserving manual Field Notes/replay and all gameplay progression. The choice stays saved across restarts and campaigns. The implementation contract is complete; no further decision is waiting on you. See the [current design reference](design-decisions-september-4.html).
+
 ## 3D authoring direction
 
 **Decided intended production:** beautiful conventional Blender-authored3D parts will be assembled and varied in game. Any later pixel-art treatment applies to the rendered game image, not modeled pixels or crude geometry. Essence stays blue; a blue crystal candidate is prepared but not yet accepted in game. Inventory pixel-art icons remain a separate consumer. The six resource-node replacements are delivered in build348’s existing3D view; their earlier code-authored meshes are historical interim artwork. Stable assets such as Coal do not need placeholder authoring; an exception needs a concrete unsettled-design reason. The procedural flora and creature direction remains intact. Quality, coherence and playability govern this work.
