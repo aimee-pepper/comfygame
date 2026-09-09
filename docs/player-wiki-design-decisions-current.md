@@ -10,7 +10,9 @@ Settings → Field Notes remains readable. **Replay on its screen** requests one
 
 **Decided behavior retained:** turning Tutorials back On resumes relevant teaching at its next normal opportunity without a backlog of popups. The delivered setting and focused replay routes have passed internal checks; not every tutorial situation or the full re-enable sequence has been reviewed in play. No further design decision is needed.
 
-## Current installed update —364
+## Current installed update —365
+
+Build365 adds snow and settled-ash patches to normal3D terrain. The patches keep the ground visible, follow its existing height and preserve the colours and cover you last observed. Separate shore ramps and crossings keep their previous appearance. Existing worlds and gameplay rules are unchanged; the build364 improvements below remain included.
 
 Build364 adds remembered non-enemy discoveries, consistent material totals with expandable exact variants, saved-reward gathering feedback, shared source placement and careful overlap repair. It also adds the blue Raw Essence droplet, the Tutorials switch, clearer opening guidance and square inventory quality frames. Terrain colours, fixed controls, supporting land faces and the earlier plant, Diary and waterfall corrections remain intact.
 
@@ -32,11 +34,13 @@ Currently visible terrain, plants, mineral nodes and creatures can cast shadows 
 
 Terrain tops, water and exposed banks use the saved colours of their world. Looking away retains the terrain colours you actually observed, without revealing unseen changes. Older observations missing a saved colour keep their previous appearance until seen again. Flora and resource colours keep their own identities. Internal palette and memory checks and the supplied image review passed.
 
-**Current gap:** snow and settled-ash cover are not yet drawn in normal3D. The colour correction does not establish complete terrain-layer or artwork coverage.
+**Snow and settled ash — installed in365:** existing cover now appears in normal3D. Internal checks and a bounded still-image review passed for distinct patches, exposed ground, uncovered cliff faces and readable nearby objects and controls. Installation and ordinary app launch are verified; this is not a physical-phone playthrough or final aesthetic acceptance.
 
-**Decided intended cover:** saved snow and settled ash appear as separate patches on the terrain’s existing solid top, with colours belonging to that world. Both can be present while leaving the underlying ground visible. Cover stops at exposed edges; cliff faces keep the underlying ground material. It does not create deeper snow, new ledges, slippery ground, a harvestable node or a different route. Water and missing ground do not gain a cover surface.
+**Current cover:** saved snow and settled ash appear as separate patches on the terrain’s existing solid top, with colours belonging to that world. Both can be present while leaving the underlying ground visible. Cover stops at exposed edges; cliff faces keep the underlying ground material. It does not create deeper snow, new ledges, slippery ground, a harvestable node or a different route. Water and missing ground do not gain a cover surface.
 
-Outside current sight, cover keeps only its last-observed pattern and colours. Older observations without that information wait until the ground is seen again. Existing worlds and resources remain intact. This3D integration is specified but not delivered; volumetric drifts, melting and coating plants or whole cliff faces are separate unsettled possibilities.
+Outside current sight, cover keeps only its last-observed pattern and colours. Older observations without that information wait until the ground is seen again. Existing worlds and resources remain intact. Separate shore ramps and crossings are not newly coated; their appearance and movement rules remain unchanged.
+
+**Unsettled proposals, not implemented:** deeper snowdrifts, melting, weather-driven accumulation, and coating plants or whole cliff faces. None follows automatically from the delivered surface patches.
 
 ## Field and inventory corrections — installed in364
 
