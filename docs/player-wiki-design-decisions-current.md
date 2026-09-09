@@ -18,6 +18,10 @@ Settings → Field Notes remains readable. **Replay on its screen** requests one
 
 **Decided behavior retained:** turning Tutorials back On resumes relevant teaching at its next normal opportunity without a backlog of popups. The delivered setting and focused replay routes have passed internal checks; not every tutorial situation or the full re-enable sequence has been reviewed in play. No further design decision is needed.
 
+**Known repeat issue:** after choosing **Got it** on Actions where you stand, that guidance was offered again on a later expedition without a replay request. The correction is pending.
+
+**Decided intended correction:** Got it remembers that you have acknowledged the guidance for this campaign and stops its automatic reminders. It does not count as performing the action being taught. Not now postpones guidance until a relevant later opportunity; Replay on its screen remains available when you want a reminder, without resetting progress.
+
 ## Current installed update —365
 
 Build365 adds snow and settled-ash patches to normal3D terrain. The patches keep the ground visible, follow its existing height and preserve the colours and cover you last observed. Separate shore ramps and crossings keep their previous appearance. Existing worlds and gameplay rules are unchanged; the build364 improvements below remain included.

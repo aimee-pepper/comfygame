@@ -15,6 +15,10 @@ This is team correction work; no new decision or retry is needed from you.
 
 Settings → Tutorials now turns automatic guidance off while keeping ordinary instructions, necessary choices and Field Notes available. Your choice survives restarts and campaign switches. Requesting one replay leaves the global switch Off, waits for the proper context and does not reset progress. Focused Writing, Village, Return and History checks passed. No further decision is waiting on you. See the [current design reference](design-decisions-september-4.html).
 
+**Known repeat issue:** after choosing **Got it** on Actions where you stand, that guidance was offered again on a later expedition without a replay request. The correction is pending.
+
+**Decided intended correction:** Got it remembers that you have acknowledged the guidance for this campaign and stops its automatic reminders. It does not count as performing the action being taught. Not now postpones guidance until a relevant later opportunity; Replay on its screen remains available when you want a reminder, without resetting progress.
+
 ## 3D authoring direction
 
 **Decided intended production:** beautiful conventional Blender-authored3D parts will be assembled and varied in game. Any later pixel-art treatment applies to the rendered game image, not modeled pixels or crude geometry. Essence stays blue; a blue crystal candidate is prepared but not yet accepted in game. Inventory pixel-art icons remain a separate consumer. The six resource-node replacements are delivered in build348’s existing3D view; their earlier code-authored meshes are historical interim artwork. Stable assets such as Coal do not need placeholder authoring; an exception needs a concrete unsettled-design reason. The procedural flora and creature direction remains intact. Quality, coherence and playability govern this work.
