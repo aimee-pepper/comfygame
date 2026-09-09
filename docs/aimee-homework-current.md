@@ -15,13 +15,13 @@ Updated 9 September 2026. One place for your decisions, design to-dos and option
 
 Settings → Tutorials now turns automatic guidance off while keeping ordinary instructions, necessary choices and Field Notes available. Your choice survives restarts and campaign switches. Requesting one replay leaves the global switch Off, waits for the proper context and does not reset progress. Focused Writing, Village, Return and History checks passed. No further decision is waiting on you. See the [current design reference](design-decisions-september-4.html).
 
-**Known repeat issue:** after choosing **Got it** on Actions where you stand, that guidance was offered again on a later expedition without a replay request. The correction is pending.
+**Got it — corrected in367:** acknowledging guidance now stops its automatic reminders for that campaign, including on later expeditions and after reopening. This does not count as performing the taught action. Manual replay still works once without resetting progress. A separate internal journey verified these steps and the transition between lessons. Installation and ordinary launch are verified; physical-phone visual acceptance remains separate.
 
-**Decided intended correction:** Got it remembers that you have acknowledged the guidance for this campaign and stops its automatic reminders. It does not count as performing the action being taught. Not now postpones guidance until a relevant later opportunity; Replay on its screen remains available when you want a reminder, without resetting progress.
+**Decided behavior retained:** Got it remembers that you have acknowledged the guidance for this campaign and stops its automatic reminders. It does not count as performing the action being taught. Not now postpones guidance until a relevant later opportunity; Replay on its screen remains available when you want a reminder, without resetting progress.
 
 ## Clay in the world — appearance correction planned
 
-**Current behavior:** Clay remains a low, walkable source gathered by hand: one gathering action yields two Clay. Its current 3D world marker is a generic yellow block; the inventory icon is separate.
+**Current behavior:** Clay remains a low, walkable source gathered by hand: one gathering action yields two Clay. Its current 3D world marker is a generic yellow block. Build367 now shows the existing Clay inventory icon beside carried Clay; this does not replace the world marker.
 
 **Decided intended appearance:** Replace that marker with a shallow, irregular exposure of soft clay, with folded clumps and a thin broken edge against the ground. It should look gatherable by hand and remain easy to walk across. Gathering, source quantities and routes stay unchanged. Discovered Clay keeps only its last-observed appearance outside sight, and an observed successful gather removes the depleted source. The dedicated world artwork is not delivered yet.
 

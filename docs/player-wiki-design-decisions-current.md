@@ -18,13 +18,13 @@ Settings → Field Notes remains readable. **Replay on its screen** requests one
 
 **Decided behavior retained:** turning Tutorials back On resumes relevant teaching at its next normal opportunity without a backlog of popups. The delivered setting and focused replay routes have passed internal checks; not every tutorial situation or the full re-enable sequence has been reviewed in play. No further design decision is needed.
 
-**Known repeat issue:** after choosing **Got it** on Actions where you stand, that guidance was offered again on a later expedition without a replay request. The correction is pending.
+**Got it — corrected in367:** acknowledging guidance now stops its automatic reminders for that campaign, including on later expeditions and after reopening. This does not count as performing the taught action. Manual replay still works once without resetting progress. A separate internal journey verified these steps and the transition between lessons. Installation and ordinary launch are verified; physical-phone visual acceptance remains separate.
 
-**Decided intended correction:** Got it remembers that you have acknowledged the guidance for this campaign and stops its automatic reminders. It does not count as performing the action being taught. Not now postpones guidance until a relevant later opportunity; Replay on its screen remains available when you want a reminder, without resetting progress.
+**Decided behavior retained:** Got it remembers that you have acknowledged the guidance for this campaign and stops its automatic reminders. It does not count as performing the action being taught. Not now postpones guidance until a relevant later opportunity; Replay on its screen remains available when you want a reminder, without resetting progress.
 
-## Current installed update —366
+## Current installed update —367
 
-Build366 adds the pre-payment world preparation correction described above. The natural early-progression journey remains under review. The Got it tutorial-repeat correction is still pending and is not included in this update.
+Build367 delivers durable Got it acknowledgement with corrected tutorial sequencing, and reuses existing material artwork in the carried-items bar. The Clay icon was checked in a separate internal scene; dedicated 3D Clay artwork is still unfinished. Build366’s pre-payment world preparation recovery remains included. The natural early-progression journey remains under review.
 
 Build365 adds snow and settled-ash patches to normal3D terrain. The patches keep the ground visible, follow its existing height and preserve the colours and cover you last observed. Separate shore ramps and crossings keep their previous appearance. Existing worlds and gameplay rules are unchanged; the build364 improvements below remain included.
 
@@ -58,7 +58,7 @@ Outside current sight, cover keeps only its last-observed pattern and colours. O
 
 ## Clay in the world — appearance correction planned
 
-**Current behavior:** Clay remains a low, walkable source gathered by hand: one gathering action yields two Clay. Its current 3D world marker is a generic yellow block; the inventory icon is separate.
+**Current behavior:** Clay remains a low, walkable source gathered by hand: one gathering action yields two Clay. Its current 3D world marker is a generic yellow block. Build367 now shows the existing Clay inventory icon beside carried Clay; this does not replace the world marker.
 
 **Decided intended appearance:** Replace that marker with a shallow, irregular exposure of soft clay, with folded clumps and a thin broken edge against the ground. It should look gatherable by hand and remain easy to walk across. Gathering, source quantities and routes stay unchanged. Discovered Clay keeps only its last-observed appearance outside sight, and an observed successful gather removes the depleted source. The dedicated world artwork is not delivered yet.
 
