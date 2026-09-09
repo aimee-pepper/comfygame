@@ -2,6 +2,14 @@
 
 Updated 9 September 2026. This reference keeps the accepted decisions and subsequent deliveries together. **Decided intended behavior** describes the game we are making; it does not mean that behavior is already available on your phone. **First-pass tuning** gives concrete starting numbers that can change through play. **Unsettled proposals** still need design work or a choice.
 
+## First departure preparation — known issue, correction pending
+
+**Current behavior:** A current internal playthrough found that an otherwise valid first blank request can fail world preparation before departure. The refused request kept its Essence and campaign progress, and issued no world. The opening is therefore not yet reliable for every new campaign; a correction is pending.
+
+**Decided intended correction, not delivered:** Before payment, preparation will find a valid layout while preserving the same written world properties, source colours and required resources. An alternate layout cannot qualify by dropping required resources or the safe introductory lessons. Its plant coverage and appearance will reflect the plants actually placed. If preparation cannot succeed, it will refuse without spending or issuing a world. Existing saved worlds stay unchanged.
+
+This is team correction work; no new decision or retry is needed from you.
+
 ## Tutorials toggle — installed in364
 
 **Current behavior:** Settings now includes **Tutorials**, On by default. Turning it Off stops automatic tips, guided prompts and tutorial-only suggestions. Your choice stays saved across app restarts and campaigns. Warnings, real results, necessary choices and ordinary help remain available. Writing still explains whether to bind the first blank request, continue the introduction or read recovered lessons in the Library.

@@ -3,6 +3,14 @@
 Updated 9 September 2026. One place for your decisions, design to-dos and optional creative work. You are not holding up the early crafting work by leaving a later refinement question open.
 
 
+## First departure preparation — known issue, correction pending
+
+**Current behavior:** A current internal playthrough found that an otherwise valid first blank request can fail world preparation before departure. The refused request kept its Essence and campaign progress, and issued no world. The opening is therefore not yet reliable for every new campaign; a correction is pending.
+
+**Decided intended correction, not delivered:** Before payment, preparation will find a valid layout while preserving the same written world properties, source colours and required resources. An alternate layout cannot qualify by dropping required resources or the safe introductory lessons. Its plant coverage and appearance will reflect the plants actually placed. If preparation cannot succeed, it will refuse without spending or issuing a world. Existing saved worlds stay unchanged.
+
+This is team correction work; no new decision or retry is needed from you.
+
 ## Tutorials switch — installed in364
 
 Settings → Tutorials now turns automatic guidance off while keeping ordinary instructions, necessary choices and Field Notes available. Your choice survives restarts and campaign switches. Requesting one replay leaves the global switch Off, waits for the proper context and does not reset progress. Focused Writing, Village, Return and History checks passed. No further decision is waiting on you. See the [current design reference](design-decisions-september-4.html).
