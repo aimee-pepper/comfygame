@@ -4,13 +4,13 @@ Updated 10 September 2026. This reference keeps the accepted decisions and subse
 
 ## Ground and solid-side textures — delivered; water limits and atmosphere separate
 
-**Current startup status — build371:** Build371 is installed and retains the startup correction from369. The phone app remained running for over 80 seconds with no new crash report during the bounded checks. The further reported opening crash remains unconfirmed; this art update is not claimed to fix it. Physical-screen review and gameplay acceptance remain unverified. The earlier368 startup failure remains part of the record.
+**Current startup status — build372:** Build372 is installed and retains the startup correction from369. Ordinary launch succeeded; the sustained-process and crash-report check for this update is pending. The further reported opening crash remains unconfirmed and is not claimed fixed by this update. Physical-screen review and gameplay acceptance remain unverified. The earlier368 startup failure remains part of the record.
 
 **Current behavior — installed in368:** Build368 adds the existing terrain textures to normal 3D ground and liquid surfaces, including grass, shallow water, deep water and solid ice. Their detail follows the world’s existing colours. Snow and settled ash keep their separate patches. Moving surface detail does not move the ground or change a turn. Remembered terrain keeps its last-observed appearance without live animation; older plain-looking memories keep that appearance until you see the place again.
 
 **Current solid-side textures — installed in371:** All nine solid terrain families now have recolorable side textures in the normal campaign: stone, soil, sand, ash, rubble, mud, growth, groundcover and ice. Build371 completes the five families remaining after370. Existing face shapes, world colours, saved observations and movement routes stay intact.
 
-**Build371 verification:** The nine side families and authored Clay passed internal review at ordinary campaign scale. Six focused checks covered normal integration, Clay, compatible launch and saved ownership. Phone installation and bounded sustained-process checks are verified. These do not establish every world palette, final physical-screen appearance or a gameplay walkthrough. Iron Ingot still uses its previous placeholder in371.
+**Build371 verification:** The nine side families and authored Clay passed internal review at ordinary campaign scale. Six focused checks covered normal integration, Clay, compatible launch and saved ownership. Phone installation and bounded sustained-process checks are verified. These do not establish every world palette, final physical-screen appearance or a gameplay walkthrough. Iron Ingot used its previous placeholder in371. Build372 adds the accepted Iron Ingot icon in Stockpiles. Smaller carried-item views retain their earlier icon; the Hafts and Collars remain separate unfinished artwork.
 
 **Remaining appearance limits:** The existing solid-side artwork is delivered. A visible shallow-water bed can still have a support face whose material is unspecified; it keeps its plain appearance rather than becoming invented stone or soil. Hidden deep beds and chasms do not gain support. Fuller atmosphere effects remain unfinished; illustrative study mist is not ordinary campaign weather.
 
@@ -46,9 +46,9 @@ Settings → Field Notes remains readable. **Replay on its screen** requests one
 
 **Decided behavior retained:** Got it remembers that you have acknowledged the guidance for this campaign and stops its automatic reminders. It does not count as performing the action being taught. Not now postpones guidance until a relevant later opportunity; Replay on its screen remains available when you want a reminder, without resetting progress.
 
-## Current installed update —371
+## Current installed update —372
 
-Build371 completes all nine solid-side texture families and adds the authored Clay model. Water-bed material limits, atmosphere and further plant refinement remain separate. Iron Ingot still uses its previous placeholder. The startup-check and unresolved report limits above apply.
+Build372 delivers the coordinated plant-crown and leaf-arrangement refinement for newly written worlds, preserving older books. Build372 adds the accepted Iron Ingot icon in Stockpiles. Smaller carried-item views retain their earlier icon; the Hafts and Collars remain separate unfinished artwork. Build371 terrain and Clay improvements remain included. Water-bed materials, atmosphere and final plant artwork remain unfinished. The startup-check and unresolved report limits above apply.
 
 ### Earlier update —367
 
@@ -104,7 +104,7 @@ Existing overlaps are repaired only when the whole affected group can be preserv
 
 **Current material stacks:** the same real material, subtype and existing quality share one visible total. Tap to expand the exact colour, properties, composition and origin of its underlying pieces. Ordinary flora and processed plant textiles remain ungraded. Field holdings, Return, Storehouse and the supported shop displays use this grouping while preserving exact crafting choices, quantities and prices. Different qualities and different materials remain separate; stored and carried holdings are not combined.
 
-**Current artwork and remaining work:** square quality frames preserve each icon's proportions. Nineteen reviewed replacement icons are included, and the four approved originals remain unchanged. Iron Ingot, Softwood Haft, Hardwood Haft, Iron Collar and Bone Collar still use their previous placeholders; their replacement artwork is not accepted. Broader final visual acceptance remains separate from the delivered grouping rules.
+**Current artwork and remaining work:** square quality frames preserve each icon's proportions. Nineteen reviewed replacement icons are included, and the four approved originals remain unchanged. Build372 adds the accepted Iron Ingot icon in Stockpiles. Smaller carried-item views retain their earlier icon; the Hafts and Collars remain separate unfinished artwork. Broader final visual acceptance remains separate from the delivered grouping rules.
 
 **Current Raw Essence:** loose Raw Essence uses a grounded blue droplet in normal3D. Collecting it adds the actual quantity and removes the find; reopening preserves that collection. It is distinct from an Essence Crystal and a Mote. Its remembered-fog appearance still needs a visual check.
 
@@ -152,11 +152,11 @@ Internal contact, source-count and saved-world checks passed. Asset reviewed all
 
 Swollen cactus or succulent forms still require actual supporting anatomy. Fleshy tissue, thorns or needle-shaped growth alone do not establish a cactus, and current plant records have no separate swollen storage stem.
 
-## Plant crowns and leaf arrangement — decided, not yet delivered
+## Plant crowns and leaf arrangement — installed in372
 
-The next coordinated refinement affects leaf-bearing fleshy plants that grow upright or carry branches. Shorter, more tapered supports and branches distributed farther up the stem will bring the existing foliage into the upper silhouette. Leaves will attach to their owner's actual surface, with more of their saved length visible. Opposite leaves share a node, alternating leaves advance along their support, and whorls and rosettes remain grouped. Fronds present their existing broad faces in a consistent plant-relative orientation; needles remain narrow. No leaves or branches are added to fill gaps.
+Newly written worlds now give leafy upright and branched fleshy plants shorter, more tapered supports and distribute their existing foliage farther up the plant. Leaves attach to their actual stems and branches, while opposite, alternating and grouped arrangements keep their identities. Fronds show their broad faces in a consistent plant-relative orientation; needles remain narrow. No leaves or branches are added to fill gaps.
 
-Compact basal rosettes and the other plant families retain their current forms. Source colours, material properties, harvests, counts and older saved appearances remain unchanged. The refinement can improve proportions and distinction without promising that every plant will be easily distinguished or look finished at ordinary scale. This is accepted intended work, not included in361.
+Compact basal rosettes and other plant families retain their previous forms. Existing books keep their saved plants; colours, materials, counts and harvests are unchanged. Internal comparisons support improved placement and silhouettes, though fine needles and some supporting shapes remain difficult to read. Normal world entry, movement and reopening passed internal checks; that expedition contained fungi, so it does not establish a natural encounter with the changed fleshy plants. Further artwork and your visual acceptance remain separate.
 
 **Unsettled future possibilities:** additional branch orders, multiple stems, storage organs, separately variable leaflet or needle-cluster counts, and more detailed flowers would need their own source structures. They are not added by this refinement, and they do not block it.
 
