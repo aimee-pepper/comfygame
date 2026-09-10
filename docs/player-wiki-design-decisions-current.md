@@ -2,6 +2,18 @@
 
 Updated 9 September 2026. This reference keeps the accepted decisions and subsequent deliveries together. **Decided intended behavior** describes the game we are making; it does not mean that behavior is already available on your phone. **First-pass tuning** gives concrete starting numbers that can change through play. **Unsettled proposals** still need design work or a choice.
 
+## World textures and atmosphere — decided, not delivered
+
+**Current behavior:** Normal 3D terrain already uses the saved world palette, and snow and settled ash have their own visible surface patches. Most ground and liquid surfaces do not yet show the existing 2D texture detail. The fuller atmospheric scene effects described below are not delivered; illustrative study mist is not ordinary campaign weather.
+
+**Decided intended textures:** Bring the existing 2D terrain textures into the normal 3D world. Grass and liquids must display their correct existing world colours: grass, shallow water, deep water and solid ice keep their own palette relationships rather than taking a generic ground tint or baked green or blue. Preserve the texture detail, continuous patterns, actual heights, visible water depth and shore connections. Similar missing surfaces may temporarily reuse and recolour suitable existing textures, including stone, while remaining recognisable. Make new artwork for gaps that suitable reuse cannot fill; keep already distinct artwork.
+
+**Decided intended atmosphere:** Show the atmosphere the world actually has: smoke, airborne ash, mist or miasma, with rain or snow where the existing world conditions call for them. Moving air changes the drift of existing effects. These visuals do not create new weather damage, slippery ground, puddles, freezing or accumulated snow. Unseen places stay hidden, remembered places show their last-observed state without live weather, and characters, useful objects, warnings and controls remain readable.
+
+**Unsettled presentation choices:** Specific cloud layers, volumetric fog techniques, sun shafts and day/night lighting treatments remain proposals. Existing sky and cloud authoring references stay available; this work does not replace that creative direction or add a new decision checklist.
+
+Existing worlds, resources, travel rules and earned stock stay intact. The first texture batch reuses available terrain artwork; no extra trial or new colour-generation system is added.
+
 ## First departure preparation — corrected in366
 
 **Current behavior — installed in366:** newly prepared ordinary worlds can try another layout before payment when the original layout cannot fit its required sources. Preparation keeps the same world identity, written properties, source colours and original required resources. It accepts the first valid layout; it does not choose a world for better rewards. If preparation cannot succeed, it refuses without spending or issuing a world. Existing saved worlds are not regenerated.
