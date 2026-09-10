@@ -4,7 +4,7 @@ Updated 10 September 2026. This reference keeps the accepted decisions and subse
 
 ## Ground textures — installed in368; sides and atmosphere unfinished
 
-**Current startup problem:** Build368 is installed, but a confirmed startup crash prevents normal entry to the game. A recovery update is in progress and has not yet been verified. The terrain changes below describe the installed update, not a currently usable play session.
+**Startup recovery — installed in369:** Build369 is installed and corrects the immediate startup crash reported in368. On the phone, the app remained running for more than150seconds and continued after the observation connection closed; no new crash report appeared during those checks. This verifies the bounded startup recovery, not a physical-screen review or playthrough. Saved progress, game rules and the terrain textures are unchanged.
 
 **Current behavior — installed in368:** Build368 adds the existing terrain textures to normal 3D ground and liquid surfaces, including grass, shallow water, deep water and solid ice. Their detail follows the world’s existing colours. Snow and settled ash keep their separate patches. Moving surface detail does not move the ground or change a turn. Remembered terrain keeps its last-observed appearance without live animation; older plain-looking memories keep that appearance until you see the place again.
 
@@ -18,7 +18,7 @@ Updated 10 September 2026. This reference keeps the accepted decisions and subse
 
 Existing worlds, resources, travel rules and earned stock stay intact. The delivered texture batch reuses existing artwork; no extra trial or new colour-generation system is added.
 
-**Verified scope:** Build368 installation is verified, but its reported startup crash means usable entry is not verified. The earlier process-start result did not establish successful startup. Internal checks covered the existing terrain families, remembered appearance and surface motion; supplied views were reviewed at normal campaign scale and in a separate six-terrain example. The At this place text is also lighter and more readable. These checks do not establish a physical-phone playthrough, every moving-camera or waterfall view, or final artistic acceptance.
+**Verified scope:** Build368 installed the texture update but crashed during startup; its earlier process-start result did not establish successful startup. Build369 now retains those textures with the bounded startup recovery described above. Internal checks covered the existing terrain families, remembered appearance and surface motion; supplied views were reviewed at normal campaign scale and in a separate six-terrain example. The At this place text is also lighter and more readable. These checks do not establish a physical-phone playthrough, every moving-camera or waterfall view, or final artistic acceptance.
 
 ## First departure preparation — corrected in366
 
