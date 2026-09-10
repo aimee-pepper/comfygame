@@ -4,7 +4,7 @@ Updated 10 September 2026. This reference keeps the accepted decisions and subse
 
 ## Ground and solid-side textures — delivered; water limits and atmosphere separate
 
-**Current startup status — build372:** Build372 is installed and retains the startup correction from369. Ordinary launch succeeded; the sustained-process and crash-report check for this update is pending. The further reported opening crash remains unconfirmed and is not claimed fixed by this update. Physical-screen review and gameplay acceptance remain unverified. The earlier368 startup failure remains part of the record.
+**Current startup status — build372:** Build372 is installed and retains the startup correction from369. Ordinary launch succeeded, and the app remained running for over106 seconds with no new crash report during the bounded check. The further reported opening crash remains unconfirmed and is not claimed fixed by this update. Physical-screen review and gameplay acceptance remain unverified. The earlier368 startup failure remains part of the record.
 
 **Current behavior — installed in368:** Build368 adds the existing terrain textures to normal 3D ground and liquid surfaces, including grass, shallow water, deep water and solid ice. Their detail follows the world’s existing colours. Snow and settled ash keep their separate patches. Moving surface detail does not move the ground or change a turn. Remembered terrain keeps its last-observed appearance without live animation; older plain-looking memories keep that appearance until you see the place again.
 
