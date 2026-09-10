@@ -5,6 +5,8 @@ Updated 10 September 2026. One place for your decisions, design to-dos and optio
 
 ## Ground textures — installed in368; sides and atmosphere unfinished
 
+**Current startup problem:** Build368 is installed, but a confirmed startup crash prevents normal entry to the game. A recovery update is in progress and has not yet been verified. The terrain changes below describe the installed update, not a currently usable play session.
+
 **Current behavior — installed in368:** Build368 adds the existing terrain textures to normal 3D ground and liquid surfaces, including grass, shallow water, deep water and solid ice. Their detail follows the world’s existing colours. Snow and settled ash keep their separate patches. Moving surface detail does not move the ground or change a turn. Remembered terrain keeps its last-observed appearance without live animation; older plain-looking memories keep that appearance until you see the place again.
 
 **Decided remaining texture work:** Exposed side faces still need texture integration and missing recolorable artwork. Complete those surfaces while preserving their actual material, height and world colours. Suitable existing textures may be reused and recoloured temporarily; make new artwork where that cannot provide the right appearance. Water remains water and solid ice remains ice. Fuller atmosphere effects remain unfinished; illustrative study mist is not ordinary campaign weather.
@@ -17,7 +19,7 @@ Updated 10 September 2026. One place for your decisions, design to-dos and optio
 
 Existing worlds, resources, travel rules and earned stock stay intact. The delivered texture batch reuses existing artwork; no extra trial or new colour-generation system is added.
 
-**Verified scope:** Build368 is installed on your phone and ordinary app launch is verified. Internal checks covered the existing terrain families, remembered appearance and surface motion; supplied views were reviewed at normal campaign scale and in a separate six-terrain example. The At this place text is also lighter and more readable. These checks do not establish a physical-phone playthrough, every moving-camera or waterfall view, or final artistic acceptance.
+**Verified scope:** Build368 installation is verified, but its reported startup crash means usable entry is not verified. The earlier process-start result did not establish successful startup. Internal checks covered the existing terrain families, remembered appearance and surface motion; supplied views were reviewed at normal campaign scale and in a separate six-terrain example. The At this place text is also lighter and more readable. These checks do not establish a physical-phone playthrough, every moving-camera or waterfall view, or final artistic acceptance.
 
 ## First departure preparation — corrected in366
 
