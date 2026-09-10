@@ -2,21 +2,21 @@
 
 Updated 10 September 2026. This reference keeps the accepted decisions and subsequent deliveries together. **Decided intended behavior** describes the game we are making; it does not mean that behavior is already available on your phone. **First-pass tuning** gives concrete starting numbers that can change through play. **Unsettled proposals** still need design work or a choice.
 
-## Ground and four side textures — current; remaining coverage unfinished
+## Ground and solid-side textures — delivered; water limits and atmosphere separate
 
-**Current startup status — build370:** Build370 is installed and retains the startup correction from369. The phone app remained running for over 90 seconds with no new crash report during the bounded checks. A further reported opening crash remains unconfirmed by those checks;370 is not being described as a fix for that report. Physical-screen review and gameplay acceptance remain unverified. The earlier368 startup failure remains part of the record.
+**Current startup status — build371:** Build371 is installed and retains the startup correction from369. The phone app remained running for over 80 seconds with no new crash report during the bounded checks. The further reported opening crash remains unconfirmed; this art update is not claimed to fix it. Physical-screen review and gameplay acceptance remain unverified. The earlier368 startup failure remains part of the record.
 
 **Current behavior — installed in368:** Build368 adds the existing terrain textures to normal 3D ground and liquid surfaces, including grass, shallow water, deep water and solid ice. Their detail follows the world’s existing colours. Snow and settled ash keep their separate patches. Moving surface detail does not move the ground or change a turn. Remembered terrain keeps its last-observed appearance without live animation; older plain-looking memories keep that appearance until you see the place again.
 
-**Current side textures — installed in370:** Build370 adds recolorable side textures to existing growth, groundcover, ice and soil faces in the normal campaign. Each keeps its own world colours and actual shape; remembered faces retain their observed appearance. Soil now has irregular clod detail instead of the stretched strip pattern seen during development. No extra terrain or movement route is created.
+**Current solid-side textures — installed in371:** All nine solid terrain families now have recolorable side textures in the normal campaign: stone, soil, sand, ash, rubble, mud, growth, groundcover and ice. Build371 completes the five families remaining after370. Existing face shapes, world colours, saved observations and movement routes stay intact.
 
-**Build370 verification:** The four side textures passed internal review at ordinary campaign scale, alongside six focused integration checks and a four-terrain native check. Phone installation and sustained process checks are verified. These do not establish every world palette, final physical-screen appearance or a gameplay walkthrough. Build370 preserves saved progress, game rules and the previous ground textures.
+**Build371 verification:** The nine side families and authored Clay passed internal review at ordinary campaign scale. Six focused checks covered normal integration, Clay, compatible launch and saved ownership. Phone installation and bounded sustained-process checks are verified. These do not establish every world palette, final physical-screen appearance or a gameplay walkthrough. Iron Ingot still uses its previous placeholder in371.
 
-**Decided remaining texture work:** Stone, sand, ash, rubble and mud sides still use plain world colours while their texture work continues. A visible shallow-water bed can have a support face, but its material has not been established; it keeps its plain appearance rather than becoming invented stone or soil. Complete the remaining surfaces without changing their material, height or world colours. Suitable existing artwork may be reused and recoloured; make new artwork where needed. Fuller atmosphere effects remain unfinished; illustrative study mist is not ordinary campaign weather.
+**Remaining appearance limits:** The existing solid-side artwork is delivered. A visible shallow-water bed can still have a support face whose material is unspecified; it keeps its plain appearance rather than becoming invented stone or soil. Hidden deep beds and chasms do not gain support. Fuller atmosphere effects remain unfinished; illustrative study mist is not ordinary campaign weather.
 
 **Decided water and chasm boundaries:** A bank beside water belongs to the land forming that bank and keeps its colours. Seeing water does not reveal an unknown bed or what it is made of. Deep-water beds remain hidden, and chasms do not gain floors or walls to fill an artwork gap. Older water retains its recorded appearance rather than gaining guessed measurements. Real waterfalls and shore steps keep their own shapes and rules; they are not ordinary support walls.
 
-**Decided complete texture coverage:** Every existing terrain type should have texture detail that follows its world colours, including exposed sides where those sides exist. A textured top does not finish an otherwise plain side. Preserve suitable existing artwork, make missing recolorable detail, and keep stone, soil, vegetation, ice and water recognisable. This does not add cliffs, floors or terrain types where none exist. Ground textures arrived in368, and four side families are installed in370. Remaining surfaces are still being completed; full coverage is not yet delivered.
+**Decided complete texture coverage:** Every existing terrain type should have texture detail that follows its world colours, including exposed sides where those sides exist. A textured top does not finish an otherwise plain side. Preserve suitable existing artwork, make missing recolorable detail, and keep stone, soil, vegetation, ice and water recognisable. This does not add cliffs, floors or terrain types where none exist. Ground textures arrived in368, and all nine existing solid side families are delivered by371. Unspecified wet-bed materials and unfinished atmosphere are not claimed complete.
 
 **Decided intended atmosphere:** Show the atmosphere the world actually has: smoke, airborne ash, mist or miasma, with rain or snow where the existing world conditions call for them. Moving air changes the drift of existing effects. These visuals do not create new weather damage, slippery ground, puddles, freezing or accumulated snow. Unseen places stay hidden, remembered places show their last-observed state without live weather, and characters, useful objects, warnings and controls remain readable.
 
@@ -46,9 +46,13 @@ Settings → Field Notes remains readable. **Replay on its screen** requests one
 
 **Decided behavior retained:** Got it remembers that you have acknowledged the guidance for this campaign and stops its automatic reminders. It does not count as performing the action being taught. Not now postpones guidance until a relevant later opportunity; Replay on its screen remains available when you want a reminder, without resetting progress.
 
-## Current installed update —367
+## Current installed update —371
 
-Build367 delivers durable Got it acknowledgement with corrected tutorial sequencing, and reuses existing material artwork in the carried-items bar. The Clay icon was checked in a separate internal scene; dedicated 3D Clay artwork is still unfinished. Build366’s pre-payment world preparation recovery remains included. The natural early-progression journey remains under review.
+Build371 completes all nine solid-side texture families and adds the authored Clay model. Water-bed material limits, atmosphere and further plant refinement remain separate. Iron Ingot still uses its previous placeholder. The startup-check and unresolved report limits above apply.
+
+### Earlier update —367
+
+Build367 delivers durable Got it acknowledgement with corrected tutorial sequencing, and reuses existing material artwork in the carried-items bar. The Clay icon was checked in a separate internal scene; dedicated 3D Clay artwork followed in371. Build366’s pre-payment world preparation recovery remains included. The natural early-progression journey remains under review.
 
 Build365 adds snow and settled-ash patches to normal3D terrain. The patches keep the ground visible, follow its existing height and preserve the colours and cover you last observed. Separate shore ramps and crossings keep their previous appearance. Existing worlds and gameplay rules are unchanged; the build364 improvements below remain included.
 
@@ -80,11 +84,11 @@ Outside current sight, cover keeps only its last-observed pattern and colours. O
 
 **Unsettled proposals, not implemented:** deeper snowdrifts, melting, weather-driven accumulation, and coating plants or whole cliff faces. None follows automatically from the delivered surface patches.
 
-## Clay in the world — appearance correction planned
+## Clay in the world — installed in371
 
-**Current behavior:** Clay remains a low, walkable source gathered by hand: one gathering action yields two Clay. Its current 3D world marker is a generic yellow block. Build367 now shows the existing Clay inventory icon beside carried Clay; this does not replace the world marker.
+**Current behavior:** Build371 replaces the generic marker for known Clay sources with a low grey-brown exposure of folded clay. It remains walkable and gathered by hand: one action yields two Clay. Gathering removes the depleted source, and its stock and depletion survive reopening. The carried Clay icon remains separate from the world model. Older remembered markers without a known Clay identity retain their earlier appearance until seen again.
 
-**Decided intended appearance:** Replace that marker with a shallow, irregular exposure of soft clay, with folded clumps and a thin broken edge against the ground. It should look gatherable by hand and remain easy to walk across. Gathering, source quantities and routes stay unchanged. Discovered Clay keeps only its last-observed appearance outside sight, and an observed successful gather removes the depleted source. The dedicated world artwork is not delivered yet.
+**Behavior and verified scope:** Clay keeps its existing source quantities, routes and gathering cost. Discovered Clay shows only its last-observed state outside sight; it does not reveal hidden changes. Internal native gathering, depletion and reopening checks passed, and the supplied appearance was accepted. This does not establish a physical-phone playthrough or a finished pixel filter for the whole 3D scene.
 
 This is team artwork and integration work; no new decision is waiting on you.
 
