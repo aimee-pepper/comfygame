@@ -148,7 +148,7 @@ export const processingQualityRules = [
 export const craftedAppearanceRules = [
   ['Equipment and visible gear', 'Every material component region keeps its selected colour, with a consistent silhouette and preserved shading. Quality uses the name highlight and thumbnail border, not a recolouring of the item artwork. A haft, binding, lining, plate, blade, or trim can therefore contribute its own region to the finished object.'],
   ['Potions and recognizable supplies', 'Keep the standardized authored colour used to identify the item at a glance. Ingredient colour does not recolour a potion, remedy, or another supply whose appearance communicates its function.'],
-  ['Inventory and history', 'Colour remains source and appearance detail beneath the material stack. It never creates another stack or changes recipe eligibility by itself.'],
+  ['Inventory and history', 'The collapsed icon identifies the material category, without sampling or averaging the colours inside. Expand the stack for exact source colours and details. Colour never creates another stack or changes recipe eligibility by itself.'],
 ] as const;
 
 export const processingConversions = [

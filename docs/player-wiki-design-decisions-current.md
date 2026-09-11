@@ -108,7 +108,7 @@ Existing overlaps are repaired only when the whole affected group can be preserv
 
 **Current Raw Essence:** loose Raw Essence uses a grounded blue droplet in normal3D. Collecting it adds the actual quantity and removes the find; reopening preserves that collection. It is distinct from an Essence Crystal and a Mote. Its remembered-fog appearance still needs a visual check.
 
-**Decided behavior retained:** exact material colours and source details stay available for crafting without creating colour-only duplicate stacks. Source repair must never erase earned stock, invent provenance or reveal an unseen object. Remaining artwork and visual checks do not change those rules.
+**Decided behavior retained:** exact material colours and source details stay available for crafting without creating colour-only duplicate stacks. A collapsed stack icon identifies its material category; it does not sample or average the colours of the pieces inside. Expand the stack for exact source colours. When crafting equipment, each component keeps the colour of its selected material. Source repair must never erase earned stock, invent provenance or reveal an unseen object. Remaining artwork and visual checks do not change those rules.
 
 ## Waterfall ledge contact and motion — installed in361
 
