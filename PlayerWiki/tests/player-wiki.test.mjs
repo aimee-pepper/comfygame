@@ -177,7 +177,9 @@ test('crafting overview separates the current property model from the intended p
   assert.match(progression, /Current progression and intended expansion/);
   assert.match(bestiary, /Creature materials inherit real anatomy/);
   assert.match(overview, /Because unusually low traits can raise this grade/);
-  assert.match(overview, /Trading Post samples instead generate values from a range/);
+  assert.match(overview, /Older Trading Post sample paths generate values from a range/);
+  assert.match(overview, /New solid-material sale and buyback preserve exact source properties/);
+  assert.match(overview, /Build376 solid materials use75% actual part expression plus25% source Danger/);
   assert.match(overview, /The world itself is never rejected/);
   assert.match(overview, /stable hash of the frozen Page, world seed, and facet/);
   assert.match(overview, /do not consume the item or Field Kit spaces/);
