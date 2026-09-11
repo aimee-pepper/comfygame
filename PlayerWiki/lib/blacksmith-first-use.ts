@@ -15,7 +15,7 @@ export const blacksmithFirstUse = {
   ],
   pointedBlade: [
     'Pointed Blade is a Close Pierce weapon. It uses one suitable point and one different suitable grip.',
-    'Choose 4 Iron plus 1 Coal, 2 Quartz, 1 Bone, or 2 Ingots at T2 for the point. The grip uses 1 Log plus 2 Plant Fibre, or a separate Bone grip. One unit cannot fill both components.',
+    'Choose 4 Iron plus 1 Coal, 2 Quartz, 1 Bone, or 2 Ingots at T2 for the point. The grip uses 1 Log plus 2 Plant Fibre, or1 Bone or1 useful Horn for a separate short grip. Horn uses no extra wrap and adds no hidden Power. One unit cannot fill both components.',
     'Ordinary Forge crafting costs 0 Essence. Actual working parts determine Power or Protection; workmanship is separate. Coal is spent fuel.',
     'Choosing, resetting, or cancelling materials spends nothing. The finished piece goes to the Storehouse or Waiting destination shown in the preview.',
   ],

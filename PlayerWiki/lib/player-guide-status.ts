@@ -59,7 +59,7 @@ export const creatureMaterialFamilies = [
   ['Plate', 'Legacy projected family. New anatomy resolves Armoured Scales, Chitin Plate or actual Shell rather than universal Plate.'],
   ['Chitin', 'A segmented, jointed hard case.'],
   ['Shell', 'A rigid enclosing or radial case.'],
-  ['Quill', 'Legacy long hard covering. The new solid-part plan distinguishes Protective Spines from actual feather quills.'],
+  ['Quill', 'Legacy long hard covering. Build376 distinguishes Protective Spines from actual feather quills.'],
   ['Bone', 'Mineralized internal structure.'],
   ['Fang', 'Requires an actual tooth-bearing part; piercing damage alone does not establish a new typed source.'],
   ['Claw', 'Requires actual claw anatomy; rending damage or limbs alone do not establish a new typed source.'],
@@ -81,7 +81,7 @@ export const lootPaths = [
   {
     name: 'Generated creatures',
     current:
-      'A creature’s saved body already determines familiar materials such as Hide, Pelt, Scale, Bone, Venom, and Ichor. Those rewards are still stored as separate samples for each source creature.',
+      'Build376 enables solid creature materials in newly written books: Fur Pelt, Overlapping Scales, Armoured Scales, Chitin, Chitin Plate, Shell, Protective Spines, Flight Feathers, Contour Feathers and useful Horn. Actual body parts determine what can be recovered. Existing books, creatures and earned stock keep their saved rules; Hide and Bone retain their existing recovery paths. Matching subtype and quality share one stack with exact variants inside. New fluids remain unimplemented.',
     accepted:
       'Creatures emit a recognizable physical type and subtype. Species-specific items of the same subtype and quality share a default stack, while species, colour, and inherited values remain visible in expanded history.',
   },
@@ -109,7 +109,7 @@ export const lootPaths = [
   {
     name: 'Expedition Return',
     current:
-      'The expedition result divides eligible carried holdings into recovered and lost lines. Material lines may still be shown as individual samples or broad family groupings.',
+      'The expedition result divides eligible carried holdings into recovered and lost lines. Material totals group by subtype and quality, with exact source variants retained inside; build376 includes the new solid materials.',
     accepted:
       'Recovered plus lost will equal the exact carried quantity for every ungraded mined or flora stack and every quality-bearing creature stack. Protected stock brought from the Cottage returns in full, and replay cannot duplicate either side.',
   },
@@ -170,14 +170,14 @@ export const craftingFamilyStatus: CraftingFamilyStatus[] = [
     slug: 'blacksmith',
     name: 'Blacksmith',
     status: 'Playable now',
-    current: 'Build324 delivers seven equipment families with exact world/Bone components, tier gates, quarter statistics, frozen prices and same-item refitting. Pick/Axe/Scythe, smelting and T3 retain their delivered tool progression.',
+    current: 'Build324 delivers seven equipment families with exact world/Bone components, tier gates, quarter statistics, frozen prices and same-item refitting. Build376 adds2 Shell as a Shield face or1 useful Horn as a short blade grip, retaining ordinary supporting costs. Pick/Axe/Scythe, smelting and T3 retain their delivered tool progression.',
     accepted: 'Raw-material starter equipment, Ingots at T2, actual material identity, separate workmanship/statistics and current-component recovery. The first Forge pass implements these decisions. Build328 adds Iron Collar at T2 after Weaponsmith or Armoury construction; Peerless refinement remains unfinished.',
     changes: [
-      { name: 'Pointed Blade', current: 'T1: choose a working point and separate short grip. Raw Iron uses 4 Iron +1 Coal, with 1 Log +2 Fibre grip; 0 Essence, Power2.0.', accepted: 'Exact Bone, Quartz and T2 Ingot alternatives follow the complete current recipe table.' },
+      { name: 'Pointed Blade', current: 'T1: choose a working point and separate short grip. Raw Iron uses 4 Iron +1 Coal, with 1 Log +2 Fibre grip; 0 Essence, Power2.0.', accepted: 'Exact Bone, Quartz, useful Horn grip and T2 Ingot alternatives follow the complete current recipe table.' },
       { name: 'Cutting Blade', current: 'T1: one complete cutting-edge bundle and separate short grip.', accepted: 'The working edge alone supplies Power; support quality can affect workmanship.' },
       { name: 'Hand Maul', current: 'T1: complete crushing-head bundle and paid haft/wrap.', accepted: 'No repeated stat bonus from the number of construction portions.' },
       { name: 'Long Spear', current: 'T2: complete point bundle and long haft/wrap.', accepted: 'Pierce/Mid identity; actual selected components determine Power.' },
-      { name: 'Shield', current: 'T1: Iron, T2 Ingot, Softwood/Hardwood or Bone face and a separate brace/wrap.', accepted: 'The face supplies Protection; components retain their own source identity.' },
+      { name: 'Shield', current: 'T1: Iron, T2 Ingot, Softwood/Hardwood, Bone or2 Shell face and a separate brace/wrap.', accepted: 'The face supplies Protection; components retain their own source identity.' },
       { name: 'Helm', current: 'T2: complete hard working bundle plus the selected Fibre or Cloth lining.', accepted: 'Exact component price and recovery; lining adds no hidden Protection.' },
       { name: 'Rigid Guard', current: 'T2: complete structural bundle, lining and binding.', accepted: 'Quarter Protection and separate four-band workmanship.' },
       { name: 'Field Pick', current: 'The same owned tool advances through its existing T1–T3 route, alongside Axe and Scythe.', accepted: 'No second craftable Pick, free tool or tool-dismantling route.' },

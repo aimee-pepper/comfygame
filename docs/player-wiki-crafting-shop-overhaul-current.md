@@ -126,26 +126,30 @@ Pick 2 supplies the Quartz needed for Forge T3. Pick 3 then reaches Rift-glass f
 
 ### Every family and its exact choices
 
+**Build376:** the optional Shell Shield face and Horn short-blade grips are delivered, with no extra tool, wrapping surcharge or Essence fee. Their source parts come from qualifying creatures in newly written books. Existing starter alternatives remain available; older books and stock keep their rules. The ten solid-material icons remain interim.
+
 T1 teaches Pointed Blade, Cutting Blade, Hand Maul and Shield. T2 adds Long Spear, Helm, Rigid Guard, Ingot making, the Scythe improvement and Refit. Existing learned schematics remain learned, while their actual facility requirement still applies. T3 adds the third tool levels.
 
 Each equipment row makes one piece for **0 Essence**. Choose one working option and the listed supporting parts. Ingot options require T2. “Fibre” means actual Stem or Leaf Fibre; “Log” means Softwood or Hardwood Log.
 
 | Family | Working part: choose one bundle | Supporting parts | Fixed role |
 | --- | --- | --- | --- |
-| Pointed Blade | 4 Iron + 1 Coal; **or** 2 Ingots; **or** 2 Quartz; **or** 1 Bone | 1 Log + 2 Fibre; **or** 1 Bone grip | Close, Pierce |
+| Pointed Blade | 4 Iron + 1 Coal; **or** 2 Ingots; **or** 2 Quartz; **or** 1 Bone | 1 Log + 2 Fibre; **or** 1 Bone grip; **or** 1 useful Horn grip | Close, Pierce |
 | Cutting Blade | 4 Iron + 1 Coal; **or** 2 Ingots; **or** 1 Bone | Same grip choices | Close, Rend |
 | Hand Maul | 4 Iron + 1 Coal; **or** 2 Ingots; **or** 2 Bone | 1 Log + 2 Fibre; **or** 2 Bone + 2 Fibre | Close, Crush |
 | Long Spear | 4 Iron + 1 Coal; **or** 2 Ingots; **or** 2 Quartz; **or** 1 Bone | 2 Logs + 4 Fibre; **or** 3 Bone + 4 Fibre | Mid, Pierce |
-| Shield | 4 Iron + 1 Coal; **or** 2 Ingots; **or** 2 Softwood Logs; **or** 2 Hardwood Logs; **or** 2 Bone | 1 Log + 2 Fibre; **or** 1 Bone + 2 Fibre | Offhand protection |
+| Shield | 4 Iron + 1 Coal; **or** 2 Ingots; **or** 2 Softwood Logs; **or** 2 Hardwood Logs; **or** 2 Bone; **or** 2 Shell | 1 Log + 2 Fibre; **or** 1 Bone + 2 Fibre | Offhand protection |
 | Helm | 4 Iron + 1 Coal; **or** 2 Ingots; **or** 2 Bone | 4 Fibre; **or** 1 Cloth lining | Head protection |
 | Rigid Guard | 8 Iron + 2 Coal; **or** 4 Ingots; **or** 4 Bone | Lining: 4 Fibre or 1 Cloth; binding: 2 Fibre or 1 Cord | Body protection |
 | Field Pick | Uses the owned Pick improvement table above | Its listed upgrade materials | One Pick progression, without a second competing tool item |
 
 Raw Forge materials do not need matching colours. Separate boards, wraps, lining portions and Bone pieces keep their real colours and sources. A shield face uses the selected Softwood or Hardwood type, but its boards may differ in colour. Already prepared Cloth and Cord retain their own manufacturing rules.
 
-Bone can combine with the other supported new materials in these bundles. Older Bone or similarly named legacy stock does not automatically qualify. Bone’s actual producer still needs implementation; not every creature has a qualifying skeleton. Other older materials retain their supported older recipe paths until their new physical roles and sources are specified.
+Bone can combine with the other supported new materials in these bundles. Older Bone or similarly named legacy stock does not automatically qualify. Typed Bone source and Forge use are delivered in324; not every creature has a qualifying skeleton. Other older materials retain their supported older recipe paths until their new physical roles and sources are specified.
 
 ### Statistics and workmanship
+
+A Shell Shield face uses two actual portions. Each contributes2 × (0.5 + covering protection ÷ 200) × its quality multiplier; average the two, then round the final Protection once to a quarter point. The brace adds no hidden Protection. A Horn grip contributes its quality to support workmanship, without changing the working point or edge’s Power. Exact Shell/Horn source details survive crafting, trade and current-component recovery.
 
 | Working construction | Weapon Power | Shield / Helm Protection | Rigid Guard Protection |
 | --- | ---: | ---: | ---: |
@@ -878,6 +882,6 @@ See [Aimee Homework](aimee-homework.html) for that choice and your creature-gene
 
 The [creature decisions](design-decisions-september-4.html) now define actual Fang/Claw/Tusk weapon parts, Down for Insulated lining, measured Membrane for Leather, and chemically qualified Oil, Venom and dye-bearing Ichor for optional preparations. These require real new anatomical sources and their exact recipe adapters. Existing Bone/metal/textile, Resin, Toxic Sap and Dyer's Root routes remain sufficient; none of these alternatives blocks the complete ordinary shops. Source colour/Pattern stays with selected components. Fluid quality does not increase Core potency or coating damage, and Venom preparation remains on its weapon for the full excursion.
 
-## Optional solid creature equipment — proposal, not implemented
+## Optional solid creature equipment — Forge delivered, specialist roles intended
 
-The [creature equipment decisions](design-decisions-september-4.html) now define Shell Shield faces, Scales/Chitin/Shell Armoury outer panels, Fur Pelt Insulated lining and Horn grips/Collars. Their exact component quantities, statistics, source quality/colour/Pattern, frozen prices and recovery are specified as a separate later extension. Spines and Flight/Contour Feathers stay deliberately raw-sale-only. No ordinary recipe, tool, foundation or active Tannery milestone depends on these alternatives.
+The [creature equipment decisions](design-decisions-september-4.html) now define Shell Shield faces, Scales/Chitin/Shell Armoury outer panels, Fur Pelt Insulated lining and Horn grips/Collars. Build376 delivers the Shell Shield face and Horn short-blade grip, with exact source quality/colour/Pattern, prices and current-component recovery. Specialist panels, Pelt lining and Horn Collars remain intended and unimplemented. Spines and Flight/Contour Feathers stay deliberately raw-sale-only. No ordinary recipe, tool, foundation or active Tannery milestone depends on these alternatives.

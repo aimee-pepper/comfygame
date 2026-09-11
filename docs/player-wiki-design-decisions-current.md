@@ -4,7 +4,7 @@ Updated 11 September 2026. This reference keeps the accepted decisions and subse
 
 ## Terrain, mist and rain — installed; remaining atmosphere separate
 
-**Current startup status — build375:** Build375 is installed and retains the startup correction from369. Successful phone launch, usable entry and a physical playthrough of375 have not been verified. The further reported opening crash remains unconfirmed and is not claimed fixed by this update. Build372 previously passed ordinary launch and over106 seconds of sustained operation with no new crash report. The earlier368 startup failure remains part of the record.
+**Current startup status — build376:** Build376 is installed and retains the startup correction from369. Successful phone launch, usable entry and a physical playthrough of376 have not been verified. The further reported opening crash remains unconfirmed and is not claimed fixed by this update. Build372 previously passed ordinary launch and over106 seconds of sustained operation with no new crash report. The earlier368 startup failure remains part of the record.
 
 **Current behavior — installed in368:** Build368 adds the existing terrain textures to normal 3D ground and liquid surfaces, including grass, shallow water, deep water and solid ice. Their detail follows the world’s existing colours. Snow and settled ash keep their separate patches. Moving surface detail does not move the ground or change a turn. Remembered terrain keeps its last-observed appearance without live animation; older plain-looking memories keep that appearance until you see the place again.
 
@@ -48,9 +48,9 @@ Settings → Field Notes remains readable. **Replay on its screen** requests one
 
 **Decided behavior retained:** Got it remembers that you have acknowledged the guidance for this campaign and stops its automatic reminders. It does not count as performing the action being taught. Not now postpones guidance until a relevant later opportunity; Replay on its screen remains available when you want a reminder, without resetting progress.
 
-## Current installed update —375
+## Current installed update —376
 
-Build375 installs the creature discovery and recovered-material journey, carried-item artwork and clearer Stockpiles details. Mist and rain from374 remain included, alongside the accepted Haft and Collar icons. Build372 adds the accepted Iron Ingot icon in Stockpiles. Build374 adds the accepted Softwood Haft, Hardwood Haft, Iron Collar and Bone Collar icons there. These category pictures do not sample or average the colours inside a stack; expanding it retains exact source colours and honest unknown labels. Build375 also uses those four pictures and Iron Ingot in the carried-items bar. Stockpiles expanded material text is clearer, while source colours, quality frames and grouping stay unchanged. The plant-crown and leaf-arrangement refinement from372 and terrain/Clay improvements from371 remain included, preserving older books. Unspecified water-bed materials, other atmosphere families and final plant artwork remain unfinished. The launch and unresolved opening-report limits above apply.
+Build376 enables solid creature materials in newly written books: Fur Pelt, Overlapping Scales, Armoured Scales, Chitin, Chitin Plate, Shell, Protective Spines, Flight Feathers, Contour Feathers and useful Horn. Actual body parts determine what can be recovered. Existing books, creatures and earned stock keep their saved rules; Hide and Bone retain their existing recovery paths. The Forge now accepts2 Shell for a Shield face or1 useful Horn for a Pointed Blade or Cutting Blade grip. Pay the ordinary remaining components; starter alternatives and0 Essence crafting stay unchanged. Shell contributes Protection; Horn contributes support workmanship without extra Power. Refitting returns displaced current components once, retaining their exact source details. The discovery journey, carried-item artwork and Stockpiles readability from375, and mist/rain from374, remain included. Fifteen internal checks passed, including new-book activation, old-book preservation and a controlled Shell source → reward → Return → Forge → reopening journey. That route used existing screens and controlled encounters; it does not establish natural material frequency or complete tap navigation. Installation is verified, but successful phone launch and physical usability remain unverified. The ten material icons are interim and are being polished; final creature artwork is also unfinished.
 
 ### Earlier update —367
 
@@ -784,13 +784,13 @@ Existing worlds retain their creatures and movement. The completed Hide path kee
 
 **Still unfinished:** the wider creature rework, additional anatomical materials and their recipes, and food, nesting and weather relationships. Aimee has lifted the Bestiary work hold after approving the arrangement below. This first habitat slice needs no new Aimee decision.
 
-### Body-to-material rewards — 6 September first pass
+### Body-to-material rewards — installed in376
 
-**Current:** newly generated modular creatures in333 keep body covering separate from other anatomical regions; obtainable rewards remain the supported typed Hide and plain Bone routes. Displayed horns, fins or feathers do not activate additional rewards. Existing saved creatures and earned stock retain their earlier rules. Plain Bone source/reward/trade and Forge use were delivered in324; the wider solid-material producers remain pending. The following solid-part reward plan is **new Design-authored first-pass work, not delivered**; it does not enable a broad creature rollout. The consolidated intended update connects actual solid parts to their source colours, one subtype-and-quality stack, exact details on tap, Return and sale. Existing Hide/Bone remain unchanged. It also preserves the planned optional Forge choices:2 Shell for a Shield face, or1 useful Horn for a short blade grip, with existing components and starter alternatives retained. Later Armoury and Weaponsmith additions remain paused. No new organ, fluid, harvesting tool or fee is introduced.
+**Current — installed in376:** Build376 enables solid creature materials in newly written books: Fur Pelt, Overlapping Scales, Armoured Scales, Chitin, Chitin Plate, Shell, Protective Spines, Flight Feathers, Contour Feathers and useful Horn. Actual body parts determine what can be recovered. Existing books, creatures and earned stock keep their saved rules; Hide and Bone retain their existing recovery paths. After victory, qualifying solid parts have no separate recovery roll. Look can say “After victory: Shell” for a supported visible source; it does not reveal hidden measurements or grant a reward. Exact recovered portions retain their source colour, Pattern and quality through Return, grouped stock, trade and supported crafting. Matching subtype and quality share one stack; tap it for the individual source details. The Forge now accepts2 Shell for a Shield face or1 useful Horn for a Pointed Blade or Cutting Blade grip. Pay the ordinary remaining components; starter alternatives and0 Essence crafting stay unchanged. Shell contributes Protection; Horn contributes support workmanship without extra Power. Refitting returns displaced current components once, retaining their exact source details. Later Armoury and Weaponsmith additions, new organs and fluids remain unfinished.
 
-The generated creature already records its body covering, wings and horns. The next reward update will use those actual parts. Body covering, appendages, horns and skeleton are separate regions. Feathers on wings do not erase a hard or furry body covering, and water habitat does not automatically mean Scales or Oil. A tissue cannot be recovered twice under different names.
+The generated creature already records its body covering, wings and horns. Build376 uses those actual parts for newly written books. Body covering, appendages, horns and skeleton are separate regions. Feathers on wings do not erase a hard or furry body covering, and water habitat does not automatically mean Scales or Oil. A tissue cannot be recovered twice under different names.
 
-| Actual body part | Intended recovered material | Boundary |
+| Actual body part | Recovered material or pending proposal | Boundary |
 | --- | --- | --- |
 | Supported soft skin or hide | Existing Smooth Skin, Supple Hide or Tough Hide | Retains the existing Hide rules and recovery chance |
 | Internal mineralized skeleton | Bone | Retains the specified plain Bone rules; no automatic Hollow Bone |
@@ -814,7 +814,9 @@ Quality uses the actual part's two relevant source measurements: covering insula
 
 **Colour and Pattern:** each recovered part retains its actual specimen colour and Pattern, or its explicit part-specific colour when one exists. Pelt is not automatically brown, Feather white or Shell neutral. Exact source portions remain selectable beneath grouped stock and carry their appearance into any later supported crafting component. Old unknown colours stay unknown. New raw solid-part sale values start at2/4/8/16 by quality, with buy values twice sale; this does not create merchant stock or change older prices.
 
-**Real uses and remaining work:** source → reward → Return → storage → ordinary raw-material sale is specified for the ready solid parts above. Their optional equipment roles are now specified below, with deliberate raw-sale-only families; none is a universal substitute for Bone, Leather, Ingot or Cloth. The complete Apothecary and Distillery recipes already use actual Resin/Toxic Sap, and new Magenta uses Dyer's Root, so unfinished creature fluids do not block those shops. The conditional Membrane-to-Leather source and adapter are now specified below, pending implementation.
+**Current uses:** the solid-part route now connects victory rewards, Return, storage, ordinary sale and buyback, with the optional Shell and Horn Forge choices above. These materials are not universal substitutes for Bone, Leather, Ingots or Cloth. Spines and Feathers remain raw-sale-only. Later specialist panels, Pelt lining and Horn Collars remain intended; Membrane and creature fluids need their separately proposed anatomy. The existing shops already use Resin, Toxic Sap and Dyer's Root without those fluids.
+
+**Build376 verification and artwork:** Fifteen internal checks passed, including new-book activation, old-book preservation and a controlled Shell source → reward → Return → Forge → reopening journey. That route used existing screens and controlled encounters; it does not establish natural material frequency or complete tap navigation. Installation is verified, but successful phone launch and physical usability remain unverified. The ten material icons are interim and are being polished; final creature artwork is also unfinished.
 
 The material plan adds no hidden Bestiary reveal, food system, nest, weather immunity or deep-water harvesting. Build375 separately delivers legitimate Seen notes and the existing-material discovery journey below. Recovered material can be associated with its actual known source; existing encounter records keep their measurements without requiring a victory. Implementation of the specified food/anatomy/equipment relationships, unsupported feeding mechanisms and natural exploration/crafting feel remain open. All three creature homework goals therefore stay unchecked; this is concrete partial progress, not a claim that the generator is finished.
 
@@ -839,19 +841,19 @@ Hard points/edges use their actual hardness and structural integrity, with the e
 
 Recoverable portions belong to the actual species part or reservoir, not the attack score. Anatomy improves recovery once without inventing organs. Actual colour/Pattern stays with the selected material through Return, crafting and component recovery; unknown old appearance is not guessed. An explicitly pigment-bearing fluid can produce Magenta even when the creature's outside is another colour, but a pink or luminous creature does not automatically supply dye.
 
-**Existing routes remain sufficient:** ordinary gear still uses its existing Bone/metal/textile alternatives; Heat Cores use Resin, Venom preparation uses Toxic Sap, and Magenta uses Dyer's Root. No new hunt or individual recipe approval blocks those shops. New creature anatomy, these optional adapters and natural source prevalence still require implementation and combined playtesting. The solid-material roles below are now specified; their actual integration and natural prevalence remain unfinished. All three broader creature goals stay open.
+**Existing routes remain sufficient:** ordinary gear still uses its existing Bone/metal/textile alternatives; Heat Cores use Resin, Venom preparation uses Toxic Sap, and Magenta uses Dyer's Root. No new hunt or individual recipe approval blocks those shops. New creature anatomy, these optional adapters and natural source prevalence still require implementation and combined playtesting. The Forge Shell-face and Horn-grip roles below are delivered in376; specialist roles and natural prevalence remain unfinished. All three broader creature goals stay open.
 
-### Solid materials in equipment — optional first-pass proposal, not implemented
+### Solid materials in equipment — Forge delivered, specialist roles intended
 
-The remaining solid parts now have deliberate equipment roles. **Not every drop needs a recipe:** Protective Spines and both Flight and Contour Feathers remain raw-sale-only in this first pass. A useful anatomical material does not automatically become a blade, bow spring, fletching bonus or magical insulator.
+**Current:** build376 delivers the Shell Shield face and Horn short-blade grip. **Decided intended:** the remaining specialist panels, Pelt lining and Horn Collar roles below are not implemented. **Not every drop needs a recipe:** Protective Spines and both Flight and Contour Feathers remain raw-sale-only in this first pass. A useful anatomical material does not automatically become a blade, bow spring, fletching bonus or magical insulator.
 
-| Material | Proposed exact use | Quantity |
+| Material | Exact use and delivery boundary | Quantity |
 | --- | --- | --- |
-| Shell | Forge Shield face |2 portions, with the ordinary brace paid separately |
+| Shell | Forge Shield face — delivered376 |2 portions, with the ordinary brace paid separately |
 | Overlapping Scales or Chitin | Armoury Balanced outer |2 portions for Body;1 for Offhand/Head/Hands/Feet |
 | Armoured Scales, Chitin Plate or Shell | Armoury Rigid outer |4 portions for Body;2 for Offhand/Head/Hands/Feet |
 | Fur Pelt | Armoury Insulated lining, as an alternative to Cloth or the separate Down proposal |2 portions for Body;1 for Head/Hands/Feet; the ordinary outer and binding remain required |
-| Horn | Forge Pointed Blade or Cutting Blade short grip |1 portion; the working point/edge is paid separately |
+| Horn | Forge Pointed Blade or Cutting Blade short grip — delivered376 |1 portion; the working point/edge is paid separately |
 | Horn | Weaponsmith Horn Collar, then an existing Weaponsmith or Balanced Armoury Collar socket |1 Horn makes1 Collar for no Essence; the full ordinary equipment bundle remains required |
 | Protective Spines; Flight/Contour Feathers | Ordinary raw-material trading |No new equipment recipe, damage bonus or writing requirement |
 
@@ -863,11 +865,11 @@ New gear value is the sum of its actual active components' preserved values. Hor
 
 **Example:** Rare Shell with actual protection64 gives a Forge Shield2.0 Protection; the brace adds no hidden protection. An Exceptional Horn grip can improve a Common Bone blade's workmanship to Superior while leaving its3.0 Power unchanged. Two Rare Pelt lining portions with ordinary Cloth/Cord still give the Insulated Body profile's2.0 Protection and25 Heat Ward, even if workmanship remains Fine.
 
-**Implementation order:** ordinary Tannery and the existing maker/service batches continue first. Future creature work pairs each actual typed source with its real component, colour, knowledge and recovery route; Shell-to-Shield is one concrete starting route. Specialist panels/lining/supports follow their implemented shops, then the separately specified new anatomy and ecological/knowledge extensions. Natural source frequency, useful repeated rewards, unsupported feeding mechanisms and the combined exploration/crafting experience remain the real unresolved work. No new Aimee decision blocks these recipes, and the three broader creature goals stay open.
+**Remaining intended work:** the optional Forge uses are delivered. Specialist panels, Pelt lining and Horn Collars remain unfinished, followed separately by proposed new anatomy and ecological relationships. Natural source frequency, useful repeated rewards, unsupported feeding mechanisms and the combined exploration/crafting experience remain unresolved. No new Aimee decision blocks the specified recipes, and the three broader creature goals stay open.
 
 ### Learning about creatures and materials — complete first-pass journey
 
-**Current — installed in375:** Build375 records a limited Seen note when a creature is genuinely in full current sight, including on normal expedition entry or resume. Look remains read-only and explains supported visible parts. Actual encounters retain their existing specimens, measurements and discovery reward without requiring victory. Only committed rewards confirm recovered type, quantity, quality and source colour/Pattern; Return records kept or lost portions, and Library history remains after those portions are spent or lost. Seen, Encountered and Recovered facts share one known identity without granting stock or Writing knowledge again.
+**Current — installed in375 and extended in376:** Build375 records a limited Seen note when a creature is genuinely in full current sight, including on normal expedition entry or resume. Look remains read-only and explains supported visible parts. Actual encounters retain their existing specimens, measurements and discovery reward without requiring victory. Only committed rewards confirm recovered type, quantity, quality and source colour/Pattern; Return records kept or lost portions, and Library history remains after those portions are spent or lost. Seen, Encountered and Recovered facts share one known identity without granting stock or Writing knowledge again.
 
 **Verified scope:** Ten focused and normal-route checks passed, including durable sight recording, source-specific Bone history, encounter rewards, Return and reopening. The internal journey used controlled encounters and existing screens; it does not establish natural difficulty, complete tap navigation or final creature artwork. Installation is verified; successful phone launch and physical usability remain unverified.
 
@@ -875,8 +877,8 @@ New gear value is the sum of its actual active components' preserved values. Hor
 
 | Moment | What you learn | What stays separate |
 | --- | --- | --- |
-| First full sight of an actually visible creature | A Seen note with its lawful name, observed appearance, supported body shape and actual habitat chapter | No measured specimen, encounter count, XP, hidden chemistry or guaranteed drops |
-| Look | A short explanation of its visible body/movement and any supported exterior parts it could provide | Read-only: no turn, fee, harvest, reward or new analysis action |
+| First full sight of an actually visible creature | A Seen note with its lawful name, observed appearance, supported body shape and actual habitat chapter | No measured specimen, encounter count, XP, hidden chemistry or material award |
+| Look | Visible body/movement and supported exterior materials; eligible solid parts use After victory, while chance-bearing hints retain uncertainty | Read-only: no turn, fee, harvest, reward or new analysis action |
 | Actual encounter or existing Read/remember | Existing specimen facts and measurements, even without victory | The earlier sighting neither consumes nor duplicates the normal first-encounter discovery reward |
 | Committed material reward | Exact recovered type, quality, quantity, colour/Pattern and source | Evidence from this specimen, not an automatic promise for every member of its kind |
 | Return | The actual kept/lost material outcome with its source link | Knowledge stays learned even if those portions are lost, sold or crafted |
@@ -896,7 +898,7 @@ Look keeps its existing interaction range and remains read-only. Explicit inspec
 
 **Apex remains its own actual status.** Existing legitimate markers keep their warning role. An outside-full-sight marker is not a new specimen or a trophy reveal; a real full sight records only the lawful Apex label and appearance. Size, stillness and rare-looking material do not create Apex identity. Rooted hostile flora stays on its existing flora/discovery path.
 
-**Still unfinished:** the planned solid-material extension, the already named missing anatomical parts and their equipment uses; food requirements, prey/forage relationships, actual nesting/den behavior and meaningful weather responses; and playtesting the resulting exploration/crafting experience. This contract creates none of those systems, no deep-water harvesting route and no new approval chores. All three creature homework goals stay open.
+**Still unfinished:** the already named missing anatomical parts and their equipment uses; food requirements, prey/forage relationships, actual nesting/den behavior and meaningful weather responses; and playtesting the resulting exploration/crafting experience. This contract creates none of those systems, no deep-water harvesting route and no new approval chores. All three creature homework goals stay open.
 
 ### Food, habitat and nesting — bounded first-pass proposal
 
@@ -993,7 +995,7 @@ A kind’s body-shape grouping follows its **latest recorded shape**. Some broad
 
 Empty collections and searches explain that no recorded creatures match; empty chapter and body groups are omitted. There is no hidden-species total, completion percentage, or search suggestion drawn from undiscovered creatures. Opening or sorting the Bestiary does not create a new discovery, specimen or material reward.
 
-**Discovery journey — installed in375:** full-sight Seen notes, read-only Look and actual-reward history now work together as described above, including legitimately visible unreachable creatures without treating them as measured specimens. Weather-context notes remain a separate unimplemented proposal, and the planned solid materials are not delivered by this update.
+**Discovery journey — installed in375:** full-sight Seen notes, read-only Look and actual-reward history now work together as described above, including legitimately visible unreachable creatures without treating them as measured specimens. Weather-context notes remain a separate unimplemented proposal, and build376 separately adds the supported solid materials for newly written books.
 
 ### Creature descriptions that match their lives
 

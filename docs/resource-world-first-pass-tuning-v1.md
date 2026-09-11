@@ -34,7 +34,7 @@ The part expression is the unrounded average of the two real creature measuremen
 
 Source measurements are clamped to 0–100. The final score is rounded half up once, after the two weighted parts are combined. Species name never changes the band by itself.
 
-Each physical part uses measurements that make sense for that part. Covering and flexibility can describe Hide; covering and insulation can describe Pelt; armour and coverage can describe Scales; hardness and armour can describe Shell or Chitin; mass and skeletal strength can describe Bone; natural-weapon strength and skeletal strength can describe Fang, Claw, Tusk, or Horn. The first plain Bone source now has a bounded intended contract: a qualifying internal skeleton, the retained 1–3 species yield and Anatomy benefit, actual-source quality/colour, Return and ordinary trading. It awaits implementation and a compatible crafting update. The6 September solid-part contract now specifies Fur Pelt, Scales, Chitin/Chitin Plate, Shell, Protective Spines, Flight/Contour Feathers and useful Horns through source, reward, Return and trade. Their equipment roles and the remaining anatomical/fluid sources are still unfinished. No Hollow/Dense Bone subtype is inferred. See the current creature decisions for the full current/intended boundary.
+Each physical part uses measurements that make sense for that part. Typed Bone source and Forge use are delivered in324. Build376 adds actual Fur Pelt, Scales, Chitin/Chitin Plate, Shell, Protective Spines, Flight/Contour Feathers and useful Horn for newly written books, with source quality/colour, Return and trade. Shell Shield faces and Horn blade grips are delivered; specialist equipment and proposed additional anatomy/fluids remain unfinished. Old sources retain their saved behavior. See the current creature decisions for the exact source measurements, four-band quality and current/intended boundary.
 
 Flora-derived materials are ungraded. They stack by their resolved physical type or subtype, while species, colour, source world, and any useful source measurements remain available beneath that stack. Recipes preserve inherited colour in the actual flora-derived material components, as well as showing it in previews; relevant plant measurements remain available without turning that plant into Poor, Common, Rare, or Exceptional stock.
 
@@ -334,8 +334,9 @@ Raw-material price is based on the physical material the player owns, not on a h
 | Common stone, common metal, common plant part | 2 Gold | 4 Gold |
 | Uncommon mineral, uncommon metal, reactive plant part | 6 Gold | 12 Gold |
 | Rare mineral or unusual metal | 18 Gold | 36 Gold |
-| Creature Hide, Skin, Pelt, Down, Feather, Fin | 3 Gold at Common quality | 6 Gold at Common quality |
-| Creature Scale, Plate, Chitin, Shell, Quill, Bone, Fang, Claw, Tusk, Horn | 4 Gold at Common quality | 8 Gold at Common quality |
+| Hide/Skin; older Pelt/Feather and proposed Down/Fin prices only | 3 Gold at Common quality | 6 Gold at Common quality |
+| Build376 solid materials, including Fur Pelt and both Feather types | 2 / 4 / 8 / 16 Gold by quality | 4 / 8 / 16 / 32 Gold by quality |
+| Bone; older Plate/Quill and proposed Fang/Claw/Tusk prices | 4 Gold at Common quality | 8 Gold at Common quality |
 | Creature Oil, Venom, or Ichor | 5 Gold at Common quality | 10 Gold at Common quality |
 
 Poor, Common, Rare, and Exceptional creature material use market multipliers ×0.5, ×1, ×2, and ×4, rounded up to a minimum of 1 Gold. Species, inherited colour, world, and source measurements do not silently alter the ordinary raw-material price. A special authored merchant request may quote a different price, but it must name that request and freeze it before commitment.

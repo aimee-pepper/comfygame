@@ -133,8 +133,8 @@ failure.
 ### Creature Materials
 
 Creature remains occupy their own domain. The wiki separately exposes currently live `MaterialKind`/remains
-behavior and the settled ecology/material family authority that is not yet live. It must not present Feather,
-Fin, Scale, Shell, Horn, Oil or Venom as live merely because their design is settled, and it must not describe
+behavior and the settled ecology/material family authority that is not yet live. Build376 verifies the supported solid Feather, Scale, Shell and Horn paths for newly written books;
+Fin and new fluid sources remain unimplemented. Do not promote additional anatomy merely because its design is settled or describe
 transitional generic Hide/Bone behavior as final. Each family detail shows visible anatomical source,
 habitat/body relationship, legal component/ingredient uses, stack/quality rule and implementation status.
 
