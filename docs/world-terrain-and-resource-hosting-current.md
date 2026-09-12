@@ -153,15 +153,16 @@ allocates the surface quota among Standing, Flowing and Frozen.
 
 ### Flowing
 
-- Generates one to `1 + floor(dispersion / 34)` channels, capped at four.
+- The desired channel count comes from `1 + floor(dispersion / 34)`, capped at four. The accepted small-channel correction limits it further to at most one channel per two flowing tiles, then shares the exact flowing amount as evenly as possible with stable rounding. Every ordinary channel has at least two tiles; four flowing tiles therefore make at most two channels.
+- Exactly one flowing tile uses a separate short-outflow rule: one shallow cell with an actual cardinal map-edge outlet or an existing equal/lower Standing-water receiver. The receiver keeps its Standing allocation; ice or an enclosed dry edge is not an outlet. Zero flowing tiles create no channel.
+- Standing/Frozen body reduction is separately permitted above. The Flowing correction does not add a general geometry-based reduction in channel count or unequal redistribution between channels.
 - A channel begins in the highest available elevation quartile and ends at a boundary at or below the source or an
   existing Standing body.
 - Its pathfinder strongly penalizes uphill movement, mildly penalizes turns and rewards joining an existing
   channel. Every selected channel is cardinally connected from source to outlet.
 - Channels are shallow Water by default. At hydrology peak 70 or above, a channel allocated at least sixteen
   tiles may have one connected DeepWater spine; it never scatters isolated deep cells.
-- Flowing must paint its exact allocated channel quota. An unrealizable channel fails terrain generation
-  before placement and spend; it never turns the remainder into a Standing pond.
+- Flowing must paint its exact allocated channel quota; it never turns the remainder into a Standing pond. Current preparation can refuse before spending if a channel cannot fit. The decided complete constructor must resolve valid supported requests without that random failure, while preserving the accepted water amounts and channel rules; it remains unfinished.
 
 ### Frozen
 
