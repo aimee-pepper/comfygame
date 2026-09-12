@@ -86,6 +86,8 @@ preview generator.
 
 ## Connected substrate regions
 
+> **12 September counting-stage reconciliation:** Exact five-material quotas below apply to the initial substrate output, before chasms, hydrology and derived surfaces. They are not a final visible-ground histogram. The current Chasm coverage/mouth walk target is not an exact distinct-cell or final Chasm quota; no numeric final Chasm minimum is settled here. Preserve resolved/as-written broken-ground influence and existing topology/return meaning. The newer total-construction requirement forbids using route repair to erase requested terrain, while legitimate water composition retains its own authority. See the [current construction clarification](player-wiki-design-decisions-current.md#every-valid-page-makes-a-world--decided-not-yet-fully-delivered).
+
 The existing Stone/Sand/Soil/Rubble/Ash pressure weights remain the first tuning baseline. Only their spatial
 allocation changes.
 
