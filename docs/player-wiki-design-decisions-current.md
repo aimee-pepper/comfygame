@@ -2,9 +2,9 @@
 
 Updated 11 September 2026. This reference keeps the accepted decisions and subsequent deliveries together. **Decided intended behavior** describes the game we are making; it does not mean that behavior is already available on your phone. **First-pass tuning** gives concrete starting numbers that can change through play. **Unsettled proposals** still need design work or a choice.
 
-## Walking crash repaired in379 — remaining lag open
+## Movement and saving improved in380 — remaining delay open
 
-Build379 delivers the correction for the confirmed crash when a step begins an encounter, along with improvements that reduce repeated processing during movement and saving. Movement costs, encounter turn order, withdrawal protection and what the party can see or remember keep their existing rules. The affected step, encounter and saving were checked on a separate copy of the campaign. Installation and ordinary phone launch are verified. Walking can still pause while the campaign saves: that remaining lag is open, and smooth movement or a physical-phone gameplay walkthrough is not claimed.
+Build380 reduces repeated work during saving and lets the screen keep responding while a move saves new discoveries. Both direction buttons and map travel wait for the accepted action to finish before accepting another move. If travel makes progress but cannot be saved, the party keeps its previous state and the message says Travel could not be saved; it does not report encounters, discoveries or later route warnings from the discarded trip. A route blocked before any progress keeps its ordinary explanation. Build379’s specific encounter-crash correction is retained. Movement costs, encounter order, withdrawal protection, saved progress and visibility rules stay unchanged. Installation and ordinary phone launch are verified. Remaining movement delay and slower first saves are still open; this is not a claim of fully responsive walking or a physical-phone gameplay walkthrough.
 
 ## Every valid Page makes a world — decided, not yet fully delivered
 
@@ -30,7 +30,7 @@ This population-allocation correction is decided and not yet delivered. It resol
 
 **Decided intended behavior:** Pressing a direction beyond the world will explain that you have reached its edge. With Look armed, the same direction will show World boundary and end Look mode. Neither action will spend a turn, move the party or use up pending withdrawal protection. Other blocked terrain will keep its own reason.
 
-**Verification:** The correction has passed three focused internal checks covering actual control actions, unchanged saved state, terrain rules and the existing collapse forecast. It is awaiting phone delivery; build379 does not include it.
+**Verification:** The correction has passed three focused internal checks covering actual control actions, unchanged saved state, terrain rules and the existing collapse forecast. It is awaiting phone delivery; build380 does not include it.
 
 ## Withdrawal gives one complete move — delivered in378
 
@@ -46,7 +46,7 @@ Looking, opening menus, cancelling a choice or trying a blocked move keeps the o
 
 ## Terrain, mist and rain — installed; remaining atmosphere separate
 
-**Current startup status — build379:** Build379 is installed and ordinary phone launch succeeded. It includes the specific walking-crash repair described above; remaining walking/save lag stays open. It retains the startup correction from369. A physical gameplay walkthrough and the earlier reported intermittent opening crash remain unverified; this update does not establish that every startup problem is fixed. The earlier368 startup failure remains part of the record.
+**Current startup status — build380:** Build380 is installed and ordinary phone launch succeeded. It retains379’s specific walking-crash repair and adds the saving and travel-feedback improvements above. Remaining walking delay and slower first saves stay open. It retains the startup correction from369. A physical gameplay walkthrough and the earlier reported intermittent opening crash remain unverified; this update does not establish that every startup problem is fixed. The earlier368 startup failure remains part of the record.
 
 **Current behavior — installed in368:** Build368 adds the existing terrain textures to normal 3D ground and liquid surfaces, including grass, shallow water, deep water and solid ice. Their detail follows the world’s existing colours. Snow and settled ash keep their separate patches. Moving surface detail does not move the ground or change a turn. Remembered terrain keeps its last-observed appearance without live animation; older plain-looking memories keep that appearance until you see the place again.
 
