@@ -2,6 +2,10 @@
 
 Updated 11 September 2026. This reference keeps the accepted decisions and subsequent deliveries together. **Decided intended behavior** describes the game we are making; it does not mean that behavior is already available on your phone. **First-pass tuning** gives concrete starting numbers that can change through play. **Unsettled proposals** still need design work or a choice.
 
+## Walking lag and encounter crash — current known issue
+
+Build378 has a confirmed walking problem: movement can lag and the app can crash when a step begins an encounter. A correction is in progress and is not yet delivered. The repair must preserve movement costs, encounter turn order, withdrawal protection and what the party can see or remember. Successful app launch does not establish that expedition walking is working reliably.
+
 ## Every valid Page makes a world — decided, not yet fully delivered
 
 **Current limitation:** A valid Page can still encounter a world-preparation failure. Existing recovery tries alternative layouts while preserving required resources, but it does not yet establish that every supported request will succeed. The recent preparation failure is a defect; asking for an unlucky world is not a player mistake.
@@ -42,7 +46,7 @@ Looking, opening menus, cancelling a choice or trying a blocked move keeps the o
 
 ## Terrain, mist and rain — installed; remaining atmosphere separate
 
-**Current startup status — build378:** Build378 is installed and ordinary phone launch succeeded. It retains the startup correction from369. A physical gameplay walkthrough and the earlier reported intermittent opening crash remain unverified; this update does not establish that every startup problem is fixed. The earlier368 startup failure remains part of the record.
+**Current startup status — build378:** Build378 is installed and ordinary phone launch succeeded. The walking lag and encounter crash described above were subsequently confirmed. It retains the startup correction from369. A physical gameplay walkthrough and the earlier reported intermittent opening crash remain unverified; this update does not establish that every startup problem is fixed. The earlier368 startup failure remains part of the record.
 
 **Current behavior — installed in368:** Build368 adds the existing terrain textures to normal 3D ground and liquid surfaces, including grass, shallow water, deep water and solid ice. Their detail follows the world’s existing colours. Snow and settled ash keep their separate patches. Moving surface detail does not move the ground or change a turn. Remembered terrain keeps its last-observed appearance without live animation; older plain-looking memories keep that appearance until you see the place again.
 
