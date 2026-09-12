@@ -143,6 +143,8 @@ a compass reading.
 
 ### Visibility ownership
 
+> **12 September implementation clarification — intended:** The valid supported typed receipt takes precedence, including none/zero. Only a missing typed field uses the existing valid legacy Smoke migration; a present invalid/future field fails clear without reviving legacy Smoke. Corrected current sight applies to retained typed worlds while preserving their earned knowledge. New-world initial discovery and Arrival must agree on the same effective profile, with an explicit replay boundary for older saved initial maps. Existing coefficients and precipitation/Wind exclusions below remain unchanged. The current383 build still uses the older sight input; the integration is not delivered.
+
 Only a selected suspended medium supplies `obscurantDensity` to the current visibility profile.
 Use its exact `suspendedDensity`; do not add a second material-specific coefficient. Smoke, Ash,
 Mist and Miasma therefore differ through their authored contributions and visuals, not undocumented
