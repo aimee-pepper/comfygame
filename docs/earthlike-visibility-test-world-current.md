@@ -1,5 +1,7 @@
 # Earth-like visibility test world — current
 
+> **12 September authority correction:** This is a historical test reference, not authorization to expose another player-facing trial. Current true darkness retains adjacent full sight and a vague terrain fringe; the old no-fringe row is corrected below. Use current normal 3D and shared visibility authority for internal checks at the actual target/default text. Older camera, configuration and accessibility directions do not apply. The current sight-presentation restoration does not change gameplay radii or create new weather penalties.
+
 **Status:** implementation-ready DEBUG testing authority; not a collectible World Page, campaign reward or
 fourth starter world.
 **Owner:** Settings → Testing, using the live World renderer/rules through an isolated test-session state.
@@ -65,7 +67,7 @@ Switching profile does not move the party, reroll the map, change fog memory or 
 |---|---|---|---|
 | `clear_day` | ordinary daylight | clear | baseline current full radius and fringe |
 | `dim_overcast` | low, not pitch black | clear | illumination contraction only |
-| `pitch_black` | pitch black | clear | one-adjacent full visibility, no fringe |
+| `pitch_black` | pitch black | clear | one-adjacent full visibility plus a vague terrain-only fringe |
 | `rain` | ordinary daylight | rain | rain presentation; radius changes only if the live visibility authority explicitly owns one |
 | `snow` | ordinary daylight | snow | snow presentation; same no-invented-radius rule |
 | `fog` | ordinary daylight | fog | use the typed fog-density rule once it exists; until then label **visual only** rather than borrowing smoke |

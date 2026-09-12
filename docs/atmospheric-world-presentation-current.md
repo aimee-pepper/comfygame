@@ -1,5 +1,7 @@
 # Atmospheric world presentation — current
 
+> **12 September current/intended reconciliation:** The typed atmosphere receipt is implemented, and normal 3D Mist and pure Rain are delivered. Snow/mixed artwork is ready; its normal integration/native review remains pending. Smoke, airborne Ash and Miasma presentation remain unfinished. The intended selected-medium sight-density connection below is not yet complete: current sight still consumes the older smoke-based visual record. Restoring 3D fade/dimming/obscurant presentation must preserve the same current sight profile; do not silently change radius as an art correction. Ordinary darkness does not blur terrain, and true darkness retains a vague fringe. Newer three-quarter geometry, last-observed non-enemy memory and fixed-target instructions supersede the old top-down, memory-exclusion and configuration paragraphs. No new trial or phone-verification request is authorized here.
+
 **Status:** Design settled; Asset proof and native implementation queued
 **Owner:** Game Design owns resolved facts, disclosure and acceptance; Asset owns the pixel grammar;
 Engineering owns the frozen receipt, visibility memory and native composition
