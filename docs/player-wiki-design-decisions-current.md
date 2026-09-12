@@ -2,6 +2,14 @@
 
 Updated 11 September 2026. This reference keeps the accepted decisions and subsequent deliveries together. **Decided intended behavior** describes the game we are making; it does not mean that behavior is already available on your phone. **First-pass tuning** gives concrete starting numbers that can change through play. **Unsettled proposals** still need design work or a choice.
 
+## Map-edge feedback — internally verified, awaiting delivery
+
+**Current limitation:** At the map edge, an outward direction can currently give no useful explanation. Some movement checks instead describe it as a non-adjacent step. The party does not move or spend a turn.
+
+**Decided intended behavior:** Pressing a direction beyond the world will explain that you have reached its edge. With Look armed, the same direction will show World boundary and end Look mode. Neither action will spend a turn, move the party or use up pending withdrawal protection. Other blocked terrain will keep its own reason.
+
+**Verification:** The correction has passed three focused internal checks covering actual control actions, unchanged saved state, terrain rules and the existing collapse forecast. It is awaiting phone delivery; build377 does not include it.
+
 ## Withdrawal gives one complete move — decided, not yet delivered
 
 **Current behavior:** Current withdrawal protection is brief and counted in world turns. Slow terrain can use that window during a single step.
