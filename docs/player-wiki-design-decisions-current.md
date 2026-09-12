@@ -2,9 +2,15 @@
 
 Updated 11 September 2026. This reference keeps the accepted decisions and subsequent deliveries together. **Decided intended behavior** describes the game we are making; it does not mean that behavior is already available on your phone. **First-pass tuning** gives concrete starting numbers that can change through play. **Unsettled proposals** still need design work or a choice.
 
+## Your location after withdrawal — corrected in377
+
+**Current behavior:** After you choose Continue following a withdrawal, At this place immediately describes the tile your party actually returned to. Previously it could keep describing the tile you had left until your next field action. The panel stays in its usual position. This corrects the location display; withdrawal costs, enemy pursuit, combat order and recovered stock keep their existing rules.
+
+**Verified scope:** Two focused internal checks passed and installation is verified. A physical-phone playthrough remains unverified. Existing terrain, mist, rain and the interim creature-material icons remain included; falling snow, mixed rain/snow and further icon polish remain unfinished.
+
 ## Terrain, mist and rain — installed; remaining atmosphere separate
 
-**Current startup status — build376:** Build376 is installed and retains the startup correction from369. Successful phone launch, usable entry and a physical playthrough of376 have not been verified. The further reported opening crash remains unconfirmed and is not claimed fixed by this update. Build372 previously passed ordinary launch and over106 seconds of sustained operation with no new crash report. The earlier368 startup failure remains part of the record.
+**Current startup status — build377:** Build377 is installed and retains the startup correction from369. Successful phone launch, usable entry and a physical playthrough of377 have not been verified. The further reported opening crash remains unconfirmed and is not claimed fixed by this update. Build372 previously passed ordinary launch and over106 seconds of sustained operation with no new crash report. The earlier368 startup failure remains part of the record.
 
 **Current behavior — installed in368:** Build368 adds the existing terrain textures to normal 3D ground and liquid surfaces, including grass, shallow water, deep water and solid ice. Their detail follows the world’s existing colours. Snow and settled ash keep their separate patches. Moving surface detail does not move the ground or change a turn. Remembered terrain keeps its last-observed appearance without live animation; older plain-looking memories keep that appearance until you see the place again.
 
