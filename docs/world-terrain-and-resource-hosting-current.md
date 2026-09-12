@@ -110,6 +110,8 @@ not a forced rule that every world must look different.
 
 ## Coherent elevation
 
+> **12 September authority reconciliation:** The initial elevated quota below applies to structural layout before water/chasm painting, not to final dry high-ground counts. New height-policy worlds use stepped routes and preserve deliberate cliffs; the older blanket cardinal relaxation below is historical for those worlds. Their separate access target is at least 90% of final dry terrain above the lowest dry support, with at most one optional scenic district covering no more than 10% of that high ground. The decided complete constructor must preserve requested relief rather than flatten inaccessible terrain solely to pass. Its implementation remains unfinished. See the [current height-routes and relief reference](player-wiki-design-decisions-current.md#height-routes-and-inaccessible-scenery--installed-in338).
+
 The current ruggedness formula remains the tuning baseline:
 `verticality / 100 × (1 - openness / 200)`.
 
