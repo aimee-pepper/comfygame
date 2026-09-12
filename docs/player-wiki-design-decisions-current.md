@@ -2,6 +2,16 @@
 
 Updated 11 September 2026. This reference keeps the accepted decisions and subsequent deliveries together. **Decided intended behavior** describes the game we are making; it does not mean that behavior is already available on your phone. **First-pass tuning** gives concrete starting numbers that can change through play. **Unsettled proposals** still need design work or a choice.
 
+## Every valid Page makes a world — decided, not yet fully delivered
+
+**Current limitation:** A valid Page can still encounter a world-preparation failure. Existing recovery tries alternative layouts while preserving required resources, but it does not yet establish that every supported request will succeed. The recent preparation failure is a defect; asking for an unlucky world is not a player mistake.
+
+**Decided intended behavior:** Every valid supported Page must produce a playable world. Random generation must not leave you with a valid request that cannot be prepared. The game must build the required arrival, routes, lessons, resource sites and return options together while respecting what you wrote. It must not quietly substitute a generic world, change your request, remove promised resources or make you buy another attempt.
+
+This does not promise every resource or traveller, a fully reachable map, or safety from the dangers you explore. Existing worlds and earned stock stay intact. Invalid or outdated input, missing materials, an unaffordable request or a failed save still need their own honest explanation; Page and Essence spending must succeed together with saving the prepared world.
+
+**Delivery status:** This requirement is decided. The complete guarantee remains unfinished; correcting one generation defect does not establish it for every supported world.
+
 ## Map-edge feedback — internally verified, awaiting delivery
 
 **Current limitation:** At the map edge, an outward direction can currently give no useful explanation. Some movement checks instead describe it as a non-adjacent step. The party does not move or spend a turn.
@@ -52,7 +62,7 @@ Existing worlds, resources, travel rules and earned stock stay intact. The deliv
 
 ## First departure preparation — corrected in366
 
-**Current behavior — installed in366:** newly prepared ordinary worlds can try another layout before payment when the original layout cannot fit its required sources. Preparation keeps the same world identity, written properties, source colours and original required resources. It accepts the first valid layout; it does not choose a world for better rewards. If preparation cannot succeed, it refuses without spending or issuing a world. Existing saved worlds are not regenerated.
+**Current behavior — installed in366:** newly prepared ordinary worlds can try another layout before payment when the original layout cannot fit its required sources. Preparation keeps the same world identity, written properties, source colours and original required resources. It accepts the first valid layout; it does not choose a world for better rewards. If current preparation cannot succeed, it refuses without spending or issuing a world. That preserves your holdings while a defect is unresolved; it is not the accepted final behavior for valid supported Pages. The new requirement above supersedes accepting exhausted attempts as a normal outcome. Existing saved worlds are not regenerated.
 
 **Verified scope:** seven focused internal checks passed, including recovery of the first blank request that had previously refused preparation. Its required sources and safe introductory route were retained. Installation and ordinary app launch are verified; the ongoing natural acquisition journey is still incomplete, and no physical-phone playthrough is claimed. The original refusal remains part of the earlier test record.
 
