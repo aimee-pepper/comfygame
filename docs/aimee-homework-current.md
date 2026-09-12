@@ -3,11 +3,13 @@
 Updated 12 September 2026. One place for your decisions, design to-dos and optional creative work. You are not holding up the early crafting work by leaving a later refinement question open.
 
 
-## Optional choice — several written Essence nodes
+## Essence Count — decided
 
-The rare node, one node from writing Essence, and distinct node artwork are decided. The detailed single-node plan can proceed; no answer is needed to unblock it.
+The rare node, distinct artwork and Count expansion are decided. The former optional Count question is closed.
 
-Additional nodes through modifiers remain an unsettled proposal. The recommendation is to use Count: Single or no Count gives one, Pair two, Few three, Many four and Countless five finite nodes. Intensity and Scale would keep their existing pressure meanings, and repeated words would not add their counts together. The first single-node version can proceed without this optional expansion. PM will consolidate this optional choice with you. Rarity, yield and learning pace are first-pass team tuning, not more homework.
+Count is now decided: no Count or Single gives one Essence node, Pair two, Few three, Many four and Countless five. Each keeps the same yield; repeated requests use the greatest Count rather than adding together. A natural node counts within the written total. Intensity and Scale keep their ordinary pressure meanings, and other words retain their actual effects on world conditions; they do not automatically multiply every resource’s quantity or quality. Rarity, yield and learning pace are first-pass team tuning, not more homework.
+
+**Separate discussions still open:** whether distant lights should show only a point, a small vague terrain patch or full nearby detail; and whether useful gems should be rare secondary finds from suitable deposits. Neither is approved for implementation. PM is consolidating the discussion. Moving lights/shadows and the dark-only rendered Torch contribution are accepted; they retain the current hidden-light rules while that discussion is open.
 
 ## Sight and weather — installed in383
 

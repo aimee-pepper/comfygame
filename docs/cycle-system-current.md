@@ -1,5 +1,7 @@
 # Cycle — live vocabulary and world-clock first slice
 
+> **12 September — moving and local lighting accepted, not yet delivered:** Moving overhead light sources and their shadows are now decided intended behavior. Their motion follows committed world turns and the world’s existing day/night cycle; waiting or leaving the game does not move the sun. Explicitly luminous nodes or veins can cast local light, while ordinary resources do not automatically glow. The planned Essence node is an appropriate blue local emitter; the currently delivered loose crystal keeps its existing aura. Rendered light does not itself grant sight or change source colours stored for crafting. An active Torch will visibly light nearby admitted surfaces at night or when ambient light is below25 on the existing0–100 scale. First-pass tuning fades the daytime contribution smoothly between20 and25, with a short250ms transition after a committed change. The check uses ambient light before the Torch’s own bonus, so it cannot switch itself off. Its existing trip-long sight effect and consumption stay unchanged in daylight; no extra fuel or use is required when darkness returns. Lantern and Light Inscription must complete their rules-owned activation before emitting light. Unseen sources and hidden creatures cast no revealing light or shadows. Remembered objects stay dim and static; current lighting cannot update their hidden state. Seeing distant lights beyond ordinary illuminated sight is a separate proposal under discussion, not an exception already approved for the renderer.
+
 **Status:** Current implementation-facing first slice; period bands and regularity jitter are
 debug-tunable. No new focus names are requested.  
 **Updated:** 9 Aug 2026
@@ -33,9 +35,7 @@ Stutter, Unwinding, Breath or Cascade merely to reach an old numeric target:
 
 ## What remains missing
 
-Every run currently reads `Tuning.DayNight.turnsPerDay == 40`. Cycle magnitude and regularity do not
-reach the world clock, so Stillness can produce “A day that never turns” while day/night transitions
-continue. That is a broken promise, not a need for more prose.
+The earlier fixed40-turn implementation gap is historical. The delivered source now uses the saved WorldClock, Cycle period/regularity and stopped phase through committed turns. The newly requested overhead light/shadow rendering must consume that clock; it is not yet delivered. The retained design below does not authorize a second wall-time clock or new amplitude-driven gameplay.
 
 ## First-slice world clock
 
