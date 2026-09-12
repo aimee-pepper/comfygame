@@ -10,6 +10,18 @@ Build384 installation and ordinary launch are verified. Focused internal checks 
 
 **Decided intended and separate proposal:** Separately, rare Essence resource nodes are decided intended behavior and are not yet available. Writing the Essence word is intended to provide one node, with artwork distinct from a loose Raw Essence find. Using modifiers to provide additional nodes remains a proposal.
 
+## Rare Essence nodes — decided intended, not yet delivered
+
+The planned Essence node is a rare, anchored source with artwork distinct from a loose crystal. Gather it deliberately by hand; no tool or advanced shop is required. Its ordinary Raw Essence joins your existing stock and is refined at the Essence Spring. A gathered node remains visibly worked out and cannot pay again. Loose walk-over finds and their ordinary income remain available.
+
+Learn the Essence Focus through a recovered lesson, then connect it to Substrate. A positive written request guarantees one reachable node; repeated words do not add more, and a naturally selected node counts within that one. The ordinary Page price still applies. The lesson can be tied to an existing loose Raw Essence find, so you need not discover a rare node before learning to request one. Existing saved worlds keep their sources.
+
+**Placement and preservation:** Each node has its own source tile and a reachable working position on solid ground, including passable ice. It cannot overlap resources, loot, lessons or travellers, block the return route or replace required early materials. Written nodes must be included in the prepared world before payment; a placement failure must not discard the written promise. Remembered nodes show only the last state you observed.
+
+**First-pass tuning:** First-pass tuning: one gather takes one world turn and yields six Raw Essence, worth twelve refined Essence at the basic Spring rate or eighteen after Second pass. A new world has at most one natural node: a 5% chance normally, or 10% when either existing Essence preference is present—sourceless light or an arrhythmic cycle. These are chances, not a guaranteed schedule. The lesson starts in the developing stage, after learning Substrate and refining some Raw Essence. Exact numbers and pacing remain adjustable. The new Focus starts with a small valuable, volatile Substrate contribution and no light contribution. Existing Intensity, Scale and Count affect that pressure through ordinary rules; the single-node version keeps its count and yield fixed. It does not consume Raw Essence to write, add a new currency or give Essence a Rare item-quality grade.
+
+**Unsettled proposal:** Additional nodes through modifiers remain an unsettled proposal. The recommendation is to use Count: Single or no Count gives one, Pair two, Few three, Many four and Countless five finite nodes. Intensity and Scale would keep their existing pressure meanings, and repeated words would not add their counts together. The first single-node version can proceed without this optional expansion.
+
 ## Explore response and readability — installed in382
 
 **Current behavior — installed in382:** Build382 restores matching static textures for already-known ground in older explored areas without appearance records, and for permitted partially visible terrain. Remembered plants retain their saved colours instead of appearing grey. Accepted movement shows a directional ripple while the party waits at its actual position; currently visible, nondepleted collectibles have a restrained local glint. A modest neutral edge improves current creature contrast while retaining each source colour. Existing saved-action gathering feedback still follows your Mining and gathering results preference.

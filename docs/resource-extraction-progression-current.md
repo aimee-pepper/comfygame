@@ -1,5 +1,7 @@
 # World-resource extraction progression — current
 
+> **12 September — decided intended addition, not yet delivered:** Rare Essence nodes add a second acquisition form of ordinary Raw Essence. The written Essence word promises one reachable node with a distinct anchored appearance; it is deliberately gathered by hand and later remains worked out. Loose pickups, Spring refining, ordinary continuation income and the prohibition on site Essence rewards stay intact. This specifically supersedes older blanket statements forbidding a second Essence source. Modifier-driven additional nodes remain a proposal. The detailed first-pass plan is recorded in the current Design decisions and World Writing references.
+
 **Status:** Game Design implementation authority; not yet implemented. Replaces the vague “three-resource
 capability experiment” in the earlier core-loop plan with a complete data-driven mineral-extraction
 progression and an explicit vertical-slice order.
@@ -69,7 +71,7 @@ This table is the implementation authority for current named resources:
 | Toxin | flora harvest | n/a | current flora-harvest rules; no pick |
 | Spore | flora harvest | n/a | current flora-harvest rules; no pick |
 | Reagent | flora/volatile harvest | n/a | current source rules; no pick in this slice |
-| Raw Essence | direct pickup | 0 | continuation resource; never tool-gated |
+| Raw Essence | current loose pickup; intended Essence-node hand gathering | 0 | continuation resource; neither source requires a tool |
 | Mote | direct Reality pickup | 0 | never tool-gated |
 
 Generic Ichor leaves this table when the creature-material overhaul lands. Ichor becomes a creature

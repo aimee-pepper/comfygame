@@ -1,5 +1,7 @@
 # Asset Questions and Decisions
 
+> **12 September — decided intended addition, not yet delivered:** Rare Essence nodes add a second acquisition form of ordinary Raw Essence. The written Essence word promises one reachable node with a distinct anchored appearance; it is deliberately gathered by hand and later remains worked out. Loose pickups, Spring refining, ordinary continuation income and the prohibition on site Essence rewards stay intact. This specifically supersedes older blanket statements forbidding a second Essence source. Modifier-driven additional nodes remain a proposal. The detailed first-pass plan is recorded in the current Design decisions and World Writing references.
+
 ## Simulator-window handling — settled 10 Aug 2026
 
 - Do not close, reopen, boot, recreate, reposition or otherwise alter Aimee's existing iPhone

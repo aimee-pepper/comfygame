@@ -1,5 +1,7 @@
 # Dynamic Asset Coverage Audit
 
+> **12 September — decided intended addition, not yet delivered:** Rare Essence nodes add a second acquisition form of ordinary Raw Essence. The written Essence word promises one reachable node with a distinct anchored appearance; it is deliberately gathered by hand and later remains worked out. Loose pickups, Spring refining, ordinary continuation income and the prohibition on site Essence rewards stay intact. This specifically supersedes older blanket statements forbidding a second Essence source. Modifier-driven additional nodes remain a proposal. The detailed first-pass plan is recorded in the current Design decisions and World Writing references.
+
 **Owner:** Asset lead  
 **Date:** 9 Aug 2026  
 **Scope:** Read-only inventory of current game code and current design authority, mapped against the
@@ -265,8 +267,9 @@ reliable Essence continuity and early surplus offloading as the next playtest ga
 
 - **Raw Essence on the map:** Resource v0.3 already delegates `essence_raw` to the accepted disclosed
   `wildDrop` footprint, distinct from nodes, travellers and ordinary item drops. It remains absent
-  from the minimap and concealed by fog. Do not invent a second Essence node or redesign this sprite
-  before the next playtest.
+  from the minimap and concealed by fog. That historical loose-find scope is superseded by the
+  delivered384 crystal replacement and the separately accepted future Essence node. Final node art
+  waits for its named native consumer, dimensions and current/remembered/exhausted state protocol.
 - **Named people:** Vance, Noll and Halloway already have accepted authored character descriptors and
   top-down catalogue coverage. Calling labels remain reference-only; their profession must not be
   encoded as anatomy.

@@ -1,5 +1,7 @@
 # Essence continuation economy — current design
 
+> **12 September — decided intended addition, not yet delivered:** Rare Essence nodes add a second acquisition form of ordinary Raw Essence. The written Essence word promises one reachable node with a distinct anchored appearance; it is deliberately gathered by hand and later remains worked out. Loose pickups, Spring refining, ordinary continuation income and the prohibition on site Essence rewards stay intact. This specifically supersedes older blanket statements forbidding a second Essence source. Modifier-driven additional nodes remain a proposal. The detailed first-pass plan is recorded in the current Design decisions and World Writing references.
+
 > **Scheduling supersession — 7 September 2026:** Aimee has deferred Essence recovery and prioritizes the cohesive opening and current player fixes. The historical budgets, run plans and gates below are reference, not an active assignment or a requirement to start another trial. Follow `game-design-early-progression-direction-2026-09-04.md` and the current player Wiki. Existing recovery behavior remains supported; this pause changes no reward or fee.
 
 
@@ -31,7 +33,7 @@ These roles remain separate:
 - The Essence Spring provides a small visible return dividend and the existing exact anti-lock
   shortfall only when the player truly cannot afford the cheapest bind.
 - Precision remains a real net cost; expensive books are allowed to draw down savings.
-- Sites and ordinary world-resource nodes do not become additional disguised Essence sources.
+- Sites and ordinary non-Essence world-resource nodes do not become additional disguised Essence sources. The separately accepted rare Essence node is the explicit exception; it preserves ordinary loose-Raw income and remains unimplemented.
 
 ## Temporary recommended profile
 

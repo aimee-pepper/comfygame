@@ -3,6 +3,12 @@
 Updated 12 September 2026. One place for your decisions, design to-dos and optional creative work. You are not holding up the early crafting work by leaving a later refinement question open.
 
 
+## Optional choice — several written Essence nodes
+
+The rare node, one node from writing Essence, and distinct node artwork are decided. The detailed single-node plan can proceed; no answer is needed to unblock it.
+
+Additional nodes through modifiers remain an unsettled proposal. The recommendation is to use Count: Single or no Count gives one, Pair two, Few three, Many four and Countless five finite nodes. Intensity and Scale would keep their existing pressure meanings, and repeated words would not add their counts together. The first single-node version can proceed without this optional expansion. PM will consolidate this optional choice with you. Rarity, yield and learning pace are first-pass team tuning, not more homework.
+
 ## Sight and weather — installed in383
 
 Build383 restores profile-based dimming across remembered terrain and objects, opaque black unknown ground, and an outward fade across never-explored fringe terrain. Actual obscuring air softly reduces detail in the admitted terrain texture; clear full sight remains sharp, and ordinary darkness adds no blur. Saved colours and last-observed objects remain intact. Sight distances, targeting, movement, camera and fixed controls are unchanged.

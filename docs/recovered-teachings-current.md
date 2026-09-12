@@ -1,5 +1,7 @@
 # Recovered teachings — current authority
 
+> **12 September — decided intended addition, not yet delivered:** Rare Essence nodes add a second acquisition form of ordinary Raw Essence. The written Essence word promises one reachable node with a distinct anchored appearance; it is deliberately gathered by hand and later remains worked out. Loose pickups, Spring refining, ordinary continuation income and the prohibition on site Essence rewards stay intact. This specifically supersedes older blanket statements forbidding a second Essence source. Modifier-driven additional nodes remain a proposal. The detailed first-pass plan is recorded in the current Design decisions and World Writing references.
+
 **Status:** Game Design implementation authority for replacing the Workshop's Instruction, Hand, Lexicon
 and Bargain knowledge purchases. The catalogue below is complete; the six-star Constellation decision and
 capacity-upgrade compression remain separate decisions.
@@ -8,6 +10,10 @@ combat scaling, the corrected Game Wiki, Starter World Pages or current native p
 **Updated:** 21 August 2026
 
 Validation: `python3 scripts/validate_recovered_teachings.py`.
+
+## Planned Essence lesson — separate from the delivered catalogue
+
+The new Essence Focus will use an ordinary recovered lesson tied to a reachable loose Raw Essence find or Essence node. It requires known Substrate and a prior committed Raw Essence refinement. First-pass availability is the existing developing band; ordinary offer, due and free Library-reading rules apply. It adds no starter grant, shop purchase, extra teaching slot or rare-node-only prerequisite. Reading teaches Essence; collecting Raw or merely seeing its printed word does not. The current catalogue below does not yet deliver this addition.
 
 ## 1. Player rule
 
