@@ -3,9 +3,9 @@
 Updated 11 September 2026. One place for your decisions, design to-dos and optional creative work. You are not holding up the early crafting work by leaving a later refinement question open.
 
 
-## Movement and saving improved in380 — remaining delay open
+## World History saving improved in381 — remaining delay open
 
-Build380 reduces repeated work during saving and lets the screen keep responding while a move saves new discoveries. Both direction buttons and map travel wait for the accepted action to finish before accepting another move. If travel makes progress but cannot be saved, the party keeps its previous state and the message says Travel could not be saved; it does not report encounters, discoveries or later route warnings from the discarded trip. A route blocked before any progress keeps its ordinary explanation. Build379’s specific encounter-crash correction is retained. Movement costs, encounter order, withdrawal protection, saved progress and visibility rules stay unchanged. Installation and ordinary phone launch are verified. Remaining movement delay and slower first saves are still open; this is not a claim of fully responsive walking or a physical-phone gameplay walkthrough.
+Build381 adds a further saving optimization for existing World History entries. Their recorded facts, wording and appearance stay intact. Internal comparisons show a partial improvement in first-movement saving; remaining movement delay and slower first saves are still open. Build380’s earlier improvements remain: saving does less repeated work and the screen can keep responding while a move saves new discoveries. Both direction buttons and map travel wait for the accepted action to finish before accepting another move. If travel makes progress but cannot be saved, the party keeps its previous state and the message says Travel could not be saved; it does not report encounters, discoveries or later route warnings from the discarded trip. A route blocked before any progress keeps its ordinary explanation. Build379’s specific encounter-crash correction is retained. Movement costs, encounter order, withdrawal protection, saved progress and visibility rules stay unchanged. Installation and ordinary phone launch are verified. Remaining movement delay and slower first saves are still open; this is not a claim of fully responsive walking or a physical-phone gameplay walkthrough.
 
 ## Every valid Page makes a world — decided, not yet fully delivered
 
@@ -31,7 +31,7 @@ This population-allocation correction is decided and not yet delivered. It resol
 
 **Decided intended behavior:** Pressing a direction beyond the world will explain that you have reached its edge. With Look armed, the same direction will show World boundary and end Look mode. Neither action will spend a turn, move the party or use up pending withdrawal protection. Other blocked terrain will keep its own reason.
 
-**Verification:** The correction has passed three focused internal checks covering actual control actions, unchanged saved state, terrain rules and the existing collapse forecast. It is awaiting phone delivery; build380 does not include it.
+**Verification:** The correction has passed three focused internal checks covering actual control actions, unchanged saved state, terrain rules and the existing collapse forecast. It is awaiting phone delivery; build381 does not include it.
 
 ## Withdrawal gives one complete move — delivered in378
 
@@ -47,7 +47,7 @@ Looking, opening menus, cancelling a choice or trying a blocked move keeps the o
 
 ## Terrain, mist and rain — installed; remaining atmosphere separate
 
-**Current startup status — build380:** Build380 is installed and ordinary phone launch succeeded. It retains379’s specific walking-crash repair and adds the saving and travel-feedback improvements above. Remaining walking delay and slower first saves stay open. It retains the startup correction from369. A physical gameplay walkthrough and the earlier reported intermittent opening crash remain unverified; this update does not establish that every startup problem is fixed. The earlier368 startup failure remains part of the record.
+**Current startup status — build381:** Build381 is installed and ordinary phone launch succeeded. It adds the World History saving optimization above, retaining379’s specific walking-crash repair and380’s saving and travel-feedback improvements. Remaining walking delay and slower first saves stay open. It retains the startup correction from369. A physical gameplay walkthrough and the earlier reported intermittent opening crash remain unverified; this update does not establish that every startup problem is fixed. The earlier368 startup failure remains part of the record.
 
 **Current behavior — installed in368:** Build368 adds the existing terrain textures to normal 3D ground and liquid surfaces, including grass, shallow water, deep water and solid ice. Their detail follows the world’s existing colours. Snow and settled ash keep their separate patches. Moving surface detail does not move the ground or change a turn. Remembered terrain keeps its last-observed appearance without live animation; older plain-looking memories keep that appearance until you see the place again.
 
