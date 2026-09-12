@@ -3,6 +3,14 @@
 Updated 11 September 2026. One place for your decisions, design to-dos and optional creative work. You are not holding up the early crafting work by leaving a later refinement question open.
 
 
+## Withdrawal gives one complete move — decided, not yet delivered
+
+**Current behavior:** Current withdrawal protection is brief and counted in world turns. Slow terrain can use that window during a single step.
+
+**Decided intended behavior:** After Withdraw and Continue, the group you escaped will give you one complete move to another tile. It will not pursue or re-engage during any part of that move, even on slow terrain. Other creatures and world hazards remain dangerous, and the move still takes its usual time and Stability.
+
+Looking, opening menus, cancelling a choice or trying a blocked move will keep the opportunity. Waiting, gathering, mining or committing another field action will use it up. Deliberately attacking an escaped foe or stepping onto its tile will give it up. A longer travel route will protect only its first step. Saving and reopening will preserve an unused opportunity; returning Home or entering another fight will end it. This change is approved and awaiting implementation; the location-panel correction in377 does not include it.
+
 ## Your location after withdrawal — corrected in377
 
 **Current behavior:** After you choose Continue following a withdrawal, At this place immediately describes the tile your party actually returned to. Previously it could keep describing the tile you had left until your next field action. The panel stays in its usual position. This corrects the location display; withdrawal costs, enemy pursuit, combat order and recovered stock keep their existing rules.
