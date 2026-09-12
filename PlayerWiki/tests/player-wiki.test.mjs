@@ -267,10 +267,8 @@ test('World Writing resource-pursuit Pages keep opening, mid-reach, and late rec
   assert.match(recipes, /not an owned World Page or automatic Template/);
   assert.match(recipes, /Fountain pen/);
   assert.match(writing, /Three current resource-pursuit Pages/);
-  assert.match(
-    writing,
-    /do not guarantee an exact terrain or resource/,
-  );
+  assert.match(writing, /Qualifying written Iron and Salt requests have their named deposit promises/);
+  assert.match(writing, /does not yet provide a general guarantee for every written terrain, liquid or resource/);
   for (const id of ids) assert.doesNotMatch(writing, new RegExp(id));
 });
 
