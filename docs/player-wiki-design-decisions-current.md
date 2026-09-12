@@ -10,7 +10,11 @@ Updated 11 September 2026. This reference keeps the accepted decisions and subse
 
 This does not promise every resource or traveller, a fully reachable map, or safety from the dangers you explore. Existing worlds and earned stock stay intact. Invalid or outdated input, missing materials, an unaffordable request or a failed save still need their own honest explanation; Page and Essence spending must succeed together with saving the prepared world.
 
+**Conditional resources — decided intended:** Required resources still depend on the actual world. Compatible rock and deposits establish mineral opportunities; plants need suitable soil, light, water and temperature, with enough connected growing land. Preparing a lawful route or more suitable ground must also reserve any early sources that those conditions require. Optional scenery cannot take their places, and the game cannot remove an already-required source to make preparation pass. This does not require every world to grow a forest or contain the whole starter catalogue.
+
 **Delivery status:** This requirement is decided. The complete guarantee remains unfinished; correcting one generation defect does not establish it for every supported world.
+
+**Specific preparation repair — delivered in378:** Build378 corrects a preparation failure caused by an Apex creature being checked as an ordinary generated creature. The Apex keeps its existing body and rewards. Internal checks verified the reproduced request, saving and reopening. The exact earlier unsaved request was not recovered, so it is not claimed replayed. This specific repair does not establish the complete world-generation guarantee.
 
 ## Map-edge feedback — internally verified, awaiting delivery
 
@@ -18,25 +22,23 @@ This does not promise every resource or traveller, a fully reachable map, or saf
 
 **Decided intended behavior:** Pressing a direction beyond the world will explain that you have reached its edge. With Look armed, the same direction will show World boundary and end Look mode. Neither action will spend a turn, move the party or use up pending withdrawal protection. Other blocked terrain will keep its own reason.
 
-**Verification:** The correction has passed three focused internal checks covering actual control actions, unchanged saved state, terrain rules and the existing collapse forecast. It is awaiting phone delivery; build377 does not include it.
+**Verification:** The correction has passed three focused internal checks covering actual control actions, unchanged saved state, terrain rules and the existing collapse forecast. It is awaiting phone delivery; build378 does not include it.
 
-## Withdrawal gives one complete move — decided, not yet delivered
+## Withdrawal gives one complete move — delivered in378
 
-**Current behavior:** Current withdrawal protection is brief and counted in world turns. Slow terrain can use that window during a single step.
+**Current behavior:** After Withdraw and Continue, the group you escaped gives you one complete move to another tile. It does not pursue or re-engage during any part of that move, even on slow terrain. Other creatures and world hazards remain dangerous, and the move still takes its usual time and Stability.
 
-**Decided intended behavior:** After Withdraw and Continue, the group you escaped will give you one complete move to another tile. It will not pursue or re-engage during any part of that move, even on slow terrain. Other creatures and world hazards remain dangerous, and the move still takes its usual time and Stability.
-
-Looking, opening menus, cancelling a choice or trying a blocked move will keep the opportunity. Waiting, gathering, mining or committing another field action will use it up. Deliberately attacking an escaped foe or stepping onto its tile will give it up. A longer travel route will protect only its first step. Saving and reopening will preserve an unused opportunity; returning Home or entering another fight will end it. This change is approved and awaiting implementation; the location-panel correction in377 does not include it.
+Looking, opening menus, cancelling a choice or trying a blocked move keeps the opportunity. Waiting, gathering, mining or committing another field action uses it up. Deliberately attacking an escaped foe or stepping onto its tile gives it up. A longer travel route protects only its first step. Saving and reopening preserves an unused opportunity; returning Home or entering another fight ends it. Build378 is installed and ordinary launch is verified. Nineteen focused internal checks and optimized-build qualification passed; a physical gameplay walkthrough is not claimed.
 
 ## Your location after withdrawal — corrected in377
 
-**Current behavior:** After you choose Continue following a withdrawal, At this place immediately describes the tile your party actually returned to. Previously it could keep describing the tile you had left until your next field action. The panel stays in its usual position. This corrects the location display; withdrawal costs, enemy pursuit, combat order and recovered stock keep their existing rules.
+**Current behavior:** After you choose Continue following a withdrawal, At this place immediately describes the tile your party actually returned to. Previously it could keep describing the tile you had left until your next field action. The panel stays in its usual position. The377 correction changed the location display only. Build378 adds the movement protection described above; other combat and recovery rules stay unchanged.
 
 **Verified scope:** Two focused internal checks passed and installation is verified. A physical-phone playthrough remains unverified. Existing terrain, mist, rain and the interim creature-material icons remain included; falling snow, mixed rain/snow and further icon polish remain unfinished.
 
 ## Terrain, mist and rain — installed; remaining atmosphere separate
 
-**Current startup status — build377:** Build377 is installed and retains the startup correction from369. Successful phone launch, usable entry and a physical playthrough of377 have not been verified. The further reported opening crash remains unconfirmed and is not claimed fixed by this update. Build372 previously passed ordinary launch and over106 seconds of sustained operation with no new crash report. The earlier368 startup failure remains part of the record.
+**Current startup status — build378:** Build378 is installed and ordinary phone launch succeeded. It retains the startup correction from369. A physical gameplay walkthrough and the earlier reported intermittent opening crash remain unverified; this update does not establish that every startup problem is fixed. The earlier368 startup failure remains part of the record.
 
 **Current behavior — installed in368:** Build368 adds the existing terrain textures to normal 3D ground and liquid surfaces, including grass, shallow water, deep water and solid ice. Their detail follows the world’s existing colours. Snow and settled ash keep their separate patches. Moving surface detail does not move the ground or change a turn. Remembered terrain keeps its last-observed appearance without live animation; older plain-looking memories keep that appearance until you see the place again.
 
@@ -717,7 +719,7 @@ The early materials have ordinary sources as well as deliberate Writing routes. 
 
 Suitable worlds set aside some source opportunities for the early crafts. They do not put the whole starter catalogue into every world. Cold, submerged, corrosive, or otherwise unsuitable ground can support different things. Sunlight by itself does not guarantee a forest or a safe journey. Your pinned recipe can help you notice relevant sources when you can normally see them.
 
-**First-pass source tuning:** where the necessary hosts exist, reserve one ordinary Iron node, one Coal node, and up to two Clay gathers, limited by the number of suitable deposit sites. Suitable growing land starts with two Stem Fibre patches, one Leaf Fibre plant, one Resin shrub, and two small Softwoods. More plants and nodes depend on the world’s size, growth, and eligible sources. Hardwood can appear before you have the Axe needed to harvest it. Intended written guarantees count toward these source budgets; they are not duplicate bonus caches. The explicit written Iron guarantee and its budget credit are now implemented and tested in development, as described below. This does not add written Coal, Clay or Resin guarantees or new vocabulary.
+**First-pass source tuning:** where the necessary hosts exist, reserve one ordinary Iron node, one Coal node and two Clay gathers. The later required-source rule preserves those minimums during preparation; too few free sites calls for a lawful layout correction, not a smaller promise. Suitable growing land starts with two Stem Fibre patches, one Leaf Fibre plant, one Resin shrub, and two small Softwoods. More plants and nodes depend on the world’s size, growth, and eligible sources. Hardwood can appear before you have the Axe needed to harvest it. Intended written guarantees count toward these source budgets; they are not duplicate bonus caches. The explicit written Iron guarantee and its budget credit are now implemented and tested in development, as described below. This does not add written Coal, Clay or Resin guarantees or new vocabulary.
 
 The intended first healing trip needs six harvest actions before travel and encounters. Building the forge and improving the Pick needs thirteen harvest actions across enough source-bearing worlds. Those are ingredient calculations, **not measured trip lengths**. The complete route still needs testing for travel, survival, returning safely, and enough Essence left to bind another world. A useful expedition should not require clearing its whole map.
 
