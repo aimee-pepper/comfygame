@@ -85,6 +85,8 @@ Count is now decided: no Count or Single gives one Essence node, Pair two, Few t
 
 ## Distant lights and gems — decided
 
+**Shared sight and light — intended:** The planned shared sight correction uses actual terrain and structure shapes for both ordinary sight and light, preserving real openings. Seeing the near face of an obstacle does not reveal what is behind it. Sight ranges and enemy visibility rules stay intact, and previously explored places remain remembered if the view becomes blocked. This shared correction is not yet delivered. Distant-light perception also needs a supported stationary source in normal expeditions; the loose Essence crystal’s decorative aura does not qualify.
+
 Both questions are closed. A distant luminous object in unobstructed viewing distance can show its vague shape and ground within its actual light radius at fringe detail. Terrain, opaque sites and tree trunks can block it; normal exploration is still needed for full detail and discovery. The small secondary-gem system is also accepted: suitable deposits can contain an extra useful gem, with richness giving a bounded increase to chance rather than multiplying quantity and quality. Neither feature is delivered yet. Exact initial catalogue, host weights and balancing are Design work, not more decisions for you. See [the current design reference](design-decisions-september-4.html) for the planned rules.
 
 ## Sight and weather — installed in383
