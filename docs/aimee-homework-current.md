@@ -1,5 +1,9 @@
 # Aimee Homework
 
+## Lighting readability — decided intended
+
+Ground and objects already in full sight must stay readable even in dark worlds, including terrain revealed by an active Torch. That readability does not add a sun, reveal unknown ground or brighten remembered areas. Overhead lighting and the Torch’s visible local glow can arrive separately only while existing visibility is preserved; both visual upgrades remain unfinished.
+
 ## Slow-terrain feedback and coherent movement
 
 **Current behavior and reports:** The broad movement ripple has been removed, and the intended slow-terrain ripple is not yet delivered. Slowing-notification delivery is being checked. Lighting appearing one step behind and intermittent movement delay are reported issues under investigation.
