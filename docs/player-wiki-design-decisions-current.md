@@ -1,5 +1,19 @@
 # Design decisions · 4 September 2026
 
+## World objects and sight — urgent decided correction
+
+**Current reported limits:** After build390, sites have been reported disappearing while occupied, and fringe and remembered areas have been reported missing or too dark to distinguish. The site problem has been traced to an actor-overlap fade; the sight presentation is still being investigated. These corrections are not yet delivered.
+
+**Decided behavior:** Walking onto a place must never hide or remove it. Sites stay in the world with their committed unlooted or looted appearance; entering or starting a search does not complete it. No intermediate looted appearance is being added now. A canopy or roof may soften only where it blocks the character, while the actual place stays visible. Portal stone is fully opaque; only the blue magic may be semitranslucent. A loose object can leave the ground when it is actually collected, including an existing automatic pickup during a successful step; simply standing over an uncollected object must not hide it.
+
+Fringe must show vague permitted terrain, and explored areas must retain discernible dim, still memories of terrain and known non-enemy objects. Only truly unknown space is wholly undisclosed. Restore those views without expanding sight, revealing hidden enemies or refreshing hidden changes. The outward fade belongs to never-explored fringe, not remembered terrain. These fixes come before the accepted moving-light work; stacking corrections follow later.
+
+## Expedition Return stacks — existing rule, correction deferred
+
+**Current limitation:** The Expedition Return screen can currently show separate entries for different physical lots of the same material. Generic cube pictures also need their exact resource identities checked; matching pictures alone do not prove matching materials. The grouping correction is deferred until the more urgent visibility and lighting work.
+
+**Settled behavior:** The existing stack rule applies here too: ungraded mined resources group by their exact material name, ordinary flora by type and subtype, and creature materials by exact subtype and Poor, Common, Rare or Exceptional quality. Source, colour and other property differences stay inside the stack details. Recovered and Lost keep separate totals. Grouping changes the presentation, not the quantities, saved variants or rewards.
+
 ## Waterfalls into chasms — decided intended
 
 **Current behavior:** Waterfalls between suitable connected water surfaces keep their existing rules. Waterfalls into chasms are decided intended behavior and are not yet delivered.

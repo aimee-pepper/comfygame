@@ -1,5 +1,11 @@
 # Expedition return receipt — current
 
+## Expedition Return stacks — existing rule, correction deferred
+
+**Current limitation:** The Expedition Return screen can currently show separate entries for different physical lots of the same material. Generic cube pictures also need their exact resource identities checked; matching pictures alone do not prove matching materials. The grouping correction is deferred until the more urgent visibility and lighting work.
+
+**Settled behavior:** The existing stack rule applies here too: ungraded mined resources group by their exact material name, ordinary flora by type and subtype, and creature materials by exact subtype and Poor, Common, Rare or Exceptional quality. Source, colour and other property differences stay inside the stack details. Recovered and Lost keep separate totals. Grouping changes the presentation, not the quantities, saved variants or rewards.
+
 **Status:** implementation-ready correctness consolidation  
 **Owner:** expedition outcome rules; recap UI is a consumer  
 **Roadmap ID:** `return-receipt-authority`
@@ -64,8 +70,7 @@ The canonical receipt uses typed lines:
 
 Receipt presentation resolves the current accepted pictorial asset through the stable catalogue ID
 and retains the frozen label as historical fallback. It does not store a screen-local icon choice.
-Truly identical stackable units may aggregate; property-bearing or unique items may not collapse by
-catalogue ID. Retained and lost lines preserve the exact partition produced by banking.
+Ordinary homogeneous stackable items may aggregate; unique gear and property-bearing item instances do not collapse by catalogue ID. Material display groups instead follow the exact material/subtype/quality rule above while retaining all property-bearing units inside the group. Retained and lost lines preserve the exact partition produced by banking.
 
 On an ordinary phone, Resources and Loot use the settled six-across icon trays with quantity badges.
 Tapping a tile opens the same edge-clamped anchored detail grammar as other physical-object screens;

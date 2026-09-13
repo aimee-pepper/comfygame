@@ -1,5 +1,11 @@
 # Expedition Return object layout — current
 
+## Expedition Return stacks — existing rule, correction deferred
+
+**Current limitation:** The Expedition Return screen can currently show separate entries for different physical lots of the same material. Generic cube pictures also need their exact resource identities checked; matching pictures alone do not prove matching materials. The grouping correction is deferred until the more urgent visibility and lighting work.
+
+**Settled behavior:** The existing stack rule applies here too: ungraded mined resources group by their exact material name, ordinary flora by type and subtype, and creature materials by exact subtype and Poor, Common, Rare or Exceptional quality. Source, colour and other property differences stay inside the stack details. Recovered and Lost keep separate totals. Grouping changes the presentation, not the quantities, saved variants or rewards.
+
 **Status:** Game Design implementation authority for B2.14 presentation
 **Depends on:** the source-complete typed `RunExitSummary` receipt; final Creature-material family/quality
 projection before native category migration
@@ -88,8 +94,8 @@ Render only nonempty sections, in this exact order.
 ### World resources
 
 - six 44×44-point object targets across at ordinary phone width;
-- stable resource silhouette, quality frame when the resource is quality-bearing, aggregate quantity badge;
-- final stack key is `world + family + qualityBand`;
+- stable exact-material silhouette and aggregate quantity badge; no invented quality frame on ungraded geological or ordinary flora stock;
+- outer stack key is the actual ungraded geological material identity or ordinary flora type/subtype; colour/source/property variations stay inside;
 - currently qualityless bulk resources remain their truthful legacy/live stack; migration never invents
   `Rough` merely to fit the new frame;
 - tap opens anchored detail with frozen quantity, resource name, known uses and collection-source record link
@@ -101,9 +107,9 @@ materials merely because both are slot-free.
 ### Creature materials
 
 - six across using the exact body-derived family silhouette;
-- stack key is `creature + family + qualityBand`;
-- one tile per family/band, so nineteen Standard Hides are one `Hides ×19` tile;
-- Standard Hides and Fine Hides are two tiles;
+- outer stack key is `creature + family + exact subtype + Poor/Common/Rare/Exceptional`;
+- one tile per exact subtype/quality, so nineteen Common Supple Hides are one `Common Supple Hide ×19` tile;
+- Common Supple Hide and Rare Supple Hide are two tiles; another actual subtype also stays separate;
 - different families never merge because their display names or crafting tags happen to match;
 - merged stacks link to Bestiary collection-source records rather than claiming all units came from one
   exact specimen.
@@ -224,7 +230,7 @@ Use the same shared production identities as field, Storehouse, Trading Post, cr
 
 - 23 World-resource families plus Raw/Refined Essence distinction;
 - 18 Creature-material family silhouettes;
-- six quality frames with redundant shape/colour grammar;
+- the existing four creature-material quality treatments; no quality frame for ungraded geological or ordinary flora stock;
 - existing item/gear/curio/unknown identities;
 - physical World Page, loose paper, folio and diary-growth assets;
 - traveller identity tiles;
@@ -240,7 +246,7 @@ as such; it never substitutes an unrelated SF Symbol and claims final identity.
 One 368×800 composite must include:
 
 - Rubble ×6 and Raw Essence ×12;
-- Standard Hides ×19, Fine Hides ×2, Standard Bone ×4;
+- Common Supple Hide ×19, Rare Supple Hide ×2, Common Bone ×4;
 - one stacked consumable, two same-catalogue gear instances with different profiles and one unknown curio;
 - two exact World Pages, one uninspected;
 - three pages from one diary, one page from another and two other writing families;
@@ -254,8 +260,8 @@ snapshot. These are evidence; production assets remain independent.
 ## Engineering acceptance
 
 1. Screen reads only the frozen typed receipt; changing Storehouse/Library/Party after return changes no tile.
-2. World resources and Creature materials are separate and use exact family/quality stack keys.
-3. Nineteen same-band Hides appear once; another quality band and Bone remain separate.
+2. World resources and Creature materials retain their domains; ungraded world materials use exact identity and creature materials use exact subtype/quality outer keys.
+3. Nineteen Hides of the same subtype and quality appear once; another subtype, quality or Bone remains separate.
 4. Exact item profiles, unknown state, World Page instances, diary IDs and traveller IDs remain independently
    reachable.
 5. Recovered/Lost lines exactly partition partial outcomes for portal, Waystone, collapse, defeat and abandon.
