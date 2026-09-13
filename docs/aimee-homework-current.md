@@ -1,5 +1,13 @@
 # Aimee Homework
 
+## Waterfalls into chasms — decided intended
+
+**Current behavior:** Waterfalls between suitable connected water surfaces keep their existing rules. Waterfalls into chasms are decided intended behavior and are not yet delivered.
+
+**Decided intended behavior:** A real flowing channel may end at an open edge into a chasm. Its waterfall starts at the actual water surface and fades into darkness over about two visible terrain levels. That is a drawing extent, not a known bottom; there is no invented pool, landing or walkable floor. A still pond, ice, blocked edge or river merely passing beside a chasm does not automatically spill. The channel must have that exact outlet.
+
+The outlet uses no extra water tiles and preserves the amounts of Standing, Flowing and Frozen water. Even a one-cell flow can use a real chasm-edge outlet. The new rule applies to newly prepared worlds under their saved generation rules; existing worlds are not rerolled or given guessed outlets. Live flow requires both the source and chasm edge in full sight. Memory keeps a complete last-observed edge still and dim; separately remembered neighbours do not reveal a new waterfall. Movement, gathering and water colours keep their existing rules.
+
 ## Recognizable portals and sites — decided intended
 
 **Current behavior:** Portal and site artwork still needs correction: different places can look too similar in the current 3D view. The interaction button now names its actual action, including Return home, but that label correction does not finish the artwork.
@@ -22,7 +30,7 @@ Build388 makes the character and view respond together on the existing safe-step
 
 Build388 replaces the main-view Apex label with a static threatening red aura around the rendered creature, keeping its body visible through the open centre. The minimap uses a red dot contained within its tile. The aura appears only for an Apex in current full sight; it does not appear in fringe sight or memory, illuminate the world, reveal hidden creatures or change combat. Internal checks and art review cover the displayed aura and its alignment during a map pan. Installation is verified; physical-phone launch and appearance remain unverified. This does not restore anatomy missing from an older saved creature.
 
-Terrain sides must remain visibly distinct from their tops so elevation is readable. A discovered chasm should show the adjacent terrain’s walls descending into darkness, with about two levels of visible descent as first-pass artwork tuning. That is not a physical bottom or a new walkable floor. Keep unknown places black and remembered edges limited to what was last seen. A real flowing-water drop can form a waterfall over a known rim under the existing water rules; still or blocked water does not gain a waterfall merely for appearance. These corrections are planned, and they do not wait for a change of rendering system.
+Terrain sides must remain visibly distinct from their tops so elevation is readable. A discovered chasm should show the adjacent terrain’s walls descending into darkness, with about two levels of visible descent as first-pass artwork tuning. That is not a physical bottom or a new walkable floor. Keep unknown places black and remembered edges limited to what was last seen. The decided chasm-outflow extension allows an actual flowing channel to end at its recorded open lip and fall into darkness, without a receiving pool. Still water, ice and an unselected or blocked edge do not automatically spill. This applies to newly prepared worlds under a saved policy, preserves water amounts, and requires the source and chasm boundary in full sight for live flow; memory stays still and last observed. These corrections are planned, and they do not wait for a change of rendering system.
 
 ## Source artwork and in-game finish — accepted comparison
 

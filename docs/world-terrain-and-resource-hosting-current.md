@@ -1,5 +1,13 @@
 # World terrain regions and resource hosting — current
 
+## Waterfalls into chasms — decided intended
+
+**Current behavior:** Waterfalls between suitable connected water surfaces keep their existing rules. Waterfalls into chasms are decided intended behavior and are not yet delivered.
+
+**Decided intended behavior:** A real flowing channel may end at an open edge into a chasm. Its waterfall starts at the actual water surface and fades into darkness over about two visible terrain levels. That is a drawing extent, not a known bottom; there is no invented pool, landing or walkable floor. A still pond, ice, blocked edge or river merely passing beside a chasm does not automatically spill. The channel must have that exact outlet.
+
+The outlet uses no extra water tiles and preserves the amounts of Standing, Flowing and Frozen water. Even a one-cell flow can use a real chasm-edge outlet. The new rule applies to newly prepared worlds under their saved generation rules; existing worlds are not rerolled or given guessed outlets. Live flow requires both the source and chasm edge in full sight. Memory keeps a complete last-observed edge still and dim; separately remembered neighbours do not reveal a new waterfall. Movement, gathering and water colours keep their existing rules.
+
 > **Final-product authority boundary (3 September 2026):** this document specifies the bounded
 > connected-terrain and host-placement correction used by the current generator. It is a useful
 > implementation foundation, not the final land, geology, resource, or World Writing design.
