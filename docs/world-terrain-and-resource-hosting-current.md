@@ -1,5 +1,9 @@
 # World terrain regions and resource hosting — current
 
+## Chasm waterfall limits — decided intended
+
+Frozen water does not produce a waterfall. If a connected body of water cannot support a valid measured flow or has no legal outlet, it keeps its existing appearance and movement rules and does not gain a chasm waterfall. This does not erase water, change its type or invent a river ending. World preparation must still satisfy the existing water amounts and route requirements: a single flowing tile still needs a real outlet. Existing worlds remain unchanged; this clarification does not make chasm waterfalls playable yet.
+
 ## Waterfalls into chasms — decided intended
 
 **Current behavior:** Waterfalls between suitable connected water surfaces keep their existing rules. Waterfalls into chasms are decided intended behavior and are not yet delivered.
