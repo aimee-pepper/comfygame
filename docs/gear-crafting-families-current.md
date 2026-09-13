@@ -1,5 +1,7 @@
 # Gear crafting families — current
 
+> **Historical specification — superseded material policy:** The six-band material grading, graded mined/flora stock and family-only stack instructions retained below are historical. Current intended policy is ungraded exact-name mined resources and ordinary flora type/subtype stacks; quality-bearing creature materials use precise subtype plus Poor/Common/Rare/Exceptional, with exact source colour and properties inside the stack. Peerless belongs to legendary equipment, not raw materials. Follow the [current crafting overview](https://aimee-pepper.github.io/comfygame/crafting/) and [current resources](https://aimee-pepper.github.io/comfygame/resources/), with the delivered whole-shop and source-specific contracts. Do not use this older document or its historical table validator as authority to restore superseded material grades, custody or recipe rules. Retained anatomy/physical-role references require reconciliation with the newer source-specific authority before use.
+
 **Status:** current structural authority for the 21 physical Schematics and their maker ownership. Exact
 socket eligibility, quality arithmetic, material effects and migration fixtures live in
 `crafting-components-and-schematics-current.md`; current catalogue-item disposition lives in

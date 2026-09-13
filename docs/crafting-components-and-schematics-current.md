@@ -1,6 +1,8 @@
 # Crafting components and physical schematics — current authority
 
-**Status:** Game Design content authority for the six-band physical-crafting migration. This completes the
+> **Historical specification — superseded material policy:** The six-band material grading, graded mined/flora stock and family-only stack instructions retained below are historical. Current intended policy is ungraded exact-name mined resources and ordinary flora type/subtype stacks; quality-bearing creature materials use precise subtype plus Poor/Common/Rare/Exceptional, with exact source colour and properties inside the stack. Peerless belongs to legendary equipment, not raw materials. Follow the [current crafting overview](https://aimee-pepper.github.io/comfygame/crafting/) and [current resources](https://aimee-pepper.github.io/comfygame/resources/), with the delivered whole-shop and source-specific contracts. Do not use this older document or its historical table validator as authority to restore superseded material grades, custody or recipe rules. Retained anatomy/physical-role references require reconciliation with the newer source-specific authority before use.
+
+**Historical status:** This was the six-band physical-crafting migration proposal; its grading/storage/migration instructions are superseded as stated above. This completes the
 material-family `ComponentProfile`, physical schematic socket, modifier, migration and Pointed Blade tables
 required by `crafting-intuition-and-quality-review-current.md`.
 **Scope:** future crafts and refits at Blacksmith, Tannery, Armoury, Bowyer and Weaponsmith. Channelworks,

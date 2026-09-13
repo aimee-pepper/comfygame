@@ -1,5 +1,7 @@
 # Minimap Disclosure — Current
 
+> **12 September correction, intended:** A visible Apex is only a red/slightly larger red dot on the minimap, without text, badge or aura. The main world creature has the threatening aura. Existing current enemy visibility still owns admission; remembered terrain alone does not expose an enemy. The old unknown-fog restrictions below remain.
+
 **Status:** settled default boundary from Aimee, 9 Aug 2026. Supersedes the earlier “navigation
 promise” rule that made portals, writing and the singular apex visible through fog.
 
