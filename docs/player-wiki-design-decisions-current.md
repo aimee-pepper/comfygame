@@ -1,5 +1,11 @@
 # Design decisions · 4 September 2026
 
+## Source artwork and in-game finish — accepted comparison
+
+**Current appearance:** the campaign retains its existing presentation. The blue Raw Essence crystal is delivered, but the requested glass shell with a visible textured glowing blue core is not yet verified in play.
+
+**Accepted next step:** compare the same artwork on iPhone to establish a better match between authored materials and the game. The target also includes surrounding textures responding convincingly to light and, later, a pixel-style world image with crisp interface text. The comparison must preserve the camera, visibility rules, gameplay and saved progress. It creates no new player trial. A change to the game’s rendering system has not been decided; artwork improvements continue while the comparison is pending.
+
 ## Information panes move together — decided intended
 
 **Current behavior:** notifications switch edges while At this place remains fixed.
