@@ -1,12 +1,12 @@
 # Aimee Homework
 
-## World objects and sight — urgent decided correction
+## World objects and sight — correction installed in391
 
-**Current reported limits:** After build390, sites have been reported disappearing while occupied, and fringe and remembered areas have been reported missing or too dark to distinguish. The site problem has been traced to an actor-overlap fade; the sight presentation is still being investigated. These corrections are not yet delivered.
+**Current correction — installed in391:** Build391 keeps sites and portals visible when you stand on them. Portal stone stays fully opaque; only the flowing blue magic is translucent. Entering a camp does not search or loot it. Fringe and remembered terrain are discernible again under the existing sight rules; unknown areas stay black and memories retain their last-observed state. Internal checks and art review support these corrections. Installation and ordinary iPhone launch succeeded; physical-phone appearance and interactive usability have not been inspected. Remembered camp and portal silhouettes remain very dark, and fine details and every plant or material appearance are not yet verified.
 
 **Decided behavior:** Walking onto a place must never hide or remove it. Sites stay in the world with their committed unlooted or looted appearance; entering or starting a search does not complete it. No intermediate looted appearance is being added now. A canopy or roof may soften only where it blocks the character, while the actual place stays visible. Portal stone is fully opaque; only the blue magic may be semitranslucent. A loose object can leave the ground when it is actually collected, including an existing automatic pickup during a successful step; simply standing over an uncollected object must not hide it.
 
-Fringe must show vague permitted terrain, and explored areas must retain discernible dim, still memories of terrain and known non-enemy objects. Only truly unknown space is wholly undisclosed. Restore those views without expanding sight, revealing hidden enemies or refreshing hidden changes. The outward fade belongs to never-explored fringe, not remembered terrain. These fixes come before the accepted moving-light work; stacking corrections follow later.
+Fringe must show vague permitted terrain, and explored areas must retain discernible dim, still memories of terrain and known non-enemy objects. Only truly unknown space is wholly undisclosed. Restore those views without expanding sight, revealing hidden enemies or refreshing hidden changes. The outward fade belongs to never-explored fringe, not remembered terrain. The bounded visibility correction is installed in391. Moving lights are the next priority; stacking corrections follow later.
 
 ## Expedition Return stacks — existing rule, correction deferred
 
@@ -28,13 +28,13 @@ The outlet uses no extra water tiles and preserves the amounts of Standing, Flow
 
 **Decided intended behavior:** The remaining writing rooms, icy vaults, exhausted housings, caverns, geyser basins, warrens, Tears and Atlas Seams will receive recognizable artwork of their own. Searching changes a place to searched or emptied where appropriate without erasing its identity or inventing physical changes. Spent Emanation Housing is already exhausted before search, and Atlas Seam keeps its separate anchoring purpose.
 
-Delivered portals and the camp keep frozen last-observed appearances with still materials in memory; hidden changes do not refresh them, and unknown objects stay hidden. Older memory without the recorded identity keeps its generic marker until the place is seen again. The current dimming can make remembered details nearly black, so detailed memory readability is not yet established. Portal flow grants no extra light or sight. Travel, searching, rewards and existing confirmations keep their rules.
+Delivered portals and the camp keep frozen last-observed appearances with still materials in memory; hidden changes do not refresh them, and unknown objects stay hidden. Older memory without the recorded identity keeps its generic marker until the place is seen again. Build391 restores discernible remembered silhouettes, but they remain very dark; fine detail is not yet verified. Portal flow grants no extra light or sight. Travel, searching, rewards and existing confirmations keep their rules.
 
 ## Interaction labels — installed in387
 
 Build387 makes the interaction button name the action it will perform: Return home, Search site, Collect page, Open cache, Use Atlas Seam, Place Anchor Frame, Survey, Choose tools, or the relevant gathering action. Both existing routes that return you home say Return home. A selected tool no longer appears beneath unrelated actions; a gathering tool is named only when that action uses it. Action costs, availability, refusal explanations and existing confirmations keep their rules.
 
-Build387 changed interaction labels only; its installation and ordinary launch were verified. Build388 adds the bounded camera-follow and Apex presentation corrections described here. Build389 adds the shared information-pane placement. Build390 adds authored portals, Wayfarer’s Camp and solid-side contrast. Other site artwork, the reported grey appearance of plants and creatures, and moving lights remain unfinished.
+Build387 changed interaction labels only; its installation and ordinary launch were verified. Build388 adds the bounded camera-follow and Apex presentation corrections described here. Build389 adds the shared information-pane placement. Build390 adds authored portals, Wayfarer’s Camp and solid-side contrast. Build391 corrects occupied-site visibility, portal opacity and fringe/remembered-terrain readability. Other site artwork, the reported grey appearance of plants and creatures, and moving lights remain unfinished.
 
 ## Movement response — installed in388
 
