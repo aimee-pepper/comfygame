@@ -1,14 +1,16 @@
 # World terrain regions and resource hosting — current
 
-## Chasm waterfall limits — decided intended
+## Chasm waterfall limits — current in400
 
-Frozen water does not produce a waterfall. If a connected body of water cannot support a valid measured flow or has no legal outlet, it keeps its existing appearance and movement rules and does not gain a chasm waterfall. This does not erase water, change its type or invent a river ending. World preparation must still satisfy the existing water amounts and route requirements: a single flowing tile still needs a real outlet. Existing worlds remain unchanged; this clarification does not make chasm waterfalls playable yet.
+Frozen water does not produce a waterfall. If a connected body of water cannot support a valid measured flow or has no legal outlet, it keeps its existing appearance and movement rules and does not gain a chasm waterfall. This does not erase water, change its type or invent a river ending. World preparation must still satisfy the existing water amounts and route requirements: a single flowing tile still needs a real outlet. Build400 applies this rule to newly prepared books. Existing worlds remain unchanged.
 
-## Waterfalls into chasms — decided intended
+## Waterfalls into chasms — delivered in400
 
-**Current behavior:** Waterfalls between suitable connected water surfaces keep their existing rules. Waterfalls into chasms are decided intended behavior and are not yet delivered.
+**Current behavior:** Build400 adds waterfalls into chasms for newly prepared books. A genuine flowing channel can end at its recorded open chasm edge, with no invented receiving pool, bottom or extra water. Existing books keep their saved water rules and are not given new outlets when reopened. Waterfalls between connected water surfaces keep their existing rules.
 
-**Decided intended behavior:** A real flowing channel may end at an open edge into a chasm. Its waterfall starts at the actual water surface and fades into darkness over about two visible terrain levels. That is a drawing extent, not a known bottom; there is no invented pool, landing or walkable floor. A still pond, ice, blocked edge or river merely passing beside a chasm does not automatically spill. The channel must have that exact outlet.
+Internal checks covered genuine one-cell and longer outlets, water and freezing records, safe saving, unchanged older-book rules and current versus remembered appearance. Native art review confirmed a visible falling curtain at the source lip and a dim, static remembered curtain fading into black without a bright bottom cap. Build400 installation and ordinary iPhone launch are verified. This does not establish a physical-phone gameplay walkthrough, smooth animation on every frame, a guaranteed scenic waterfall or completion of the separate world-generation overhaul.
+
+**Decided behavior — delivered in400:** A real flowing channel may end at an open edge into a chasm. Its waterfall starts at the actual water surface and fades into darkness over about two visible terrain levels. That is a drawing extent, not a known bottom; there is no invented pool, landing or walkable floor. A still pond, ice, blocked edge or river merely passing beside a chasm does not automatically spill. The channel must have that exact outlet.
 
 The outlet uses no extra water tiles and preserves the amounts of Standing, Flowing and Frozen water. Even a one-cell flow can use a real chasm-edge outlet. The new rule applies to newly prepared worlds under their saved generation rules; existing worlds are not rerolled or given guessed outlets. Live flow requires both the source and chasm edge in full sight. Memory keeps a complete last-observed edge still and dim; separately remembered neighbours do not reveal a new waterfall. Movement, gathering and water colours keep their existing rules.
 
