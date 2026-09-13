@@ -9,7 +9,9 @@ The rare node, distinct artwork and Count expansion are decided. The former opti
 
 Count is now decided: no Count or Single gives one Essence node, Pair two, Few three, Many four and Countless five. Each keeps the same yield; repeated requests use the greatest Count rather than adding together. A natural node counts within the written total. Intensity and Scale keep their ordinary pressure meanings, and other words retain their actual effects on world conditions; they do not automatically multiply every resource’s quantity or quality. Rarity, yield and learning pace are first-pass team tuning, not more homework.
 
-**Separate discussions still open:** whether distant lights should show only a point, a small vague terrain patch or full nearby detail; and whether useful gems should be rare secondary finds from suitable deposits. Neither is approved for implementation. PM is consolidating the discussion. Moving lights/shadows and the dark-only rendered Torch contribution are accepted; they retain the current hidden-light rules while that discussion is open.
+## Distant lights and gems — decided
+
+Both questions are closed. A distant luminous object in unobstructed viewing distance can show its vague shape and ground within its actual light radius at fringe detail. Terrain, opaque sites and tree trunks can block it; normal exploration is still needed for full detail and discovery. The small secondary-gem system is also accepted: suitable deposits can contain an extra useful gem, with richness giving a bounded increase to chance rather than multiplying quantity and quality. Neither feature is delivered yet. Exact initial catalogue, host weights and balancing are Design work, not more decisions for you. See [the current design reference](design-decisions-september-4.html) for the planned rules.
 
 ## Sight and weather — installed in383
 
