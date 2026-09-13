@@ -1,5 +1,11 @@
 # Design decisions · 4 September 2026
 
+## Information panes move together — decided intended
+
+**Current behavior:** notifications switch edges while At this place remains fixed.
+
+Notifications and At this place will switch between top and bottom together, using the existing two-tile opposite-edge rule. Movement controls, minimap, Use Tile, Look, carried items and Field Kit stay fixed at the bottom. The map keeps its size, scale and position. Open pane details, the current location, exact Read now links and notification expiry stay intact during the switch. If neither edge is suitable, both panes stay at their existing shared edge rather than jumping back and forth. This correction is accepted and not yet delivered. It replaces the earlier fixed-context rule; it does not move the whole bottom interface.
+
 Updated 12 September 2026. This reference keeps the accepted decisions and subsequent deliveries together. **Decided intended behavior** describes the game we are making; it does not mean that behavior is already available on your phone. **First-pass tuning** gives concrete starting numbers that can change through play. **Unsettled proposals** still need design work or a choice.
 
 ## Moving light and shadows — decided intended
@@ -180,7 +186,7 @@ Installation and ordinary app launch are verified. The focused internal checks d
 
 The intermittent **Securing action** hang remains unreproduced and has not been confirmed fixed. Long bare upper stems and weak needle/frond distinction remain appearance limitations. The waterfall's contact and sampled downward movement passed a bounded review; real-time smoothness, flicker and natural occurrence remain unverified. Older delivery notes below describe their own checkpoints; their earlier launch restrictions are not a current production blocker.
 
-## Only notifications move — corrected in362
+## Earlier notification-only placement — installed in362, further correction intended
 
 Only the notification pane switches edges as your character approaches. At this place, movement controls, minimap, Use Tile, Look, satchel and Field Kit stay fixed in their original bottom layout. Notification movement does not resize or reframe the map. Exact Diary page links and notice expiry remain intact. This corrects the unintended whole-navigation movement in359–361. Internal layout and input checks passed; no further decision is waiting on you.
 
@@ -624,7 +630,7 @@ This demonstrates only the ordinary actions actually tried in3D. It does not est
 
 ## Field and terrain feedback · 5 September
 
-**Notification placement — corrected in362:** only notifications move. At this place and its details stay fixed, as do all navigation and carried-item controls in their original bottom layout. The map keeps its size and tile scale during notification switches. Exact Read now identity, normal expiry and safe touches remain. If both edges are too close, the notification stays put. This replaces the unintended whole-navigation movement in359–361.
+**Current placement from362, awaiting the newer shared-pane correction above:** only notifications move. At this place and its details stay fixed, as do all navigation and carried-item controls in their original bottom layout. The map keeps its size and tile scale during notification switches. Exact Read now identity, normal expiry and safe touches remain. If both edges are too close, the notification stays put. This replaces the unintended whole-navigation movement in359–361.
 
 **Forecast wording — installed in357:** the approximate collapse countdown says **About 588 turns left**, for example, instead of using a tilde that can look like a minus sign. The estimate and collapse rules are unchanged.
 
