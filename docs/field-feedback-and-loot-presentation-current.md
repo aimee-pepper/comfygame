@@ -114,7 +114,7 @@ context without applying the stale predicted outcome.
 
 #### Rules-owned preview shape
 
-Engineering exposes one pure four-entry `AdjacentConsequencePreview` snapshot. The renderer and Look do not
+The Design-specified shape below describes one pure four-entry `AdjacentConsequencePreview` snapshot; it is not an existing Swift declaration or consumer. Engineering implements the required projection from existing visibility, movement-edge/cost and blocker rules, and owns the actual type name. The renderer and Look do not
 query tiles independently:
 
 ```text
