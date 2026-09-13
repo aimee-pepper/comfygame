@@ -34,7 +34,7 @@ related writing problem, not become a ninth password for finding Ashe.
 ## Interaction payload
 
 - Search time: **2 world turns**
-- Working yields: 3 raw essence and 2 ore
+- Rewards follow the current site-search rules. Raw Essence is not a site reward; the earlier 3 Raw Essence + 2 Ore specification is superseded and must not be restored.
 - Items/teachings: none initially
 - Authored stability delta: **-4**, retained for comparison but not currently charged by worldgen
 
@@ -44,13 +44,13 @@ schematic. Oda's housing schematic remains her diary reward; this site cannot te
 ## Safety and persistence
 
 - Inspecting/searching does not apply an affliction or unavoidable damage in v1.
-- The residual effect is communicated through art, prose and the small stability contribution.
-- In anchored realms it persists after search, visibly exhausted; unique yields remain taken.
+- The residual thermal consequence is communicated through art and prose. The authored stability delta is not charged; appearance does not introduce damage or an active discharge.
+- It is intrinsically exhausted before search. In anchored realms its recognizable structure persists after search, with unique yields remaining taken; search state does not switch an active machine off.
 - Ashe's diary page reveals the definition only. It never guarantees placement.
 
 ## Live acceptance gap
 
 Generic site reachability, placement, persistence and search fixtures cover the shared machinery,
 but this named site still needs one exact content fixture proving its three-condition eligibility,
-two-turn search, 3 Raw Essence + 2 Ore yield, no item/teaching reward and exhausted anchored revisit.
+two-turn search, rewards matching the current rules with no Raw Essence payout, and searched anchored revisit without changing the intrinsically spent machine into an active one.
 That is a test-coverage gap, not permission to defer or rename the live page/site.

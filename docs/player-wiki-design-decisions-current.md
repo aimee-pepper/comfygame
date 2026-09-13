@@ -1,5 +1,13 @@
 # Design decisions · 4 September 2026
 
+## Recognizable portals and sites — decided intended
+
+**Current behavior:** Portal and site artwork still needs correction: different places can look too similar in the current 3D view. The interaction button now names its actual action, including Return home, but that label correction does not finish the artwork.
+
+**Decided intended behavior:** Portals will have a distinct shape with flowing blue Essence magic. Camps, writing rooms, icy vaults, exhausted housings, caverns, geyser basins, warrens, Tears and Atlas Seams will keep recognizable identities of their own. Searching changes a place to searched or emptied where appropriate; it does not erase the landmark, turn it into a portal or automatically extinguish its natural activity. Spent Emanation Housing is already exhausted before you search it. Atlas Seam keeps its separate anchoring purpose.
+
+Remembered portals and sites will retain their last-observed appearance, dim and still. Hidden changes will not update them. An older remembered place without enough recorded detail will keep its generic known-place appearance until you see it again. Portal flow does not itself grant illumination or extra sight. This is an appearance correction; travel, searching, rewards and existing confirmations keep their rules.
+
 ## Interaction labels — installed in387
 
 Build387 makes the interaction button name the action it will perform: Return home, Search site, Collect page, Open cache, Use Atlas Seam, Place Anchor Frame, Survey, Choose tools, or the relevant gathering action. Both existing routes that return you home say Return home. A selected tool no longer appears beneath unrelated actions; a gathering tool is named only when that action uses it. Action costs, availability, refusal explanations and existing confirmations keep their rules.

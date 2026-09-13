@@ -1,5 +1,13 @@
 # Sites and catalogue expansion — current design
 
+## Recognizable portals and sites — decided intended
+
+**Current behavior:** Portal and site artwork still needs correction: different places can look too similar in the current 3D view. The interaction button now names its actual action, including Return home, but that label correction does not finish the artwork.
+
+**Decided intended behavior:** Portals will have a distinct shape with flowing blue Essence magic. Camps, writing rooms, icy vaults, exhausted housings, caverns, geyser basins, warrens, Tears and Atlas Seams will keep recognizable identities of their own. Searching changes a place to searched or emptied where appropriate; it does not erase the landmark, turn it into a portal or automatically extinguish its natural activity. Spent Emanation Housing is already exhausted before you search it. Atlas Seam keeps its separate anchoring purpose.
+
+Remembered portals and sites will retain their last-observed appearance, dim and still. Hidden changes will not update them. An older remembered place without enough recorded detail will keep its generic known-place appearance until you see it again. Portal flow does not itself grant illumination or extra sight. This is an appearance correction; travel, searching, rewards and existing confirmations keep their rules.
+
 > **12 September — decided intended addition, not yet delivered:** Rare Essence nodes add a second acquisition form of ordinary Raw Essence. The written Essence word promises one reachable node with a distinct anchored appearance; it is deliberately gathered by hand and later remains worked out. Loose pickups, Spring refining, ordinary continuation income and the prohibition on site Essence rewards stay intact. This specifically supersedes older blanket statements forbidding a second Essence source. The unmodified word gives one node; Aimee has approved Count1/2/3/4/5 with equal per-node yield and no repetition stacking. The detailed first-pass plan is recorded in the current Design decisions and World Writing references.
 
 **Status:** current structural rules plus six implementation-ready content profiles. Conditions,
