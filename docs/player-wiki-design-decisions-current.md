@@ -1,8 +1,8 @@
 # Design decisions · 4 September 2026
 
-## Movement feedback — installed in385
+## Movement response — installed in386
 
-Build385 removes the misleading pending/completion movement ripple. Ordinary and slow moves keep their existing world-turn costs and saving rules. The current movement system has no separate stationary slow-terrain phase, so it does not yet show a truthful slow-crossing ripple. Installation and ordinary launch are verified. Movement delay remains unresolved; this update is not an instant-response fix.
+Build386 gives earlier visible character movement for eligible safe steps to an already visible neighbouring tile. It does not reveal hidden details early. Discoveries, world changes and the next action still wait for the saved result; a failed save restores the character’s saved position. Steps involving encounters or other events can still take longer, and accepting the next move still waits for completion. This is a partial responsiveness improvement, not instant movement everywhere. Installation and ordinary launch are verified; internal timing measurements are not a physical-phone latency guarantee. The misleading pending/completion ripple remains removed. Terrain and action costs keep their existing rules. A truthful stationary slow-terrain cue remains unfinished because movement has no separate exposed slow phase.
 
 ## Apex warning and readable depth — intended corrections
 
@@ -72,7 +72,7 @@ Learn the Essence Focus through a recovered lesson, then connect it to Substrate
 
 **Current behavior — installed in382:** Build382 restores matching static textures for already-known ground in older explored areas without appearance records, and for permitted partially visible terrain. Remembered plants retain their saved colours instead of appearing grey. Build382 introduced a broad pending-movement ripple, removed in385; currently visible, nondepleted collectibles have a restrained local glint. A modest neutral edge improves current creature contrast while retaining each source colour. Existing saved-action gathering feedback still follows your Mining and gathering results preference.
 
-**Current movement response:** Build385 removes the misleading pending/completion movement ripple. Ordinary and slow moves keep their existing world-turn costs and saving rules. The current movement system has no separate stationary slow-terrain phase, so it does not yet show a truthful slow-crossing ripple. Installation and ordinary launch are verified. Movement delay remains unresolved; this update is not an instant-response fix.
+**Current movement response:** Build386 gives earlier visible character movement for eligible safe steps to an already visible neighbouring tile. It does not reveal hidden details early. Discoveries, world changes and the next action still wait for the saved result; a failed save restores the character’s saved position. Steps involving encounters or other events can still take longer, and accepting the next move still waits for completion. This is a partial responsiveness improvement, not instant movement everywhere. Installation and ordinary launch are verified; internal timing measurements are not a physical-phone latency guarantee. The misleading pending/completion ripple remains removed. Terrain and action costs keep their existing rules. A truthful stationary slow-terrain cue remains unfinished because movement has no separate exposed slow phase.
 
 **Decided intended correction:** The ripple appears only while your character remains still during an actual slow-terrain crossing, and points toward the tile that takes extra time. Ordinary moves have no pending or completion ripple. The ripple disappears as soon as movement happens, the attempt is cancelled or refused, or the slow-terrain wait ends. Movement never waits for the animation to finish. Terrain still costs its ordinary world turns, and saving still follows the normal action rules.
 
