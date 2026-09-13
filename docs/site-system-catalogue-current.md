@@ -1,10 +1,14 @@
 # Sites and catalogue expansion — current design
 
-## Portals and camp — installed; other site artwork — intended
+## Portals, camp and Workshop — installed; remaining site artwork — intended
 
-**Current behavior:** Build390 delivers authored stone portals with flowing blue Essence magic and a recognizable Wayfarer’s Camp. Its chest changes from closed to open after a committed search, while the shelter, bedroll and cold hearth remain. Both portal identities keep their actual Return home behavior. Other site families still use unfinished markers. Installation and ordinary phone launch are verified; physical-phone appearance and interactive usability have not been inspected.
+**Current behavior:** Build390 delivers authored stone portals with flowing blue Essence magic and a recognizable Wayfarer’s Camp. Its chest changes from closed to open after a committed search, while the shelter, bedroll and cold hearth remain. Both portal identities keep their actual Return home behavior. Beyond the camp and Workshop, site families still use unfinished markers. Installation and ordinary launch were verified for these earlier portal and camp additions; build401 has the separate launch limitation below.
 
-**Decided intended behavior:** The remaining writing rooms, icy vaults, exhausted housings, caverns, geyser basins, warrens, Tears and Atlas Seams will receive recognizable artwork of their own. Searching changes a place to searched or emptied where appropriate without erasing its identity or inventing physical changes. Spent Emanation Housing is already exhausted before search, and Atlas Seam keeps its separate anchoring purpose.
+**Current Workshop artwork — installed in401:** Build401 adds the recognizable Binder’s Workshop: a stone writing room with a walnut bench, paper and brass details. The central standing space stays clear, and a completed search changes its drawer while the room remains. Internal checks and art review covered unsearched, searched, occupied and remembered appearances. Installation is verified; ordinary launch, physical-phone appearance and interactive usability remain unverified for this build. Search effort, rewards, movement and saved-world generation keep their existing rules.
+
+**Decided intended behavior:** The remaining icy vaults, exhausted housings, caverns, geyser basins, warrens, Tears and Atlas Seams will receive recognizable artwork of their own. Searching changes a place to searched or emptied where appropriate without erasing its identity or inventing physical changes. Spent Emanation Housing is already exhausted before search, and Atlas Seam keeps its separate anchoring purpose.
+
+**Decided intended Vault behavior:** The Glacial Vault’s ice is a physical enclosure: its body blocks sight and Torch light even where the artwork looks partly translucent. Real openings can let sight and light through. This does not add melting, refraction or a new movement rule; its authored presentation is still intended, not delivered.
 
 Delivered portals and the camp keep frozen last-observed appearances with still materials in memory; hidden changes do not refresh them, and unknown objects stay hidden. Older memory without the recorded identity keeps its generic marker until the place is seen again. The current dimming can make remembered details nearly black, so detailed memory readability is not yet established. Portal flow grants no extra light or sight. Travel, searching, rewards and existing confirmations keep their rules.
 
