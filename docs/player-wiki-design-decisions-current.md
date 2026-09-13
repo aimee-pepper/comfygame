@@ -12,7 +12,7 @@ Remembered portals and sites will retain their last-observed appearance, dim and
 
 Build387 makes the interaction button name the action it will perform: Return home, Search site, Collect page, Open cache, Use Atlas Seam, Place Anchor Frame, Survey, Choose tools, or the relevant gathering action. Both existing routes that return you home say Return home. A selected tool no longer appears beneath unrelated actions; a gathering tool is named only when that action uses it. Action costs, availability, refusal explanations and existing confirmations keep their rules.
 
-Build387 changed interaction labels only; its installation and ordinary launch were verified. Build388 adds the bounded camera-follow and Apex presentation corrections described here. Moving both information panes together, portal and site artwork, the reported grey appearance of plants and creatures, and moving lights remain unfinished.
+Build387 changed interaction labels only; its installation and ordinary launch were verified. Build388 adds the bounded camera-follow and Apex presentation corrections described here. Build389 adds the shared information-pane placement. Portal and site artwork, the reported grey appearance of plants and creatures, and moving lights remain unfinished.
 
 ## Movement response — installed in388
 
@@ -30,11 +30,11 @@ Terrain sides must remain visibly distinct from their tops so elevation is reada
 
 **Accepted next step:** compare the same artwork on iPhone to establish a better match between authored materials and the game. The target also includes surrounding textures responding convincingly to light and, later, a pixel-style world image with crisp interface text. The comparison must preserve the camera, visibility rules, gameplay and saved progress. It creates no new player trial. A change to the game’s rendering system has not been decided. Making the current game playable comes first, including movement, interface, terrain and lighting; the comparison is deferred until after that work. Artwork improvements continue.
 
-## Information panes move together — decided intended
+## Information panes move together — installed in389
 
-**Current behavior:** notifications switch edges while At this place remains fixed.
+**Current behavior:** Build389 makes notifications and At this place switch between top and bottom together, using the existing two-tile opposite-edge rule. Movement controls, minimap, Use Tile, Look, carried items and Field Kit stay fixed at the bottom. The map keeps its size, scale and position. Open pane details, the current location, exact Read now links and notification expiry stay intact during the switch. If neither edge is suitable, both panes stay at their existing shared edge rather than jumping back and forth.
 
-Notifications and At this place will switch between top and bottom together, using the existing two-tile opposite-edge rule. Movement controls, minimap, Use Tile, Look, carried items and Field Kit stay fixed at the bottom. The map keeps its size, scale and position. Open pane details, the current location, exact Read now links and notification expiry stay intact during the switch. If neither edge is suitable, both panes stay at their existing shared edge rather than jumping back and forth. This correction is accepted and not yet delivered. It replaces the earlier fixed-context rule; it does not move the whole bottom interface.
+Details open inward, and notification arrival or expiry alone does not move At this place. Internal checks cover both edges, exact page links, expansion, notification lifetime and safe touch handling. Installation is verified. The phone was locked during the launch attempt, so usable launch and physical appearance remain unverified; no action from you is needed to continue development.
 
 Updated 12 September 2026. This reference keeps the accepted decisions and subsequent deliveries together. **Decided intended behavior** describes the game we are making; it does not mean that behavior is already available on your phone. **First-pass tuning** gives concrete starting numbers that can change through play. **Unsettled proposals** still need design work or a choice.
 
@@ -216,7 +216,7 @@ Installation and ordinary app launch are verified. The focused internal checks d
 
 The intermittent **Securing action** hang remains unreproduced and has not been confirmed fixed. Long bare upper stems and weak needle/frond distinction remain appearance limitations. The waterfall's contact and sampled downward movement passed a bounded review; real-time smoothness, flicker and natural occurrence remain unverified. Older delivery notes below describe their own checkpoints; their earlier launch restrictions are not a current production blocker.
 
-## Earlier notification-only placement — installed in362, further correction intended
+## Earlier notification-only placement — superseded by389
 
 Only the notification pane switches edges as your character approaches. At this place, movement controls, minimap, Use Tile, Look, satchel and Field Kit stay fixed in their original bottom layout. Notification movement does not resize or reframe the map. Exact Diary page links and notice expiry remain intact. This corrects the unintended whole-navigation movement in359–361. Internal layout and input checks passed; no further decision is waiting on you.
 
@@ -660,7 +660,7 @@ This demonstrates only the ordinary actions actually tried in3D. It does not est
 
 ## Field and terrain feedback · 5 September
 
-**Current placement from362, awaiting the newer shared-pane correction above:** only notifications move. At this place and its details stay fixed, as do all navigation and carried-item controls in their original bottom layout. The map keeps its size and tile scale during notification switches. Exact Read now identity, normal expiry and safe touches remain. If both edges are too close, the notification stays put. This replaces the unintended whole-navigation movement in359–361.
+**Current placement in389:** notifications and At this place move together, with details opening inward. Navigation and carried-item controls keep their original bottom layout. The map keeps its size and tile scale during notification switches. Exact Read now identity, normal expiry and safe touches remain. If both edges are too close, the notification stays put. This replaces the unintended whole-navigation movement in359–361.
 
 **Forecast wording — installed in357:** the approximate collapse countdown says **About 588 turns left**, for example, instead of using a tilde that can look like a minus sign. The estimate and collapse rules are unchanged.
 
