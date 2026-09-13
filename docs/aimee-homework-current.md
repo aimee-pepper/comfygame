@@ -1,5 +1,11 @@
 # Aimee Homework
 
+## Raised ground at the map edge
+
+**Current limitation:** Raised tiles near the bottom of the map have been reported missing their side faces. The cause is being checked; a correction is not yet verified.
+
+**Decided intended behavior:** At the physical edge of the world, raised solid ground should show its own side down to the normal zero-elevation level. Ground at elevation1 shows a one-level side; this does not create ground outside the world. Chasms keep their separate descent into darkness. The edge of the screen must not make an otherwise visible face disappear. This must preserve the actual terrain height, material and view, without revealing unknown neighbouring ground or adding a walkable floor. Moving lighting remains a significant priority.
+
 ## World objects and sight — correction installed in391
 
 **Current correction — installed in391:** Build391 keeps sites and portals visible when you stand on them. Portal stone stays fully opaque; only the flowing blue magic is translucent. Entering a camp does not search or loot it. Fringe and remembered terrain are discernible again under the existing sight rules; unknown areas stay black and memories retain their last-observed state. Internal checks and art review support these corrections. Installation and ordinary iPhone launch succeeded; physical-phone appearance and interactive usability have not been inspected. Remembered camp and portal silhouettes remain very dark, and fine details and every plant or material appearance are not yet verified.
